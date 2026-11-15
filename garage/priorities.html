@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101710">
+  <title>Project priorities — Vehicle collection</title>
+  <meta name="description" content="Track vehicle modeling, source checks and related projects. Each vehicle links to a part study and the evidence behind it.">
+  <link rel="stylesheet" href="../shared/play.css">
+  <link rel="stylesheet" href="./priority-board.css">
+  <script type="module" src="./priority-board.js"></script>
+  <script type="module" data-narration="garage" src="../shared/narration.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#requests">Skip to requests</a>
+  <header>
+    <a class="brand" href="https://brandon-huang-studio.brainyalbatross8.chatgpt.site/"><b>B.</b>BRANDON FRANK HAN-CHWEEN HUANG</a>
+    <a class="back" href="./index.html#workbench">← Vehicle collection</a>
+  </header>
+  <main>
+    <section class="board-intro" aria-labelledby="board-title">
+      <p class="kicker">THE GARAGE</p>
+      <h1 id="board-title">Project priorities</h1>
+      <p class="intro">Track fixes and source checks across the collection. Change any item’s priority or status. Your edits are saved in this browser.</p>
+      <nav class="section-jump" aria-label="Board sections"><a href="#g500-geometry">G500 parts and drawings ↓</a><a href="#reviews">Detail and QA review ↓</a><a href="#requests">Requested changes ↓</a><a href="#vehicles">Vehicle register ↓</a></nav>
+    </section>
+    <form id="board-filter" role="search">
+      <div class="filter-fields">
+        <label for="priority-query">Search<input id="priority-query" name="q" type="search" placeholder="Search requests or vehicles"></label>
+        <label for="vehicle-filter">Vehicle<select id="vehicle-filter" name="vehicle"><option value="all">All vehicles</option></select></label>
+        <label for="priority-level">Priority<select id="priority-level" name="priority"><option value="all">All priorities</option></select></label>
+        <label for="priority-status">Status<select id="priority-status" name="status"><option value="all">All statuses</option></select></label>
+        <label for="environment-filter">Environment<select id="environment-filter"><option value="all">All environments</option></select></label>
+        <label for="type-filter">Vehicle type<select id="type-filter"><option value="all">All types</option></select></label>
+      </div>
+      <div class="filter-actions">
+        <details id="visibility"><summary>Hide categories<span id="hidden-count"></span></summary><div id="category-toggles"></div></details>
+        <button id="clear-filter" type="button" hidden>Clear filters</button>
+        <output id="board-count" aria-live="polite" aria-atomic="true"></output>
+      </div>
+    </form>
+    <p id="edit-message" role="status" hidden></p>
+    <noscript><p>Enable JavaScript to filter the board and open the vehicle register. The <a href="./index.html#workbench">vehicle collection</a> uses the same part studies.</p></noscript>
+    <div id="empty-message" hidden><p>No requests or vehicles match these filters.</p><button type="button" id="empty-clear">Show everything</button></div>
+    <section class="directory" id="g500-geometry" aria-labelledby="geometry-title">
+      <h2 id="geometry-title">G500 parts and drawings</h2>
+      <p class="section-note" id="geometry-summary"></p>
+      <div class="geometry-tools">
+        <label>System<select id="geometry-group"><option value="all">All systems</option></select></label>
+        <label>Source basis<select id="geometry-basis"><option value="all">All sources</option></select></label>
+      </div>
+      <ol id="geometry-rows" class="review-tasks"></ol>
+      <div class="geometry-paging"><button type="button" id="geometry-prev">Previous</button><output id="geometry-count" aria-live="polite"></output><button type="button" id="geometry-next">Next</button></div>
+    </section>
+    <section class="directory" id="reviews" aria-labelledby="reviews-heading">
+      <h2 id="reviews-heading">Detail and QA review</h2>
+      <div id="detail-benchmark"></div>
+      <p class="section-note">Set a priority and status for each task. The G500 is the reference for the collection. The BMW has a partial review.</p>
+      <div id="review-sections" class="review-list"></div>
+    </section>
+    <section class="directory" id="requests" aria-labelledby="requests-heading">
+      <h2 id="requests-heading">Requested changes</h2>
+      <p class="section-note">P0 is the highest priority. Select a priority or status on any row to change it.</p>
+      <div id="request-sections"></div>
+    </section>
+    <section class="directory" id="vehicles" aria-labelledby="vehicles-heading">
+      <h2 id="vehicles-heading">Vehicle register</h2>
+      <p class="section-note">Each entry pairs a working part study with a source and the next detail to check. A dimensioned drawing can establish proportions. A parts plate can show how pieces fit together. Many hidden surfaces are still approximations.</p>
+      <nav class="section-jump" id="domain-links" aria-label="Vehicle environments"></nav>
+      <div id="vehicle-sections"></div>
+    </section>
+  </main>
+  <footer><a href="./index.html#workbench">← Vehicle collection</a><a href="#board-title">Back to top ↑</a></footer>
+</body>
+</html>

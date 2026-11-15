@@ -1,0 +1,37 @@
+import {seatAdjusterPlate,seatTrackPlate,seatTrimPlate} from './g500-seat-adjuster.js';
+import {windowPlate} from './g500-window-lifter.js';
+
+const source=(label,url)=>({label,url});
+const filter=source('MANN-FILTER CUK 2545 · product drawing, application and OE number','https://www.mann-filter.com/us-en/catalog/search-results/product.html/cuk2545_mann-filter.html');
+const evap=source('NRF 36122 · replacement specifications and OE cross-reference','https://webshop.nrf.eu/automotive/air-conditioning-products/mercedes-benz-18561.html');
+const heater=source('NRF 54274 · replacement specifications and OE cross-reference','https://www.napaautoparts.co.uk/nrf-54274-heater-matrix');
+const heaterPlate=source('2002 G500 · heater and evaporator components 13 and 14','https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/a-c-heating/heater-core-control-valve');
+const frontSeatManual=source('2002 G-Class operator’s manual · front seat heating','https://www.manualsdir.com/manuals/118401/mercedes-benz-2002-g-class-2002-g-500-g-class-2002-owners-manual.html?page=55');
+const scope=(ids,kind,fact,need,source)=>({ids,kind,fact,need,source});
+const seat=id=>'g500-front-seat.'+id;
+const doors=['front-left','front-right','rear-left','rear-right'];
+export default [
+ scope(['hvac.filter'],'dimensioned','MANN CUK 2545 cross-references A 463 830 00 18 for the US 2002 G500. Its 246 × 216 × 32 mm outside envelope matches the drawing. MANN’s installation photos show the element standing on edge in the cowl intake.','Measure the intake housing, seal interfaces, exact installation angle and offsets from the bulkhead.',filter),
+ scope(['g500-pollen-filter.media','g500-pollen-filter.sides','g500-pollen-filter.ends'],'diagram','MANN’s product photograph and dimensioned sketch show parallel folds along the long side and straight edge bands.','Measure pleat pitch, media thickness and the widths of the bonded strips.',filter),
+ scope(['hvac.evaporator','g500-evaporator-matrix.tubes'],'dimensioned','The NRF 36122 replacement cross-references A 209 830 03 58, callout 13 on the 2002 G500 plate. Its core measures 308 mm across, 200 mm high and 65 mm deep.','Measure header shape, port centers, tube rows, fin pitch and case mounting datums.',evap),
+ scope(['hvac.heater-core','cooling.heater-core','g500-heater-matrix.tubes'],'dimensioned','The NRF 54274 replacement cross-references A 203 830 01 61, callout 14 on the 2002 G500 plate. The finned core measures 234 × 175 × 32 mm.','Measure the headers, firewall tube bends, seal lands, brackets and coolant-hose interfaces.',heater),
+ scope(['hvac.case','hvac.blower','hvac.flaps','hvac.expansion-valve','hvac.footwell'],'diagram','The 2002 parts plate identifies the common housing, blower, left and right actuators, individual lower ducts and expansion valve.','Obtain case and duct sections, actuator geometry, flap pivots and blower wheel and scroll dimensions.',heaterPlate),
+ scope(['body.front-seats',...['tracks','trim','travel','height','recline'].map(seat)],'diagram','The service illustration shows the open adjuster beneath the cushion, paired tracks, separate drives and outboard recliner trim. The drive list distinguishes travel, height and backrest motors.','Measure rail center spacing and section, adjustment travel, transmission cases, motor mounts and the trim surfaces for both hands.',seatTrackPlate),
+ scope(['frame'].map(seat),'diagram','Mercedes distinguishes the handed adjuster, cushion suspension and seat-shell kit.','Measure the suspension wire pattern and the stampings, joining flanges and attachment points.',seatAdjusterPlate),
+ scope(['anchor'].map(seat),'dimensioned','Mercedes specifies a nominal M10 × 1, class 10.9 screw at the seat-frame anchor. The modeled shank has a 10 mm diameter.','Verify the length, drive recess, head geometry and the inner angle bracket against an original.',seatAdjusterPlate),
+ scope(['back-frame','cushion','back','headrest','lumbar','pump'].map(seat),'diagram','The 2002 front-seat plate distinguishes handed back frames, cushion and back pads, a two-post head restraint, the center and outer lumbar supports, the pump and its bracket.','Obtain the foam and trim surfaces, frame sections, pivot centers, post spacing, bladder profiles, distributor hoses and pump mount dimensions.',seatTrimPlate),
+ scope(['seat-heating.front-left-cushion','seat-heating.front-right-cushion','seat-heating.front-left-back','seat-heating.front-right-back',seat('heat-cushion'),seat('heat-back')],'diagram','The manual confirms two-stage front seat heating. The cutaways distinguish the cushion and inclined backrest. The visible conductor and carrier illustrate how a resistance mat works.','Identify the VIN-matched heater mats and obtain their outlines, lead exits, electrical construction and stitch attachments.',frontSeatManual),
+ scope(doors.flatMap(side=>['door-g500-'+side+'.regulator',...['track','sheath','motor','carriage','glass'].map(key=>'g500-window-'+side+'.'+key)]),'diagram','The 2002 catalog distinguishes front and rear handed assemblies. The guide curves beneath the carrier and turns toward the offset motor. The front replacement photo and rear service illustration confirm the curved guide.','Measure each bent guide centerline, mount spacing, glass shoe position, electrical plug and operating travel.',windowPlate)
+];
+
+export const gaps=[
+ {title:'Passenger occupancy sensor mat and restraint connections',need:'Distinguish A 463 820 08 10, the passenger recognition switch, from the heater. Source the correct pad stack, mat outline, seat harness and module mount for the vehicle.',source:source('Genuine A 463 820 08 10 · passenger discriminating sensor','https://www.mbpartsgiant.com/genuine/mercedes-benz~passenger-discriminating-sensor~4638200810')},
+ {title:'Front seat tilt drive, Hall sensor and harness guides',need:'Identify handed inclination kits, the adjustment sensor, guides and stops against the VIN. Measure links, travel and drive interfaces.',source:seatAdjusterPlate},
+ {title:'Seat foam, trim and individual fasteners',need:'Obtain bolster sections, cushion cover patterns, underside attachment channels, spring-wire measurements and head-restraint guide geometry.',source:seatTrimPlate},
+ {title:'Rear bench underframe, release and hinges',need:'Verify split-seat latches, pivots, links, restraint attachment brackets, foam sections and rear heater shapes from a measured donor.'},
+ {title:'Door latch, hinges and handles',need:'Measure latch and striker housings, release links, check strap, fastener spacing and handed hinge leaves. The existing kinematic study illustrates the operating principle.'},
+ {title:'Interior trim, floor coverings and seals',need:'Capture door and cargo panel backside clips, carpet patterns and pile, sill channels, dash carrier, console and plenum interfaces from the same LWB interior.'},
+ {title:'HVAC case internals and air routing',need:'Obtain matched blower dimensions, case sections, recirculation and distribution flap profiles, drain, seals, full duct centerlines and mounting brackets.',source:heaterPlate},
+ {title:'Seat heater mat construction and wiring',need:'Obtain genuine front/rear cushion and backrest outlines, backing, terminal positions, resistance pattern and seat-harness routing.'},
+ {title:'Cabin controls and ventilation fittings',need:'Verify the sun visors, glove box, switch carriers, dash crossmember and vent outlet mounting profiles.'}
+];

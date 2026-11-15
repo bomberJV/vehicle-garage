@@ -1,0 +1,9 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {acceleration,circularSpeed,advanceTracer,weightGiB,overlap,rollDie} from '../shared/core.js';
+test('weight estimates use binary GiB, including quantization changes',()=>{assert.ok(Math.abs(weightGiB(8,4)-3.725290298)<1e-8);assert.equal(weightGiB(8,16)/weightGiB(8,4),4);assert.ok(weightGiB(70,16)>80);});
+test('circular speeds balance the inward force for all three presets',()=>{for(const p of [{mass:1,scale:1,halo:1},{mass:1,scale:1,halo:0},{mass:2,scale:.3,halo:.45}])for(const r of [.5,1,5,12])assert.ok(Math.abs(circularSpeed(r,p)**2/r+acceleration(r,0,0,p)[0])<1e-10);});
+test('leapfrog preserves a circular orbit over many steps',()=>{const params={mass:1,scale:1,halo:1},r=5,p={x:r,y:0,z:0,vx:0,vy:0,vz:circularSpeed(r,params)};for(let i=0;i<5000;i++)advanceTracer(p,.01,params);assert.ok(Math.abs(Math.hypot(p.x,p.z)-r)<.001);assert.ok(Math.abs(p.x*p.vz-p.z*p.vx-r*circularSpeed(r,params))<1e-9);});
+test('removing halo weakens the force without changing a tracer velocity',()=>{const halo={mass:1,scale:1,halo:1},bare={...halo,halo:0};assert.ok(Math.abs(acceleration(10,0,0,halo)[0])>Math.abs(acceleration(10,0,0,bare)[0]));assert.ok(circularSpeed(10,bare)<circularSpeed(5,bare));assert.ok(acceleration(0,0,0,halo).every(Number.isFinite));});
+test('tower cuts preserve overlap and reject missed placements',()=>{assert.deepEqual(overlap(0,0,4,4),{size:4,center:0});assert.deepEqual(overlap(2,0,4,4),{size:2,center:1});assert.equal(overlap(5,0,4,4).size,0);assert.equal(overlap(4,0,4,4).size,0);});
+test('dice reject modulo-bias tail and include both endpoints',()=>{let values=[4294967295,0,19];const rng={getRandomValues:a=>{a[0]=values.shift();return a;}};assert.equal(rollDie(20,rng),1);assert.equal(rollDie(20,rng),20);});

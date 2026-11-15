@@ -1,0 +1,53 @@
+# Engine-bay component references
+
+Research checked November 13, 2026. The data and original geometry are an explanatory assembly study. They do not constitute measured factory CAD, a removal order, a connector pinout, validated hose routing, or a part-fitment decision.
+
+## How to read the hierarchy
+
+`engine-data.js` defines nine functional systems per selected engine. Their leaf components have unique renderer tags, parent IDs, quantities where supported, approximate location descriptions, and typed connection edges (mechanical, air, fuel, oil, coolant or electrical). An edge means the broad connection described in the component notes; it does not imply the objects bolt directly together without intervening hardware. The brake reservoir is deliberately disconnected from the engine circuits.
+
+Generic descriptions of functions such as piston/rod/crank motion and separate oil/coolant circuits are original engineering explanations. The sources below establish model architecture, component names and relationships. Their diagrams are linked, not copied into the app.
+
+## Mercedes-Benz G500, M113 5.0L
+
+- Mercedes-Benz service document **GF01.00-P-9611F**, Engine113.962 in model463, reproduced at [LEMON Manuals](https://lemon-manuals.la/Mercedes%20Benz/2004/G%20500%20%28463.249%29%20V8-5.0L%20%28113.962%29/Repair%20and%20Diagnosis/Engine%2C%20Cooling%20and%20Exhaust/Engine/Service%20and%20Repair/Procedures/GF01.00-P-9611F%20General%20Information%20on%20Complete%20Engine/). Search-index text was available; direct open returned a redirect loop during this pass. It identifies90°V8, one camshaft per bank, three valves, twin ignition, and variable intake. This is an engine-family description from a later service-document revision, not a2002 bay-coordinate drawing.
+- [Mercedes-Benz Classic2002G500 engine parts](https://classicparts.mbusa.com/v-2002-mercedes-benz-g500--base--5-0l-v8-gas/engine--engine-parts). Opened official catalog categories covering engine parts, belts/cooling, ignition, and related components. Catalog variants require VIN verification.
+- Schaeffler/INA **SERVICE INFO INA0039**, issued08/2009, [OEM-supplier PDF](https://vehiclelifetimesolutions.schaeffler.fi/medias/INA-0039-en.PDF?context=bWFzdGVyfGRvY3VtZW50c3wyMjU0Mzh8YXBwbGljYXRpb24vcGRmfGRvY3VtZW50cy9oZGEvaDUxLzkzMDUyMzgyNzQwNzgucGRmfGQxNmFkOGJkYTc0YjcyNDkzZDM5YWRmZDE2NWNjOTBmZjFiZjI5YzY5Yjg0ZWFmZjc2MGJmMjRiZjAyYzYxMTc). Opened primary supplier document lists separate intake1, intake2 and exhaust rocker designs for M112/M113; the drawing does not use a forked single rocker for both intake valves.
+
+- The [2002G-Class operator manual](https://cdn.dealereprocess.org/cdn/servicemanuals/mercedesbenz/2002-gclass.pdf#page=322), printed p319, locates the physical battery in front of the rear seat below the cup holder and the jump terminals on the left of the engine bay. The selectable bay object is that remote power interface, not an under-hood battery box. Search-index text was verified in the [manufacturer-document mirror](https://www.carmanualsonline.info/mercedes-benz-g500-2002-w463-owner-s-manual/33).
+
+## 2003 BMW 325Ci coupe, M54B25
+
+- BMW **M54 Engine / Siemens MS43.0 Technical Training**, original June2000 revision, [48-page reprint](https://bmwtuning.co/wp-content/uploads/2023/08/BMW-M54-Training-Doc.pdf). Opened manufacturer-origin PDF. Used for engine-management, electronic throttle, VANOS and resonance-manifold architecture. The training introduction and numerical tables emphasize the3.0L version; no3.0L bore, stroke or power data are transplanted into the2.5L coupe.
+- [BMW-origin E46 325Ci engine diagrams, 2001 M54 family reference, RealOEM mirror](https://www.realoem.com/bmw/enUS/partgrp?id=bn33-usa-02-2001-E46-BMW-325Ci&mg=11). Opened diagrams index covering block, head, chain drive, crank/rods/pistons, oil pump/filter, cooling and intake. The production month is a reference vehicle, not a decoded user VIN.
+- [2003 325Ci M54 coupe VANOS diagram, OEM catalog mirror](https://www.bmwpartsdeal.com/parts-list/2003-bmw-325ci-coupe_m54_engine_e46/engine/cylinder_head_vanos.html). Opened and checked the double-VANOS adjuster and related categories.
+- The physical battery is not shown as an engine-bay battery box on the E46. Its selectable object is explicitly the remote power/jump-start interface; the vehicle battery is in the luggage compartment.
+
+## Mercedes-Benz2014C63AMG, M156
+
+- Mercedes-Benz Service, **Introduction of SL-Class Model Refinement and Launch of New SL63AMG**,02/2008, [manufacturer-origin service-manual reprint](https://benzbits.com/r230/MY2009Revisions.pdf#page=55), pp54–60. Opened PDF. Supports M156 engine-family architecture, four-valve cam-adjustment system, and the distinction between control signals, fuel supply and cooling. The source's R230-specific brackets, twin-throttle arrangement and output figures are not claimed to describe the W204C63 bay.
+- [Official2014C63AMG catalog](https://mbparts.mbusa.com/v-2014-mercedes-benz-c63-amg--base--6-3l-v8-gas), reached from the official model-year selector and opened. Used as the vehicle-specific diagram entry point. Its marketed6.3 designation is not used as the engine's physical displacement: the engine is labeled6.2L.
+- [Mercedes-Benz XENTRY bulletin, NHTSA mirror](https://static.nhtsa.gov/odi/tsbs/2018/MC-10135445-9999.pdf), supports the presence of cylinder-bank camshafts/tappets. No fault likelihood or diagnosis is inferred in the app.
+
+## Honda2026US HR-V2.0L
+
+- [Honda2026HR-V specifications, July30,2025](https://hondanews.com/en-US/releases/release-6f8b202ddb1c7f26ecd92774bb014b0c-2026-honda-hr-v-specifications-and-features). Opened primary release. Establishes1996cc inline-four, DOHC i-VTEC, **multi-point port injection**, CVT and US-market architecture. No direct-injection high-pressure pump is invented.
+- [Honda2026HR-V engine technology](https://www.hondainfocenter.com/2026/HR-V/Feature-Guide/Engine-Chassis-Features/Powerful-Fuel-Efficient-2-0-liter-Engine/). Opened primary manufacturer explanation of intake/exhaust VTC working alongside i-VTEC. The data explains these as different mechanisms.
+- [2026HR-V air-cleaner diagram, OEM catalog mirror](https://www.hondapartsnow.com/parts-list/2026-honda-hr_v--5_door_sport_awd-cvt/electrical_exhaust_heater_fuel/air_cleaner.html), opened. Lists the air-flow meter, filter housing/element, duct and resonator components. AWD is only the reference diagram variant; the illustration does not choose the user's drive configuration.
+- A generic yearless Honda product URL redirected to2027 during research and was not used for2026-specific claims. The precise K20 subvariant code is not asserted without a matching engine/VIN reference.
+
+## Ford1993F-350
+
+The engine is unresolved. [LMC's Ford catalog](https://media.lmctruck.com/pdf/FD/fdComplete.pdf) is a configuration reference. The engine explorer exposes only an explicit configuration marker, with no guessed fuel system, cylinder layout, induction system or internal component inventory. Choosing the actual engine is necessary before building a comparable detailed engine study.
+
+## Limits
+
+The connection graph is functional and educational. It omits many brackets, individual fasteners, wiring branches, emissions equipment, passages and model-option differences. A line between components is not a physical hose-routing specification. Component quantities represent repeated instances where appropriate; grouped rings, bearings and valve mechanisms are not a complete service bill of materials.
+
+### The 2002 U.S. G500 intake, cooling and heater circuits
+
+The original 5.0-litre engine-compartment photograph and 2002 air-intake plate establish the paired inlet ducts and filters, single clean-air outlet, meter and throttle assembly. The short- and long-runner cutaway follows the M112/M113 manifold section in WIS GF09.20-P-3102-02A. It depicts one cylinder’s passage at bench scale. The installed drawing uses eight runners in the engine valley. [2002 G500 intake plate](https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/air-fuel-delivery/air-intake) · [2002 G500 photograph](https://cdn.rmsothebys.com/c/7/9/b/7/3/c79b7359c5a3a4254fff352a54accb606f862a23.webp) · [WIS manifold section](https://www.carmanualsonline.info/amp/mercedes-benz-ml500-1997-complete-repair-manual/116)
+
+The radiator and water-pump plates identify the large radiator hoses, short bypass, belt pulley, pump gasket and thermostat. The separate fan plate places the clutch between fan and drive. A heater pump and return pipe appear in the U.S. catalogue. The firewall couplings join the tubes on the same heater matrix used by the HVAC view. Hose centerlines, hidden clips, impeller vanes and thermal-element travel are illustrative. The catalogue lists two engine pump castings with different oil-cooler fittings; the fittings require a vehicle-specific check. [Pump and thermostat](https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/belts-cooling/water-pump) · [Radiator](https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/belts-cooling/radiator-components) · [Fan and clutch](https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/belts-cooling/cooling-fan) · [Mercedes-Benz heater pump and return line](https://mbparts.mbusa.com/v-2002-mercedes-benz-g500--base--5-0l-v8-gas/cooling-auxiliary-heating--high-temperature-cooling-circuit)
+
+The G500 exhaust follows WIS GF49.00-P-2000GB and a photographed U.S. 2002 underbody. Each bank feeds two catalysts and its own front muffler outside the frame. The branches feed a common transverse main muffler forward of the rear axle; its outlet turns toward the left running board. Catalyst channel pitch is enlarged for visibility. The muffler internals, precise pipe bends and sensor angles were not available in the plate. [G500 WIS exhaust section](https://charm.li/Mercedes%20Benz/2002/G%20500%20%28463.249%29%20V8-5.0L%20%28113.962%29/Repair%20and%20Diagnosis/Engine%2C%20Cooling%20and%20Exhaust/Exhaust%20System/Description%20and%20Operation/) · [2002 G500 underside](https://bringatrailer.com/wp-content/uploads/2018/03/1520349820cf2af4d3f8707cDSC_0053.jpg)

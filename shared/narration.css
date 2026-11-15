@@ -1,0 +1,21 @@
+button.listen-button {
+  display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;
+  width:1.55rem;min-width:1.55rem;height:1.55rem;min-height:1.55rem;
+  padding:3px;margin:0 0 0 .3rem;border:0;border-radius:4px;
+  background:transparent;color:inherit;opacity:.68;box-shadow:none;cursor:pointer;
+  font:normal 12px/1 sans-serif;transform:none;letter-spacing:0;text-indent:0;
+}
+button.listen-button svg{position:static;display:block;inset:auto;max-width:none;width:15px;height:15px;transform:none;pointer-events:none}
+button.listen-button:focus-visible,button.listen-button:hover,button.listen-button[aria-pressed=true]{color:inherit;background:color-mix(in srgb,currentColor 13%,transparent);opacity:1;outline:1px solid currentColor}
+button.listen-button.listen-panel{align-self:start;flex:0 0 auto}
+.listen-card-frame{position:relative;min-width:0;display:grid}
+.listen-card-wide{grid-column:1/-1}
+.listen-card-frame>button.listen-card{position:absolute;right:.55rem;bottom:.55rem;margin:0;z-index:2;color:#e9eee5;background:#223028;opacity:.9}
+.listen-card-frame:has(.paper-row)>button.listen-card{color:#283526;background:#e0e7d4}
+.listen-card-frame:has(.paper-row){display:block}
+.listen-status:not(:empty){position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:90;max-width:80vw;padding:.7rem 1rem;border:1px solid #647258;background:#1a231d;color:#f0f3e9;border-radius:5px;font:14px/1.45 system-ui}
+@media(pointer:coarse){button.listen-button{min-width:28px;width:28px;min-height:28px;height:28px}}
+@media print{.listen-button,.listen-status{display:none!important}}
+.inspection-readout [data-listening],.studio-top [data-listening]{pointer-events:auto}
+
+.inspection-readout #hover-detail{color:#afbeb0;margin-top:3px;font-size:12px}

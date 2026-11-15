@@ -1,0 +1,147 @@
+import {drawPorscheCompartmentLid} from './porsche-cabin.js';
+import {paintChoice} from './paint-colors.js';
+import {m54InstalledPoint} from './bmw-m54-installation.js';
+import {drawM54FuelRail,drawM54Injectors,m54RailInlet} from './bmw-m54-fuel-rail.js';
+import {e46RotorSite,drawE46Rotor,drawE46Caliper,drawE46ParkingShoes} from './e46-running-gear.js';
+import {roadSystems} from './road-service-data.js';
+import {path,box,plus,wheelSites,disc,caliper,drum,tankBody,sender,electricMachine,battery,roofGlass,topBows,topFabric,backlight,metal,alloy,iron,rubber,copper,fuelGold} from './road-service-geometry.js';
+import {cyl,sleeve,turn} from './mechanism-shapes.js';
+import {getServiceStudy} from './road-service-studies.js';
+import {refineBmwFuelParts,drawBmwFuseCarrier} from './bmw-fuel-system.js';
+const X=[1,0,0],Y=[0,1,0],Z=[0,0,1];
+function component(id,name,description,offset,draw){return {id,name,description,offset,draw};}
+function brakeMasterSite(p){return p.bike?[-.49,.26,.90]:[p.engine[0]>0?-1.06:p.axles[0]+.62,-.36,.65];}
+export function drawRoadBrakeMaster(r,id){
+ const p=roadSystems[id],m=brakeMasterSite(p);
+ if(p.bike){
+   // The road RR's remote cylindrical fluid cup is carried inboard of
+   // the right clip-on, separate from the black radial master cylinder.
+   const body=[-.411,.231,.900],cup=[-.426,.192,.929];
+   cyl(r,body,Y,-.022,.022,.019,'#373c3e',12);
+   cyl(r,body,X,-.032,.018,.012,'#484b4d',12);
+   turn(r,cup,Z,[[0,.012],[.004,.016],[.029,.017],[.031,.016]],'#a49f87',{n:16});
+   cyl(r,cup,Z,.031,.039,.019,'#363a3c',16);
+   cyl(r,cup,Z,.039,.040,.015,'#4a4d4e',16);
+   path(r,[plus(cup,[0,0,.002]),[-.423,.204,.908],body],.004,'#373c3e');
+   path(r,[plus(cup,[.008,-.014,.009]),[-.418,.182,.914],[-.407,.212,.901]],.0027,'#777b7d');
+   cyl(r,[.15,.17,.39],Z,-.036,.036,.014,metal);
+   return;
+ }
+ cyl(r,m,X,.07,.125,.090,'#383d3c',16);
+ cyl(r,m,X,-.064,.071,.026,alloy);
+ box(r,plus(m,[.024,0,.043]),[.090,.057,.056],'#b6bda6');
+ cyl(r,plus(m,[.02,0,.068]),Z,0,.014,.022,rubber,12);
+}
+function brakes(id,p){
+ const e46=id==='bmw325ci';
+ const axleSites=rear=>e46?[-1,1].map(s=>e46RotorSite(rear,s)):wheelSites(p,rear);
+ const m=brakeMasterSite(p);
+ const mod=p.bike?[.14,0,.55]:[m[0]-.10,m[1]+.12,m[2]-.09];
+ const parts=[];
+ for(const rear of [false,true]){
+  const key=rear?'rear':'front',label=rear?'Rear':'Front',idx=rear?1:0,sites=axleSites(rear),R=p.radii[idx],n=p.calipers[idx];
+  if(rear&&p.park==='drum'){
+   parts.push(component('rear-drum','Rear brake drums','Each rear drum turns around a stationary backing plate. Open the drum to see its shoes, cylinder, adjuster and springs.',[.43,-.53,.18],r=>sites.forEach(c=>drum(r,c,R))));continue;
+  }
+  const rotorNote=e46
+   ? rear?'The 294 × 19 mm vented rear discs include a drum surface for the parking brake.':'The front discs measure 300 × 22 mm. A vent gap separates the two friction rings.'
+   : p.bike&&!rear?'A disc sits on each side of the front wheel.':rear&&p.rearSolid?'This axle uses solid rotors.':'The friction faces rotate through the caliper with the wheel.';
+  const caliperNote=n>1?`Opposed pistons press one pad against each face. This ${n}-piston arrangement is shown in section.`:n?'The piston acts on the inner pad. The caliper body travels on its guide pins to load the opposite pad.':'The axle and brake option determine the detailed casting and piston configuration.';
+  const atSites=(r,draw)=>{for(const c of sites){
+   const s=Math.sign(c[1]);
+   if(e46||id.startsWith('porsche'))r.instance(key+'-'+(s<0?'left':'right'),()=>draw(c,s));else draw(c,s);
+  }};
+  parts.push(component(key+'-disc',label+(p.bike&&rear?' disc':' discs'),rotorNote,[rear?.31:-.30,rear?.51:-.54,.04],
+   r=>atSites(r,(c,s)=>e46?drawE46Rotor(r,rear,s):disc(r,c,R,!p.bike&&!(rear&&p.rearSolid),p.drilled,p.bike))));
+  parts.push(component(key+'-caliper',label+(n>1?' fixed caliper':n?' floating caliper':' brake caliper'),caliperNote,[rear?.46:-.49,rear?-.33:.39,.28],
+   r=>atSites(r,(c,s)=>e46?drawE46Caliper(r,rear,s):caliper(r,c,R,n,p.bike,n>=4?(id==='porsche992scab'?'#a9473c':'#525e5f'):'#626e70'))));
+ }
+ parts.push(component('master',p.bike?'Front brake master cylinder':'Master cylinder & reservoir',p.bike?'The right-hand lever acts on the front circuit. The rear pedal has a separate master cylinder.':'A fluid reservoir sits on the tandem cylinder at the driver’s side of the vehicle.',[-.40,0,.40],r=>drawRoadBrakeMaster(r,id)),component('abs',p.park==='drum'?'Rear anti-lock circuit':'ABS hydraulic unit',p.park==='drum'?'The rear anti-lock system acts on the rear axle brake circuit. The diagram omits option-specific valve plumbing.':'The hydraulic block modulates brake pressure. An electric pump and valve passages share the module.',[.03,.44,.36],r=>{box(r,mod,[.099,.066,.075],metal);cyl(r,plus(mod,[.065,0,0]),X,-.038,.046,.033,rubber,16);for(let j=0;j<(p.bike?3:4);j++)cyl(r,plus(mod,[-.03+j*.020,0,.034]),Z,0,.019,.006,copper,8);}),
+ component('lines','Hard lines & flexible hoses','The fixed lines carry fluid along the chassis. A flexible section follows each moving wheel. Routes are schematic.',[.03,.14,-.40],r=>{
+  for(const rear of [false,true])for(const c of axleSites(rear)){
+   const side=Math.sign(c[1]),mid=[c[0]+(rear?-.13:.13),side*(p.bike?.042:.38),c[2]+.10];
+   path(r,[mod,[mod[0],side*(p.bike?.042:.38),mod[2]-.027],mid],p.bike?.003:.0045,'#897d64');path(r,[mid,[c[0]-.04,c[1]*.90,c[2]+.145],plus(c,[.10,0,.054])],p.bike?.004:.007,rubber);
+  }
+ }));
+ if(p.park==='epb')parts.push(component('parking','Rear electric parking-brake motors','A small motor on each rear caliper applies the parking brake through its reduction drive.',[.31,.52,-.23],r=>wheelSites(p,true).forEach(c=>{const q=plus(c,[.11,-Math.sign(c[1])*.033,.015]);cyl(r,q,Y,-.024,.022,.034,rubber,14);box(r,plus(q,[.027,0,.016]),[.029,.048,.062],iron);} )));
+ if(p.park==='shoes')parts.push(component('parking','Parking-brake shoes','A separate pair of small shoes bears on the internal drum surface of each rear disc hat.',[.37,.18,-.33],r=>axleSites(true).forEach(c=>{if(e46){drawE46ParkingShoes(r,Math.sign(c[1]));return;}for(const a of [.22,Math.PI+.22])turn(r,c,Y,[[-.012,.065],[-.012,.078],[.012,.078],[.012,.065]],'#6d635a',{start:a,sweep:2.68,n:18});})));
+ return parts;
+}
+function fuel(id,p){
+ const t=p.tank,b=p.bike,ford=p.tankShape==='midship',saddle=p.tankShape==='saddle',external=id==='porsche993cab';
+ const unit=plus(t,[0,saddle?.28:0,b?-.09:.065]);
+ const neck=external?[-.948,-.661,.747]:b?plus(t,[-.02,0,.119]):[t[0]+(p.engine[0]>0?-.22:.43),p.neckSide*(ford?.90:.74),t[2]+.37];
+ const end=id==='bmw325ci'?m54RailInlet:plus(p.engine,[0,0,.13]);
+ const parts=[component('tank',ford?'Midship tank · one configuration':saddle?'Saddle fuel tank':'Fuel tank',p.fuel,[0,0,-.38],r=>tankBody(r,t,p.tankShape)),
+  component('filler',b?'Filler cap & neck':'Filler neck',b?'The cap sits in the top of the tank ahead of the rider.':'The neck leads from the body-side filler opening to the tank.',[0,p.neckSide*.44,.27],r=>{const join=plus(t,[0,p.neckSide*(ford?.12:.23),.06]);if(!b)path(r,[neck,[neck[0]-.04,neck[1]*.86,neck[2]-.13],join],.025,rubber);cyl(r,neck,b?Z:Y,-.014,.016,b?.048:.037,iron,18);}),
+  component('sender',saddle?'Right-hand delivery flange & sender':'Fuel level sender',ford?'The float tracks the fuel level. The engine specification determines the pump and sender combination.':'A float arm pivots as the liquid level changes. The electrical sender reports that position.',[-.18,.07,.52],r=>sender(r,unit,b?.64:1)),
+  component('supply','Fuel supply line',ford?'The chassis line shown ends at the engine bay. A gasoline rail or diesel injection pump requires a specific engine selection.':'The supply line runs from the tank assembly toward the engine. Its bends and clips are schematic.',[.12,-.33,-.15],r=>{const y=b?.08:.27;path(r,[unit,[unit[0],y,unit[2]-.13],[end[0],y,b?.65:.33],end],b?.005:.009,'#736f5a');})];
+ if(saddle)parts.push(component('left-sender','Left tank sender','The second float measures the level across the center tunnel.',[-.29,-.41,.27],r=>sender(r,plus(t,[-.035,-.28,.07]))));
+ if(!ford){
+  const q=external?plus(t,[.25,-.12,-.14]):plus(unit,[.004,0,-.096]);
+  parts.push(component('pump',external?'External delivery pump':'Tank delivery pump',external?'The 993 uses an electric delivery pump mounted separately from the tank.':'The electrically driven pump supplies fuel from the tank. The sender reports level independently of the pump motor.',[-.31,.32,.18],r=>{cyl(r,q,external?X:Z,-.071,.064,b?.030:.040,metal,17);sleeve(r,q,external?X:Z,-.034,-.016,b?.033:.044,.028,rubber,18);}));
+  const count=b||id==='hrv'?4:id==='c63'?8:6,banked=id==='c63'||id.startsWith('porsche');
+  parts.push(component('rail',id==='porsche992scab'?'High-pressure rails & direct injectors':b?'Lower rail & port injectors':'Fuel rail & injectors',id==='porsche992scab'?'The rails deliver high-pressure fuel to injectors that open into the combustion chambers.':b?'This section follows the lower row of injectors at the four throttle ports.':'The rail supplies an injector for each cylinder. Each injector meters fuel at the inlet port.',[-.20,-.15,.36],r=>{if(id==='bmw325ci'){drawM54FuelRail(r);drawM54Injectors(r);return;}
+   for(const bank of banked?[-1,1]:[0]){
+    const center=plus(end,[0,bank*.17,0]),n=banked?count/2:count,alongY=id==='hrv'||b;
+    const railPoint=t=>plus(center,alongY?[0,t,0]:[t,0,0]);r.rod(railPoint(-.19),railPoint(.19),.012,alloy,10);
+    for(let j=0;j<n;j++){const u=railPoint((j/(n-1)-.5)*.34),v=plus(u,[0,bank*.032,-.068]);r.rod(u,v,.011,iron,10);box(r,plus(u,[.014,0,-.025]),[.022,.019,.030],rubber);}
+   }
+  }));
+ }
+ return id==='bmw325ci'?refineBmwFuelParts(parts,p):parts;
+}
+function electrical(id,p){
+ const e=p.engine,b=p.bike,B=p.battery,classic=id==='porsche993cab',starter=plus(e,[.16,b?.02:.11,-.09]),gen=classic?plus(e,[.22,0,.18]):plus(e,[-.13,b?-.10:-.20,.04]);
+ const fuse=b?plus(B,[.09,.02,.03]):id.startsWith('porsche')?[.02,-.46,.49]:plus(B,[.08,.16,.025]);
+ const cableStart=id==='bmw325ci'?plus(B,[.100,-.046,.115]):B;
+ const cableEnd=id==='bmw325ci'?m54InstalledPoint([.638,.25,-.024]):starter;
+ return [component('battery','12 V battery',p.electric,[-.16,.14,.46],r=>battery(r,B,b)),component('starter','Starter motor & solenoid','The solenoid engages the starter drive with the engine’s ring gear. Opening the motor shows the armature and pinion.',[.28,.25,-.15],r=>electricMachine(r,starter,'starter',b?.67:1)),
+ component('generator',b?'Generator stator & rotor':classic?'Fan-axis alternator':'Belt-driven alternator',b?'A stator winding and rotating field generate current at the engine. The regulator controls the charging supply.':classic?'The alternator shares the engine cooling fan axis. The pulley is driven by the engine belt.':'A belt drives a rotor inside the stator. The rectifier converts its output for the vehicle’s DC circuit.',[-.30,-.32,.20],r=>electricMachine(r,gen,b?'bike-gen':'alternator',b?.72:1)),
+ component('fuses',b?'Fuses & distribution':id==='bmw325ci'?'Glove-compartment fuse carrier':'Fuse carrier',id==='bmw325ci'?'The carrier is behind the glovebox panel and its two clips, as shown on page 140 of the 2003 coupé manual. Fuse colors and assignments here are illustrative.':'Individual fuse links protect branch circuits. Fuse assignments and ratings are omitted from this layout.',[.12,.47,.32],r=>{if(id==='bmw325ci')return drawBmwFuseCarrier(r);box(r,fuse,b?[.072,.049,.034]:[.148,.091,.047],rubber);for(let j=0;j<(b?3:6);j++)for(const side of [-1,1])box(r,plus(fuse,[(j-(b?1:2.5))*.018,side*(b?.009:.019),b?.020:.031]),[.013,.013,.015],['#a9785c','#9fa976','#718ba8'][j%3]);}),
+ component('cables','Positive feed & ground strap','A high-current feed connects the starter to the battery. A separate bond returns current through the engine and chassis.',[0,-.34,-.22],r=>{const y=b?.105:.36;path(r,[cableStart,plus(cableStart,[.07,0,-.02]),[B[0],y,B[2]-.09],[cableEnd[0],y,b?.54:.41],cableEnd],b?.005:.009,'#956451');path(r,[cableEnd,plus(cableEnd,[.03,-.06,0]),plus(cableEnd,[.12,-.11,.018])],.010,'#717b73');})];
+}
+function slidingRoof(p){const X0=p.roofX,H=p.roofZ;
+ return [component('glass','Sliding glass lid','The moving glass sits in the opening and tilts about the front guides.',[.12,0,.39],r=>roofGlass(r,X0,H)),
+ component('cassette','Cassette & guide rails','Side channels carry the sliding shoes inside the roof opening. The rear sections receive the panel when it retracts.',[-.14,-.16,-.21],r=>{for(const s of [-1,1]){const c=[X0+.24,s*.49,H-.030];box(r,c,[1.17,.039,.023],metal);box(r,plus(c,[0,s*.019,.013]),[1.17,.009,.026],iron);}for(const dx of [-.34,.81])box(r,[X0+dx,0,H-.039],[.035,.98,.020],alloy);}),
+ component('drive','Electric roof drive','The geared motor moves the sliding mechanism along the fixed channels.',[-.42,.17,.10],r=>{const c=[X0-.36,0,H-.067];cyl(r,c,Y,-.084,.018,.026,iron,16);box(r,plus(c,[.021,.039,0]),[.065,.054,.035],rubber);}),
+ component('slides','Guide shoes & lifting links','The two sides support the moving lid. Raising its trailing edge gives the tilt position.',[.23,.32,.17],r=>{for(const s of [-1,1])for(const dx of [-.25,.22]){const c=[X0+dx,s*.472,H-.025];box(r,c,[.081,.026,.015],rubber);path(r,[c,plus(c,[.039,0,.023]),plus(c,[.073,0,.029])],.007,metal);}}),
+ component('shade','Interior sliding shade','The shade travels below the glass on its own guides.',[-.26,-.29,.06],r=>{box(r,[X0,0,H-.061],[.62,.90,.013],'#787e76');box(r,[X0-.20,0,H-.069],[.035,.107,.012],iron);})];
+}
+function softTop(p){const modern=p.roofType==='modern';return [
+ ...(modern?[component('compartment-lid','Convertible-top compartment lid','The curved, body-colour lid covers the rear of the folded roof. The forward fabric panel remains visible.',[.34,0,.49],r=>drawPorscheCompartmentLid(r,paintChoice(r.build?.paint).hex))]:[]),
+ component('fabric','Fabric roof cover','The fabric follows the raised frame and folds when the frame retracts.',[.06,0,.60],topFabric),component('header','Front roof frame','The leading frame meets the windshield header.',[-.42,0,.22],r=>topBows(r,'header')),
+ component('bows',modern?'Magnesium panel bows':'Folding transverse bows',modern?'Two panel bows support the fabric between the front frame and rear window.':'Transverse bows span the two side mechanisms and carry the fabric roof.',[.08,.39,.38],r=>topBows(r,'bows')),
+ component('rear-window',modern?'Glass rear window & frame':'Flexible rear screen','The rear window occupies the sloping section behind the last roof bow.',[.35,0,.24],r=>{backlight(r);topBows(r,'rearframe');}),
+ component('links','Side folding links','The linked arms guide the roof frame between the windshield and its storage well.',[.05,-.44,.14],r=>{for(const s of [-1,1]){const Y=s*.58;path(r,[[-.36,Y,1.197],[.08,Y,1.204],[.42,Y,1.173],[.60,Y,.94],[.79,Y,.77]],.012,iron);path(r,[[.18,Y,1.20],[.54,Y,.94],[.73,Y,.81]],.009,alloy);}}),
+ component('drive',modern?'Left and right hydraulic cylinders':'Electric drive, flexible shafts & gearboxes',modern?'A hydraulic cylinder on each side acts on its linkage. The windshield header uses a separate electric central lock.':'The motor drives the two sides through flexible shafts and reduction gearboxes. PET plate 811-35 identifies the individual drive parts.',[.31,-.23,-.18],r=>{for(const s of [-1,1]){const a=[.82,s*.55,.74],b=[.62,s*.55,.90],c=[.53,s*.55,.99];if(modern){r.rod(a,b,.023,iron,12);r.rod(b,c,.009,alloy,10);}else{box(r,a,[.10,.055,.079],iron);path(r,[[.80,s*.07,.71],[.83,s*.36,.72],a],.012,rubber);}}if(!modern)electricMachine(r,[.82,0,.73],'starter',.48);})];}
+const cache=new Map();
+export function getRoadServiceAssemblies(vehicle){
+ if(!Object.hasOwn(roadSystems,vehicle))return [];
+ if(!cache.has(vehicle)){
+  const p=roadSystems[vehicle],groups=[['brakes','Brakes',p.brake,brakes(vehicle,p)],['fuel','Fuel system',p.fuel,fuel(vehicle,p)],['electrical','Starting & charging',p.electric,electrical(vehicle,p)]];
+  if(p.roofType)groups.push(['roof',p.roofType==='slide'?(vehicle==='hrv'?'Moonroof · EX-L':'Sliding roof'):'Cabriolet folding roof',p.roof,p.roofType==='slide'?slidingRoof(p):softTop(p)]);
+  cache.set(vehicle,groups.map(([id,name,description,parts])=>({id,name,description,source:p.refs[id],parts:parts.map(c=>({...c,id:id+'.'+c.id,source:p.refs[id]})),view:'hero',category:'service',internal:true})));
+ }
+ return cache.get(vehicle);
+}
+export function drawRoadServiceAssembly(r,vehicle,id,engineOwnsM54Rail=false){
+ const g=getRoadServiceAssemblies(vehicle).find(g=>g.id===id);
+ // The coupe engine already owns its exact accessory and bellhousing positions.
+ // Keep a single physical starter and alternator while preserving both menus.
+ const shared=new Set();
+ if(vehicle==='bmw325ci'&&id==='electrical'){
+  for(const f of r.faces){
+   const owner=f.part==='powertrain.starter'?'electrical.starter':f.part==='powertrain.alternator'?'electrical.generator':null;
+   if(!owner)continue;
+   if(r.inspection?.assembly==='electrical')f.part=owner;
+   shared.add(owner);
+  }
+ }
+ for(const p of g?.parts||[]){
+  if(shared.has(p.id))continue;
+  if(engineOwnsM54Rail&&p.id==='fuel.rail')continue;
+  r.tag(p.id,()=>p.draw(r));
+ }
+}
+export function getRoadServiceDetail(vehicle,id){return Object.hasOwn(roadSystems,vehicle)?getServiceStudy(vehicle,roadSystems[vehicle],id):null;}

@@ -1,0 +1,46 @@
+// The US sales chart establishes equipment for MY2014. The SL 500 drawings in
+// the earlier, German-market service introduction establish shared R231 geometry.
+const brochure = 'https://www.auto-brochures.com/makes/Mercedes_Benz/SL-Class/Mercedes%20Benz_US%20SL-Class_2014.pdf';
+const manual = 'https://www.mbusa.com/content/dam/mb-nafta/us/owners/manuals/2014/operators/MY14_SL_Operator.pdf';
+const service = 'https://www.manualslib.de/manual/89970/Mercedes-Benz-Typenreihe-231.html?page=';
+const parts = 'https://classicparts.mbusa.com/v-2014-mercedes-benz-sl550--base--4-7l-v8-gas/';
+const reference = (kind,label,url,scope,study) => ({kind,label,url,scope,study});
+
+export const slSpecifications = [
+  ['Configuration','2014 US SL550 roadster, with the Sport Wheel and Driver Assistance packages. This is a representative factory configuration.'],
+  ['Powertrain','4.6-liter biturbo V8, 429 hp and 516 lb-ft. A seven-speed automatic drives the rear wheels.'],
+  ['Seat equipment','Both 16-way seats have heating, ventilation, active multicontour support, massage and AIRSCARF neck heating as standard.'],
+  ['Interior finish','Optional Ginger Beige / Espresso Brown Nappa leather with Burl Walnut trim and illuminated door sills.'],
+  ['Sport Wheel Package','19-inch AMG five-spoke wheels, larger front discs, perforated rear discs and a leather sport steering wheel with shift paddles.'],
+  ['Chassis option','Active Body Control uses hydraulic struts to counter body movement.'],
+  ['Roof','Power retractable hardtop with optional MAGIC SKY CONTROL glass. The power wind blocker rises behind the seats.'],
+  ['Audio and display','Optional 900-watt Bang & Olufsen BeoSound and SPLITVIEW on the seven-inch COMAND display.'],
+  ['Driver assistance','DISTRONIC PLUS, PRE-SAFE Brake, Active Blind Spot Assist and Active Lane Keeping Assist. Night View Assist PLUS is a separate option.'],
+  ['Access and parking','Optional soft-close doors. Standard KEYLESS-GO, hands-free trunk access, rearview camera and PARKTRONIC with Active Parking Assist.'],
+  ['Visibility','Bi-Xenon headlamps with Active Curve Illumination. MAGIC VISION CONTROL delivers washer fluid through the wiper blades.']
+];
+
+export const slReferences = [
+  reference('Specifications','Mercedes-Benz USA · 2014 SL packages and powertrain',brochure+'#page=24','Read the SL550 column for the two packages and for the V8, transmission and drivetrain fitted to this build.'),
+  reference('Specifications','Mercedes-Benz USA · individual options and dimensions',brochure+'#page=25','The US equipment matrix identifies the optional hydraulic suspension, switchable roof glass, premium audio, night vision and soft-close doors. The dimension table gives raised-roof height and width across extended mirrors.'),
+  reference('Photograph','Mercedes-Benz USA · SL550 cockpit and sport steering wheel',brochure+'#page=16','The Ginger Beige and Espresso Brown cabin photograph shows the dashboard, steering wheel and console with Burl Walnut trim. Pages 26–27 show upholstery samples and wheel faces.'),
+  reference('Illustrated reference','Mercedes-Benz USA · 2014 seat and neck heating controls',manual+'#page=120','Printed page 118 shows the AIRSCARF switch and its three output levels. The adjacent pages distinguish neck heating from the seat cushion heater and seat ventilation.',['seats','seats.airscarf','Open the neck heater']),
+  reference('Illustrated reference','Mercedes-Benz USA · multicontour seat adjustment',manual+'#page=321','Printed pages 319–322 show the COMAND seat menus. Each front occupant can set their own cushion, bolsters and massage program.',['seats','seats.massage','Open the massage insert']),
+  reference('Engineering drawing','Mercedes-Benz · R231 SL500 dimensioned body views',service+'21','Factory drawing P00.10-5105-00 gives the pre-facelift SL500 body proportions. Its dimension notes specify loading and the European number-plate adapter. Use the US brochure for SL550 published dimensions.'),
+  reference('Arrangement plan','Mercedes-Benz · R231 rescue card','https://rk.mb-qr.com/en/231/','The side and plan views identify roll-over protection, batteries, fuel tank and restraint locations across the 2012–2020 R231 family.'),
+  reference('Engineering drawing','Mercedes-Benz · R231 compressor and charge-cooler ducts','https://static.nhtsa.gov/odi/tsbs/2013/MC-10135792-9999.pdf#page=6','Workshop drawing AR09.41-P-8620RKB identifies the upper filter-to-compressor pipes and lower compressor-to-cooler pipes for the M278 in the R231.',['sl-air','sl-air.core','Inspect the charge cooler']),
+  reference('Parts diagram','2014 SL550 · intercooler, throttle seal and coupling','https://www.mbpartsgiant.com/parts-list/2014-mercedes_benz-sl550/air-fuel-delivery/intercooler-air','Items 1–9 identify the common cooler, throttle body, O-ring, coupling, clamp, sensors and distributor. The drawing does not specify the internal plate spacing.',['sl-air','sl-air.core','Open the throttle and cooler']),
+  reference('Engineering drawing','Mercedes-Benz · M278 charge-coolant loop','https://w124performance.com/docs/mb/M278/M276_M278_Introduction_into_Service.pdf#page=40','Figure P09.41-2590-00 shows the separate circulation pump, front exchanger, expansion reservoir and vent branch. The 3D hose bends are approximate.',['sl-air','sl-air.low-temp','Trace the coolant circuit']),
+  reference('Parts diagram','Mercedes-Benz USA · passenger seat structure and climate components','https://classicparts.mbusa.com/v-2014-mercedes-benz-sl550--base--4-6l-v8-gas/body--passenger-seat-components','The numbered plates identify the frame, pads, heater and head restraint. The order notes distinguish AIRSCARF and upholstery variants.'),
+  reference('Parts diagram','Mercedes-Benz USA · dynamic-seat pneumatic supply','https://mbparts.mbusa.com/v-2014-mercedes-benz-sl550--base--4-7l-v8-gas/vacuum-system-hydraulic-system--vacuum-pump-and-connector','The dynamic-seat pump is a separate assembly. The parts plate identifies its pneumatic connections.',['seats','seats.supply','Trace the pneumatic supply']),
+  reference('Engineering drawing','Mercedes-Benz · Vario roof folding sequence',service+'26','Figure P77.30-2536-00 shows the roof sequence used in the R231 service introduction. The drawing establishes the direction of travel.',['roof','roof.panel','Open the roof mechanism']),
+  reference('Engineering drawing','Mercedes-Benz · MAGIC SKY CONTROL panel',service+'29','Figure P77.30-2538-00 shows how electrical control changes light transmission through the optional panel.',['roof','roof.sky-glass','Inspect the roof glass']),
+  reference('Parts diagram','Mercedes-Benz USA · convertible roof hydraulic units',parts+'electrical--convertible-top','The SL550 catalog identifies the roof pump, release and lifting cylinders and associated hydraulic lines.',['roof','roof.hydraulics','Open the hydraulic drive']),
+  reference('Parts diagram','Mercedes-Benz USA · parking sensors and rearview camera',parts+'electrical--parking-aid','The parking-aid illustrations locate the sensor carriers, bumper harness and rear camera. The operator’s manual gives the front and rear sensor counts.',['sl-assist','sl-assist.rearview','Open the trunk camera']),
+  reference('Parts diagram','Mercedes-Benz USA · audio and COMAND components',parts+'entertainment-and-telematics--mobile-multi-media','The equipment notes identify the premium-sound speakers. Several alternatives share the same exploded illustration.',['audio','audio.bass','Inspect the FrontBass woofer']),
+  reference('Engineering drawing','Mercedes-Benz · R231 washer and wiper circuit',service+'32','The service introduction illustrates the washer hoses, wiper arms and integrated delivery at the blades.',['visibility','visibility.left-blade','Inspect the washer blade']),
+  reference('Parts diagram','Mercedes-Benz USA · propeller shaft and bearing carrier',parts+'driveline-and-axles--drive-shaft','The rear driveline plate shows the two-piece shaft, two flexible discs and the separate center support.',['sl-drive','sl-drive.shaft','Inspect the propeller shaft']),
+  reference('Parts diagram','Mercedes-Benz USA · complete SL550 exhaust','https://classicparts.mbusa.com/v-2014-mercedes-benz-sl550--base--4-6l-v8-gas/exhaust--exhaust-components','Callouts 5 and 6 are the converters. Callout 7 joins both sides at the front muffler. Callouts 11 and 12 have separate rear silencers.',['sl-drive','sl-drive.exhaust','Open the dual exhaust']),
+  reference('Engineering drawing','Mercedes-Benz · seven-speed automatic section',service+'49','Drawing P27.10-2400-00 shows the torque converter, lockup clutch, planetary gearsets, electrohydraulic control unit and auxiliary oil pump.',['sl-drive','sl-drive.auto','Open the automatic transmission']),
+  reference('Illustrated reference','Mercedes-Benz · R231 Active Body Control',service+'58','The R231 introduction describes hydraulic wheel-strut control and the switching valve integrated into the pump.',['sl-abc','sl-abc.struts','Open the hydraulic strut'])
+];

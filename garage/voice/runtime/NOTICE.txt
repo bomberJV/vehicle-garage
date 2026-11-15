@@ -1,0 +1,12 @@
+American English Garage narration uses Bruno (expr-voice-3-m) in Kitten TTS Nano 0.8 INT8 by KittenML. The model, released under Apache 2.0, was retrieved from revision 84781d74e29ee25217551556398b42f80593a813.
+https://huggingface.co/KittenML/kitten-tts-nano-0.8-int8
+
+The Bruno style vectors were extracted from the original voices.npz without alteration. The tokenizer vocabulary is from the author's 0.8 reference implementation. Speech is synthesized at 24 kHz. The same neural voice is included in the standalone Garage and combined project downloads.
+https://github.com/KittenML/KittenTTS/releases/tag/0.8
+
+ONNX Runtime Web 1.22.0 by Microsoft is distributed under the MIT License.
+https://github.com/microsoft/onnxruntime/tree/v1.22.0
+
+Phonemizer.js 1.2.1 by Xenova is distributed under Apache 2.0 and incorporates the eSpeak NG phonemizer. Corresponding sources and build instructions are available below.
+https://github.com/xenova/phonemizer.js
+https://github.com/espeak-ng/espeak-ng

@@ -1,4 +1,4 @@
-import {m113Stations,m113CrankZ,m113PanRail,m113PanOutline} from './g500-m113-geometry.js';
+import {m113Stations,m113CrankZ,m113PanRail,m113PanOutline,m113InstalledX} from './g500-m113-geometry.js';
 import {cyl,sleeve,x,y,z} from './mechanism-shapes.js';
 import {engineShapes} from './engine-shapes.js';
 import {g500FluidAccess} from './g500-engine-bay.js';
@@ -8,7 +8,8 @@ import {fluidRefs as ref} from './g500-fluid-refs.js';
 
 const oilColor='#9c884c';
 const local=([x,y,z])=>[-1.235+x,y,.57+z];
-const crankPoint=([x,y,z])=>[-1.235+x,y,m113CrankZ+z];
+const crankPoint=([x,y,z])=>[m113InstalledX+x,y,m113CrankZ+z];
+const pumpDriveX=-.346;
 
 function drawM113Pan(t){
  // WIS AR01.45-P-7555VA places the detachable lower bowl at the pulley
@@ -47,18 +48,32 @@ export function drawG500EngineOilPart(r,key){
  if(key==='sump'){
   drawM113Pan(t);
  }else if(key==='oil-pump'){
-  t.cyl([-.425,0,-.085],[-.340,0,-.085],.065,iron,12);
-  t.tube([-.430,0,-.085],[-.424,0,-.085],.058,.025,metal,12);
+  // The pump hangs inside the forward bowl, below the crankshaft and ahead of
+  // the first main bearing. A short chain drives it from the crank nose. The
+  // housing, sprocket sizes and stations are estimated; every surface stays
+  // inside the pan skin.
+  const shaft=[pumpDriveX,-.030,-.074];
+  t.box(-.336,-.075,-.110,-.286,.015,-.044,iron);
+  // Coarse sprockets and strands keep the engine within its face budget.
+  t.tube([pumpDriveX-.005,shaft[1],shaft[2]],[pumpDriveX+.005,shaft[1],shaft[2]],.034,.008,metal,10);
+  t.tube([pumpDriveX-.005,0,0],[pumpDriveX+.005,0,0],.024,.014,metal,8);
+  // The two chain strands are the outer tangents of the sprockets.
+  const run=Math.hypot(shaft[1],shaft[2]),ny=-shaft[2]/run,nz=shaft[1]/run,lean=(.034-.024)/run;
+  for(const side of [-1,1]){
+   const along=Math.sqrt(1-lean*lean),oy=side*ny*along-lean*shaft[1]/run,oz=side*nz*along-lean*shaft[2]/run;
+   t.route([[pumpDriveX,.024*oy,.024*oz],[pumpDriveX,shaft[1]+.034*oy,shaft[2]+.034*oz]],.004,metal,4);
+  }
  }else if(key==='oil-pickup'){
-  t.route([[-.35,0,-.085],[-.301,-.024,-.077],[-.234,-.066,-.094]],.011,oilColor);
+  // The suction pipe leaves the pump's rear face square, 1 mm proud of it.
+  t.route([[-.285,-.050,-.085],[-.268,-.050,-.085],[-.250,-.062,-.088],[-.234,-.066,-.094]],.011,oilColor);
   t.cyl([-.234,-.066,-.111],[-.234,-.066,-.093],.039,iron,16);
   for(const yy of [-.022,0,.022])t.box(-.261,-.067+yy,-.112,-.207,-.065+yy,-.111,metal);
  }else if(key==='oil-filter')g500FluidAccess((k,fn)=>{if(k===key)fn();},t);
 }
 const oilParts=[
  ['sump','Upper and lower oil pan','The M113.962 carries its lower oil pan at the pulley end. The shallow rear casting passes above the front axle, with clearance for the differential on the passenger side. The installed contours are estimated.',[.13,.10,-.32],ref.pan],
- ['oil-pickup','Suction pipe and strainer','The screened inlet sits inside the forward bowl. A short pipe connects it to the suction side of the oil pump.',[.12,-.25,-.15],ref.oil],
- ['oil-pump','Engine oil pump','The front-mounted pump draws oil from the strainer and supplies the filter housing and pressure circuit.',[-.27,-.10,-.12],ref.oil],
+ ['oil-pickup','Suction pipe and strainer','The screened inlet sits inside the forward bowl. A short pipe connects it to the suction side of the oil pump beside it.',[.12,-.25,-.15],ref.oil],
+ ['oil-pump','Engine oil pump','The pump sits inside the front of the oil pan, below the crankshaft, which drives it through a short chain. It draws oil from the strainer and supplies the filter housing and pressure circuit. The housing shape and position are estimated.',[-.27,-.10,-.12],ref.oil],
  ['oil-filter','Oil-filter housing and cartridge','A removable cap holds a pleated cartridge above the pump. Open the housing to inspect the cap stem, element, bore and seals.',[-.12,-.25,.22],ref.filter]
 ];
 export const oilRows=[

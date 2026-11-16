@@ -77,3 +77,14 @@ export function meshSeparation(A,B){
   return {...best,crossings:crossings.length,crossingPoints:crossings};
 }
 export const mm=n=>Math.round(n*10000)/10;
+// Every other part whose installed surfaces cross the given triangles, sorted.
+export function crossedParts(faces,tris,own){
+  const lo=[0,1,2].map(i=>Math.min(...tris.map(t=>t.min[i]))),hi=[0,1,2].map(i=>Math.max(...tris.map(t=>t.max[i])));
+  const groups=new Map();
+  for(const face of faces){
+    if(face.part===own)continue;
+    if([0,1,2].some(i=>Math.min(...face.points.map(p=>p[i]))>hi[i]||Math.max(...face.points.map(p=>p[i]))<lo[i]))continue;
+    (groups.get(face.part)??groups.set(face.part,[]).get(face.part)).push(face);
+  }
+  return [...groups].filter(([,group])=>meshSeparation(tris,worldTriangles(group,()=>true)).crossings).map(([id])=>id).sort();
+}

@@ -2,7 +2,7 @@
 import {section,part,slab,source} from './section-primitives.js';
 
 const profiles={
- g500:{front:-.85,rear:1.28,width:.75,height:.64,tunnel:.16,rise:.16,rows:2,description:'The high, nearly rectangular W463 floor places a footwell on either side of the central tunnel. The section runs from the toe boards to the rear seat.',ref:source('Mercedes-Benz · G500 floor mats','https://mbparts.mbusa.com/v-2002-mercedes-benz-g500--base--5-0l-v8-gas/instrument-panel-center-console-linings--floor-mats')},
+ g500:{front:-.85,rear:1.28,width:.75,height:.64,tunnel:.16,bell:.225,rise:.16,rows:2,description:'The high, nearly rectangular W463 floor places a footwell on either side of the central tunnel. The section runs from the toe boards to the rear seat.',ref:source('Mercedes-Benz · G500 floor mats','https://mbparts.mbusa.com/v-2002-mercedes-benz-g500--base--5-0l-v8-gas/instrument-panel-center-console-linings--floor-mats')},
  bmw325ci:{front:-.90,rear:1.22,width:.72,height:.35,tunnel:.15,rise:.24,rows:2,description:'The E46 coupe has deep front footwells beside a high transmission tunnel. The front floor covering follows the change of height ahead of the rear seats.',ref:source('BMW ETK via RealOEM · 2003 325Ci floor covering','https://www.realoem.com/bmw/enUS/showparts?diagId=91_0221&id=BN33-USA-03-2003-E46-BMW-325Ci')},
  f350:{front:-1.17,rear:.12,width:.80,height:.59,tunnel:.30,rise:.26,rows:1,description:'This regular cab has one seating row and a wide, short floor. Ford offered different tunnel heights. This estimated contour rises over the E4OD automatic.',ref:source('LMC Truck · regular-cab carpet and floor hump variants','https://www.lmctruck.com/interior%2Fcarpet-insulation%2Ffd-1980-96-molded-carpet')},
  c63:{front:-.94,rear:1.26,width:.75,height:.35,tunnel:.17,rise:.23,rows:2,description:'The W204 sedan floor rises over the longitudinal driveline. Two front seat mounts sit between the tunnel and the sill on each side.',ref:source('Mercedes-Benz · W204 floor and seat crossmember','https://classicparts.mbusa.com/v-2013-mercedes-benz-c63-amg--base--6-3l-v8-gas/body--floor')},
@@ -13,7 +13,10 @@ const profiles={
 
 function surface(p,u,v,extra){
  const x=p.front+u*(p.rear-p.front),y=v*p.width;
- const crest=Math.max(0,1-(Math.abs(y)/p.tunnel)**3);
+ // Where a bellhousing sits under the toe boards, the tunnel is wider there
+ // and returns to its ordinary width by the end of the kick-up.
+ const tunnel=p.tunnel+(p.bell?(p.bell-p.tunnel)*Math.min(1,Math.max(0,(.18-u)/.05)):0);
+ const crest=Math.max(0,1-(Math.abs(y)/tunnel)**3);
  const kick=Math.max(0,1-u/.18),step=p.rows===2?Math.max(0,(u-.82)/.18):0;
  const sill=Math.max(0,(Math.abs(v)-.90)/.1),end=1-.15*kick-.055*step;
  return [x,y*end,p.height+p.rise*crest+.13*kick*kick+.095*step*step+.044*sill*sill+extra];

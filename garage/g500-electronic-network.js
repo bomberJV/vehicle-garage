@@ -27,7 +27,7 @@ function terminal(r,p,axis=z){sleeve(r,p,axis,-.003,.003,.008,.003,alloy,6);}
 
 // All coordinates are shared model anchors, in metres. -Y is the driver's side.
 export const g500ElectronicAnchors={
- prefuse:[.482,-.074,.754],jump:[-.785,-.680,.870],alternator:[-1.600,-.280,.690],starter:[-.720,.250,.678],
+ prefuse:[.482,-.074,.754],jump:[-.785,-.680,.870],alternator:[-1.600,-.280,.690],starter:[-.965,.300,.713],
  ecu:[-.640,.710,1.075],tcm:[-.355,-.115,.729],esm:[-.290,0,.790],transfer:[.245,-.035,.718],esp:[-.435,.485,.780],
  frontSam:[-.645,.565,1.065],rearSam:[.245,-.025,.793],cluster:[-.480,-.415,1.291],eis:[-.465,-.202,1.158],
  column:[-.510,-.410,1.215],upper:[-.496,0,1.163],overhead:[-.361,0,1.904],comand:[-.509,0,1.054],
@@ -106,7 +106,9 @@ export function drawG500ElectronicShared(r,key){
   terminal(r,A.alternator);return;
  }
  if(key==='starter'){
-  cyl(r,[-.815,.21,.600],x,0,.18,.045,'#65747c',10);cyl(r,[-.785,.25,.655],x,0,.11,.022,black,8);
+  // The starter lies along the right side of the block and ends at the
+  // engine/transmission joint, ahead of the bulkhead and above the crossmember.
+  cyl(r,[-1.06,.26,.635],x,0,.18,.045,'#65747c',10);cyl(r,[-1.03,.30,.69],x,0,.11,.022,black,8);
   terminal(r,A.starter);return;
  }
 }
@@ -183,10 +185,13 @@ function drivetrainNetwork(r){
 function primaryPower(r){
  const junction=[-.651,-.388,.742];
  line(r,[A.prefuse,[.33,-.077,.708],[-.25,-.175,.708],junction,A.jump],.009,red);
- line(r,[junction,[-.70,.175,.676],A.starter],.008,red);
+ // The starter cable leaves the jump-start terminal, crosses the back of the
+ // engine bay above the bellhousing and drops to the starter on the right.
+ line(r,[A.jump,[-.788,-.58,.87],[-.788,-.18,.925],[-.788,.18,.925],[-.80,.33,.83],[-.87,.33,.80],[-.93,.31,.75],A.starter],.008,red);
  // The charging cable follows the right side of the block above the pan rail,
- // drops in front of the pan and crosses below the crank nose to the alternator.
- line(r,[A.starter,[-.80,.262,.700],[-1.56,.262,.700],[-1.648,.165,.600],[-1.648,-.205,.600],A.alternator],.007,red);
+ // passes over the engine-mount arm, drops in front of the pan and crosses
+ // below the crank nose to the alternator.
+ line(r,[A.starter,[-1.05,.262,.745],[-1.30,.262,.745],[-1.36,.262,.700],[-1.56,.262,.700],[-1.648,.165,.600],[-1.648,-.205,.600],A.alternator],.007,red);
 }
 function engineGround(r){
  const a=[-1.107,-.324,.485],b=[-1.003,-.465,.475];

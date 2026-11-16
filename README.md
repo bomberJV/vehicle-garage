@@ -1,5 +1,8 @@
 # The Garage
 
+[Project priorities and agent handoff](https://github.com/bomberJV/brandon-studio/tree/priority-hub/priorities)
+
+
 Inspect and assemble vehicles in a browser-based 3D workbench.
 
 From the repository root, run `python -m http.server 8000` and open [The Garage](http://localhost:8000/garage/).

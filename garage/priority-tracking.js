@@ -1,6 +1,7 @@
 import {vehiclePriorities} from './priority-vehicles.js';
 import {vehicleReviewTracks,reviewTask} from './priority-review-tracks.js';
 import {additionalRequestAssignments} from './priority-backlog.js';
+import {vehicleAssignments} from './priority-vehicle-assignments.js';
 
 export const priorityLevels=[
   {id:'P0',label:'P0',description:'A defect prevents reliable use of the model.'},
@@ -48,11 +49,11 @@ const requestAssignments={
   'porsche-pair':['P1','in-progress',porsches,'Compare the quarter panels and soft-top shapes with measured sections of the two variants.'],
   'road-variants':['P1','done',['bmw325ci','hrv','bmws1000rr'],'The collection has the requested road models and named variants.'],
   'car-interiors':['P2','todo',passenger,'Measure door trim, wiring routes and the floor layers against the documented variants.'],
-  'road-engines':['P1','todo',road,'The F-350 engine remains unidentified. Other road-engine and transmission studies are available for comparison.'],
+  'road-engines':['P1','todo',road,'The F-350 engine and axle are decided: 7.5-litre V8, E4OD and Sterling 10.25 rear. Other road-engine and transmission studies are available for comparison.'],
   'vehicle-paint':['P2','done',road,'The paint picker, yellow finish and saved swatches are available.'],
   'accessories':['P2','todo',road,'Compare more selected equipment and wheel combinations with their published fitment listings.'],
   'all-vehicles':['P1','done',all,'The collection and type filters each have an All option.'],
-  'aviation':['P1','todo',civilAircraft,'Glazing and engine variations need checks against individually identified civil airframes.'],
+  'aviation':['P1','todo',civilAircraft,'Check glazing and engines against the decided airframes: KLM PH-BFB, the early 172S, the museum’s 1940 J-5A and the three-area G800 cabin.'],
   'space':['P1','todo',space,'Apollo 15 cabin stowage and rover deployment have mission-specific comparisons outstanding.'],
   'maritime':['P1','todo',maritime,'The remaining checks concern machinery-space layouts and the equipment fitted to particular hulls.'],
   'heritage':['P2','todo',heritage,'The remaining comparisons concern visible exterior geometry in museum and manufacturer imagery.'],
@@ -62,48 +63,6 @@ const requestAssignments={
   'portfolio-writing':['P2','done',[],'The revised introduction and attribution are published.'],
   'pantry':['P3','done',[],'The expanded pantry and recipe suggestions are available.'],
   'project-priorities':['P1','done',all,'The board lists the project requests and a separate next check for each vehicle.']
-};
-
-// A vehicle's workflow tracks its single next check in the register. A finished
-// vehicle feature can therefore coexist with an unstarted vehicle-level check.
-const vehicleAssignments={
-  sl550:['P1','in-progress','Compare the fitted seat and roof mechanisms against a documented US donor and verify hidden joints.'],
-  g500:['P1','todo','A dimensioned early US jamb and roof-gutter section, or measurements from the truck, would resolve the remaining body fit.'],
-  f350:['P2','todo','A 1993 donor truck with a documented engine and axle is needed to fix the underhood layout.'],
-  c63:['P2','todo'],
-  hrv:['P2','todo'],
-  bmw325ci:['P1','todo','A measured seal section and vent linkage are still needed to establish exact travel.'],
-  porsche993cab:['P1','in-progress'],
-  porsche992scab:['P1','in-progress'],
-  bmws1000rr:['P1','in-progress'],
-  'little-willie':['P3','todo'],
-  'sherman-e8':['P3','todo'],
-  boeing747:['P1','todo'],
-  cessna172:['P1','todo'],
-  piperj5:['P2','todo'],
-  gulfstreamg800:['P2','todo','The cabin-completion layout must be identified before the floor plan can be checked.'],
-  f16:['P3','todo'],
-  f22:['P3','todo'],
-  f35:['P3','todo'],
-  b52:['P3','todo'],
-  uh60:['P2','todo'],
-  mh6:['P3','todo'],
-  ch47:['P2','todo'],
-  'saturn-v':['P1','todo'],
-  'apollo-falcon':['P1','todo'],
-  'apollo-lrv':['P2','todo'],
-  'atlas-v-541':['P2','todo'],
-  'falcon-9':['P2','todo','Flight-specific fairing details need an identified payload and mission.'],
-  'falcon-heavy':['P2','todo'],
-  'crew-dragon':['P2','todo'],
-  pioneeringspirit:['P2','todo'],
-  seawisegiant:['P1','todo'],
-  ooclspain:['P2','todo'],
-  azzam:['P2','todo'],
-  octopussy:['P3','todo'],
-  araho:['P2','todo'],
-  viking90:['P2','todo','A particular hull and installed engine option are needed to place its service clearances.'],
-  alvin:['P2','todo']
 };
 
 const vehicleById=new Map(vehiclePriorities.map(v=>[v.id,v]));

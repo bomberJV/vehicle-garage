@@ -9,9 +9,9 @@ const link=(label,url)=>({label,url});
 const model=(label,id,tool='systems')=>link(label,garageLink(id,{tool}));
 const part=(label,id,assembly,open)=>link(label,garageLink(id,{assembly,open}));
 const assignments={};
-function work(id,level,vehicleIds,title,description,reason,links,workflow='todo'){
+function work(id,level,vehicleIds,title,description,reason,links,workflow='todo',status){
   assignments[id]=[level,workflow,vehicleIds,reason];
-  return {id,status:workflow==='done'?'shipped':workflow==='in-progress'?'partial':'open',title,description,links};
+  return {id,status:status||(workflow==='done'?'shipped':workflow==='in-progress'?'partial':'open'),title,description,links};
 }
 
 // New requests get new keys. Existing delivery notes and locally saved workflow
@@ -37,23 +37,23 @@ export const additionalRequestSections=[
   {id:'fit-and-detail',name:'Vehicle fit and detail corrections',items:[
     work('porsche-equipment-fit','P1',['porsche993cab','porsche992scab'],'Verify accessories for each 911 Cabriolet',
       'The 1998 Cabriolet has its own Porsche Tequipment roof carrier (993 801 055 01) and US Litronic headlamp retrofit. The 2023 Carrera S retains its factory front-axle lift. Unsupported ladder, guard, snorkel, lamp and four-corner lift previews have been removed from both cars.',
-      'Porsche lists separate carrier part numbers by body style. The 993 Cabriolet carrier supports touring cargo above the closed soft top.',
-      [link('993 Cabriolet touring carrier',garageLink('porsche993cab',{tool:'customize',section:'equipment',equipment:'roof-racks'})),model('2023 Carrera S equipment','porsche992scab','customize')],'done'),
+      'For each car, check the exact model and year against a parts catalog, accessory catalog, or documented installation. Keep the ladder only if a real one fits that Porsche. Use a documented Porsche equivalent if it serves the same purpose. Omit the accessory if neither can be verified.',
+      [link('993 Cabriolet touring carrier',garageLink('porsche993cab',{tool:'customize',section:'equipment',equipment:'roof-racks'})),model('2023 Carrera S equipment','porsche992scab','customize')],'todo','partial'),
     work('g500-2002-guard','P1',['g500'],'Replace the later-model brush guard on the 2002 G500',
       'The 2002 US folding guard has a polished surround, rounded headlamp returns, a low tie bar and two padded uprights. The installed view shows the bumper hinges and quick locks in the latched position.',
-      'The period parts plate, manual and vehicle photographs establish the layout. Tube and bracket dimensions are estimated.',
-      [link('Fit the 2002 G500 guard',garageLink('g500',{tool:'customize',section:'equipment',equipment:'brush-guards'})),link('2002 G500 bumper parts diagram','https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/body-hardware/bumper-components-front')],'done'),
+      'Identify the correct guard from a period reference. Match the hoop profile, crossbars, and bumper mounting points, then compare the model with front and side reference views.',
+      [link('Fit the 2002 G500 guard',garageLink('g500',{tool:'customize',section:'equipment',equipment:'brush-guards'})),link('2002 G500 bumper parts diagram','https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/body-hardware/bumper-components-front')],'todo','partial'),
     work('g500-sump-diff-clearance','P0',['g500'],'Resolve the oil sump and front differential overlap',
       'The former pan mesh intersected the front axle housing. The rebuilt two-piece pan has a deep front bowl and a shallow rear section above the right-offset differential. The closest point is the differential-lock actuator, with 12.4 mm of vertical clearance at stock height and 52.4 mm with the 40 mm spring kit.',
-      'Open the oil sump and turn on See through body to inspect it beside the axle. The model clearance is tested. The factory installed gap still needs a measurement.',
-      [link('Inspect the installed oil sump',garageLink('g500',{part:'powertrain.sump'})),link('Inspect the front differential',garageLink('g500',{part:'differentials.front'}))],'done'),
+      'Inspect a section through both parts in the assembled model to determine whether the meshes intersect or the renderer shows a hidden surface. Check the sump contour, engine mounts, and front axle position against 2002 G500 references. Verify clearance at ride height and through any suspension travel the viewer depicts.',
+      [link('Inspect the installed oil sump',garageLink('g500',{part:'powertrain.sump'})),link('Inspect the front differential',garageLink('g500',{part:'differentials.front'}))],'todo','partial'),
     work('sl550-engine-detail','P1',['sl550'],'Detail the 2014 SL550 engine and its connections',
       'Compare the installed M278 with R231 diagrams and engine-bay photos. Trace the valve covers, intake and charge plumbing, accessory drive, coolant hoses and wiring to their mounting points. Check the same connections with the engine isolated.',
-      'The installed view and engine study should show the same physical connections.',
+      'Use diagrams and engine-bay photos for the modeled year to reproduce the visible valve covers, intake and charge plumbing, accessory drive, hoses, and wiring. Check their routing and mounting points with the engine installed and isolated in the viewer.',
       [model('SL550 engine and systems','sl550'),model('SL550 references','sl550','references')]),
     work('s1000rr-engine-detail','P1',['bmws1000rr'],'Detail the 2023 S 1000 RR engine behind the fairings',
       'Compare both sides with parts fiches and photographs of the 2023 bike. Match the head, crankcase and side covers, intake bodies, coolant lines and header connections. Verify each connection with the fairings hidden.',
-      'Check the engine in the frame and in isolation from both sides.',
+      'Use parts fiches and photos for the modeled generation to reproduce the cylinder head, crankcase and side covers, intake bodies, coolant lines, and header connections. Check both sides with the fairings hidden so the shapes and connection points are visible.',
       [model('S 1000 RR engine and systems','bmws1000rr'),model('S 1000 RR references','bmws1000rr','references')]),
     work('911-rr-shape-evidence','P1',['porsche993cab','porsche992scab','bmws1000rr'],'Record the source for unverified 911 and S 1000 RR contours',
       'For both Cabriolets and the 2023 RR, identify the contours still inferred from photographs. Link each to the exact variant drawing, CAD section or measurement when available. Start with the 911 rear quarters and folded tops, and the transverse profiles of the BMW fairings. Mark the sections that still need measurements.',
@@ -125,19 +125,19 @@ export const additionalRequestSections=[
       [link('FAA passenger safety guidance',backlogSources.airlineSafety),link('FAA general aviation briefing',backlogSources.gaSafety),...civilAircraft.map(id=>model(vehiclePriorities.find(v=>v.id===id).name,id))]),
     work('747400-cabin-safety','P1',['boeing747'],'Choose and build a passenger 747-400 cabin',
       'Use Boeing D6-58326-1 sections 2.4–2.7 for the two decks, cabin cross-sections, stairs, galleys and doors. Select an operator layout before fixing seat rows, lavatories or crew stations. Add restraints, exit paths, lighting and the selected operator’s oxygen and flotation equipment, checked against FAA AC 121-24E.',
-      'The collection is a passenger 747-400; a freighter or 747-8 layout cannot establish its cabin, and operator seat counts remain unresolved.',
+      'The decided airframe is KLM PH-BFB, a passenger 747-406 preserved at the Corendon Village Hotel. Fix its seat rows, lavatories and crew stations from KLM’s layout for that aircraft.',
       [model('747-400 cabin context','boeing747'),link('Boeing 747-400 cabin and door drawings',backlogSources.boeing400),link('FAA cabin safety guidance',backlogSources.airlineSafety)]),
     work('172s-cabin-safety','P1',['cessna172'],'Match the early 172S cabin and restraint layout',
       'Use the Cessna handbook issued 8 July 1998 for the early four-place 172S. Check seats, seat rails, harness anchors, doors, baggage restraints and panel layout; follow Figure 7-8’s heater, ventilation and defrost paths. Verify fitted fire extinguisher and emergency-equipment locations against one airframe and the FAA general aviation briefing topics.',
-      'An early 172S cabin must be checked against its serial range and fitted equipment rather than a later NAV III panel.',
+      'The decided baseline is the 8 July 1998 handbook for serials 172S8001 and on, without the Nav III panel.',
       [model('172S cabin context','cessna172'),link('Cessna early 172S handbook, operator copy',backlogSources.cessnaEarlyS),link('FAA passenger briefing topics',backlogSources.gaSafety)]),
     work('j5a-cabin-safety','P2',['piperj5'],'Document the J-5A’s three-place cabin',
       'Model the front pilot seat and wider rear bench, fabric-covered tube structure, door opening and visible restraint mounts. Use the museum’s J-5A and EAA’s documented 1940 owner airframe as comparison evidence; record their modifications separately. Confirm the selected example’s belts, heater and emergency equipment before presenting a safety breakdown.',
-      'The J-5A is not the two-seat J-3. Surviving examples vary in glazing, engines and cabin equipment.',
+      'The decided example is the Western Antique Aeroplane & Automobile Museum’s 1940 J-5A. Record its later modifications separately; it is not the two-seat J-3.',
       [model('J-5A cabin context','piperj5'),link('Museum J-5A cabin reference',backlogSources.piperMuseum),link('EAA owner airframe and modifications',backlogSources.piperOwner),link('FAA general aviation briefing',backlogSources.gaSafety)]),
     work('g800-cabin-safety','P2',['gulfstreamg800'],'Choose one G800 cabin completion',
       'Compare Gulfstream’s three living areas with a dedicated crew compartment against its four-area layout. Choose one documented completion before fixing seats, divans, galley, lavatories and baggage access; the advertised maximum of 19 seats is not a universal floor plan. Add the fitted restraints, cabin air, exits and safety-equipment locations from completion-specific evidence and FAA guidance.',
-      'Manufacturer reference layouts exist, but the installed cabin and safety equipment remain dependent on the selected completion.',
+      'The decided cabin is Gulfstream’s three living areas with a dedicated crew compartment. Place its seats, galley, lavatories and safety equipment from that plan.',
       [model('G800 cabin context','gulfstreamg800'),link('Gulfstream cabin plans and specifications',backlogSources.gulfstream),link('FAA passenger safety guidance',backlogSources.airlineSafety)]),
     work('military-public-safety','P2',heritage,'Keep military reviews to public exterior and general crew safety',
       'Check museum-visible exterior contours, glazing, public entry openings, steps and access clearances. Explain general crew restraints and publicly documented exit locations at an educational level. Exclude weapon internals, mission systems and operating or emergency action sequences from the geometry and breakdown scope.',
@@ -155,7 +155,7 @@ export const additionalRequestSections=[
       [model('Open the SL550','sl550'),link('US 2014 SL manual',backlogSources.slManual),link('MBUSA equipment table',backlogSources.slBrochure+'#page=24')],'done'),
     work('evaluate-r231-sl63','P2',[],'Evaluate the US 2014 SL63 AMG R231',
       'Establish the 5.5-liter biturbo AMG V8, 530 hp, 590 lb-ft, seven-speed MCT, AMG Active Body Control and 19-inch wheels. Compare the Performance Package’s 557 hp, 664 lb-ft and limited-slip differential, optional carbon-ceramic brakes and 19-inch front/20-inch rear forged wheels. Keep its bodywork, brakes and drivetrain distinct from the SL550.',
-      'The AMG baseline and optional hardware are documented; a selected specification and measured model are still pending.',
+      'Decided: the base US 2014 SL63 AMG, without the Performance Package or carbon-ceramic brakes. Build it after the SL550 review is complete.',
       [link('US 2014 SL operator’s manual',backlogSources.slManual),link('MBUSA AMG specifications and options, archive copy',backlogSources.slBrochure+'#page=24')])
   ]},
   {id:'next-copy-voice',name:'Writing and voice review',items:[

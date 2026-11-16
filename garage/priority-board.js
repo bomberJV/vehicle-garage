@@ -4,6 +4,7 @@ import {vehiclePriorities} from './priority-vehicles.js';
 import {detailBenchmark,vehicleReviewTracks,reviewProgress} from './priority-review-tracks.js';
 
 import {priorityLevels,workflowStatuses,trackingDefaults} from './priority-tracking.js';
+import {vehicleDecisions} from './vehicle-decisions.js';
 import {domains,typesFor,readFilters,writeFilters,filterKeys,inScope,savedAssignment} from './priority-filters.js';
 
 const labels={shipped:'Shipped',partial:'Partial',open:'Open'};
@@ -63,6 +64,31 @@ function createVehicle(item,controls){
   wrap.append(card,controls);
   return wrap;
 }
+// Anchor and label for an entry a decision unblocks, in kind:id form.
+export function decisionTarget(ref){
+  const [kind,id]=ref.split(':');
+  if(kind==='request'){
+    const item=requestSections.flatMap(s=>s.items).find(r=>r.id===id);
+    return item&&{label:item.title,url:'#request-'+id};
+  }
+  if(kind==='review'){
+    const task=vehicleReviewTracks.flatMap(t=>t.steps).find(s=>s.id===id);
+    return task&&{label:task.vehicleName+' · '+task.title,url:'#review-'+id};
+  }
+  if(kind==='vehicle'){
+    const v=vehiclePriorities.find(row=>row.id===id);
+    return v&&{label:v.year+' '+v.name+' · register',url:'#vehicle-'+id};
+  }
+  return null;
+}
+function createDecision(item){
+  const row=element('li','review-task'),copy=element('div','review-copy');
+  row.id='decision-'+item.id;
+  const basis=element('p');basis.append(element('b','','Why. '),document.createTextNode(item.basis));
+  copy.append(element('h4','',item.title),element('p','',item.decision),basis,entryLinks(item.sources,item.title+' source'),
+    entryLinks(item.unblocks.map(decisionTarget).filter(Boolean),item.title+' unblocks'));
+  row.append(copy);return row;
+}
 function createReview(item,controls){
   const row=element('li','review-task'),copy=element('div','review-copy');
   row.id='review-'+item.id;
@@ -110,6 +136,8 @@ export function mountPriorityBoard(){
   level.append(...priorityLevels.map(option));status.append(...workflowStatuses.map(option));
   domain.append(...optionsFromNames(domains));
   vehicle.append(...vehicleReviewTracks.map(v=>option({id:v.id,label:v.year+' '+v.name})));
+  const decisions=vehicleDecisions.map(item=>({item,row:createDecision(item)}));
+  byId('decision-rows')?.append(...decisions.map(d=>d.row));
   const benchmark=byId('detail-benchmark'),checks=element('ul');
   for(const line of detailBenchmark.checks)checks.append(element('li','',line));
   benchmark.append(element('h3','',detailBenchmark.title),element('p','',detailBenchmark.description),checks);
@@ -218,6 +246,13 @@ export function mountPriorityBoard(){
     }
     byId('requests').hidden=!requests;byId('vehicles').hidden=!vehicles;
     byId('reviews').hidden=!reviews;
+    let shownDecisions=0;
+    for(const d of decisions){
+      const text=[d.item.title,d.item.decision,d.item.basis,...d.item.vehicleIds].join(' ');
+      d.row.hidden=!((filters.vehicle==='all'||d.item.vehicleIds.includes(filters.vehicle))&&words(filters.q).every(term=>fold(text).includes(term)));
+      if(!d.row.hidden)shownDecisions++;
+    }
+    if(byId('decisions'))byId('decisions').hidden=!shownDecisions;
     const geometry=drawGeometry(filters);
     byId('empty-message').hidden=Boolean(requests||vehicles||reviews||geometry);
     clear.hidden=!writeFilters(filters).size;

@@ -11,6 +11,7 @@ import {planetary} from './mechanism-planetary.js';
 import {diff,transaxleDiff} from './mechanism-differential.js';
 import {manual,clutch,cvJoint,multiClutch,finalChain} from './mechanism-shaft.js';
 import {hrvAwdRows,getHrvAwdDetail} from './hrv-awd.js';
+import {drawE4OD,drawE4ODConverter,drawF350Propshaft,drawSterlingCarrier,drawSterlingHousing,drawSterlingShafts,drawFullFloatingHubs} from './f350-powertrain.js';
 
 const references={
  hrv:{label:'Honda · 2026 HR-V transmission and drivetrain specifications',url:'https://hondanews.com/en-US/releases/release-6f8b202ddb1c7f26ecd92774bb014b0c-2026-honda-hr-v-specifications-and-features'},
@@ -19,7 +20,9 @@ const references={
  porsche993cab:{label:'Porsche · type 993 history',url:'https://newsroom.porsche.com/en/history/porsche-911-seven-generations-part-4-type-993-16486.html'},
  porsche992scab:{label:'Porsche · Carrera S seven-speed manual',url:'https://newsroom.porsche.com/en_US/products/manual-transmission-2020-911-carrera-s-carrera-4s-coupe-cabriolet-19154.html'},
  bmws1000rr:{label:'BMW Motorrad · S 1000 RR technical data',url:'https://www.bmw-motorrad.co.uk/en/models/sport/s1000rr-2023/technicaldata.html'},
+ f350:{label:'Ford · 1993 commercial pickups and chassis',url:'https://xr793.com/wp-content/uploads/2022/11/1993-Ford-Commercial-Trucks-Pickups-Chassis.pdf'},
 };
+const sterlingSource={label:'Diesel Hub · Sterling 10.25 applications',url:'https://dieselhub.com/maintenance/sterling-axle-fluid.html'};
 
 const converter=study('converter','Torque converter section','The engine-driven impeller accelerates oil into the turbine. The turbine turns the transmission input shaft. The stator redirects the returning flow when the converter is multiplying torque.',{label:'Schaeffler · hydrodynamic torque converters',url:'https://www.schaeffler.com/remotemedien/media/_shared_media/08_media_library/01_publications/schaeffler_2/symposia_1/downloads_11/Schaeffler_Kolloquium_2014_20_en.pdf'},[
  ...[['pump','Impeller',-.36,1],['turbine','Turbine',.12,-1],['stator','Stator',-.055,1]].map(([key,name,start,direction],i)=>part(key,name,
@@ -60,6 +63,7 @@ const layouts={
  hrv:{wheelbase:2.654,box:'Continuously variable transmission',desc:'This 2026 US HR-V EX-L has Real Time AWD. The CVT, reduction gears and front differential share a transaxle beside the engine. A transfer unit at the front differential drives a two-piece propeller shaft, and an electronically controlled coupling at the rear differential sets how much torque reaches the rear wheels. The rear driveline shapes and routing are estimated. Open the CVT to watch the belt move.'},
  porsche993cab:{rear:1.112,box:'Six-speed manual transaxle',desc:'On the 993 Carrera, the engine sits behind the rear axle. A clutch and six-speed transaxle ahead of the engine feed both rear wheels through half-shafts.'},
  porsche992scab:{rear:1.25,box:'Seven-speed manual transaxle',desc:'The Carrera S manual combines its gearbox and rear final drive in one transaxle ahead of the flat-six. The differential cutaway illustrates the underlying bevel gear action. Limited-slip functions are outside that mechanism model.'},
+ f350:{box:'E4OD four-speed automatic',desc:'The E4OD four-speed automatic with overdrive sits behind the 7.5-litre V8. A propeller shaft drives the second-generation Sterling 10.25 full-floating rear axle on this two-wheel-drive truck. Lengths, diameters and offsets are estimated.'},
  bmws1000rr:{box:'Six-speed motorcycle gearbox',desc:'A wet multi-plate clutch feeds the six-speed gearbox. A chain connects its small output sprocket to the larger sprocket fixed to the rear wheel.'},
 };
 function register(id,rows){
@@ -127,6 +131,18 @@ function carrera(id){
   ['halfshafts','Rear half-shafts','Two jointed shafts carry drive outward to the independently suspended rear wheels.',[0,.34,-.24],r=>shaft(r,rear,axleZ,false,hubY)]
  ]);
 }
+function truck(){
+ const id='f350';
+ return register(id,[
+  ['gearbox',layouts[id].box,'The electronically controlled four-speed automatic adds an overdrive top gear. Its planetary gearsets sit in the main case behind the bellhousing. Open the gearbox to follow one planetary set; case dimensions are estimated.',[0,0,.44],drawE4OD],
+  ['torque-converter','Torque converter','Engine torque enters the E4OD through the fluid coupling inside the bellhousing.',[-.30,0,.30],drawE4ODConverter],
+  ['propshaft','Propeller shaft','A tubular shaft with a universal joint at each end carries drive from the E4OD output to the axle pinion. It is drawn as one tube; whether this wheelbase uses a two-piece shaft with a center bearing is not confirmed here.',[0,-.45,0],drawF350Propshaft],
+  ['rear-differential','Sterling 10.25 differential','The 10.25-inch ring gear and the differential carrier sit in the center section, with the pinion entering from the front. This is the second-generation 1993–97 axle. Open it to follow the differential gears; housing and cover shapes are estimated.',[0,0,.42],drawSterlingCarrier,sterlingSource],
+  ['axle-housing','Axle housing & tubes','Steel tubes extend from the center section to the stationary wheel spindles. A leaf-spring seat sits under each tube. Tube diameter and seat positions are estimated.',[.30,0,-.22],drawSterlingHousing,sterlingSource],
+  ['axle-shafts','Full-floating axle shafts','Each shaft is splined into a differential side gear and bolted to its hub flange. The shafts carry drive torque; the hubs and spindles carry the truck’s weight.',[0,.34,-.30],drawSterlingShafts,sterlingSource],
+  ['hubs','Full-floating hubs & bearings','Each hub turns on two wheel bearings on the stationary spindle, and the drum and wheel mount to the hub. An axle shaft can be withdrawn without the wheel coming off. Bearing and hub dimensions are estimated.',[-.25,.52,.10],drawFullFloatingHubs,sterlingSource],
+ ]);
+}
 function motorcycle(){
  const id='bmws1000rr', rear=.729, small=.122, left=-.13;
  return register(id,[
@@ -144,7 +160,7 @@ function motorcycle(){
 }
 const fleetSpark={...spark,description:spark.description+' The enlarged section uses a representative single-strap electrode. The fitted plug’s tip and seat depend on its part number.'};
 const launchClutch={...multiClutch,id:'launch-clutch',name:'Wet start-up clutch',source:references.c63,description:'The C63 uses an oil-cooled clutch stack for launch. This representative section shows how alternating plates couple the basket to the hub. The plate count is illustrative.'};
-const map=Object.fromEntries(Object.keys(layouts).map(id=>[id,id==='bmws1000rr'?motorcycle():id.startsWith('porsche')?carrera(id):sedan(id)]));
+const map=Object.fromEntries(Object.keys(layouts).map(id=>[id,id==='bmws1000rr'?motorcycle():id==='f350'?truck():id.startsWith('porsche')?carrera(id):sedan(id)]));
 export function getRoadDrivetrain(id){return id==='bmw325ci'?e46Drivetrain:Object.hasOwn(map,id)?map[id]:null;}
 export function drawRoadDrivetrain(r,id,{skipGearbox=false,installedG500=false}={}){
  for(const p of getRoadDrivetrain(id)?.parts||[]){
@@ -178,7 +194,7 @@ export function getRoadDetail(vehicleId,partId){
    const awd=getHrvAwdDetail(partId);
    if(awd)return awd;
  }
- if(['g500','c63'].includes(vehicleId)&&['powertrain.transmission','drivetrain.gearbox'].includes(partId))return planetary;
+ if(['g500','c63','f350'].includes(vehicleId)&&['powertrain.transmission','drivetrain.gearbox'].includes(partId))return planetary;
  if(vehicleId==='c63'&&partId==='drivetrain.launch-clutch')return launchClutch;
  if(partId==='drivetrain.torque-converter')return converter;
  if(partId==='drivetrain.halfshafts'||partId==='drive.axles'||vehicleId==='hrv'&&partId==='drivetrain.rear-halfshafts')return vehicleId==='g500'?null:axleStudy;

@@ -86,8 +86,10 @@ export function buildFordExterior(r,paint,selected=[]){
    for(const x of [.47,1.48,2.47])box(x,side<0?-.983:.934,1.358,x+.075,side<0?-.934:.983,1.363,'#192125');
   }
   // A bench and dash are visible through the open cab.
-  box(-.60,-.78,.586,.026,.78,.74,'#485055');
-  r.profile([[-.083,.72],[.012,.72],[.136,1.216],[.066,1.236]],-.78,.78,'#434b50');
+  // The bench sits on risers above the seat tracks, clear of the transmission tunnel.
+  box(-.60,-.78,.83,.026,.78,.96,'#485055');
+  for(const y of [-.656,-.312,.312,.656])box(-.62,y-.03,.645,-.36,y+.03,.83,'#3a4246');
+  r.profile([[-.06,.94],[.035,.94],[.136,1.216],[.066,1.236]],-.78,.78,'#434b50');
   driverControls(r,[-.647,-.458,1.127],.178,4);
   box(-.967,-.801,1.076,-.73,.801,1.19,'#465057');
   // Roof, rear cab wall and bulkhead. Glazing is an external surface, not buried.
@@ -95,7 +97,8 @@ export function buildFordExterior(r,paint,selected=[]){
   const rearOuter=[[.245,-.975,1.25],[.130,-.89,1.90],[.130,.89,1.90],[.245,.975,1.25]];
   const rearOpening=[[.242,-.74,1.34],[.159,-.75,1.81],[.159,.75,1.81],[.242,.74,1.34]];
   for(let i=0;i<4;i++)poly([rearOuter[i],rearOuter[(i+1)%4],rearOpening[(i+1)%4],rearOpening[i]],shade(paint,.78),false);
-  box(-.98,-.94,.52,.24,.94,.57,shade(paint,.6));
+  // The cab floor underside stops either side of the transmission tunnel.
+ for(const side of [-1,1])box(-.98,side<0?-.94:.36,.52,.24,side<0?-.36:.94,.57,shade(paint,.6));
   // Narrow gap between cab and bed, front bed panel, inner side skins and ribbed floor.
   box(.34,-.99,.86,.38,.99,1.31,paint);
   const bedColor=selected.some(p=>p?.visual==='bedmat')?'#242e2b':shade(paint,.80);

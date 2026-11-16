@@ -48,7 +48,8 @@ const references = {
     parts('Mercedes-Benz USA · rear and side lighting', 'https://mbparts.mbusa.com/v-2002-mercedes-benz-g500--base--5-0l-v8-gas/electr-system--rear-side-lighting', 'The 2002 catalog identifies the side-marker lamp separately from the rear lamp assembly.')
   ],
   f350: [
-    specs('Ford · 1993 commercial pickups and chassis', 'https://xr793.com/wp-content/uploads/2022/11/1993-Ford-Commercial-Trucks-Pickups-Chassis.pdf', 'Ford’s pickup dimensions table gives the regular cab a 133-inch wheelbase, 213.3-inch overall length and eight-foot box.')
+    specs('Ford · 1993 commercial pickups and chassis', 'https://xr793.com/wp-content/uploads/2022/11/1993-Ford-Commercial-Trucks-Pickups-Chassis.pdf', 'Ford’s pickup dimensions table gives the regular cab a 133-inch wheelbase, 213.3-inch overall length and eight-foot box.'),
+    specs('Diesel Hub · Sterling 10.25 applications', 'https://dieselhub.com/maintenance/sterling-axle-fluid.html', 'Cited in the configuration decision for the Sterling 10.25 under single-rear-wheel F-350s and the stronger pinion introduced in 1993. Housing and hub shapes in the model are estimated.')
   ],
   c63: [
     parts('Mercedes-Benz Classic USA · bumper assembly', 'https://classicparts.mbusa.com/v-2014-mercedes-benz-c63-amg--base--6-3l-v8-gas/body--bumper', '2014 C 63 AMG catalog. The cover, trim and fasteners are separate pieces. The catalog includes multiple body styles and equipment options.')

@@ -91,7 +91,10 @@ export function drawG500Gearbox(r){
  // 359 mm behind the middle of the crankshaft. A 1 mm joint line keeps the
  // two mating faces from sharing a plane.
  const front=[m113RearFace+.007,0,m113CrankZ],rear=gearboxOutput;
- const stations=[[0,.173],[.018,.177],[.14,.155],[.18,.16],[.30,.149],[.36,.121],[.39,.093],[rear[0]-front[0]-.024,.045]];
+ // The bell narrows to the main case ahead of the bulkhead. The case then
+ // tapers under the floor tunnel, and a short neck carries the output flange
+ // below the front of the center console.
+ const stations=[[0,.173],[.018,.177],[.10,.148],[.16,.134],[.30,.112],[.345,.095],[.368,.046],[rear[0]-front[0]-.024,.045]];
  const segments=18;
  const rings=stations.map(([d,rad])=>{
   const f=d/(rear[0]-front[0]);return Array.from({length:segments},(_,i)=>{

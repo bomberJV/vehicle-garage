@@ -184,8 +184,19 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  if(id==='g500'&&!g500ServiceOwnsFlow)tag('starter',()=>drawG500ElectronicShared(r,'starter'));
  if(id!=='g500'&&!ford)tag('starter',()=>{cyl([L/2+.01,.21,-.08],[L/2+.19,.21,-.08],.045,CAST,12);cyl([L/2+.04,.25,-.025],[L/2+.15,.25,-.025],.022,BLACK,10);});
  tag('transmission',()=>{if(id==='g500'){drawG500Gearbox(r);return;}if(ford){drawE4OD(r);return;}if(m54){drawE46Gearbox(r);return;}const a=[L/2+.03,0,-.035],b=[L/2+.56,0,-.06];if(trans){box(L/2+.01,-.17,-.20,L/2+.36,.18,.15,CAST);for(let x=L/2+.03;x<L/2+.34;x+=.065)box(x,-.185,-.16,x+.014,.185,-.13,METAL);}else{cyl(a,[L/2+.15,0,-.035],.18,CAST,14);cyl([L/2+.15,0,-.035],b,.105,CAST,12);for(let x=L/2+.22;x<L/2+.53;x+=.08)tube([x,0,-.06],[x+.012,0,-.06],.115,.10,DARK,12);}});
- tag('engine-mounts',()=>{for(const side of [-1,1]){cyl([.03,side*.32,-.19],[.03,side*.32,-.10],.046,BLACK,10);box(-.02,side*.32-.055,-.21,.08,side*.32+.055,-.19,METAL);// The G500 arm bolts to the block wall above the pan rail and stays outside the pan rim.
-  route([[.02,side*(id==='g500'?.205:.20),id==='g500'?crankRise+.015:-.05],[.03,side*.32,-.11]],.025,CAST,8);}});
+ tag('engine-mounts',()=>{for(const side of [-1,1]){
+  if(id==='g500'){
+   // Each rubber mount stands on a bracket on the inner face of the frame rail,
+   // above the front axle and its propeller shaft. A 1 mm joint line separates
+   // the bracket from the rail. The arm bolts to the block wall above the pan
+   // rail and stays outside the pan rim.
+   cyl([.03,side*.385,.03],[.03,side*.385,.09],.046,BLACK,10);
+   box(-.02,Math.min(side*.33,side*.454),.01,.08,Math.max(side*.33,side*.454),.03,METAL);
+   route([[.02,side*.185,crankRise+.015],[.03,side*.385,.10]],.025,CAST,8);
+   continue;
+  }
+  cyl([.03,side*.32,-.19],[.03,side*.32,-.10],.046,BLACK,10);box(-.02,side*.32-.055,-.21,.08,side*.32+.055,-.19,METAL);
+  route([[.02,side*.20,-.05],[.03,side*.32,-.11]],.025,CAST,8);}});
  const airX=front-.16,airY=-.61,airZ=base+.22;
  if(id==='g500'){if(!g500ServiceOwnsFlow)drawG500InductionCircuit(r,'powertrain');}
  else if(ford){}

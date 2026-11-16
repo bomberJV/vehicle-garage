@@ -7,7 +7,7 @@ import {vehicleDomain,vehicleType} from './fleet.js';
 const highlights={
  sl550:['sl-headlamp','sl550-roof-motion','sl-seat-airscarf','sl-seat-supply','slcomand','sl-rear-camera'],
  g500:['g500-ball-steering','g500-atf-control','g500-oil-exchanger','g500-carbon-bed','g500-exhaust-main','g500-seat-heater-element','g500-column-reach','g500-cabin-blower','g500-coolant-thermostat','g500-air-cleaner','g500-engine-pump','g500-roof-drive','g500-brake-hydraulics','g500-fuel-delivery','g500-fuse-panel','g500-front-diff','g500-center-diff','g500-rear-diff','g500-optic-fog'],
- hrv:['cvt','pushbelt','transaxle-diff'],
+ hrv:['cvt','pushbelt','transaxle-diff','hrv-transfer','hrv-coupling'],
  bmw325ci:['e46-rear-silencer','e46-blower','e46-idle-valve','e46-heater-valve','e46-left-cushion','e46-general-module','regulator-bmw325ci','piston-motion-study'],
  porsche993cab:['993oilreg','993oilpump','993heaterjacket','993case','993barecrank','993spoiler-motor','993fan'],
  porsche992scab:['p992-wastegate','p992-clutch-master','p992-cabin-blower','p992-seat-element','992case','992barecrank','992spoiler-motor','992deckcoolers'],

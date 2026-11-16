@@ -42,15 +42,18 @@ export function drumParts(r,key){const c=[0,0,.48],R=.38;
   if(key==='springs'){for(const dz of [-.13,.16]){let old=[-.21,0,.48+dz];for(let i=1;i<=55;i++){const t=i/55,pt=[-.21+.42*t,.015*Math.cos(t*TAU*11),.48+dz+.015*Math.sin(t*TAU*11)];r.rod(old,pt,.004,copper,5);old=pt;}}return;}
   cyl(r,[0,0,.209],x,-.10,.10,.022,metal,14);sleeve(r,[0,0,.209],x,-.031,.031,.042,.020,iron,12);
 }
-export function tankBody(r,c,shape){
+// An optional tunnel {y,half,top} recesses the underside, offsets relative to the tank center.
+export function tankBody(r,c,shape,tunnel=null){
   if(shape==='saddle'){
     for(const s of [-1,1])slab(r,c[0],c[1]+s*.31,c[2]-.096,.69,.49,.21,rubber,.095);
     slab(r,c[0]+.03,c[1],c[2]+.045,.57,.19,.072,'#414a47',.053);
   }else{
     const [l,w,h]=shape==='nose'?[.70,.82,.27]:shape==='midship'?[1.12,.38,.28]:shape==='bike'?[.46,.285,.184]:[.72,.93,.20];
     const sides=shape==='bike'?[[-.5,.54,.64],[-.34,.94,.96],[.10,1,1],[.35,.60,.46],[.414,.39,.15]]:[[-.50,.77,.70],[-.40,1,.94],[.33,1,1],[.50,.80,.75]];
-    const loop=([dx,fw,fh])=>{const x0=c[0]+dx*l,W=w*fw/2,H=h*fh/2;return [[-.85,-1],[.85,-1],[1,-.66],[1,.51],[.78,1],[-.78,1],[-1,.51],[-1,-.66]].map(([y,z])=>[x0,c[1]+y*W,c[2]+z*H]);};
-    const rings=sides.map(loop);for(let j=1;j<rings.length;j++)for(let i=0;i<8;i++){const k=(i+1)%8;r.polygon([rings[j-1][i],rings[j-1][k],rings[j][k],rings[j][i]],tint(shape==='midship'?'#87918c':rubber,.84+.14*(i%3)),false);}
+    const loop=([dx,fw,fh])=>{const x0=c[0]+dx*l,W=w*fw/2,H=h*fh/2,ring=[[-.85,-1],[.85,-1],[1,-.66],[1,.51],[.78,1],[-.78,1],[-1,.51],[-1,-.66]].map(([y,z])=>[x0,c[1]+y*W,c[2]+z*H]);
+      if(tunnel){const a=c[1]+tunnel.y-tunnel.half,b=c[1]+tunnel.y+tunnel.half,top=c[2]+tunnel.top;ring.splice(1,0,[x0,a,c[2]-H],[x0,a,top],[x0,b,top],[x0,b,c[2]-H]);}
+      return ring;};
+    const rings=sides.map(loop);const n=rings[0].length;for(let j=1;j<rings.length;j++)for(let i=0;i<n;i++){const k=(i+1)%n;r.polygon([rings[j-1][i],rings[j-1][k],rings[j][k],rings[j][i]],tint(shape==='midship'?'#87918c':rubber,.84+.14*(i%3)),false);}
     for(const a of [rings[0],rings.at(-1)])r.polygon(a,'#4c5755',false);
   }
 }

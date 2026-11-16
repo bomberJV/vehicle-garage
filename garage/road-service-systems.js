@@ -69,10 +69,10 @@ function brakes(id,p){
 }
 function fuel(id,p){
  const t=p.tank,b=p.bike,ford=p.tankShape==='midship',saddle=p.tankShape==='saddle',external=id==='porsche993cab';
- const unit=plus(t,[0,saddle?.28:0,b?-.09:.065]);
+ const unit=plus(t,[0,saddle?.28:p.pumpY||0,b?-.09:.065]);
  const neck=external?[-.948,-.661,.747]:b?plus(t,[-.02,0,.119]):[t[0]+(p.engine[0]>0?-.22:.43),p.neckSide*(ford?.90:.74),t[2]+.37];
  const end=id==='bmw325ci'?m54RailInlet:plus(p.engine,[0,0,.13]);
- const parts=[component('tank',ford?'Midship tank · one configuration':saddle?'Saddle fuel tank':'Fuel tank',p.fuel,[0,0,-.38],r=>tankBody(r,t,p.tankShape)),
+ const parts=[component('tank',ford?'Midship tank · one configuration':saddle?'Saddle fuel tank':'Fuel tank',p.fuel,[0,0,-.38],r=>tankBody(r,t,p.tankShape,p.tunnel)),
   component('filler',b?'Filler cap & neck':'Filler neck',b?'The cap sits in the top of the tank ahead of the rider.':'The neck leads from the body-side filler opening to the tank.',[0,p.neckSide*.44,.27],r=>{const join=plus(t,[0,p.neckSide*(ford?.12:.23),.06]);if(!b)path(r,[neck,[neck[0]-.04,neck[1]*.86,neck[2]-.13],join],.025,rubber);cyl(r,neck,b?Z:Y,-.014,.016,b?.048:.037,iron,18);}),
   component('sender',saddle?'Right-hand delivery flange & sender':'Fuel level sender',ford?'The float tracks the fuel level. The engine specification determines the pump and sender combination.':'A float arm pivots as the liquid level changes. The electrical sender reports that position.',[-.18,.07,.52],r=>sender(r,unit,b?.64:1)),
   component('supply','Fuel supply line',ford?'The chassis line shown ends at the engine bay. A gasoline rail or diesel injection pump requires a specific engine selection.':'The supply line runs from the tank assembly toward the engine. Its bends and clips are schematic.',[.12,-.33,-.15],r=>{const y=b?.08:.27;path(r,[unit,[unit[0],y,unit[2]-.13],[end[0],y,b?.65:.33],end],b?.005:.009,'#736f5a');})];

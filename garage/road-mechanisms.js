@@ -10,6 +10,7 @@ import {cvt,pushbelt} from './mechanism-cvt.js';
 import {planetary} from './mechanism-planetary.js';
 import {diff,transaxleDiff} from './mechanism-differential.js';
 import {manual,clutch,cvJoint,multiClutch,finalChain} from './mechanism-shaft.js';
+import {hrvAwdRows,getHrvAwdDetail} from './hrv-awd.js';
 
 const references={
  hrv:{label:'Honda · 2026 HR-V transmission and drivetrain specifications',url:'https://hondanews.com/en-US/releases/release-6f8b202ddb1c7f26ecd92774bb014b0c-2026-honda-hr-v-specifications-and-features'},
@@ -56,7 +57,7 @@ const g500FrontProp=g500AxleShaftStudy(true),g500RearProp=g500AxleShaftStudy(fal
 const layouts={
  g500:{wheelbase:2.85,box:'Five-speed automatic',desc:'The longitudinal five-speed drives a separate two-speed VG150E. A center differential feeds both solid axles in normal driving. Selecting low range and locking the center differential operate separate mechanisms.'},
  c63:{wheelbase:2.76,box:'Seven-speed AMG MCT',desc:'A wet start-up clutch couples the V8 to the seven-speed MCT. The propeller shaft carries drive rearward to the final drive and independently suspended rear wheels.'},
- hrv:{wheelbase:2.654,box:'Continuously variable transmission',desc:'On the standard front-wheel-drive 2026 US HR-V, the CVT, reduction gears and front differential share a transaxle beside the engine. The optional AWD rear drive is a different configuration. Open the CVT to watch the belt move.'},
+ hrv:{wheelbase:2.654,box:'Continuously variable transmission',desc:'This 2026 US HR-V EX-L has Real Time AWD. The CVT, reduction gears and front differential share a transaxle beside the engine. A transfer unit at the front differential drives a two-piece propeller shaft, and an electronically controlled coupling at the rear differential sets how much torque reaches the rear wheels. The rear driveline shapes and routing are estimated. Open the CVT to watch the belt move.'},
  porsche993cab:{rear:1.112,box:'Six-speed manual transaxle',desc:'On the 993 Carrera, the engine sits behind the rear axle. A clutch and six-speed transaxle ahead of the engine feed both rear wheels through half-shafts.'},
  porsche992scab:{rear:1.25,box:'Seven-speed manual transaxle',desc:'The Carrera S manual combines its gearbox and rear final drive in one transaxle ahead of the flat-six. The differential cutaway illustrates the underlying bevel gear action. Limited-slip functions are outside that mechanism model.'},
  bmws1000rr:{box:'Six-speed motorcycle gearbox',desc:'A wet multi-plate clutch feeds the six-speed gearbox. A chain connects its small output sprocket to the larger sprocket fixed to the rear wheel.'},
@@ -76,6 +77,7 @@ function sedan(id){
   arr.push(['torque-converter','Torque converter','Engine torque enters the transaxle through the fluid coupling.',[-.17,-.33,.32],r=>housing(r,[front+.15,.19,.50],y,.154,.12)],
   ['front-differential','Front differential','The final reduction turns the differential carrier. The side gears drive the front wheels.',[-.25,.40,-.13],r=>finalDrive(r,[front,0,.37],true)],
   ['halfshafts','Front half-shafts','An inboard and outboard joint on each side allow steering and suspension motion.',[0,.24,-.31],r=>shaft(r,front,.37)]);
+  if(id==='hrv')arr.push(...hrvAwdRows);
  }else {
   const tail=c[0]+.29,center=.02;
   if(g){
@@ -173,11 +175,13 @@ export function getRoadDetail(vehicleId,partId){
    if(['powertrain.transmission','drivetrain.gearbox'].includes(partId))return cvt;
    if(partId==='cvt.belt')return pushbelt;
    if(partId==='drivetrain.front-differential')return transaxleDiff;
+   const awd=getHrvAwdDetail(partId);
+   if(awd)return awd;
  }
  if(['g500','c63'].includes(vehicleId)&&['powertrain.transmission','drivetrain.gearbox'].includes(partId))return planetary;
  if(vehicleId==='c63'&&partId==='drivetrain.launch-clutch')return launchClutch;
  if(partId==='drivetrain.torque-converter')return converter;
- if(partId==='drivetrain.halfshafts'||partId==='drive.axles')return vehicleId==='g500'?null:axleStudy;
+ if(partId==='drivetrain.halfshafts'||partId==='drive.axles'||vehicleId==='hrv'&&partId==='drivetrain.rear-halfshafts')return vehicleId==='g500'?null:axleStudy;
  if(partId==='shaft.outer')return cvJoint;
  if(['drivetrain.rear-differential','drivetrain.front-differential'].includes(partId))return diff;
  if(vehicleId.startsWith('porsche')){

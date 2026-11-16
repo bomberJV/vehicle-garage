@@ -12,6 +12,10 @@ export const m113CrankZ=.680;
 export const m113PanRail=-.029;
 export const m113PanOutline=[[-.392,-.132],[-.350,-.191],[.301,-.191],[.359,-.145],
  [.359,.144],[.309,.192],[-.327,.192],[-.392,.116]];
+// The middle of the crankshaft in vehicle coordinates, and the rear face of
+// the block and upper pan, where the bellhousing bolts on.
+export const m113InstalledX=-1.235;
+export const m113RearFace=m113InstalledX+Math.max(...m113PanOutline.map(p=>p[0]));
 const throwRadius=.042,bore=.0485,chain=[0,1,3,2],gray='#8f9b9f',iron='#637178';
 const axis=side=>[0,side*Math.SQRT1_2,Math.SQRT1_2];
 const along=(p,n,t)=>p.map((v,i)=>v+n[i]*t);

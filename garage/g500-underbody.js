@@ -50,8 +50,10 @@ export function drawG500Frame(r){
      r.box(xx-.027,side*.52-.043,.420,xx+.027,side*.52+.043,.512,dark);
    }
  }
- for(const [station,height] of [[-1.91,.60],[-.87,.503],[.22,.449],[1.87,.641]])
-   r.rod([station,-.49,height],[station,.49,height],.040,dark,12);
+ // The second crossmember passes behind the oil pan and ahead of the
+ // bellhousing, above the front propeller shaft and the fluid cooler lines.
+ for(const [station,height,radius=.040] of [[-1.91,.60],[-.94,.55,.030],[.22,.449],[1.87,.641]])
+   r.rod([station,-.49,height],[station,.49,height],radius,dark,12);
 }
 function beam(r,axle,isFront){
   for(const s of [-1,1]){

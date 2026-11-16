@@ -101,8 +101,14 @@ function roadDoor(r,side,isFront,paint) {
 
 function bodyShell(r,paint) {
   r.rigid('body-shell',[0,0,0],()=>r.tag('body.structure',()=>{
-    r.box(-.744,-.83,.545,2.05,.83,.575,tone(paint,.53));
-    r.box(-.749,-.823,.58,-.723,.823,1.19,tone(paint,.58));
+    // The floor and the bulkhead open around the transmission, which sits
+    // under the tunnel pressing between the footwells.
+    for(const side of [-1,1]){
+      r.box(-.744,Math.min(side*.20,side*.83),.545,-.40,Math.max(side*.20,side*.83),.575,tone(paint,.53));
+      r.box(-.749,Math.min(side*.20,side*.823),.58,-.723,Math.max(side*.20,side*.823),1.19,tone(paint,.58));
+    }
+    r.box(-.40,-.83,.545,2.05,.83,.575,tone(paint,.53));
+    r.box(-.749,-.20,.84,-.723,.20,1.19,tone(paint,.58));
     drawG500Cabin(r);
     for(const side of [-1,1]) {
       const y=side*width;

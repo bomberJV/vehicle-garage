@@ -23,7 +23,7 @@ const backlog=additionalRequestSections.flatMap(s=>s.items).find(item=>item.id==
 // The pump, the cables, the bellhousing and the mount arms all crossed the pan
 // before they were rebuilt. Each must now clear its skin at both ride heights.
 const neighbours=[['powertrain.oil-pump',12.7],['powertrain.oil-pickup',11.0],['electrical.primary-power',27.7],
-  ['drivetrain.gearbox',5.4],['powertrain.engine-mounts',6.0]];
+  ['drivetrain.gearbox',5.4],['powertrain.engine-mounts',17.8]];
 
 test('no pump, pickup, cable, bellhousing or mount triangle crosses or touches the G500 oil pan at either depicted pose',()=>{
   assert.deepEqual(poses,['stock','g500-orc-40']);

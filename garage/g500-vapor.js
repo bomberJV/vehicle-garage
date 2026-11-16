@@ -27,7 +27,7 @@ export const evapRows=[
   box(r,plus(pressure,[-.023,0,.015]),[.017,.018,.012],iron);
  }],
  ['purge-line','Long vapor purge line','A separate line carries recovered vapor forward from the canister. It passes the engine-bay bulkhead and reaches the purge valve.',[0,.27,-.15],ref.evapRoute,r=>{
-  path(r,[canPorts.purge,[2.097,.746,.836],[1.976,.639,.717],[1.659,.575,.597],[1.291,.512,.520],[.490,.473,.512],[-.397,.465,.532],[-.635,.351,.610],[-.715,-.303,.694],[-.858,-.535,.826],plus(purge,[.033,0,0])],.0065,iron);
+  path(r,[canPorts.purge,[2.097,.746,.836],[1.976,.639,.717],[1.659,.575,.597],[1.291,.512,.520],[.490,.473,.512],[-.397,.465,.532],[-.70,.44,.53],[-.885,.44,.53],[-.885,.44,.80],[-.80,.44,.80],[-.762,.18,.955],[-.762,-.18,.955],[-.762,-.45,.80],[-.858,-.535,.826],plus(purge,[.033,0,0])],.0065,iron);
  }],
  ['purge-valve','Engine-bay purge valve · Y58/1','The engine controller opens the valve in pulses. Intake vacuum then draws stored vapor out of the carbon bed and into the engine.',[-.17,-.28,.20],ref.evapControls,r=>{
   cyl(r,purge,x,-.022,.024,.021,rubber,12);

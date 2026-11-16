@@ -184,7 +184,9 @@ function primaryPower(r){
  const junction=[-.651,-.388,.742];
  line(r,[A.prefuse,[.33,-.077,.708],[-.25,-.175,.708],junction,A.jump],.009,red);
  line(r,[junction,[-.70,.175,.676],A.starter],.008,red);
- line(r,[A.starter,[-.86,.29,.570],[-1.36,.26,.57],[-1.62,.07,.57],A.alternator],.007,red);
+ // The charging cable follows the right side of the block above the pan rail,
+ // drops in front of the pan and crosses below the crank nose to the alternator.
+ line(r,[A.starter,[-.80,.262,.700],[-1.56,.262,.700],[-1.648,.165,.600],[-1.648,-.205,.600],A.alternator],.007,red);
 }
 function engineGround(r){
  const a=[-1.107,-.324,.485],b=[-1.003,-.465,.475];

@@ -1,6 +1,6 @@
 // Measurements are in metres. The Welte and Driveshaft Parts replacement lengths differ.
 import {TAU,add,basis,turn,cyl,sleeve,unit,part,study,origin,x,metal,steel,dark} from './mechanism-shapes.js';
-import {m113CrankZ} from './g500-m113-geometry.js';
+import {m113CrankZ,m113RearFace} from './g500-m113-geometry.js';
 
 const classic='https://classicparts.mbusa.com/v-2002-mercedes-benz-g500--base--5-0l-v8-gas/';
 export const shaftRefs={
@@ -87,7 +87,10 @@ g500InputShaftStudy.sources=[shaftRefs.intermediate,shaftRefs.welte,shaftRefs.in
 export function drawG500Gearbox(r){
  // Body and bell contours are estimated. The tail face meets the CV joint, and
  // the body sits over the separate pan and hydraulic assembly at their installed height.
- const front=[-.893,0,m113CrankZ],rear=gearboxOutput;
+ // The bellhousing flange meets the rear face of the block and upper pan,
+ // 359 mm behind the middle of the crankshaft. A 1 mm joint line keeps the
+ // two mating faces from sharing a plane.
+ const front=[m113RearFace+.007,0,m113CrankZ],rear=gearboxOutput;
  const stations=[[0,.173],[.018,.177],[.14,.155],[.18,.16],[.30,.149],[.36,.121],[.39,.093],[rear[0]-front[0]-.024,.045]];
  const segments=18;
  const rings=stations.map(([d,rad])=>{

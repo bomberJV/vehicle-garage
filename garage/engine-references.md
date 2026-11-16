@@ -38,7 +38,9 @@ Generic descriptions of functions such as piston/rod/crank motion and separate o
 
 ## Ford1993F-350
 
-The engine is unresolved. [LMC's Ford catalog](https://media.lmctruck.com/pdf/FD/fdComplete.pdf) is a configuration reference. The engine explorer exposes only an explicit configuration marker, with no guessed fuel system, cylinder layout, induction system or internal component inventory. Choosing the actual engine is necessary before building a comparable detailed engine study.
+The configuration decision `f350-powertrain` in `vehicle-decisions.js` fixes the truck: regular cab, long box, two-wheel drive, single rear wheels, the 7.5-litre (460 cu in) EFI V8, the E4OD automatic, Twin I-Beam front suspension and the second-generation Sterling 10.25 full-floating rear axle. The decision cites Ford's [1993 commercial pickups and chassis brochure](https://xr793.com/wp-content/uploads/2022/11/1993-Ford-Commercial-Trucks-Pickups-Chassis.pdf) and [Diesel Hub's Sterling 10.25 applications](https://dieselhub.com/maintenance/sterling-axle-fluid.html). [LMC's Ford catalog](https://media.lmctruck.com/pdf/FD/fdComplete.pdf) remains the component-name reference.
+
+The engine study draws a 90° V8 with one in-block camshaft, lifters, pushrods and rocker arms, two valves per cylinder, a 4.36 in bore, distributor ignition and multiport injection. Its bay position, oil-pan contour, manifold shapes, air-cleaner location and all clearances are estimates fitted to the existing frame, cab and hood. The E4OD case, propeller shaft, axle housing, hubs and bearings are drawn to estimated proportions. The front spring and radius-arm arrangement is not drawn, because no reference in the repository establishes it.
 
 ## Limits
 

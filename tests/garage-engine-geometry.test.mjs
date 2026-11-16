@@ -12,7 +12,7 @@ test('every engine leaf has finite tagged geometry and remains within the detail
 });
 test('closed hoods do not get pierced by a coarse engine proxy',()=>{for(const v of vehicles)assert.equal(mesh(v,false).length,0);});
 test('physical piston and plug meshes retain each engine cylinder and ignition architecture',()=>{
- for(const vehicle of vehicles.filter(v=>v!=='f350')){const faces=mesh(vehicle),d=getEngineDefinition(vehicle);const pistonCaps=facesFor(faces,'pistons').filter(f=>f.points.length===14);assert.equal(pistonCaps.length,2*d.cylinders,`${vehicle} piston solids`);const plugCaps=facesFor(faces,'spark-plugs').filter(f=>f.points.length===8);assert.equal(plugCaps.length,2*d.cylinders*d.plugsPerCylinder,`${vehicle} ceramic plug bodies`);}
+ for(const vehicle of vehicles){const faces=mesh(vehicle),d=getEngineDefinition(vehicle);const pistonCaps=facesFor(faces,'pistons').filter(f=>f.points.length===14);assert.equal(pistonCaps.length,2*d.cylinders,`${vehicle} piston solids`);const plugCaps=facesFor(faces,'spark-plugs').filter(f=>f.points.length===8);assert.equal(plugCaps.length,2*d.cylinders*d.plugsPerCylinder,`${vehicle} ceramic plug bodies`);}
 });
 test('the HR-V cylinder row is transverse and the M54 cylinder row longitudinal',()=>{
  const h=bounds(facesFor(mesh('hrv'),'pistons')),b=bounds(facesFor(mesh('bmw325ci'),'pistons'));assert(h[1][1]-h[1][0]>(h[0][1]-h[0][0])*2);assert(b[0][1]-b[0][0]>(b[1][1]-b[1][0])*2);
@@ -21,7 +21,7 @@ test('the E46 and G500 engine bays show a remote power interface instead of an u
  for(const vehicle of ['g500','bmw325ci']){const b=bounds(facesFor(mesh(vehicle),'battery'));assert(b[0][1]-b[0][0]<.20);assert(b[2][1]-b[2][0]<.30);}
 });
 test('engine expansion opens the head and cover while retaining finite rigid offsets',()=>{
- for(const vehicle of vehicles.filter(v=>v!=='f350')){const d=getEngineDefinition(vehicle);for(const p of d.components)assert(enginePartOffset(p.id,vehicle).every(Number.isFinite));assert(enginePartOffset('powertrain.valve-cover',vehicle)[2]>enginePartOffset('powertrain.head',vehicle)[2]);assert(enginePartOffset('powertrain.head',vehicle)[2]>enginePartOffset('powertrain.block',vehicle)[2]);assert(enginePartOffset('powertrain.sump',vehicle)[2]<0);}
+ for(const vehicle of vehicles){const d=getEngineDefinition(vehicle);for(const p of d.components)assert(enginePartOffset(p.id,vehicle).every(Number.isFinite));assert(enginePartOffset('powertrain.valve-cover',vehicle)[2]>enginePartOffset('powertrain.head',vehicle)[2]);assert(enginePartOffset('powertrain.head',vehicle)[2]>enginePartOffset('powertrain.block',vehicle)[2]);assert(enginePartOffset('powertrain.sump',vehicle)[2]<0);}
 });
 
 test('M113.962 air, ignition and service-fluid placements match the G500 layout',()=>{

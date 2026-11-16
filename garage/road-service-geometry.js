@@ -33,7 +33,8 @@ export function caliper(r,c,R,n,bike=false,color='#475454'){
   for(const h of [-.28,.36])box(r,at(.87,0,h),[R*.25,R*.53,R*.11],color);
   if(n<=1)for(const h of [-.28,.34])r.rod(at(.66,-.38,h),at(.66,.30,h),R*.045,alloy,8);
 }
-export function drum(r,c,R){turn(r,c,y,[[-R*.21,R*.91],[-R*.21,R],[-R*.14,R*1.02],[R*.17,R*1.02],[R*.23,R*.88],[R*.23,R*.28],[R*.19,R*.28],[R*.19,R*.86],[-R*.21,R*.91]],iron,{n:38});}
+// The closed face is outboard; side mirrors the section for the left wheel.
+export function drum(r,c,R,side=1){turn(r,c,y,[[-R*.21,R*.91],[-R*.21,R],[-R*.14,R*1.02],[R*.17,R*1.02],[R*.23,R*.88],[R*.23,R*.28],[R*.19,R*.28],[R*.19,R*.86],[-R*.21,R*.91]].map(([d,rad])=>[side*d,rad]),iron,{n:38});}
 export function drumParts(r,key){const c=[0,0,.48],R=.38;
   if(key==='shell')return drum(r,c,R);
   if(key==='plate')return cyl(r,c,y,-.11,-.096,.374,'#525e5e',40);

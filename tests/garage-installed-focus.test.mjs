@@ -27,7 +27,8 @@ test('the road-car engines are installed in the complete car before a part or vi
     assert(r.faces.filter(f=>/^(engine|powertrain|sl-m278)\./.test(f.part)).every(f=>!f.pickThrough));
     r.seeThroughBody=false;r.buildMesh();assert(!r.faces.some(f=>f.pickThrough));
   }
-  const r=scene('f350');r.buildMesh();assert(!r.faces.some(f=>f.part==='powertrain.block'));
+  const r=scene('f350');r.buildMesh();
+  for(const id of ['powertrain.lifters','drivetrain.rear-differential','drivetrain.hubs','steering.axle'])assert(r.faces.some(f=>f.part===id),'F-350 '+id);
 });
 test('the transparent BMW bonnet exposes a pickable installed engine at the same world position',()=>{
   globalThis.window={devicePixelRatio:1};

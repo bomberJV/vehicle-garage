@@ -7,7 +7,7 @@ import {pulleyState} from '../garage/mechanism-cvt.js';
 import {differentialState} from '../garage/mechanism-differential.js';
 import {planetaryState} from '../garage/mechanism-planetary.js';
 
-const models=['g500','bmw325ci','c63','hrv','porsche993cab','porsche992scab','bmws1000rr'];
+const models=['g500','bmw325ci','c63','hrv','f350','porsche993cab','porsche992scab','bmws1000rr'];
 const close=(a,b,tolerance=1e-8)=>assert(Math.abs(a-b)<tolerance,`${a} vs ${b}`);
 function mesh(draw){
   const r=Object.assign(Object.create(GarageRenderer.prototype),{faces:[],currentPart:null});
@@ -39,7 +39,9 @@ test('road layouts draw individual finite, tagged parts using each vehicle archi
   for(const key of ['front-differential','transfer','propshaft','center-support','rear-coupling','rear-differential','rear-halfshafts'])assert(honda.includes('drivetrain.'+key),key);
   assert(getRoadDrivetrain('g500').parts.some(p=>p.id==='drivetrain.transfer'));
   assert(getRoadDrivetrain('bmws1000rr').parts.some(p=>p.id==='drivetrain.chain'));
-  assert.equal(getRoadDrivetrain('f350'),null);
+  const ford=getRoadDrivetrain('f350').parts.map(p=>p.id);
+  for(const id of ['gearbox','torque-converter','propshaft','rear-differential','axle-housing','axle-shafts','hubs'])assert(ford.includes('drivetrain.'+id),id);
+  assert(!ford.includes('drivetrain.halfshafts'),'a full-floating axle has no CV half-shafts');
 });
 test('nested mechanisms declare exactly the selectable geometry they draw at sampled phases',()=>{
   const checked=new Set();
@@ -59,7 +61,9 @@ test('nested mechanisms declare exactly the selectable geometry they draw at sam
     }
   }
   for(const id of ['spark','electrode','cvt','pushbelt','diff','transaxle-diff','shaft','cvjoint','manual','clutch','wetclutch','roller','planetary','launch-clutch','g500-input-shaft','g500-front-propeller','g500-rear-propeller','converter','hrv-transfer','hrv-propshaft','hrv-coupling'])assert(checked.has(id),id);
-  assert.equal(getRoadDetail('f350','powertrain.spark-plugs'),null);
+  assert.equal(getRoadDetail('f350','powertrain.spark-plugs').id,'spark');
+  assert.equal(getRoadDetail('f350','drivetrain.rear-differential').id,'diff');
+  assert.equal(getRoadDetail('f350','drivetrain.gearbox').id,'planetary');
   assert.equal(getRoadDetail('f16','powertrain.spark-plugs'),null);
 });
 test('CVT pitch radii preserve belt length and fixed sheaves hold their axial positions',()=>{

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {getEngineDefinition} from '../garage/engine-data.js';
 import {buildEngineBay} from '../garage/engine-geometry.js';
 import {GarageRenderer} from '../garage/render.js';
-const vehicles=['g500','bmw325ci','c63','hrv'];
+const vehicles=['g500','bmw325ci','c63','hrv','f350'];
 const mesh=vehicle=>{const r=Object.assign(Object.create(GarageRenderer.prototype),{faces:[],currentPart:null,build:{vehicle},lights:true});buildEngineBay(r,getEngineDefinition(vehicle),{detail:true});return r.faces;};
 
 test('engine hierarchy covers every component once and connection targets resolve',()=>{
@@ -18,7 +18,7 @@ test('engine hierarchy covers every component once and connection targets resolv
 });
 
 test('engine-specific cylinder, cam, valve and ignition counts remain distinct',()=>{
- const expected={g500:[8,2,24,16,'longitudinal'],bmw325ci:[6,2,24,6,'longitudinal'],c63:[8,4,32,8,'longitudinal'],hrv:[4,2,16,4,'transverse']};
+ const expected={g500:[8,2,24,16,'longitudinal'],bmw325ci:[6,2,24,6,'longitudinal'],c63:[8,4,32,8,'longitudinal'],hrv:[4,2,16,4,'transverse'],f350:[8,1,16,8,'longitudinal']};
  for(const [vehicle,[cylinders,cams,valves,plugs,orientation]]of Object.entries(expected)){
   const d=getEngineDefinition(vehicle),q=id=>d.components.find(p=>p.id==='powertrain.'+id).quantity;
   assert.equal(d.cylinders,cylinders);assert.equal(q('pistons'),cylinders);assert.equal(q('connecting-rods'),cylinders);assert.equal(q('camshafts'),cams);assert.equal(q('valves'),valves);assert.equal(q('spark-plugs'),plugs);assert.equal(d.orientation,orientation);
@@ -33,8 +33,14 @@ test('every listed engine component has finite, selectable geometry within a bou
  }
 });
 
-test('unselected Ford engine stays neutral instead of inheriting a different engine',()=>{
- const d=getEngineDefinition('f350');assert.equal(d.cylinders,0);assert.deepEqual(d.components.map(p=>p.id),['powertrain.configuration']);const tags=new Set(mesh('f350').map(f=>f.part));assert.deepEqual([...tags],['powertrain.configuration']);
+test('the decided Ford 7.5-litre V8 is a pushrod engine with distributor ignition',()=>{
+ const d=getEngineDefinition('f350'),q=id=>d.components.find(p=>p.id==='powertrain.'+id);
+ assert.equal(d.layout,'v8');assert.match(d.summary,/7\.5-litre.*90° V8.*one camshaft in the block.*bore 4\.36 in, stroke 3\.85 in/);
+ for(const id of ['lifters','pushrods','rocker-arms'])assert.equal(q(id).quantity,16,id);
+ assert.equal(q('distributor').quantity,1);assert.equal(q('coils').quantity,1);assert.match(q('spark-plugs').description,/1-5-4-2-6-3-7-8/);
+ assert.deepEqual(q('camshafts').connectsTo.filter(id=>id==='powertrain.lifters'),['powertrain.lifters']);
+ assert.ok(!d.components.some(p=>p.id==='powertrain.configuration'));
+ const tags=new Set(mesh('f350').map(f=>f.part));for(const id of ['lifters','pushrods','rocker-arms','distributor'])assert.ok(tags.has('powertrain.'+id),id);
 });
 
 test('connection labels distinguish physical air paths, mounting and electrical signals',()=>{

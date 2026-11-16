@@ -10,7 +10,7 @@ import {getServiceStudy} from './road-service-studies.js';
 import {refineBmwFuelParts,drawBmwFuseCarrier} from './bmw-fuel-system.js';
 const X=[1,0,0],Y=[0,1,0],Z=[0,0,1];
 function component(id,name,description,offset,draw){return {id,name,description,offset,draw};}
-function brakeMasterSite(p){return p.bike?[-.49,.26,.90]:[p.engine[0]>0?-1.06:p.axles[0]+.62,-.36,.65];}
+function brakeMasterSite(p){return p.master||(p.bike?[-.49,.26,.90]:[p.engine[0]>0?-1.06:p.axles[0]+.62,-.36,.65]);}
 export function drawRoadBrakeMaster(r,id){
  const p=roadSystems[id],m=brakeMasterSite(p);
  if(p.bike){
@@ -32,16 +32,30 @@ export function drawRoadBrakeMaster(r,id){
  box(r,plus(m,[.024,0,.043]),[.090,.057,.056],'#b6bda6');
  cyl(r,plus(m,[.02,0,.068]),Z,0,.014,.022,rubber,12);
 }
+// The truck's lines drop from the inner fender, pass under the bellhousing and
+// run along the right of the frame below the crossmembers. Routes are schematic.
+function fordBrakeLines(r,mod,axleSites){
+ const drop=[mod[0],-.74,.56],over=[-1.12,-.74,.56],inside=[-1.12,-.40,.52],low=[-1.12,-.40,.33],cross=[-1.12,.40,.33],rearCross=[1.40,.40,.33];
+ const line='#897d64';
+ path(r,[mod,drop],.0045,line);
+ for(const rear of [false,true])for(const c of axleSites(rear)){
+  const side=Math.sign(c[1]),mid=rear?[c[0]+.13,side*.40,.52]:[c[0]+.13,side*.74,.56];
+  if(!rear&&side<0)path(r,[drop,mid],.0045,line);
+  else if(!rear)path(r,[drop,over,inside,low,cross,[-1.12,.40,.52],[-1.12,.74,.56],mid],.0045,line);
+  else path(r,[drop,over,inside,low,cross,rearCross,...(side<0?[[1.40,-.40,.33]]:[]),[c[0]+.13,side*.40,.33],mid],.0045,line);
+  path(r,rear?[mid,[c[0]+.10,side*.62,.58],[c[0]+.03,side*.74,c[2]+.14]]:[mid,[c[0]-.04,c[1]*.90,c[2]+.145],plus(c,[.10,0,.054])],.007,rubber);
+ }
+}
 function brakes(id,p){
  const e46=id==='bmw325ci';
  const axleSites=rear=>e46?[-1,1].map(s=>e46RotorSite(rear,s)):wheelSites(p,rear);
  const m=brakeMasterSite(p);
- const mod=p.bike?[.14,0,.55]:[m[0]-.10,m[1]+.12,m[2]-.09];
+ const mod=p.absSite||(p.bike?[.14,0,.55]:[m[0]-.10,m[1]+.12,m[2]-.09]);
  const parts=[];
  for(const rear of [false,true]){
   const key=rear?'rear':'front',label=rear?'Rear':'Front',idx=rear?1:0,sites=axleSites(rear),R=p.radii[idx],n=p.calipers[idx];
   if(rear&&p.park==='drum'){
-   parts.push(component('rear-drum','Rear brake drums','Each rear drum turns around a stationary backing plate. Open the drum to see its shoes, cylinder, adjuster and springs.',[.43,-.53,.18],r=>sites.forEach(c=>drum(r,c,R))));continue;
+   parts.push(component('rear-drum','Rear brake drums','Each rear drum turns around a stationary backing plate. Open the drum to see its shoes, cylinder, adjuster and springs.',[.43,-.53,.18],r=>sites.forEach(c=>drum(r,c,R,Math.sign(c[1])||1))));continue;
   }
   const rotorNote=e46
    ? rear?'The 294 × 19 mm vented rear discs include a drum surface for the parking brake.':'The front discs measure 300 × 22 mm. A vent gap separates the two friction rings.'
@@ -58,6 +72,7 @@ function brakes(id,p){
  }
  parts.push(component('master',p.bike?'Front brake master cylinder':'Master cylinder & reservoir',p.bike?'The right-hand lever acts on the front circuit. The rear pedal has a separate master cylinder.':'A fluid reservoir sits on the tandem cylinder at the driver’s side of the vehicle.',[-.40,0,.40],r=>drawRoadBrakeMaster(r,id)),component('abs',p.park==='drum'?'Rear anti-lock circuit':'ABS hydraulic unit',p.park==='drum'?'The rear anti-lock system acts on the rear axle brake circuit. The diagram omits option-specific valve plumbing.':'The hydraulic block modulates brake pressure. An electric pump and valve passages share the module.',[.03,.44,.36],r=>{box(r,mod,[.099,.066,.075],metal);cyl(r,plus(mod,[.065,0,0]),X,-.038,.046,.033,rubber,16);for(let j=0;j<(p.bike?3:4);j++)cyl(r,plus(mod,[-.03+j*.020,0,.034]),Z,0,.019,.006,copper,8);}),
  component('lines','Hard lines & flexible hoses','The fixed lines carry fluid along the chassis. A flexible section follows each moving wheel. Routes are schematic.',[.03,.14,-.40],r=>{
+  if(id==='f350')return fordBrakeLines(r,mod,axleSites);
   for(const rear of [false,true])for(const c of axleSites(rear)){
    const side=Math.sign(c[1]),mid=[c[0]+(rear?-.13:.13),side*(p.bike?.042:.38),c[2]+.10];
    path(r,[mod,[mod[0],side*(p.bike?.042:.38),mod[2]-.027],mid],p.bike?.003:.0045,'#897d64');path(r,[mid,[c[0]-.04,c[1]*.90,c[2]+.145],plus(c,[.10,0,.054])],p.bike?.004:.007,rubber);
@@ -71,11 +86,11 @@ function fuel(id,p){
  const t=p.tank,b=p.bike,ford=p.tankShape==='midship',saddle=p.tankShape==='saddle',external=id==='porsche993cab';
  const unit=plus(t,[0,saddle?.28:p.pumpY||0,b?-.09:.065]);
  const neck=external?[-.948,-.661,.747]:b?plus(t,[-.02,0,.119]):[t[0]+(p.engine[0]>0?-.22:.43),p.neckSide*(ford?.90:.74),t[2]+.37];
- const end=id==='bmw325ci'?m54RailInlet:plus(p.engine,[0,0,.13]);
+ const end=id==='bmw325ci'?m54RailInlet:p.fuelEnd||plus(p.engine,[0,0,.13]);
  const parts=[component('tank',ford?'Midship tank · one configuration':saddle?'Saddle fuel tank':'Fuel tank',p.fuel,[0,0,-.38],r=>tankBody(r,t,p.tankShape,p.tunnel)),
   component('filler',b?'Filler cap & neck':'Filler neck',b?'The cap sits in the top of the tank ahead of the rider.':'The neck leads from the body-side filler opening to the tank.',[0,p.neckSide*.44,.27],r=>{const join=plus(t,[0,p.neckSide*(ford?.12:.23),.06]);if(!b)path(r,[neck,[neck[0]-.04,neck[1]*.86,neck[2]-.13],join],.025,rubber);cyl(r,neck,b?Z:Y,-.014,.016,b?.048:.037,iron,18);}),
   component('sender',saddle?'Right-hand delivery flange & sender':'Fuel level sender',ford?'The float tracks the fuel level. The engine specification determines the pump and sender combination.':'A float arm pivots as the liquid level changes. The electrical sender reports that position.',[-.18,.07,.52],r=>sender(r,unit,b?.64:1)),
-  component('supply','Fuel supply line',ford?'The chassis line shown ends at the engine bay. A gasoline rail or diesel injection pump requires a specific engine selection.':'The supply line runs from the tank assembly toward the engine. Its bends and clips are schematic.',[.12,-.33,-.15],r=>{const y=b?.08:.27;path(r,[unit,[unit[0],y,unit[2]-.13],[end[0],y,b?.65:.33],end],b?.005:.009,'#736f5a');})];
+  component('supply','Fuel supply line',ford?'The chassis line runs inside the left frame rail and ends at the engine bay. The connection to the V8’s fuel rails and the return line are not drawn.':'The supply line runs from the tank assembly toward the engine. Its bends and clips are schematic.',[.12,-.33,-.15],r=>{const y=p.supplyY??(b?.08:.27);path(r,[unit,[unit[0],y,ford?.33:unit[2]-.13],[end[0],y,b?.65:.33],end],b?.005:.009,'#736f5a');})];
  if(saddle)parts.push(component('left-sender','Left tank sender','The second float measures the level across the center tunnel.',[-.29,-.41,.27],r=>sender(r,plus(t,[-.035,-.28,.07]))));
  if(!ford){
   const q=external?plus(t,[.25,-.12,-.14]):plus(unit,[.004,0,-.096]);
@@ -92,7 +107,7 @@ function fuel(id,p){
  return id==='bmw325ci'?refineBmwFuelParts(parts,p):parts;
 }
 function electrical(id,p){
- const e=p.engine,b=p.bike,B=p.battery,classic=id==='porsche993cab',starter=plus(e,[.16,b?.02:.11,-.09]),gen=classic?plus(e,[.22,0,.18]):plus(e,[-.13,b?-.10:-.20,.04]);
+ const e=p.engine,b=p.bike,B=p.battery,classic=id==='porsche993cab',starter=p.starter||plus(e,[.16,b?.02:.11,-.09]),gen=classic?plus(e,[.22,0,.18]):plus(e,[-.13,b?-.10:-.20,.04]);
  const fuse=b?plus(B,[.09,.02,.03]):id.startsWith('porsche')?[.02,-.46,.49]:plus(B,[.08,.16,.025]);
  const cableStart=id==='bmw325ci'?plus(B,[.100,-.046,.115]):B;
  const cableEnd=id==='bmw325ci'?m54InstalledPoint([.638,.25,-.024]):starter;
@@ -130,9 +145,10 @@ export function drawRoadServiceAssembly(r,vehicle,id,engineOwnsM54Rail=false){
  // The coupe engine already owns its exact accessory and bellhousing positions.
  // Keep a single physical starter and alternator while preserving both menus.
  const shared=new Set();
- if(vehicle==='bmw325ci'&&id==='electrical'){
+ const ownsBattery=Boolean(roadSystems[vehicle]?.sharedEngine);
+ if((vehicle==='bmw325ci'||ownsBattery)&&id==='electrical'){
   for(const f of r.faces){
-   const owner=f.part==='powertrain.starter'?'electrical.starter':f.part==='powertrain.alternator'?'electrical.generator':null;
+   const owner=f.part==='powertrain.starter'?'electrical.starter':f.part==='powertrain.alternator'?'electrical.generator':ownsBattery&&f.part==='powertrain.battery'?'electrical.battery':null;
    if(!owner)continue;
    if(r.inspection?.assembly==='electrical')f.part=owner;
    shared.add(owner);

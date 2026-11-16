@@ -22,7 +22,7 @@
       <p class="kicker">THE GARAGE</p>
       <h1 id="board-title">Project priorities</h1>
       <p class="intro">Track fixes and source checks across the collection. Change any item’s priority or status. Your edits are saved in this browser.</p>
-      <nav class="section-jump" aria-label="Board sections"><a href="#g500-geometry">G500 parts and drawings ↓</a><a href="#reviews">Detail and QA review ↓</a><a href="#requests">Requested changes ↓</a><a href="#vehicles">Vehicle register ↓</a></nav>
+      <nav class="section-jump" aria-label="Board sections"><a href="#decisions">Configuration decisions ↓</a><a href="#g500-geometry">G500 parts and drawings ↓</a><a href="#reviews">Detail and QA review ↓</a><a href="#requests">Requested changes ↓</a><a href="#vehicles">Vehicle register ↓</a></nav>
     </section>
     <form id="board-filter" role="search">
       <div class="filter-fields">
@@ -42,6 +42,11 @@
     <p id="edit-message" role="status" hidden></p>
     <noscript><p>Enable JavaScript to filter the board and open the vehicle register. The <a href="./index.html#workbench">vehicle collection</a> uses the same part studies.</p></noscript>
     <div id="empty-message" hidden><p>No requests or vehicles match these filters.</p><button type="button" id="empty-clear">Show everything</button></div>
+    <section class="directory" id="decisions" aria-labelledby="decisions-heading">
+      <h2 id="decisions-heading">Configuration decisions</h2>
+      <p class="section-note">Each decision fixes the exact variant to build. The linked entries follow it.</p>
+      <ol id="decision-rows" class="review-tasks"></ol>
+    </section>
     <section class="directory" id="g500-geometry" aria-labelledby="geometry-title">
       <h2 id="geometry-title">G500 parts and drawings</h2>
       <p class="section-note" id="geometry-summary"></p>

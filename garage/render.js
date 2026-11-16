@@ -570,10 +570,16 @@ export class GarageRenderer{
  }
  mechanicalMesh(){
  if(this.build.vehicle==='bmw325ci'){drawE46Suspension(this);return;}
- const v=VEHICLES[this.build.vehicle],g=this.build.vehicle==='g500',truck=v.body==='truck',w=v.width/2,wb=v.wheelbase,front=-wb/2,rear=wb/2,tag=(id,fn)=>this.tag(id,fn),box=(...a)=>this.box(...a),rod=(...a)=>this.rod(...a),metal='#69757c',dark='#353e43';
- tag('suspension.frame',()=>{if(g){drawG500Frame(this);return;}if(truck){for(const y of [-.48,.48])box(-wb/2-.43,y-.055,.35,wb/2+.40,y+.055,.49,dark);for(const x of [-wb/2,-.25,.63,wb/2])box(x-.045,-.52,.35,x+.045,.52,.46,dark);}else{box(front-.30,-.55,.27,front+.32,.55,.35,dark);box(rear-.25,-.50,.27,rear+.25,.50,.34,dark);}});
+ const v=VEHICLES[this.build.vehicle],g=this.build.vehicle==='g500',awd=this.build.vehicle==='hrv',truck=v.body==='truck',w=v.width/2,wb=v.wheelbase,front=-wb/2,rear=wb/2,tag=(id,fn)=>this.tag(id,fn),box=(...a)=>this.box(...a),rod=(...a)=>this.rod(...a),metal='#69757c',dark='#353e43';
+ tag('suspension.frame',()=>{if(g){drawG500Frame(this);return;}if(truck){for(const y of [-.48,.48])box(-wb/2-.43,y-.055,.35,wb/2+.40,y+.055,.49,dark);for(const x of [-wb/2,-.25,.63,wb/2])box(x-.045,-.52,.35,x+.045,.52,.46,dark);}else if(awd){
+   // AWD HR-V: the front cradle sits beneath the half-shafts and transfer; the rear
+   // subframe is drawn as a perimeter frame around the rear differential (estimated).
+   this.instance('front',()=>box(front-.30,-.55,.24,front+.32,.55,.29,dark));
+   this.instance('rear',()=>{box(rear-.36,-.50,.20,rear-.29,.50,.25,dark);box(rear+.17,-.50,.20,rear+.25,.50,.25,dark);
+    for(const side of [-1,1])box(rear-.29,side<0?-.50:.30,.20,rear+.17,side<0?-.30:.50,.25,dark);});
+ }else{box(front-.30,-.55,.27,front+.32,.55,.35,dark);box(rear-.25,-.50,.27,rear+.25,.50,.34,dark);}});
  if(g)drawG500AxleLocation(this);
- else tag('steering.axle',()=>{for(const x of [front,rear])for(const side of [-1,1]){box(x-.075,side*(w-.14)-.04,.30,x+.075,side*(w-.14)+.04,.53,metal);rod([x-.20,side*.35,.31],[x,side*(w-.14),.39],.026,metal);}});
+ else tag('steering.axle',()=>{for(const x of [front,rear])for(const side of [-1,1]){const low=awd&&x===rear;box(x-.075,side*(w-.14)-.04,.30,x+.075,side*(w-.14)+.04,.53,metal);rod([x-.20,side*.35,low?.235:.31],[x,side*(w-.14),low?.30:.39],.026,metal);}});
  tag('steering.linkage',()=>{if(g){drawG500SteeringLinkage(this);}else{rod([front-.09,-.66,.38],[front-.09,.66,.38],.023,metal);}});
  tag('suspension.spring',()=>{for(const x of [front,rear])for(const side of [-1,1]){const y=side*(g?.48:.57);if(truck){for(let layer=0;layer<4;layer++)this.profile([[x-.52+layer*.065,.39+layer*.013],[x,.34+layer*.013],[x+.52-layer*.065,.39+layer*.013],[x+.52-layer*.065,.402+layer*.013],[x,.352+layer*.013],[x-.52+layer*.065,.402+layer*.013]],y-.035,y+.035,'#76818a');continue;}const base=g?.47:.44,height=g?.39:.48;let prior=null;for(let i=0;i<=84;i++){const t=i/84,a=t*Math.PI*12,p=[x+Math.cos(a)*.073,y+Math.sin(a)*.073,base+t*height];if(prior)rod(prior,p,.011,'#b0b5a4',6);prior=p;}}});
  tag('suspension.damper',()=>{for(const x of [front,rear])for(const side of [-1,1]){rod([x-.14,side*.59,.43],[x+.06,side*.62,.90],.026,'#98a4ac');rod([x-.14,side*.59,.43],[x-.03,side*.605,.68],.039,'#414c53');}});

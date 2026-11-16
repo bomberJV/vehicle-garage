@@ -35,7 +35,8 @@ test('road layouts draw individual finite, tagged parts using each vehicle archi
     compareDrawToList(assembly.parts,r=>drawRoadDrivetrain(r,id));
   }
   const honda=getRoadDrivetrain('hrv').parts.map(p=>p.id);
-  assert(honda.includes('drivetrain.front-differential')&&!honda.includes('drivetrain.propshaft'));
+  // The decided US EX-L AWD keeps the transaxle front differential and adds the rear driveline.
+  for(const key of ['front-differential','transfer','propshaft','center-support','rear-coupling','rear-differential','rear-halfshafts'])assert(honda.includes('drivetrain.'+key),key);
   assert(getRoadDrivetrain('g500').parts.some(p=>p.id==='drivetrain.transfer'));
   assert(getRoadDrivetrain('bmws1000rr').parts.some(p=>p.id==='drivetrain.chain'));
   assert.equal(getRoadDrivetrain('f350'),null);
@@ -57,7 +58,7 @@ test('nested mechanisms declare exactly the selectable geometry they draw at sam
       for(const time of (detail.animated?[0,.33,.63,1]:[0]))compareDrawToList(parts,r=>detail.draw(r,time));
     }
   }
-  for(const id of ['spark','electrode','cvt','pushbelt','diff','transaxle-diff','shaft','cvjoint','manual','clutch','wetclutch','roller','planetary','launch-clutch','g500-input-shaft','g500-front-propeller','g500-rear-propeller','converter'])assert(checked.has(id),id);
+  for(const id of ['spark','electrode','cvt','pushbelt','diff','transaxle-diff','shaft','cvjoint','manual','clutch','wetclutch','roller','planetary','launch-clutch','g500-input-shaft','g500-front-propeller','g500-rear-propeller','converter','hrv-transfer','hrv-propshaft','hrv-coupling'])assert(checked.has(id),id);
   assert.equal(getRoadDetail('f350','powertrain.spark-plugs'),null);
   assert.equal(getRoadDetail('f16','powertrain.spark-plugs'),null);
 });

@@ -39,6 +39,7 @@ import {wheelDesign} from './wheel-designs.js';
 import {drawWheelFace} from './wheel-faces.js';
 import {buildC63Exterior,buildHrvExterior} from './exterior-modern.js';
 import {buildEngineBay,enginePartOffset} from './engine-geometry.js';
+import {drawF350Frame,drawTwinIBeams,drawTwinIBeamLinkage,drawTwinIBeamSpringSeats,drawF350RearLeafSprings} from './f350-powertrain.js';
 import {getEngineDefinition} from './engine-data.js';
 const shade=(hex,f)=>{const h=hex.replace('#','');return '#'+[0,2,4].map(i=>Math.min(255,Math.max(0,Math.round(parseInt(h.slice(i,i+2),16)*f))).toString(16).padStart(2,'0')).join('');};
 function physicalInstance(face){
@@ -571,6 +572,7 @@ export class GarageRenderer{
  mechanicalMesh(){
  if(this.build.vehicle==='bmw325ci'){drawE46Suspension(this);return;}
  const v=VEHICLES[this.build.vehicle],g=this.build.vehicle==='g500',truck=v.body==='truck',w=v.width/2,wb=v.wheelbase,front=-wb/2,rear=wb/2,tag=(id,fn)=>this.tag(id,fn),box=(...a)=>this.box(...a),rod=(...a)=>this.rod(...a),metal='#69757c',dark='#353e43';
+ if(this.build.vehicle==='f350'){drawF350Chassis(this,tag);return;}
  tag('suspension.frame',()=>{if(g){drawG500Frame(this);return;}if(truck){for(const y of [-.48,.48])box(-wb/2-.43,y-.055,.35,wb/2+.40,y+.055,.49,dark);for(const x of [-wb/2,-.25,.63,wb/2])box(x-.045,-.52,.35,x+.045,.52,.46,dark);}else{box(front-.30,-.55,.27,front+.32,.55,.35,dark);box(rear-.25,-.50,.27,rear+.25,.50,.34,dark);}});
  if(g)drawG500AxleLocation(this);
  else tag('steering.axle',()=>{for(const x of [front,rear])for(const side of [-1,1]){box(x-.075,side*(w-.14)-.04,.30,x+.075,side*(w-.14)+.04,.53,metal);rod([x-.20,side*.35,.31],[x,side*(w-.14),.39],.026,metal);}});
@@ -707,8 +709,7 @@ export class GarageRenderer{
  const topMotion=!focusView&&exhibit&&this.getMechanism();
  const progress=this.progress??spreadTarget(this.inspection);
  const liftedHood=this.inspection?.assembly==='body' && (this.inspection.expanded||progress>.001) && !this.isolate && !this.inspection.onlyPart;
- const engineView=assembly==='powertrain'||((liftedHood||Boolean(this.sectionPlane))&&b.vehicle!=='f350');
- const detail=b.vehicle!=='f350'||engineView;
+ const engineView=assembly==='powertrain'||liftedHood||Boolean(this.sectionPlane);
  const engineOwnsM54Rail=b.vehicle==='bmw325ci'&&engineView&&activeService?.id!=='fuel';
  const ownGearbox=assembly==='powertrain';
  const porsche=isWorkbenchPorsche(b.vehicle),porscheLegacy=porsche&&['drive','running','cabin'].includes(assembly)?assembly:null;
@@ -717,7 +718,7 @@ export class GarageRenderer{
  const bikeLegacyGroup=b.vehicle==='bmws1000rr'&&['engine','drive'].includes(assembly)?assembly:null;
  const isolatedPorscheEngine=Boolean(exhibit?.inspectionSections?.engine && assembly==='engine' && this.isolate && !focusView);
  const bodyModules=assembly==='body'&&['bmw325ci','c63','hrv'].includes(b.vehicle);
- const sourceKey=JSON.stringify([isolatedPorscheEngine,bikeLegacyGroup,bodyModules,b.vehicle,b.paint,b.finish,b.wheelDesign,b.roofPosition,b.slGlass,b.slWindstop,b.slComfort,this.inspection?.studySeat,this.slRoofFraction,b.bmwVentPosition,Boolean(this.inspection?.engineCutaway),b.parts,this.lights,!exhibit&&detail,engineOwnsM54Rail,ownGearbox,porscheLegacy,showDrive,showFloor,activeService?.id,focusView?.id,movingAssembly,phase]);
+ const sourceKey=JSON.stringify([isolatedPorscheEngine,bikeLegacyGroup,bodyModules,b.vehicle,b.paint,b.finish,b.wheelDesign,b.roofPosition,b.slGlass,b.slWindstop,b.slComfort,this.inspection?.studySeat,this.slRoofFraction,b.bmwVentPosition,Boolean(this.inspection?.engineCutaway),b.parts,this.lights,!exhibit,engineOwnsM54Rail,ownGearbox,porscheLegacy,showDrive,showFloor,activeService?.id,focusView?.id,movingAssembly,phase]);
  const lift=!focusView&&b.lift?.mm?b.lift:null;
  const key=lift?sourceKey+JSON.stringify(lift):sourceKey;
  if(this.assembledMesh?.key===key)this.meshCache=this.assembledMesh;
@@ -758,7 +759,7 @@ export class GarageRenderer{
      exterior(this,paint,selected);
      this.mechanicalMesh();
      if(b.vehicle==='g500'&&!showDrive)drawG500Differentials(this);
-     buildEngineBay(this,getEngineDefinition(b.vehicle),{detail,fuelSystemOwnsRail:b.vehicle==='bmw325ci'&&!engineOwnsM54Rail,
+     buildEngineBay(this,getEngineDefinition(b.vehicle),{fuelSystemOwnsRail:b.vehicle==='bmw325ci'&&!engineOwnsM54Rail,
        g500ServiceOwnsFlow:b.vehicle==='g500'&&!ownGearbox});
      if(!ownGearbox&&getRoadDrivetrain(b.vehicle))this.faces=this.faces.filter(f=>f.part!=='powertrain.transmission');
      const radius=v.wheelRadius||(['sedan','coupe'].includes(v.body)?.33:v.body==='crossover'?.36:.405);
@@ -987,4 +988,15 @@ export class GarageRenderer{
    this.draw();
    return (this.focusTransition?.destination||this.canvas).toDataURL('image/png');
  }
+}
+// 1993 F-350 2WD chassis: frame rails that rise over the Sterling axle, Twin
+// I-Beam front axle, rear leaf springs and the shared shock absorbers.
+function drawF350Chassis(r,tag){
+ const front=-1.6891,rear=1.6891;
+ tag('suspension.frame',()=>drawF350Frame(r,'#353e43'));
+ tag('steering.axle',()=>drawTwinIBeams(r));
+ tag('steering.linkage',()=>drawTwinIBeamLinkage(r));
+ tag('suspension.spring',()=>{drawTwinIBeamSpringSeats(r);drawF350RearLeafSprings(r);});
+ // Front shocks mount behind the beams; rear shocks outboard of the spring seats.
+ tag('suspension.damper',()=>{for(const side of [-1,1])for(const [a,b] of [[[front+.10,side*.68,.44],[front+.04,side*.66,.88]],[[rear-.14,side*.64,.43],[rear+.01,side*.66,.80]]]){const m=a.map((v,i)=>v+(b[i]-v)*.5);r.rod(a,b,.026,'#98a4ac');r.rod(a,m,.039,'#414c53');}});
 }

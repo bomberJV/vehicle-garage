@@ -318,8 +318,10 @@ function installedTransfer(r){
   const upper=[c[0],c[1]-.09,c[2]+.105];
   cyl(r,upper,x,-.116,.092,.105,dark,14);
   drawG500TransferInputFlange(r);
-  cyl(r,[c[0]-.03,c[1]+.112,c[2]+.157],x,-.076,.056,.047,dark,14);
-  cyl(r,[c[0]+.012,c[1]+.107,c[2]+.135],y,-.031,.036,.058,steel,14);
+  // The range motor rides on top of the input bore, under the crest of the tunnel;
+  // the lock-sleeve actuator sits low on the right flank of the case.
+  cyl(r,[c[0]-.03,c[1]-.12,c[2]+.157],x,-.076,.056,.047,dark,14);
+  cyl(r,[c[0]+.012,c[1]+.107,c[2]+.035],y,-.031,.036,.058,steel,14);
   sleeve(r,c,x,-.19,-.158,.115,.057,dark,18);
   for(const s of [-1,1])cyl(r,c,x,s*.175,s*.21,.065,metal,14);
 }

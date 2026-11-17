@@ -112,7 +112,23 @@ function classicInduction(r,cx,z){
     const back=curve.map(([x,y,h])=>[x-.012,y,h]);for(let i=1;i<curve.length;i++)r.polygon([curve[i-1],curve[i],back[i],back[i-1]],'#aaa994',false);
   });
 }
-function modernInduction(r,cx,z){
+function modernInduction(r,cx,z,na=false){
+  if(na){
+    // M96/01: one resonance distributor across the engine, a resonance flap
+    // between its halves and a single throttle body fed from the left airbox.
+    r.tag('engine.intake',()=>{
+      barrel(r,[cx-.02,-.215,z+.235],[cx-.02,.215,z+.235],.058,'#474f52',14);
+      barrel(r,[cx-.02,-.012,z+.235],[cx-.02,.012,z+.235],.064,'#2f3436',14);
+      barrel(r,[cx+.045,-.06,z+.235],[cx+.135,-.06,z+.235],.040,'#9aa3a3',12);
+      sweep(r,[[cx+.135,-.06,z+.235],[cx+.22,-.14,z+.24],[cx+.27,-.30,z+.215]],.036,'#2e3335',10);
+      r.box(cx+.215,-.47,z+.145,cx+.335,-.30,z+.285,'#3a4144');
+      for(const s of [-1,1])for(let n=0;n<3;n++){
+        const x=cx-.1845+n*.178+s*.0445;
+        sweep(r,[[cx-.02+(x-cx)*.4,s*.14,z+.235],[x-.012,s*.24,z+.205],[x,s*.302,z+.153],[x,s*.355,z+.077]],.032,'#4a5356',8);
+      }
+    });
+    return;
+  }
   for(const s of [-1,1]){
     r.tag('engine.intake',()=>{
       for(let n=0;n<3;n++){
@@ -159,7 +175,28 @@ function silencer(r,center,length,width,height,across){
    for(let i=0;i<a.length;i++){const j=(i+1)%a.length;r.polygon([a[i],a[j],b[j],b[i]],'#a9aaa1',false);}
  }
 }
+function naExhaust(r,cx,z){
+  // 996: three branches per bank meet under the engine, then a catalyst and a
+  // transverse silencer in each rear corner end in one oval tailpipe.
+  r.tag('engine.exhaust',()=>{
+    for(const s of [-1,1]){
+      const collector=[cx+.09,s*.36,z-.185];
+      for(let n=0;n<3;n++){
+        const x=cx-.1845+n*.178+s*.0445;
+        sweep(r,[[x,s*.351,z-.063],[x+.01,s*.375,z-.120],[x+.04,s*(.37-.01*n),z-.165-.008*n],collector],.022,'#8a7565',8);
+      }
+      const cat=[cx+.24,s*.40,.300];
+      sweep(r,[collector,[cx+.17,s*.39,z-.20],cat],.032,'#7e7f78',10);
+      barrel(r,[cat[0],cat[1],cat[2]],[cat[0]+.11,cat[1]+s*.01,cat[2]],.050,'#9a9b92',12);
+      const box=[2.005,s*.40,.322];
+      sweep(r,[[cat[0]+.11,cat[1]+s*.01,cat[2]],[box[0]-.13,s*.36,.315],[box[0]-.06,s*.33,.320]],.030,'#7e817d',9);
+      silencer(r,box,.105,.075,.078,true);
+      sweep(r,[[box[0],s*.48,.315],[2.06,s*.50,.302],[2.10,s*.50,.300]],.034,'#848c89',12);
+    }
+  });
+}
 function exhaust(r,cx,z,modern,rear){
+  if(modern==='996'){naExhaust(r,cx,z);return;}
   r.tag('engine.exhaust',()=>{
     for(const s of [-1,1]){
       const collector=modern?[cx+.012,s*.427,z-.133]:[cx+.185,s*.318,z-.176];
@@ -193,7 +230,7 @@ function exhaust(r,cx,z,modern,rear){
 export function drawInstalledBoxer(r,cx,z,modern,rear){
   const start=r.faces.length;
   for(const side of [-1,1])heads(r,cx,z,modern,side);
-  if(modern)modernInduction(r,cx,z);else classicInduction(r,cx,z);
+  if(modern)modernInduction(r,cx,z,modern==='996');else classicInduction(r,cx,z);
   exhaust(r,cx,z,modern,rear);
   // Carry one indexed surface per material and side. Each original triangle
   // and its shade survives; the two cylinder banks still section independently.

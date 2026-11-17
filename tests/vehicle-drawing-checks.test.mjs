@@ -33,6 +33,7 @@ const checks = {
   bmw325ci:['door-bmw325ci-front-left.regulator',['track','carriage','cable','motor']],
   porsche993cab:['engine.case',['left','right','crankshaft','bearings','nose']],
   porsche992scab:['engine.case',['left','right','crankshaft','bearings']],
+  porsche996cab:[null,['shell.fenders','shell.luggage','shell.deck','shell.bumpers','lights.headlamps','lights.tail']],
   bmws1000rr:['k67-final.rear',['sprocket','carrier','damper','bearing']],
   'little-willie':[null,['hull.cab','hull.roof','tracks.left','tracks.right']],
   'sherman-e8':[null,['tracks.left','tracks.right','hull.upper']],

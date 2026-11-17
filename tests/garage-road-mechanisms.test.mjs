@@ -103,7 +103,7 @@ test('open differential speeds average to carrier speed, and the 16:32 fixed rin
 });
 
 test('every Porsche and RR plug is installed at its cylinder, individually selectable, and opens the spark cutaway',()=>{
-  const counts={porsche993cab:12,porsche992scab:6,bmws1000rr:4};
+  const counts={porsche993cab:12,porsche992scab:6,porsche996cab:6,bmws1000rr:4};
   for(const vehicle of roadModels){
     const rows=vehicle.groups.find(group=>group.id==='engine').parts.filter(p=>p.id.startsWith('engine.plug-'));
     assert.equal(rows.length,counts[vehicle.id]);

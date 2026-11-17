@@ -65,7 +65,7 @@ const piston={id:'piston-motion-study',name:'Piston and crank cutaway',source,an
     });
   }};
 export function getPistonDetail(vehicle,id){
-  if(!['g500','bmw325ci','hrv','c63','porsche993cab','porsche992scab','bmws1000rr'].includes(vehicle))return null;
+  if(!['g500','bmw325ci','hrv','c63','porsche993cab','porsche992scab','porsche996cab','bmws1000rr'].includes(vehicle))return null;
   if(id==='slider.rings'||id==='powertrain.piston-rings')return ringPack;
   if(vehicle==='g500'&&['powertrain.pistons','powertrain.connecting-rods','powertrain.crankshaft'].includes(id))return m113Slider;
   return ['powertrain.pistons','powertrain.connecting-rods','powertrain.crankshaft','engine.cylinders'].includes(id)?piston:null;

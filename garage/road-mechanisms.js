@@ -19,6 +19,7 @@ const references={
  g500:{label:'Mercedes-Benz USA · VG150E, exploded assembly and flanges, pp. 5–7',url:'https://mbmanuals.com/pdf/mb463g500-vg150-transfer-case.pdf#page=5'},
  c63:{label:'Mercedes-Benz · 2014 C-Class brochure',url:'https://s3.amazonaws.com/cdn.autoipacket.com/brochures/mercedes-benz/2014/2014-cclass.pdf'},
  porsche993cab:{label:'Porsche · type 993 history',url:'https://newsroom.porsche.com/en/history/porsche-911-seven-generations-part-4-type-993-16486.html'},
+ porsche996cab:{label:'Porsche Classic · 911 Carrera (type 996)',url:'https://www.porsche.com/central-eastern-europe/en/_bulgaria_/accessoriesandservice/classic/models/996/996/'},
  porsche992scab:{label:'Porsche · Carrera S seven-speed manual',url:'https://newsroom.porsche.com/en_US/products/manual-transmission-2020-911-carrera-s-carrera-4s-coupe-cabriolet-19154.html'},
  bmws1000rr:{label:'BMW Motorrad · S 1000 RR technical data',url:'https://www.bmw-motorrad.co.uk/en/models/sport/s1000rr-2023/technicaldata.html'},
  f350:{label:'Ford · 1993 commercial pickups and chassis',url:'https://xr793.com/wp-content/uploads/2022/11/1993-Ford-Commercial-Trucks-Pickups-Chassis.pdf'},
@@ -89,6 +90,7 @@ const layouts={
  c63:{wheelbase:2.76,box:'Seven-speed AMG MCT',desc:'A wet start-up clutch couples the V8 to the seven-speed MCT. The propeller shaft carries drive rearward to the final drive and independently suspended rear wheels.'},
  hrv:{wheelbase:2.654,box:'Continuously variable transmission',desc:'This 2026 US HR-V EX-L has Real Time AWD. The CVT, reduction gears and front differential share a transaxle beside the engine. A transfer unit at the front differential drives a two-piece propeller shaft, and an electronically controlled coupling at the rear differential sets how much torque reaches the rear wheels. The rear driveline shapes and routing are estimated. Open the CVT to watch the belt move.'},
  porsche993cab:{rear:1.112,box:'Six-speed manual transaxle',desc:'On the 993 Carrera, the engine sits behind the rear axle. A clutch and six-speed transaxle ahead of the engine feed both rear wheels through half-shafts.'},
+ porsche996cab:{rear:1.175,box:'Six-speed manual transaxle',desc:'The 1999 Carrera’s six-speed manual transaxle sits ahead of the water-cooled flat-six, with the final drive between the rear wheels. Half-shafts with a joint at each end drive the rear hubs.'},
  porsche992scab:{rear:1.25,box:'Seven-speed manual transaxle',desc:'The Carrera S manual combines its gearbox and rear final drive in one transaxle ahead of the flat-six. The differential cutaway illustrates the underlying bevel gear action. Limited-slip functions are outside that mechanism model.'},
  f350:{box:'E4OD four-speed automatic',desc:'The E4OD four-speed automatic with overdrive sits behind the 7.5-litre V8. A propeller shaft drives the second-generation Sterling 10.25 full-floating rear axle on this two-wheel-drive truck. Lengths, diameters and offsets are estimated.'},
  bmws1000rr:{box:'Six-speed motorcycle gearbox',desc:'A wet multi-plate clutch feeds the six-speed gearbox. A chain connects its small output sprocket to the larger sprocket fixed to the rear wheel.'},
@@ -145,7 +147,7 @@ function carrera(id){
  // The crankshaft flange is the forward end of the installed flat-six. The
  // gearbox input shares its axis; the differential outputs sit at hub height.
  const flange=rear+.285-.0065-.607*.55625,clutchDepth=.068,caseDepth=.48;
- const back=flange-clutchDepth,axleZ=modern?.358:.320,hubY=modern?.778:.722;
+ const back=flange-clutchDepth,axleZ={porsche992scab:.358,porsche996cab:.324}[id]??.320,hubY={porsche992scab:.778,porsche996cab:.75}[id]??.722;
  return register(id,[
   inputComponent(id,spec,r=>gearbox(r,[back-caseDepth/2,0,.502],[-1,0,0],.145,caseDepth)),
   ['clutch','Clutch and flywheel','The flywheel and clutch meet at the interface between the rear-mounted flat-six and the gearbox.',[.33,0,.36],r=>{

@@ -3,6 +3,7 @@
 // use the same transparent panes that close the rear and side window openings.
 import {roof992,backlight992,draw992HoodSide} from './porsche992-exterior-trim.js';
 import {hoodSide993,backlightU993} from './porsche993-trim.js';
+import {roof996,backlight996} from './porsche996-exterior-trim.js';
 import {glazingFace} from './surface-materials.js';
 import {porscheDeckPoint} from './porsche-coachwork.js';
 import {tint,strip} from './road-primitives.js';
@@ -15,7 +16,7 @@ const rows993=[
 ];
 export function roofSections(car){
   const [,headerX,h,,w]=car.screen;
-  return [[headerX,h+.007,w,h-.029,car.screenHeaderSweep],...(car.modern?roof992:rows993)];
+  return [[headerX,h+.007,w,h-.029,car.screenHeaderSweep],...(car.variant==='996'?roof996:car.modern?roof992:rows993)];
 }
 export function roofPoint(row,u){
   const [x,h,w,edge,sweep]=row,t=Math.abs(u);
@@ -29,7 +30,7 @@ const us=[-1,-.82,-.68,-.5,0,.5,.68,.82,1];
 export function raisedTop(r,car){
   const rows=roofSections(car),fabric=car.modern?'#4d5050':'#514f50';
   const backlight={first:5,last:7};
-  const panePoint=(j,u)=>at(rows[j],car.modern?backlight992(j,u):backlightU993(j,u));
+  const panePoint=(j,u)=>at(rows[j],car.variant==='996'?backlight996(j,u):car.modern?backlight992(j,u):backlightU993(j,u));
   for(let j=1;j<rows.length;j++)for(let i=1;i<us.length;i++){
     const a=us[i-1],b=us[i],mid=(a+b)/2;
     const panel=[panePoint(j-1,a),panePoint(j-1,b),panePoint(j,b),panePoint(j,a)];

@@ -19,6 +19,7 @@ export function spokenText(text) {
     .replace(/\bWinGD\b/g,'Winterthur Gas and Diesel').replace(/\bX92[-‑]B\b/g,'X ninety two B')
     .replace(/\bGE\b/g,'G E').replace(/\bCF6[-‑]80C2\b/g,'C F six eighty C two').replace(/\bCF6\b/g,'C F six')
     .replace(/\b992\.1\b/g,'nine ninety two point one').replace(/\b992\b/g,'nine ninety two')
+    .replace(/\b996\.1\b/g,'nine ninety six point one').replace(/\b996\b/g,'nine ninety six')
     .replace(/\bS[-‑]IVB\b/g,'S four B').replace(/\bS[-‑]II\b/g,'S two').replace(/\bS[-‑]IC\b/g,'S one C')
     .replace(/\bCVT\b/g,'C V T').replace(/\bECU\b/g,'E C U')
     .replace(/\bMAF\b/g,'mass airflow').replace(/\bDOHC\b/g,'double overhead cam')

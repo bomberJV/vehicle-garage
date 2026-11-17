@@ -17,7 +17,7 @@ export const workflowStatuses=[
 ];
 
 const all=vehiclePriorities.map(v=>v.id);
-const road=['sl550','g500','f350','c63','hrv','bmw325ci','bmw328xi','porsche993cab','porsche992scab','bmws1000rr'];
+const road=['sl550','g500','f350','c63','hrv','bmw325ci','bmw328xi','porsche993cab','porsche992scab','porsche996cab','bmws1000rr'];
 const passenger=road.filter(id=>id!=='bmws1000rr');
 const porsches=['porsche993cab','porsche992scab'];
 const civilAircraft=['boeing747','cessna172','piperj5','gulfstreamg800'];

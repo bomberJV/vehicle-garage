@@ -14,9 +14,9 @@ const request=id=>requests.find(item=>item.id===id);
 const assignment=id=>trackingDefaults('request',id);
 const filters=query=>readFilters(new URLSearchParams(query));
 
-test('the new implementation passes cover all 38 vehicles and route the applicable work through vehicle filters',()=>{
-  assert.equal(vehicleReviewTracks.length,38);
-  assert.equal(vehicleReviewTracks.flatMap(track=>track.steps).length,114);
+test('the new implementation passes cover all 39 vehicles and route the applicable work through vehicle filters',()=>{
+  assert.equal(vehicleReviewTracks.length,39);
+  assert.equal(vehicleReviewTracks.flatMap(track=>track.steps).length,117);
   for(const id of ['installed-complete','body-translucency','focus-installed-core','model-variant-selector','copy-voice-next-pass']){
     assert.deepEqual(new Set(assignment(id).vehicleIds),new Set(Object.keys(VEHICLES)),id);
     for(const vehicle of Object.keys(VEHICLES))assert(inScope(assignment(id),filters('vehicle='+vehicle)),id+' / '+vehicle);

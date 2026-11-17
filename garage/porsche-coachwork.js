@@ -6,6 +6,8 @@ import {faceTriangles} from './mesh-triangles.js';
 import {headlampSeat992,rocker992,stations992,sideLevels992,spoiler992,sweep992,bonnetStart,bonnetHalfWidth,bonnetPressing,frontCrown992,door992,doorRibX,fascia992} from './porsche992-skin.js';
 import {classicStations,classicSpoiler,classicGrilleSpan,sweepClassicBody,classicBonnetStart,classicBonnetWidth,classicBonnetRib,classicDoor,classicDoorHem,classicDoorRib,classicSillHeight,classicLowerBands,classicBumperInset,classicBonnetValley,drawClassicCornerVents} from './porsche993-body-profile.js';
 import {draw992Headlamp,draw992RunningLamp,draw992Tail,draw992Nameplate,draw992Mirror,draw992EngineGrille} from './porsche992-exterior-trim.js';
+import {sweep996,cut996,setback996,deckHalf996,stations996,spoiler996,bonnetStart996,bonnetHalfWidth996,bonnetPressing996,frontCrown996,headlampSeat996,rocker996,door996,sideLevels996,doorRibX996,fascia996} from './porsche996-skin.js';
+import {draw996Headlamp,draw996SideMarker,draw996Tail,draw996Mirror,draw996EngineGrille,draw996Script} from './porsche996-exterior-trim.js';
 import {panelSeam} from './porsche-panel-seams.js';
 import {spoilerPoint,drawSpoilerDrive} from './porsche-spoilers.js';
 import {pipe, ellipse, ellipsoid, strip, tint} from './road-primitives.js';
@@ -14,14 +16,34 @@ const TAU=Math.PI*2, clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
 const mix=(a,b,t)=>a+(b-a)*t;
 const rgb=color=>[1,3,5].map(i=>parseInt(color.slice(i,i+2),16));
 const hex=color=>'#'+color.map(a=>Math.round(clamp(a,0,255)).toString(16).padStart(2,'0')).join('');
+// Water-cooled cars share one loft. Their kits hold the body-specific surfaces,
+// lamps and constants; the 992's values are the ones this generator was built on.
+const kit992={id:'992',sweep:sweep992,headlampSeat:headlampSeat992,rocker:rocker992,sideLevels:sideLevels992,spoiler:spoiler992,
+  bonnetStart,bonnetHalfWidth,pressing:bonnetPressing,frontCrown:frontCrown992,doorRibX,fascia:fascia992,
+  arch:.029,cut:.156,crestU:.766,inset:.068,blade:.726,toeAft:.110,
+  handle:{x:.18,z:.750,w:.133},tailHigh:.740,tailH:.015,tailWrap:1.665,plateZ:.357,badgeX:.20};
+const kit996={id:'996',sweep:sweep996,headlampSeat:headlampSeat996,rocker:rocker996,sideLevels:sideLevels996,spoiler:spoiler996,
+  bonnetStart:bonnetStart996,bonnetHalfWidth:bonnetHalfWidth996,pressing:bonnetPressing996,frontCrown:frontCrown996,doorRibX:doorRibX996,fascia:fascia996,
+  arch:.042,cut:cut996,setback:setback996,crestU:.770,inset:.058,blade:.452,toeAft:.090,
+  handle:{x:.072,z:.733,w:.104},tailHigh:.742,tailH:.064,tailWrap:1.716,plateZ:.465,badgeX:.135,
+  // Side glass of the raised top: door glass to the B-post line, then the quarter light.
+  hood:{jamb:.535,tip:.885,y:.700,yRate:.012,lift:.020,rise:.013,kick:.050,kickAt:.80},
+  // The engine lid runs between the tail lamps behind the roof compartment lid.
+  deckHalf:deckHalf996,deckStart:1.52};
 export const coupeShape=[
   {modern:false,width:1.735,front:-1.16,rear:1.112,frontRadius:.316,rearRadius:.314,
     screen:[-.613,-.155,1.260,.700,.577],screenFootSweep:.240,screenHeaderSweep:.065, cockpit:[-.62,.725],door:classicDoor,belt:.840,
     stations:classicStations},
   {modern:true,width:1.852,front:-1.2,rear:1.25,frontRadius:.333,rearRadius:.352,
     screen:[-.869,-.238,1.248,.755,.647],screenFootSweep:.281,screenHeaderSweep:.113,cockpit:[-.695,.84],door:door992,belt:.866,
-    stations:stations992}
+    stations:stations992,kit:kit992},
+  // 1999 Carrera Cabriolet (996.1). The water-cooled loft with the 996 kit; the
+  // string flag keeps every shared water-cooled branch while naming the body.
+  {modern:'996',variant:'996',width:1.765,front:-1.175,rear:1.175,frontRadius:.318,rearRadius:.318,
+    screen:[-.836,-.168,1.262,.742,.548],screenFootSweep:.310,screenHeaderSweep:.046,cockpit:[-.62,.94],door:door996,belt:.874,
+    stations:stations996,kit:kit996}
 ];
+export const porscheShape=modern=>coupeShape[modern==='996'?2:modern?1:0];
 
 // Rows through the classic flank and over its shoulder. The 993 panels are
 // continuous compound curves, so a coarse row pitch reads as flat facets.
@@ -40,12 +62,13 @@ function station(car,x){
 }
 // The bumper, glazing, lid and light edges all use the same front and rear plan sweep.
 function swept(car,[x,y,z]){
-  return [car.modern?sweep992(x,y):sweepClassicBody(car,x,y,z),y,z];
+  return [car.modern?car.kit.sweep(x,y):sweepClassicBody(car,x,y,z),y,z];
 }
-function archRadius(car,r){return r+(car.modern?.029:.055);}
+function archRadius(car,r){return r+(car.modern?car.kit.arch:.055);}
 
+const cutOf=(car,x)=>typeof car.kit.cut==='function'?car.kit.cut(x):car.kit.cut;
 function wheelCut(car,x){
-  let z=car.modern?.156:.172;
+  let z=car.modern?cutOf(car,x):.172;
   for(const [axle,r] of [[car.front,car.frontRadius],[car.rear,car.rearRadius]]){
     // Outer wheelhouse returns vertically into the sill below the axle centre.
     const rx=archRadius(car,r),d=(x-axle)/rx;
@@ -60,7 +83,7 @@ function wheelCut(car,x){
 // that widens with that compression, so it spans about the same real length
 // everywhere and vanishes where the loft is not compressed.
 function top(car,x,y){
-  if(!car.modern||x>=-1.0)return seatTop(car,x,y,deckRaw(car,x,y));
+  if(!car.modern||car.kit.id!=='992'||x>=-1.0)return seatTop(car,x,y,deckRaw(car,x,y));
   const p=deckRaw(car,x,y);
   p[2]=lowPass992(x,y,v=>deckRaw(car,v,y)[2],p[2]);
   return seatTop(car,x,y,p);
@@ -74,22 +97,22 @@ function lowPass992(x,y,height,centre){
   if(span<1e-4)return centre;
   return (height(x-span)+4*height(x-span/2)+6*centre+4*height(x+span/2)+height(x+span))/16;
 }
-function seatTop(car,x,y,p){return car.modern?headlampSeat992(p):headlampSeat993(p);}
+function seatTop(car,x,y,p){return car.modern?car.kit.headlampSeat(p):headlampSeat993(p);}
 function deckRaw(car,x,y){
   if(!car.modern)x=classicBonnetRib(x,y);
   const [w,z,c]=station(car,x),u=Math.abs(y)/w;
   // The separate fender humps flank the shallow luggage lid. Across the tail,
   // the rear deck broadens and rounds down into the side quarters.
-  const crestU=car.modern?.766:.77;
+  const crestU=car.modern?car.kit.crestU:.77;
   const inner=Math.min(u/crestU,1);
   const rounded=Math.sin(inner*Math.PI/2)**3.2;
   // Toward the 993's nose the luggage lid stays nearly flat across and the
   // wings rise steeply outside its shut lines to carry the headlamps.
-  const haunch=car.modern?frontCrown992(x,Math.min(u,crestU),crestU,rounded):Math.sin(inner*Math.PI/2)**(3.2+11*clamp((-1.30-x)/.62)**1.5);
+  const haunch=car.modern?car.kit.frontCrown(x,Math.min(u,crestU),crestU,rounded):Math.sin(inner*Math.PI/2)**(3.2+11*clamp((-1.30-x)/.62)**1.5);
   const drop=clamp((u-crestU)/(.958-crestU));
-  const crown=(z-c)*haunch+(car.modern?bonnetPressing(x,y):classicBonnetValley(x,y));
+  const crown=(z-c)*haunch+(car.modern?car.kit.pressing(x,y):classicBonnetValley(x,y));
   const p=swept(car,[x,y,c+crown-.076*(car.modern?drop**2.65:1-Math.cos(drop*Math.PI/2))]);
-  if(car.modern&&x>1.04&&u>.73){
+  if(car.kit?.id==='992'&&x>1.04&&u>.73){
     // The shoulder drops continuously toward the corner lamp in side elevation.
     // Position that drop in real longitudinal distance: the plan sweep compresses
     // the last several loft stations into a short stretch of rear quarter.
@@ -108,16 +131,16 @@ function sideRaw(car,x,t,s){
   // The flank sits further outboard than its shoulder, where the plan sweep
   // compresses the loft harder still; filter the shoulder at that position.
   // The wheel opening keeps its sharp edge.
-  const shoulder=car.modern?lowPass992(x,w,v=>shoulderZ(car,v),shoulderZ(car,x)):shoulderZ(car,x);
+  const shoulder=car.kit?.id==='992'?lowPass992(x,w,v=>shoulderZ(car,v),shoulderZ(car,x)):shoulderZ(car,x);
   // A wheel arch trims the *same* flank that continues over it. Compressing
   // the door cross-section into the top of the arch leaves unnatural bands.
   const h=mix(bottom,shoulder,t),v=clamp((h-.17)/Math.max(.1,shoulder-.17));
-  const inset=(car.modern?.068:.046)*(1-v)**2+.0015*(1-Math.cos(2*Math.PI*v))+.042*clamp((v-.64)/.36)**(car.modern?4.7:2);
+  const inset=(car.modern?car.kit.inset:.046)*(1-v)**2+.0015*(1-Math.cos(2*Math.PI*v))+.042*clamp((v-.64)/.36)**(car.modern?4.7:2);
   // The rear and front bumper covers both tuck under at the corners.
   const start=car.stations[0][0],end=car.stations.at(-1)[0];
   const fore=clamp(1-(x-start)/.36),aft=clamp(1-(end-x)/.40);
   const toe=clamp((.42-h)/.25)**1.4;
-  const waist=car.modern?.014*Math.exp(-(((v-.42)/.22)**2))*clamp((x+.81)/.23)*clamp((.77-x)/.24):0;
+  const waist=car.kit?.id==='992'?.014*Math.exp(-(((v-.42)/.22)**2))*clamp((x+.81)/.23)*clamp((.77-x)/.24):0;
   const p=swept(car,[x,s*(w-inset-waist-.042*clamp((v-.75)/.25)**2*(w-1)),h]);
   // The broadest point of the 993 is the rear wheel arch lip. The transition
   // fades into the rear quarter and meets the existing crown at the shoulder.
@@ -128,14 +151,21 @@ function sideRaw(car,x,t,s){
     const doorTaper=clamp((x+.79)/.23)*clamp((.82-x)/.28);
     p[1]-=s*doorTaper*(.028*(1-v)**2+.009*Math.exp(-(((v-.41)/.18)**2)));
   }
-  if(car.modern){
+  if(car.kit?.id==='992'){
     // The widest station on the 992.1 Cabriolet is the lip over the rear tire.
     const arch=Math.exp(-(((x-car.rear)/.38)**2));
     const blend=clamp((shoulder-h)/.084);
     const lip=Math.exp(-(((h-.716)/.113)**2))*blend*blend*(3-2*blend);
     p[1]+=s*(.00517*arch*lip-rocker992(x,h));
+  }else if(car.modern){
+    // The 996 flank swells gently over both wheels; the plan outline's widest
+    // stations are the rear arch. The rocker is flush and slightly concave.
+    const blend=clamp((shoulder-h)/.10);
+    const swell=Math.exp(-(((h-.62)/.13)**2))*blend*blend*(3-2*blend);
+    const arches=.004*Math.exp(-(((x-car.front)/.40)**2))+.006*Math.exp(-(((x-car.rear)/.42)**2));
+    p[1]+=s*(arches*swell-car.kit.rocker(x,h));
   }
-  p[0]+=(fore*fore*.085-aft*aft*(car.modern?.110:.137))*toe;
+  p[0]+=(fore*fore*.085-aft*aft*(car.modern?car.kit.toeAft:.137))*toe;
   p[1]-=s*(fore*fore+aft*aft)*.024*toe;
   return p;
 }
@@ -167,7 +197,7 @@ function flank992(car,x,t,side){
     return sideRaw(car,v,(h-low)/(high-low),side);
   };
   const bottom=wheelCut(car,x),shoulder=top(car,x,station(car,x)[0]*.958)[2];
-  const z=Math.max(bottom,mix(.156,shoulder,t));
+  const z=Math.max(bottom,mix(cutOf(car,x),shoulder,t));
   const p=at(x,z),h=Math.min(z,shoulder-.001),e=.0004;
   // The cap's plan sweep packs the parameter rows tightly near each bumper.
   // Sample a finite longitudinal patch so a cutout or a narrow row cannot
@@ -179,13 +209,13 @@ function flank992(car,x,t,side){
   return {p,n};
 }
 function bladeSpan(car,x){
-  const front=car.modern?spoiler992.front:classicSpoiler.front,back=car.modern?spoiler992.rear:classicSpoiler.rear,t=clamp((x-front)/(back-front));
-  return (car.modern?.726:.548)*(.87+.13*Math.sin(t*Math.PI));
+  const front=car.modern?car.kit.spoiler.front:classicSpoiler.front,back=car.modern?car.kit.spoiler.rear:classicSpoiler.rear,t=clamp((x-front)/(back-front));
+  return (car.modern?car.kit.blade:.548)*(.87+.13*Math.sin(t*Math.PI));
 }
 const stationBreaks=new Map();
 function uBreaks(car){
   if(stationBreaks.has(car))return stationBreaks.get(car);
-  const xs=[...car.stations.map(s=>s[0]),...car.cockpit,...car.door,...(car.modern?[bonnetStart,spoiler992.front,spoiler992.rear]:[classicBonnetStart,classicSpoiler.front,classicSpoiler.grilleFront,classicSpoiler.grilleRear,classicSpoiler.rear])];
+  const xs=[...car.stations.map(s=>s[0]),...car.cockpit,...car.door,...(car.modern?[car.kit.bonnetStart,car.kit.spoiler.front,car.kit.spoiler.rear]:[classicBonnetStart,classicSpoiler.front,classicSpoiler.grilleFront,classicSpoiler.grilleRear,classicSpoiler.rear])];
   for(const [axle,r] of [[car.front,car.frontRadius],[car.rear,car.rearRadius]]){
     const rad=archRadius(car,r);
     for(let j=0;j<=18;j++)xs.push(axle+rad*Math.cos(j*Math.PI/18));
@@ -208,13 +238,16 @@ function uBreaks(car){
   stationBreaks.set(car,result);return result;
 }
 function lidWidth(car,x,w,front){
-  if(front)return car.modern?bonnetHalfWidth(x):classicBonnetWidth(x);
+  if(front)return car.modern?car.kit.bonnetHalfWidth(x):classicBonnetWidth(x);
+  if(car.kit?.deckHalf)return car.kit.deckHalf(x);
   return w*mix(.76,.83,clamp((x-1)/(car.stations.at(-1)[0]-1)));
 }
 function floorAndSills(r,car,paint){
   const [first,last]=[car.stations[0][0],car.stations.at(-1)[0]];
   r.tag('shell.fenders',()=>{
-    const p=[[first+.18,-.55,.176],[car.front,-.52,.149],[car.front+.36,-.67,.134],[car.rear-.35,-.67,.134],[car.rear,-.53,.15],[last-.24,-.52,.18]];
+    const p=car.kit?.id==='996'?
+      [[first+.20,-.52,cutOf(car,first+.20)-.012],[car.front,-.52,.172],[car.front+.36,-.67,.170],[car.rear-.35,-.67,.172],[car.rear,-.53,.215],[last-.24,-.52,cutOf(car,last-.24)-.012]]:
+      [[first+.18,-.55,.176],[car.front,-.52,.149],[car.front+.36,-.67,.134],[car.rear-.35,-.67,.134],[car.rear,-.53,.15],[last-.24,-.52,.18]];
     strip(r,p,p.map(([x,y,z])=>[x,-y,z]),'#303235');
     for (const [axle,rad] of [[car.front,car.frontRadius],[car.rear,car.rearRadius]])for(const s of [-1,1]){
       const ring=[];
@@ -224,7 +257,11 @@ function floorAndSills(r,car,paint){
       }
       const lip=ring.map(([x,y,z])=>[x,y-s*.015,z-.004]);
       const inner=ring.map(([x,,z])=>[x,s*.535,z+.006]);
-      if(car.modern)strip(r,ring,lip,'#535859');
+      if(car.kit?.id==='996'){
+        // The 996 wheel opening has a painted, rolled edge.
+        const hem=ring.map(([x,y,z],i)=>[x-(x-axle)*.010,y-s*.006,z-.006*Math.sin(i*Math.PI/26)]);
+        strip(r,ring,hem,tint(paint,.80));strip(r,hem,lip,tint(paint,.55));
+      }else if(car.modern)strip(r,ring,lip,'#535859');
       else{
         // Rolled painted edge of the arch above its dark inner housing. It
         // curls inwards rather than widening the narrow-body Carrera fender.
@@ -265,7 +302,7 @@ function lidStrip(r,car,paint,phase,a,b,s,front,moves){
     const point=deckPatch(car,pos,t,s,front,moves,true);
     return moves?spoilerPoint(car.modern,point,phase):point;
   };
-  r.tag(moves?'shell.spoiler':front?(b<=(car.modern?bonnetStart:classicBonnetStart)?'shell.bumpers':'shell.luggage'):'shell.deck',()=>{
+  r.tag(moves?'shell.spoiler':front?(b<=(car.modern?car.kit.bonnetStart:classicBonnetStart)?'shell.bumpers':'shell.luggage'):'shell.deck',()=>{
     const open=moves&&!car.modern&&a>=classicSpoiler.grilleFront&&b<=classicSpoiler.grilleRear;
     const paintedPoint=(pos,t)=>open?
       spoilerPoint(false,top(car,pos,s*mix(classicGrilleSpan(pos),bladeSpan(car,pos),t)),phase):f(pos,t);
@@ -279,7 +316,7 @@ function lidStrip(r,car,paint,phase,a,b,s,front,moves){
     const e=f(a,1),ee=f(b,1);
     const edge=[e,ee].map(([x,y,z])=>car.modern?[x,y-s*.002,z-.003]:[x,y,z]);
     strip(r,edge,edge.map(([x,y,z])=>[x,y,z-.01]),'#383d40');
-    const start=car.modern?spoiler992.front:classicSpoiler.front,end=car.modern?spoiler992.rear:classicSpoiler.rear;
+    const start=car.modern?car.kit.spoiler.front:classicSpoiler.front,end=car.modern?car.kit.spoiler.rear:classicSpoiler.rear;
     if(a===start||b===end){
       const cap=a===start?a:b,rib=Array.from({length:steps+1},(_,i)=>f(cap,i/steps));
       strip(r,rib,rib.map(([x,y,z])=>[x,y,z-.013]),tint(paint,.66));
@@ -293,7 +330,7 @@ function skin(r,car,paint,phase){
   const xs=uBreaks(car),[doorA,doorB]=car.door,[cabinA,cabinB]=car.cockpit;
   const sampled=new Map();
   const flankFrame=(v,t,side)=>{
-    const x=doorRibX(v,t),key=[x,t,side].join('/');
+    const x=car.kit.doorRibX(v,t),key=[x,t,side].join('/');
     if(!sampled.has(key))sampled.set(key,flank992(car,x,t,side));
     return sampled.get(key);
   };
@@ -309,7 +346,7 @@ function skin(r,car,paint,phase){
       };
       r.tag(door?sideDoor:'shell.fenders',()=>{
         let levelBelow=0,fa=flank(a,0),fb=flank(b,0);
-        for(const level of (car.modern?sideLevels992:classicFlankLevels)){
+        for(const level of (car.modern?car.kit.sideLevels:classicFlankLevels)){
           const na=flank(a,level),nb=flank(b,level);
           const normals=car.modern?[flankFrame(a,levelBelow,s).n,flankFrame(b,levelBelow,s).n,flankFrame(b,level,s).n,flankFrame(a,level,s).n]:null;
           const panel=()=>{if(!car.modern||fa[2]!==na[2]||fb[2]!==nb[2])painted(r,[fa,fb,nb,na],paint,[0,s,0],normals);};
@@ -329,7 +366,7 @@ function skin(r,car,paint,phase){
         }
       });
       if(!cabin){
-        const activeBlade=!front && x>=(car.modern?spoiler992.front:classicSpoiler.front) && x<(car.modern?spoiler992.rear:classicSpoiler.rear);
+        const activeBlade=!front && x>=(car.modern?car.kit.spoiler.front:classicSpoiler.front) && x<(car.modern?car.kit.spoiler.rear:classicSpoiler.rear);
         const surface=(pos,t,wing)=>deckPatch(car,pos,t,s,front,activeBlade,wing);
         lidStrip(r,car,paint,phase,a,b,s,front,activeBlade);
         if(activeBlade||(car.modern&&!front))r.tag(deckPart,()=>{
@@ -356,7 +393,7 @@ function skin(r,car,paint,phase){
       const rows=car.modern?[[a,1],[a,.9],[a,.76],[a,.54],[a,.34],[a,.22],[a,.16],[a+.03,.145],[a+.17,.145],[0,.145],[b-.16,.145],[b,.145],[b,.18],[b,.22],[b,.34],[b,.54],[b,.76],[b,.9],[b,1]]:[[a,1],[a,.9],[a,.76],[a,.54],[a,low+.05],[a,low+.012],
         [a+.025,low],[a+.14,low],[0,low],[b-.14,low],[b-.025,low],
         [b,low+.012],[b,low+.05],[b,.54],[b,.76],[b,.9],[b,1]];
-      const seam=rows.map(([x,t])=>sideRaw(car,car.modern?doorRibX(x,t):classicDoorRib(car,x,t),t,s));
+      const seam=rows.map(([x,t])=>sideRaw(car,car.modern?car.kit.doorRibX(x,t):classicDoorRib(car,x,t),t,s));
       panelSeam(r,car,'door'+s,seam,car.modern?.0065:.0055,s,car.modern?'#2a2d2f':tint(paint,.48));
       if(!car.modern){
         // The front bumper cover meets the wing in a level joint at the top of
@@ -369,18 +406,25 @@ function skin(r,car,paint,phase){
         }
         r.tag('shell.fenders',()=>panelSeam(r,car,'bumper-wing'+s,joint,.0055,s,tint(paint,.5)));
       }
-      const hw=car.modern?.133:.116,hz=car.modern?.750:.733,hx=b-.18;
+      const hw=car.modern?car.kit.handle.w:.116,hz=car.modern?car.kit.handle.z:.733,hx=b-(car.modern?car.kit.handle.x:.18);
       const handle=cheek(hx,hz);
       // The 993 pull handle is a body-colour moulding over a shallow dark recess.
       ellipsoid(r,handle,[hw*.63,.014,.023],car.modern?tint(paint,.67):'#4a4d4f',12,4);
       ellipsoid(r,[hx,handle[1]+s*.012,hz+.005],[hw*.52,.013,.009],tint(paint,1.05),12,4);
       const foot=top(car,a+.108,s*station(car,a+.108)[0]*.858);
-      if(car.modern){
+      if(car.kit?.id==='996'){
+        // A short body-colour stalk carries the 996 mirror from the door's front corner.
+        const root=top(car,a+.080,s*station(car,a+.080)[0]*.90);
+        pipe(r,[root,[root[0]+.012,root[1]+s*.050,root[2]+.040],[root[0]+.004,root[1]+s*.078,root[2]+.062]],.019,tint(paint,.80),8);
+        draw996Mirror(r,[root[0]-.004,s*(Math.abs(root[1])+.135),root[2]+.088],s,paint);
+      }else if(car.modern){
         pipe(r,[foot,[foot[0]+.015,foot[1]+s*.073,foot[2]+.045],[foot[0]-.012,foot[1]+s*.14,foot[2]+.066]],.024,'#32383b',8);
         draw992Mirror(r,[foot[0]-.010,s*(1.012-.097),foot[2]+.096],s,paint);
       }else classicMirror(r,foot,s,paint);
-      const molding=Array.from({length:7},(_,i)=>cheek(mix(a+.04,b-.05,i/6),.228,.005));
-      r.tag(car.modern?id:'shell.fenders',()=>strip(r,molding,molding.map(([x,y,z])=>[x,y,z+.006]),tint(paint,.63)));
+      if(car.kit?.id!=='996'){
+        const molding=Array.from({length:7},(_,i)=>cheek(mix(a+.04,b-.05,i/6),.228,.005));
+        r.tag(car.modern?id:'shell.fenders',()=>strip(r,molding,molding.map(([x,y,z])=>[x,y,z+.006]),tint(paint,.63)));
+      }
     });
     r.tag('shell.fenders',()=>{
       // Hemmed sill remains fixed while a separate door is removed.
@@ -388,8 +432,8 @@ function skin(r,car,paint,phase){
       strip(r,hem,hem.map(([x,y,z])=>[x,y,z-.012]),tint(paint,.73));
     });
     for(const fore of [true,false]){
-      const nose=car.modern?bonnetStart:classicBonnetStart;
-      const lo=fore?nose:car.cockpit[1]+.205,hi=fore?cabinA-.014:car.stations.at(-1)[0]-.061;
+      const nose=car.modern?car.kit.bonnetStart:classicBonnetStart;
+      const lo=fore?nose:car.kit?.deckStart??car.cockpit[1]+.205,hi=fore?cabinA-.014:car.stations.at(-1)[0]-.061;
       r.tag(fore?'shell.luggage':'shell.deck',()=>{
         const samples=[lo,...xs.filter(x=>x>lo&&x<hi),hi];
         const edge=samples.map(x=>top(car,x,s*lidWidth(car,x,station(car,x)[0],fore)));
@@ -397,18 +441,32 @@ function skin(r,car,paint,phase){
       });
     }
   }
+  if(car.kit?.id==='996'){
+    // Fuel filler flap on the right front wing (rescue sheet plan, path 210).
+    const flap=Array.from({length:33},(_,i)=>{const a=i/32*Math.PI*2;return top(car,-.955+.098*Math.cos(a),.782+.038*Math.sin(a));});
+    r.tag('shell.fenders',()=>panelSeam(r,car,'fuel-flap',flap,.005,0,'#2c2f31'));
+  }
+  if(car.kit?.deckStart){
+    // Front edge of the 996 engine lid, behind the roof compartment lid.
+    const x=car.kit.deckStart,half=lidWidth(car,x,station(car,x)[0],false);
+    r.tag('shell.deck',()=>panelSeam(r,car,'deck-front',Array.from({length:25},(_,i)=>top(car,x,(i/12-1)*half)),.0065,0,'#2c2f31'));
+  }
 }
 export function porscheBumperPoint(car,front,y,z,depth=0){
   const x=front?car.stations[0][0]:car.stations.at(-1)[0],sign=front?-1:1;
-  const floorInset=front?.085:car.modern?.110:.137;
+  const floorInset=front?.085:car.modern?car.kit.toeAft:.137;
   const toe=floorInset*clamp((.42-z)/.25)**1.4;
   // The rear lens stands proud of its mounting face. Recess the fascia behind
   // each lamp so the visible lens remains inside the bumper-to-bumper envelope.
-  const rearRecess=front?0:car.modern?.009*clamp((z-.47)/.14):.008*clamp((z-.470)/.014);
+  const rearRecess=front||car.kit?.id==='996'?0:car.modern?.009*clamp((z-.47)/.14):.008*clamp((z-.470)/.014);
+  if(car.kit?.setback){
+    // The 996 covers follow the side elevation's nose and tail profiles.
+    const p=swept(car,[x,y,z]);p[0]-=sign*(car.kit.setback(front,z)+depth+rearRecess);return p;
+  }
   if(car.modern){
     // The light shelf and lower diffuser recede from the convex bumper crown.
     const capZ=top(car,x,y)[2];
-    const shelf=front?0:.022*clamp((z-.53)/.14)*clamp((capZ-z)/.030);
+    const shelf=front||car.kit.id!=='992'?0:.022*clamp((z-.53)/.14)*clamp((capZ-z)/.030);
     const p=swept(car,[x,y,z]);p[0]-=sign*(toe+depth+shelf);return p;
   }
   const p=swept(car,[x,y,z]);
@@ -427,7 +485,7 @@ function fascia(r,car,front,paint){
     };
     // Both joins reuse the polygon edges of the adjoining loft. An analytic
     // point on a curved skin can sit millimetres off a chord between vertices.
-    const side=sideLevels992.map(t=>sideRaw(car,x,t,1)[2]);
+    const side=car.kit.sideLevels.map(t=>sideRaw(car,x,t,1)[2]);
     side.unshift(sideRaw(car,x,0,1)[2]);
     const inside=lidWidth(car,x,station(car,x)[0],front);
     const n=lidSteps992(front);
@@ -435,7 +493,7 @@ function fascia(r,car,front,paint){
     for(const t of [...deckRows992].reverse().slice(1))deck.push(mix(inside,w,t));
     deck.push(w);
     const outer=deck.map(y=>top(car,x,y));
-    return fascia992(r,front,paint,w,x,point,cap,flank,painted,side,outer);
+    return car.kit.fascia(r,front,paint,w,x,point,cap,flank,painted,side,outer);
   }
   const bands=y=>{
     const t=Math.abs(y/w),cap=top(car,x,y)[2];
@@ -519,7 +577,8 @@ function exteriorLights(r,car,paint){
   };
   for(const s of [-1,1]){
     r.tag('lights.headlamps',()=>{
-      if(modern)draw992Headlamp(r,car,s,top);
+      if(car.kit?.id==='996')draw996Headlamp(r,car,s,top);
+      else if(modern)draw992Headlamp(r,car,s,top);
       else{
         if(!r.build?.parts?.includes('993-litronic-us'))headlamp993(r,car,s,paint,top);
         washerNozzle(r,car,s,top);
@@ -527,14 +586,26 @@ function exteriorLights(r,car,paint){
     });
     r.tag('lights.indicators',()=>{
       if(!modern){frontSignals993(r,s,nose);return;}
+      if(car.kit.id==='996'){
+        const flankAt=(x,z)=>{
+          let p=null,lo=car.stations[0][0],hi=car.front-.10;
+          for(let j=0;j<16;j++){
+            const mid=(lo+hi)/2,bottom=wheelCut(car,mid),crown=top(car,mid,station(car,mid)[0]*.958)[2];
+            p=sideRaw(car,mid,clamp((z-bottom)/(crown-bottom)),s);
+            if(p[0]<x)lo=mid;else hi=mid;
+          }
+          return p;
+        };
+        draw996SideMarker(r,car,s,flankAt);return;
+      }
       draw992RunningLamp(r,s,nose);
     });
     r.tag('lights.tail',()=>{
-      const high=modern?.740:.575,h=modern?.015:.083;
+      const high=modern?car.kit.tailHigh:.575,h=modern?car.kit.tailH:.083;
       // Face curves around either rear corner until it runs parallel with the flank.
       const row=(t,upper,depth=0)=>{
         const y=t<=.84?tail.w*t/.84:mix(tail.w,station(car,tail.x-.31)[0]-.003,(t-.84)/.16);
-        const lensHeight=modern?h+.012*clamp((t-.60)/.25):h;
+        const lensHeight=car.kit?.id==='992'?h+.012*clamp((t-.60)/.25):h;
         const z=high-lensHeight+upper*lensHeight+.013*t;
         const proud=modern?.008:.006368;
         if(t<=.84)return tail.point(s*y,z,depth-proud);
@@ -561,7 +632,7 @@ function exteriorLights(r,car,paint){
         const flank=raw=>sideRaw(car,raw,clamp((actualZ-wheelCut(car,raw))/(top(car,raw,station(car,raw)[0]*.958)[2]-wheelCut(car,raw))),s);
         if(modern){
           // Outer point of the lamp pocket in the side elevation, ahead of the rear corner.
-          const physical=mix(base[0],1.665,k);
+          const physical=mix(base[0],car.kit.tailWrap,k);
           xx=physical;
           for(let i=0;i<7;i++)xx+=physical-flank(xx)[0];
         }
@@ -569,6 +640,7 @@ function exteriorLights(r,car,paint){
         const turn=Math.sin(k*Math.PI/2);
         return [mix(base[0],side[0],turn),s*(mix(tail.w,Math.abs(side[1]),turn)+.004-depth),actualZ];
       };
+      if(car.kit?.id==='996'){draw996Tail(r,(u,v,depth)=>tailLamp996(r,car,s,u,v,depth));return;}
       if(modern){draw992Tail(r,row);return;}
       const profile=[0,.20,.43,.60,.69,.78,.84,.86,.88,.90,.92,.94,.96,.98,1];
       for(let j=0;j<profile.length-1;j++){
@@ -580,9 +652,17 @@ function exteriorLights(r,car,paint){
       if(!modern)rearOptics993(r,row);
     });
   }
-  if(modern)r.tag('lights.tail',()=>draw992Nameplate(r,tail.point));
+  if(car.kit?.id==='992')r.tag('lights.tail',()=>draw992Nameplate(r,tail.point));
+  if(car.kit?.id==='996')r.tag('shell.deck',()=>draw996Script(r,tail.point));
   r.tag('shell.bumpers',()=>{
-    const plate=tail.point(0,modern?.357:.361,-.002);
+    const plate=tail.point(0,modern?car.kit.plateZ:.361,-.002);
+    if(car.kit?.id==='996'){
+      // Black rubber guards flank the US plate recess.
+      for(const side of [-1,1]){
+        const y=side*.235,base=tail.point(y,plate[2],-.002)[0];
+        r.box(base-.004,y-.045,plate[2]-.050,base+.016,y+.045,plate[2]+.050,'#25292b');
+      }
+    }
     if(!modern){
       plate[0]+=.012;
       // US impact guards flank the shorter North American license plate.
@@ -593,7 +673,7 @@ function exteriorLights(r,car,paint){
     }
     r.box(plate[0]-.006,-.164,plate[2]-.063,plate[0]+.008,.164,plate[2]+.063,'#484d4d');
     r.box(plate[0]+.009,-.147,plate[2]-.049,plate[0]+.013,.147,plate[2]+.049,'#b9bcb1');
-    if(modern)for(const s of [-1,1]){
+    if(car.kit?.id==='992')for(const s of [-1,1]){
       // The reflector carrier clips into the recessed rear grille. Both ends
       // need a supported return, including the one seen in side elevation.
       const band=(height,depth)=>Array.from({length:9},(_,i)=>{
@@ -609,17 +689,17 @@ function exteriorLights(r,car,paint){
     }
   });
   if(!modern){fixedStopLamp(r,car,paint,top);cowlInlet993(r,car,paint,top);classicBodyTrim(r,car,paint,top,tail.point,sideRaw);r.tag('shell.deck',()=>classicDeckScript(r,car,top));}
-  const hoodX=car.stations[0][0]+(modern?.20:.16);
+  const hoodX=car.stations[0][0]+(modern?car.kit.badgeX:.16);
   r.tag('shell.luggage',()=>{
     const gap=Array.from({length:29},(_,i)=>{
-      const side=i/14-1,x=modern?bonnetStart:classicBonnetStart;
+      const side=i/14-1,x=modern?car.kit.bonnetStart:classicBonnetStart;
       return top(car,x,side*lidWidth(car,x,station(car,x)[0],true));
     });
     panelSeam(r,car,'bonnet-front',gap,modern?.007:.0063,0,modern?'#2c2f31':tint(paint,.47));
     const at=(dx,y,lift)=>{const p=top(car,(modern?hoodX:classicBonnetStart+.085)+dx,y);p[2]+=lift;return p;};
     const badge=[[-.027,-.017],[-.027,.017],[.011,.015],[.038,0],[.011,-.015]].map(([dx,y])=>at(dx,y,.005));
     r.polygon(badge,'#b2945d',false);
-    if(!modern){
+    if(!modern||car.kit.id==='996'){
       // Enamelled crest: a gold rim around red and black quarters.
       const q=(dx0,dx1,y0,y1,color)=>r.polygon([at(dx0,y0,.0056),at(dx0,y1,.0056),at(dx1,y1,.0056),at(dx1,y0,.0056)],color,false);
       q(-.022,-.004,-.012,0,'#9a2c27');q(-.022,-.004,0,.012,'#2b2523');
@@ -628,10 +708,59 @@ function exteriorLights(r,car,paint){
     }
   });
 }
+// 996 tail lamp: a band seated on the rounded rear corner. Each lens point is
+// cast outward from a vertical axis inside the corner onto the faceted body
+// already drawn, so the lens follows the actual panel. Along u the lens runs
+// from its inner end on the rear panel (plan y = 0.44) around the corner to its
+// tip on the quarter (x = 1.72); v runs from the bumper seam to the top edge.
+// Plan and side outlines from the rescue sheet (paths 213, 226, 53, 54).
+const lampHits=new WeakMap();
+function lampSurface(r,s){
+  let cache=lampHits.get(r.faces);
+  if(!cache){
+    const tris=[];
+    for(const f of r.faces||[]){
+      if(!/^shell\.(fenders|deck|bumpers)$/.test(f.part||''))continue;
+      const P=f.points;
+      if(!P.some(p=>p[0]>1.55&&Math.abs(p[1])>.30&&p[2]>.58&&p[2]<.92))continue;
+      for(let i=1;i<P.length-1;i++)tris.push([P[0],P[i],P[i+1]]);
+    }
+    cache={tris,hits:new Map()};lampHits.set(r.faces,cache);
+  }
+  return cache;
+}
+function tailLamp996(r,car,s,u,v,depth=0){
+  const zlo=mix(.680,.664,u),zhi=u<.62?.818:mix(.818,.758,smoothstep((u-.62)/.38));
+  let z=mix(zlo,zhi,v);
+  if(u>.9){const k=(u-.9)/.1;z=mix(z,mix(.690,.735,v),k*k);}
+  const phi=mix(.066,1.79,u),origin=[1.80,s*.42,z],dir=[Math.cos(phi),s*Math.sin(phi),0];
+  const {tris,hits}=lampSurface(r,s),key=[s,phi.toFixed(5),z.toFixed(5)].join('/');
+  let t=hits.get(key);
+  if(t===undefined){
+    t=null;
+    for(const [a,b,c] of tris){
+      // Möller–Trumbore against each triangle; keep the farthest hit.
+      const e1=[b[0]-a[0],b[1]-a[1],b[2]-a[2]],e2=[c[0]-a[0],c[1]-a[1],c[2]-a[2]];
+      const p=[dir[1]*e2[2]-dir[2]*e2[1],dir[2]*e2[0]-dir[0]*e2[2],dir[0]*e2[1]-dir[1]*e2[0]];
+      const det=e1[0]*p[0]+e1[1]*p[1]+e1[2]*p[2];if(Math.abs(det)<1e-12)continue;
+      const inv=1/det,o=[origin[0]-a[0],origin[1]-a[1],origin[2]-a[2]];
+      const bu=(o[0]*p[0]+o[1]*p[1]+o[2]*p[2])*inv;if(bu<0||bu>1)continue;
+      const q=[o[1]*e1[2]-o[2]*e1[1],o[2]*e1[0]-o[0]*e1[2],o[0]*e1[1]-o[1]*e1[0]];
+      const bv=(dir[0]*q[0]+dir[1]*q[1]+dir[2]*q[2])*inv;if(bv<0||bu+bv>1)continue;
+      const d=(e2[0]*q[0]+e2[1]*q[1]+e2[2]*q[2])*inv;
+      if(d>0&&(t===null||d>t))t=d;
+    }
+    hits.set(key,t);
+  }
+  const reach=(t??.45)+.0095-depth;
+  return [origin[0]+dir[0]*reach,origin[1]+dir[1]*reach,z];
+}
+function smoothstep(t){t=clamp(t);return t*t*(3-2*t);}
 function engineGrille(r,car,paint,phase){
-  const modern=car.modern;
-  const p=(x,y,lift)=>{const q=top(car,x,y);q[2]+=lift;return modern?q:spoilerPoint(false,q,phase);};
-  r.tag(modern?'shell.deck':'shell.spoiler',()=>{
+  const modern=car.modern,lifting=car.kit?.id==='996';
+  const p=(x,y,lift)=>{const q=top(car,x,y);q[2]+=lift;return modern&&!lifting?q:spoilerPoint(car.modern||false,q,phase);};
+  r.tag(modern&&!lifting?'shell.deck':'shell.spoiler',()=>{
+    if(lifting){draw996EngineGrille(r,p);return;}
     if(modern){draw992EngineGrille(r,p);return;}
     const {grilleFront,grilleRear}=classicSpoiler;
     const stations=uBreaks(car).filter(x=>x>=grilleFront&&x<=grilleRear);
@@ -798,13 +927,13 @@ function packClassicSkin(faces,start){
 // Whole-car motion redraws only the blade and its mechanism. All unaffected
 // coachwork, upholstery, glazing and running gear reuse their parked mesh.
 export function drawPorscheSpoilerMotion(r,modern,paint,phase=0){
-  const car=coupeShape[modern?1:0],start=r.faces?.length||0,xs=uBreaks(car);
-  const a=modern?spoiler992.front:classicSpoiler.front,b=modern?spoiler992.rear:classicSpoiler.rear;
+  const car=porscheShape(modern),start=r.faces?.length||0,xs=uBreaks(car);
+  const a=modern?car.kit.spoiler.front:classicSpoiler.front,b=modern?car.kit.spoiler.rear:classicSpoiler.rear;
   for(let i=1;i<xs.length;i++){
     if(xs[i-1]<a||xs[i]>b)continue;
     for(const side of [-1,1])lidStrip(r,car,paint,phase,xs[i-1],xs[i],side,false,true);
   }
-  if(!modern)engineGrille(r,car,paint,phase);
+  if(!modern||car.kit.id==='996')engineGrille(r,car,paint,phase);
   drawSpoilerDrive(r,modern,phase);
   if(r.faces)softenPaint(r.faces.slice(start),paint,modern?8:3);
 }

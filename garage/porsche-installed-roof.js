@@ -23,16 +23,23 @@ function panelBow(r,fore,aft,color){
     r.polygon([fore(a),fore(b),aft(b),aft(a)],color,false);
   }
 }
+// The 996 frame shares the water-cooled packaging under a body-colour lid; its
+// well starts 0.115 m further back and 0.015 m higher than the 992's.
+const shift=car=>car.variant==='996'?[.115,.015]:[0,0];
+const moved=(car,[x,y,z])=>{const [dx,dz]=shift(car);return [x+dx,y,z+dz];};
 const loweredPoint=(car,i,u)=>{
   // The hard-glass modern package folds flush. The classic flexible screen folds with the fabric.
   const q=car.modern?[[.74,.861],[.936,.825],[1.013,.786],[1.132,.735]][i]:
     [[.761,.884],[.824,.864],[.859,.839],[.918,.809]][i];
-  return [q[0]+.020*(1-u*u),u*(car.modern?.589:.548),q[1]-.020*u*u];
+  return moved(car,[q[0]+.020*(1-u*u),u*(car.modern?.589:.548),q[1]-.020*u*u]);
 };
-function mount(car,s){return car.modern?[.755,s*.612,.763]:[.693,s*.586,.770];}
+function mount(car,s){return car.modern?moved(car,[.755,s*.612,.763]):[.693,s*.586,.770];}
 function positioned(r,id,alias,draw){r.tag(alias?'cabin.top':'roof.'+id,draw);}
 function roofFrame(r,car,raised,alias){
   const rows=roofSections(car);
+  // Only the 992 roof has panel bows and hydraulic cylinders. The 996 keeps
+  // tubular bows and an electric drive under its body-colour compartment lid.
+  const panel=car.kit?.id==='992';
   const beam=(stage,u)=>{
     if(!raised)return loweredPoint(car,stage,u);
     const p=roofPoint(rows[[0,2,3,4][stage]],u);
@@ -40,7 +47,7 @@ function roofFrame(r,car,raised,alias){
   };
   positioned(r,'header',alias,()=>{
     crossBow(r,u=>beam(0,u),.010,iron);
-    if(car.modern){
+    if(panel){
       const center=beam(0,0);
       r.box(center[0]+.014,-.040,center[2]-.018,center[0]+.077,.040,center[2]-.007,trim);
       panelBow(r,u=>beam(0,u),u=>{
@@ -50,7 +57,7 @@ function roofFrame(r,car,raised,alias){
     }
   });
   positioned(r,'bows',alias,()=>{
-    if(car.modern){
+    if(panel){
       // Each broad sheet directly supports the closed roof skin. Neither is a tubular bow.
       for(const i of [1,2]){
         const a=u=>{
@@ -73,7 +80,7 @@ function roofFrame(r,car,raised,alias){
         const point=(u,v)=>{
           if(car.modern){
             const fore=[.717,.812,.885][i],zz=[.875,.819,.778][i];
-            return [fore+.185*v+.040*(1-u*u),u*.57,zz-.022*u*u+.006*Math.sin(v*Math.PI)];
+            return moved(car,[fore+.185*v+.040*(1-u*u),u*.57,zz-.022*u*u+.006*Math.sin(v*Math.PI)]);
           }
           return [.767+.035*i+.065*v+.009*(1-u*u),u*.528,.868-.025*i-.022*u*u+.010*Math.sin(v*Math.PI)];
         };
@@ -82,7 +89,7 @@ function roofFrame(r,car,raised,alias){
       }
     });
     positioned(r,'rear-window',alias,()=>{
-      const p=(u,v)=>car.modern?[.886+.324*v+.027*(1-u*u),u*.456,.698+.034*v-.010*u*u]:
+      const p=(u,v)=>car.modern?moved(car,[.886+.324*v+.027*(1-u*u),u*.456,.698+.034*v-.010*u*u]):
         [.803+.126*v,u*.425,.789+.011*u*u-.020*Math.sin(v*Math.PI)];
       for(let j=0;j<4;j++)for(let i=1;i<spans.length;i++){
         const a=spans[i-1],b=spans[i];
@@ -94,9 +101,9 @@ function roofFrame(r,car,raised,alias){
   if(car.modern)positioned(r,'compartment-lid',alias,()=>{
     // The drawn exterior already includes this shut lid with the roof down.
     // With the roof up, its forward rim is tucked under the fabric sail.
-    if(raised)drawPorscheCompartmentLid(r,paintChoice(r.build?.paint).hex);
+    if(raised)drawPorscheCompartmentLid(r,paintChoice(r.build?.paint).hex,car);
     for(const s of [-1,1]){
-      const hinge=[.900,s*.453,.826],ear=[.825,s*.486,.885];
+      const hinge=moved(car,[.900,s*.453,.826]),ear=moved(car,[.825,s*.486,.885]);
       r.rod(hinge,ear,.007,iron,7);sleeve(r,hinge,y,-.014,.014,.012,.005,alloy,8);
     }
   });
@@ -116,18 +123,20 @@ function roofFrame(r,car,raised,alias){
       }
     });
     positioned(r,'drive',alias,()=>{
-      if(car.modern){
-        const aft=[.890,s*.620,.705],rodEnd=mix(a,elbow,.78),guide=mix(aft,rodEnd,.60);
+      if(panel){
+        const aft=moved(car,[.890,s*.620,.705]),rodEnd=mix(a,elbow,.78),guide=mix(aft,rodEnd,.60);
         r.rod(aft,guide,.016,iron,10);r.rod(guide,rodEnd,.007,alloy,8);
         for(const p of [aft,rodEnd])sleeve(r,p,y,-.009,.009,.014,.006,alloy,8);
       }else{
         // One center drive motor and two flexible shafts from model year 1996.
         // The left and right planetary transmissions are fixed at the main hinge.
         cyl(r,a,y,-.016,.016,.034,iron,12);
-        const pickup=[a[0]+.019,s*.557,a[2]-.012],guide=[.794,s*.445,.711],socket=[.797,s*.097,.714];
+        // The 996 motor sits under its compartment lid, 0.18 m behind the 993's.
+        const [ox,oz]=car.variant==='996'?[.177,.008]:[0,0];
+        const pickup=[a[0]+.019,s*.557,a[2]-.012],guide=[.794+ox,s*.445,.711+oz],socket=[.797+ox,s*.097,.714+oz];
         r.rod(socket,guide,.006,trim,7);r.rod(guide,pickup,.006,trim,7);
         if(s===-1){
-          const c=[.797,0,.714];
+          const c=[.797+ox,0,.714+oz];
           cyl(r,c,y,-.090,.090,.030,iron,12);
           for(const k of [-1,1])cyl(r,c,y,k*.088,k*.104,.017,alloy,10);
         }
@@ -136,11 +145,11 @@ function roofFrame(r,car,raised,alias){
   }
 }
 export function drawPorscheInstalledRoof(r,vehicle){
-  const modern=vehicle==='porsche992scab';
-  if(!modern&&vehicle!=='porsche993cab')return;
+  const index=['porsche993cab','porsche992scab','porsche996cab'].indexOf(vehicle);
+  if(index<0)return;
   const cabin=r.inspection?.assembly==='cabin';
   if(!cabin){
     for(const face of r.faces)if(face.part==='cabin.top')face.part=face.roofServicePart||'roof.fabric';
   }
-  roofFrame(r,coupeShape[modern?1:0],r.build?.roofPosition==='up',cabin);
+  roofFrame(r,coupeShape[index],r.build?.roofPosition==='up',cabin);
 }

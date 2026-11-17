@@ -1,4 +1,5 @@
 import {spoiler992} from './porsche992-skin.js';
+import {spoiler996} from './porsche996-skin.js';
 import {porscheDeckPoint,coupeShape} from './porsche-coachwork.js';
 import {classicSpoiler} from './porsche993-body-profile.js';
 // Separate lid-mounted drive and active spoiler studies. Travel is illustrative.
@@ -9,24 +10,31 @@ import {pipe,barrel} from './road-primitives.js';
 const TAU=Math.PI*2, phaseTravel=phase=>(1-Math.cos(TAU*phase))*.5;
 const sources={
   classic:{label:'Porsche PET · 993 rear spoiler drive, plate 803-15',url:'https://www.design911.co.uk/diagrams/d/40739/0/'},
+  type996:{label:'Porsche PET · 996 rear spoiler, plate 803-007 (drive unit and electric motor)',url:'https://eurospares.co.uk/Porsche/996/996_(2001)/PartDiagrams/803-007/REAR_SPOILER'},
   new:{label:'Porsche · Carrera S Cabriolet active aerodynamics',url:'https://newsroom.porsche.com/dam/jcr%3A027b3198-602a-498d-b4fc-52e6e3b5261a/2020_911_Carrera_S_and_4S_Cabriolet_US_Press_Kit.pdf.PDF#page=10'},
   carrier:{label:'TECHART · original 992 motor, carrier and Hall sensor, figures 35–38',url:'https://www.techart.de/fileadmin/mediapoint/6b6d8f2a844669b49e8197fb041bf6f.pdf'}
 };
 const variants={
   porsche993cab:{id:'993spoiler',modern:false,front:classicSpoiler.front,rear:classicSpoiler.rear,zc:.948,w:.54,mount:.377,base:.673,source:sources.classic},
-  porsche992scab:{id:'992spoiler',modern:true,front:spoiler992.front,rear:spoiler992.rear,zc:.905,w:.715,mount:.435,base:.69,source:sources.new},
+  porsche992scab:{id:'992spoiler',modern:true,shape:1,front:spoiler992.front,rear:spoiler992.rear,zc:.905,w:.715,mount:.435,base:.69,source:sources.new},
+  // The 996 lid lifts its louvred section on two arms, driven like the 993's by
+  // one motor and flexible shafts; the blade follows the lofted 996 lid.
+  porsche996cab:{id:'996spoiler',modern:false,shape:2,front:spoiler996.front,rear:spoiler996.rear,zc:.918,w:.45,mount:.300,base:.700,source:sources.type996,
+    tilt:.22,advance:.020,rise:.075}
 };
-const model=modern=>modern?variants.porsche992scab:variants.porsche993cab;
+const model=modern=>modern==='996'?variants.porsche996cab:modern?variants.porsche992scab:variants.porsche993cab;
+// The lofted lid that the blade sits in; the 993 blade uses its own analytic surface.
+const skinOf=g=>g.shape===undefined?null:coupeShape[g.shape];
 export function spoilerPoint(modern,p,phase){
   const g=model(modern),t=phaseTravel(phase),x=p[0]-g.front,z=p[2]-g.zc;
-  const angle=t*(modern?.24:.30),advance=t*(modern?.035:.013),rise=t*(modern?.112:.060);
+  const angle=t*(g.tilt??(modern?.24:.30)),advance=t*(g.advance??(modern?.035:.013)),rise=t*(g.rise??(modern?.112:.060));
   return [g.front+x*Math.cos(angle)-z*Math.sin(angle)+advance,p[1],g.zc+z*Math.cos(angle)+x*Math.sin(angle)+rise];
 }
 function mounting(g,s,phase,forward){
   const x=g.front+(g.rear-g.front)*(forward?.22:.74),y=s*g.mount,z=g.zc-(x-g.front)*(g.modern?.270:.29);
   // Leave the pin and its bracket beneath the skin even at the sloping rear edge.
-  const skin=g.modern?porscheDeckPoint(coupeShape[1],x,y):[x,y,z];
-  const end=spoilerPoint(g.modern,[skin[0],y,skin[2]-(g.modern?.031:.052)],phase);
+  const skin=skinOf(g)?porscheDeckPoint(skinOf(g),x,y):[x,y,z];
+  const end=spoilerPoint(g.shape===2?'996':g.modern,[skin[0],y,skin[2]-(g.modern?.031:.052)],phase);
   const base=[skin[0]-(forward?.085:.110),y,g.base-.035];
   return {base,end};
 }
@@ -74,8 +82,8 @@ function closing(r,g,phase){
   for(let j=0;j<2;j++){
     const a=-g.w*.79+g.w*.79*j,b=a+g.w*.79;
     const p=(y,u)=>{
-      const surface=g.modern?porscheDeckPoint(coupeShape[1],x,y):[x,y,g.zc];
-      const low=surface[2]-.061,edge=spoilerPoint(g.modern,[surface[0],y,surface[2]-.021],phase);
+      const surface=skinOf(g)?porscheDeckPoint(skinOf(g),x,y):[x,y,g.zc];
+      const low=surface[2]-.061,edge=spoilerPoint(g.shape===2?'996':g.modern,[surface[0],y,surface[2]-.021],phase);
       return [surface[0]+(edge[0]-surface[0])*u-.025*(1-u)*t,y,low+(edge[2]-low)*u];
     };
     if(g.modern){r.polygon([p(a,0),p(b,0),p(b,1),p(a,1)],'#51565a',false);}
@@ -100,20 +108,24 @@ function spoilerStopLamp(r,g,phase){
 }
 export function drawSpoilerDrive(r,modern,phase=0){
   const g=model(modern);
-  if(modern)r.tag('shell.spoiler',()=>spoilerStopLamp(r,g,phase));
+  if(g.modern)r.tag('shell.spoiler',()=>spoilerStopLamp(r,g,phase));
   r.tag('shell.spoiler-drive',()=>{carrier(r,g);motor(r,g);transmission(r,g);feedback(r,g);for(const s of [-1,1])lift(r,g,phase,s);closing(r,g,phase);});
 }
 function blade(r,g,phase){
   if(g.modern)spoilerStopLamp(r,g,phase);
   for(let i=0;i<7;i++)for(let j=0;j<14;j++){
     const p=(a,b)=>{const u=a/7,v=b/7-1,x=g.front+(g.rear-g.front)*u,w=g.w*(.85+.15*Math.sin(Math.PI*u));
-      const skin=g.modern?porscheDeckPoint(coupeShape[1],x,v*w):[x,v*w,g.zc-u*.159+.02*(1-v*v)];
-      return spoilerPoint(g.modern,skin,phase);};
+      const skin=skinOf(g)?porscheDeckPoint(skinOf(g),x,v*w):[x,v*w,g.zc-u*.159+.02*(1-v*v)];
+      return spoilerPoint(g.shape===2?'996':g.modern,skin,phase);};
     const col=g.modern?'#8397a1':(i%2?'#647177':'#949e9e');
     r.polygon([p(i,j),p(i+1,j),p(i+1,j+1),p(i,j+1)],col,false);
   }
   if(!g.modern)for(let t=1;t<11;t++){
-    const x=g.front+.062+t*.038,u=(x-g.front)/(g.rear-g.front),p=y=>spoilerPoint(false,[x,y,g.zc-.159*u+.025-.016*(y/g.w)**2],phase);
+    const x=g.front+.062+t*.038*(g.rear-g.front)/.48,u=(x-g.front)/(g.rear-g.front);
+    const p=y=>{
+      if(skinOf(g)){const q=porscheDeckPoint(skinOf(g),x,y);return spoilerPoint('996',[q[0],q[1],q[2]+.004],phase);}
+      return spoilerPoint(false,[x,y,g.zc-.159*u+.025-.016*(y/g.w)**2],phase);
+    };
     pipe(r,[p(-.42),p(0),p(.42)],.007,'#323a3c',5);
   }
 }

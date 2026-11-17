@@ -11,7 +11,7 @@ const serviceAlias={
  'drivetrain.gearbox':'drive.gearbox','drivetrain.clutch':'drive.gearbox','drivetrain.rear-differential':'drive.gearbox','drivetrain.halfshafts':'drive.axles',
  'brakes.front-disc':'running.brakes','brakes.rear-disc':'running.brakes','brakes.front-caliper':'running.brakes','brakes.rear-caliper':'running.brakes'
 };
-export const isWorkbenchPorsche=vehicle=>vehicle==='porsche992scab'||vehicle==='porsche993cab';
+export const isWorkbenchPorsche=vehicle=>vehicle==='porsche992scab'||vehicle==='porsche993cab'||vehicle==='porsche996cab';
 export function drawPorscheInstalledServices(r,vehicle,assembly){
  // Remove the compact floor, hub brakes, transmission and shaft substitutes
  // before the full installed meshes take their places. The roof uses the

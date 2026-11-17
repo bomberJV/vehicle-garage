@@ -175,16 +175,20 @@ function glass(r,car,paint){
   const center=p(0,.942);pipe(r,[center,[center[0]+.039,0,center[2]-.054]],.009,'#37383a',7);
   ellipsoid(r,[center[0]+.045,0,center[2]-.062],[.024,.096,.032],'#343a3d',16,6);
 }
-function compartmentEdges(){
+// The 996 cockpit opening ends further back and higher; its U follows the
+// rescue sheet's plan (roof well from the B-post line to x = 0.94 at the centre).
+const compartment={992:[.42,.41,.626,.885],996:[.535,.405,.645,.900]};
+function compartmentEdges(car){
+  const [x0,depth,half,z0]=compartment[car?.variant==='996'?996:992];
   const apron=Array.from({length:25},(_,i)=>{
     const a=i*Math.PI/24;
-    return [.42+.41*Math.sin(a)**.70,.626*Math.cos(a),.885+.017*Math.sin(a)];
+    return [x0+depth*Math.sin(a)**.70,half*Math.cos(a),z0+.017*Math.sin(a)];
   });
   return {apron,inner:apron.map(([x,y,z])=>[x+.069,y*1.041,z+.016]),
-    outer:apron.map(([x,y,z])=>[x+.09+.045*(1-Math.abs(y)/.626),y*1.061,z+.022])};
+    outer:apron.map(([x,y,z])=>[x+.09+.045*(1-Math.abs(y)/half),y*1.061,z+.022])};
 }
-export function drawPorscheCompartmentLid(r,paint){
-  const {inner,outer}=compartmentEdges();
+export function drawPorscheCompartmentLid(r,paint,car){
+  const {inner,outer}=compartmentEdges(car);
   strip(r,inner,outer,paint);
   strip(r,outer,outer.map(([x,y,z])=>[x+.005,y,z+.001]),tint(paint,.65));
 }
@@ -244,12 +248,13 @@ function softTop(r,car,paint){
     // fabric-covered front bow then lies flush on top as the cover: photographs
     // of the car with the top down show black fabric from behind the seats to
     // a curved edge just ahead of the engine grille, not painted bodywork.
-    const {apron,inner,outer}=compartmentEdges();
+    // The 996 stows its top under a painted compartment lid instead.
+    const {apron,inner,outer}=compartmentEdges(car);
     strip(r,apron,inner,'#393a3b');
     const first=r.faces.length;
-    drawPorscheCompartmentLid(r,paint);
+    drawPorscheCompartmentLid(r,paint,car);
     for(let i=first;i<r.faces.length;i++)r.faces[i].roofServicePart='roof.compartment-lid';
-    stowedBow(r,car,outer);
+    if(car.variant!=='996')stowedBow(r,car,outer);
   }
 }
 function dash(r,car){

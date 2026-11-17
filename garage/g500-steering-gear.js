@@ -6,7 +6,8 @@ import {fluidRefs as ref} from './g500-fluid-refs.js';
 const pump=[-1.706,-.351,.819],gear=[-1.602,-.544,.627];
 // The drag link runs ahead of the differential housing, below the cooler pipes.
 const pitmanTip=[-1.625,-.530,.440],rightJoint=[-1.612,.622,.380];
-const press=plus(pump,[.040,-.045,.008]),inlet=plus(gear,[.046,.027,.072]),outlet=plus(gear,[-.004,.027,.072]);
+const press=plus(pump,[.040,-.045,.008]),inlet=plus(gear,[.046,-.030,.072]),outlet=plus(gear,[-.004,-.030,.072]);
+// The ports sit on the outboard half of the box top, clear of the frame rail beneath it.
 const feed=[-1.997,-.566,.577],returnEnd=[-1.997,-.566,.604],reservoirIn=plus(pump,[.045,-.067,.069]);
 function hose(r,points,rad){
  path(r,points,rad,rubber);
@@ -43,7 +44,7 @@ export const steeringRows=[
   slab(r,c[0],c[1],c[2]+.091,.134,.117,.009,iron,.025);
   cyl(r,plus(c,[-.025,0,.095]),z,0,.020,.030,rubber,12);cyl(r,reservoirIn,y,-.012,.015,.011,iron,10);
  }],
- ['pressure-line','High-pressure hose','A crimped hose joins the pump outlet to the control valve in the steering gear. The parts catalog lists a chassis-number break for this line.',[-.12,-.32,.10],ref.steering,r=>hose(r,[press,[-1.653,-.459,.811],[-1.608,-.493,.746],inlet],.011)],
+ ['pressure-line','High-pressure hose','A crimped hose joins the pump outlet to the control valve in the steering gear. The parts catalog lists a chassis-number break for this line.',[-.12,-.32,.10],ref.steering,r=>hose(r,[press,[-1.653,-.459,.811],[-1.590,-.574,.780],inlet],.011)],
  ['steering-box','Recirculating-ball steering box','The steering shaft turns a worm. A ball-supported rack piston acts on a sector shaft, whose splined end carries the pitman arm.',[.06,-.35,-.03],ref.gear,r=>{
   turn(r,gear,x,[[-.095,0],[-.095,.057],[-.080,.072],[.073,.072],[.092,.053],[.113,.029],[.113,0]],iron,{n:14});
   cyl(r,plus(gear,[-.010,0,-.014]),z,-.095,.044,.052,iron,12);
@@ -66,6 +67,6 @@ export const steeringRows=[
  }],
  ['return-lines','Steering-box and reservoir return hoses','One hose carries oil from the box to the cooler. The second runs from the other cooler port back to the reservoir.',[.05,-.28,-.16],ref.steering,r=>{
   hose(r,[outlet,[-1.650,-.566,.701],[-1.705,-.596,.630],[-1.930,-.591,.576],feed],.009);
-  hose(r,[returnEnd,[-1.925,-.564,.620],[-1.852,-.510,.720],[-1.780,-.487,.862],reservoirIn],.009);
+  hose(r,[returnEnd,[-1.925,-.564,.620],[-1.900,-.578,.705],[-1.852,-.510,.745],[-1.780,-.487,.862],reservoirIn],.009);
  }]
 ];

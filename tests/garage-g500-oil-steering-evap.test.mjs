@@ -47,8 +47,8 @@ test('every component of each G500 bench study draws, and the steering and purge
 test('installed control and fluid paths reach their fittings, gearbox and wheel end',()=>{
  const mesh=viewer();
  for(const [port,keys,radius] of [
-  [[-1.516,-.527,.473],['steering-assist.pitman','steering.linkage'],.030],
-  [[-1.542,.680,.412],['steering.linkage'],.030],
+  [[-1.625,-.530,.440],['steering-assist.pitman','steering.linkage'],.030],
+  [[-1.612,.622,.380],['steering.linkage'],.030],
   [[-.625,-.410,1.109],['column-adjustment.shaft','steering-assist.shaft'],.018],
   [[-1.997,-.566,.577],['steering-assist.cooler','steering-assist.return-lines'],.015],
   [[-2.060,-.407,.687],['transmission-fluid.cooler','transmission-fluid.left-line'],.020],
@@ -67,7 +67,7 @@ test('the 40 mm lift keeps the drag link attached to the rising pitman arm and t
  r.build={...r.build,lift:{mode:'g500-orc-40',mm:40}};r.buildMesh();
  const raised=link(),average=(items)=>items.reduce((s,n)=>s+n,0)/items.length;
  const delta=(at)=>reference.flatMap((pt,i)=>at(pt)?[raised[i][2]-pt[2]]:[]);
- const pitman=delta(p=>p[1]<-.505),wheel=delta(p=>p[1]>.660);
+ const pitman=delta(p=>p[1]<-.505),wheel=delta(p=>p[1]>.590);
  assert(pitman.length>10&&wheel.length>10);
  assert(Math.abs(average(pitman)-.040)<.001);assert(Math.abs(average(wheel))<.001);
 });

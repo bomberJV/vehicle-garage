@@ -143,7 +143,8 @@ export function drawG500PickupFilter(r,c,scale=1){
 const cooler=[-2.066,0,.712];
 // The header unions stand 3 mm proud of the condenser face.
 const coolerPorts=[[-2.063,-.407,.687],[-2.063,.407,.737]];
-const union=s=>[-.644,s*.155,.426];
+// The right union sits lower so the front shaft clears it when the body is lifted.
+const union=s=>[-.644,s*.155,s>0?.405:.426];
 export const atfRows=[
  ['pan','Transmission oil pan','The shallow stamped pan holds the fluid beneath the five-speed automatic. Its rim and the case clamp the perimeter gasket.',[.14,-.10,-.27],ref.atfPan,r=>panShell(r,pan)],
  ['pan-seal','Pan gasket and drain plug','A molded gasket follows the irregular pan rim. A separate sealing washer sits underneath the drain plug.',[.12,.22,-.15],ref.atfPan,r=>{
@@ -176,7 +177,11 @@ export const atfRows=[
  ...[-1,1].map((s,i)=>[s<0?'left-line':'right-line',s<0?'Driver-side cooler pipe':'Passenger-side cooler pipe','The bent steel pipe runs forward from a transmission-case union. The short front connection joins the pipe to its cooler header.',[-.03,s*.29,-.09],ref.atfCooler,r=>{
   const c=union(s),front=[-1.888,s*.433,.487];
   cyl(r,c,y,-.014,.014,.014,alloy,6);
-  path(r,[c,[-.788,s*.208,.435],[-.981,s*.228,.420],[-1.468,s*.236,.405],[-1.717,s*.321,.430],front],.008,metal);
+  // The pipe climbs beside the sump, inboard of the coil spring and over the axle,
+  // then passes outboard of the compressor or alternator to the cooler header.
+  const run=s>0?[[-1.565,.25,.61],[-1.585,.40,.585],[-1.80,.43,.53]]:[[-1.572,-.25,.60],[-1.605,-.375,.60],[-1.80,-.40,.55]];
+  const back=s>0?[[-.70,.228,.405],[-.788,.262,.425],[-.981,.285,.47],[-1.05,.27,.572]]:[[-.788,-.208,.435],[-.981,-.228,.420],[-1.05,-.252,.572]];
+  path(r,[c,...back,[-1.30,s*.245,.607],...run,front],.008,metal);
   path(r,[front,[-1.970,s*.516,.514],[-2.042,s*.523,.558],[-2.060,s*.488,coolerPorts[i][2]],coolerPorts[i]],.009,rubber);
  }])
 ];

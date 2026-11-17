@@ -87,9 +87,14 @@ g500FrontSeatStudy.viewAngle=[-.65,.30];
 function rearBench(r){
  r.tag('body.rear-bench',()=>{
   // The cargo photograph shows the division to the right of the middle restraint.
-  for(const [a,b] of [[-.689,.216],[.224,.689]]){
+  // The seat bases stand on the floor either side of the tunnel; the center
+  // cushion bridges the tunnel and the battery well beneath it.
+  for(const [a,b] of [[-.689,-.196],[.196,.689]]){
    const cy=(a+b)/2,w=(b-a)/2;
    upholstery(r,[[.752,cy,.674,.185,w*.96],[.757,cy,.752,.234,w],[.762,cy,.783,.239,w*.995]],rubber);
+  }
+  for(const [a,b] of [[-.689,.216],[.224,.689]]){
+   const cy=(a+b)/2,w=(b-a)/2;
    upholstery(r,[[.980,cy,.792,.050,w*.97],[1.001,cy,.89,.057,w],[1.104,cy,1.317,.053,w*.99],[1.113,cy,1.365,.043,w*.955]],rubber);
   }
   for(const [cy,w] of [[-.451,.218],[0,.207],[.451,.218]]){
@@ -102,10 +107,25 @@ function rearBench(r){
 function dashboard(r){
  r.tag('body.dashboard',()=>{
   // The black upper pad wraps over the instrument binnacle. COMAND occupies the center face.
-  r.profile([[-.749,1.12],[-.744,1.265],[-.672,1.30],[-.493,1.302],[-.443,1.267],[-.446,1.196],[-.508,1.116]],-.76,.76,'#424749');
-  r.profile([[-.601,1.25],[-.601,1.324],[-.542,1.376],[-.444,1.367],[-.419,1.327],[-.422,1.238]],-.613,-.209,'#3c4143');
+  // A 20 mm skin over the top and down the front; the HVAC housing, ducts,
+  // column and control units sit in the hollow beneath it.
+  // The front skin stops at z 1.165 so the column and stack wiring can rise behind it.
+  r.profile([[-.744,1.265],[-.672,1.30],[-.493,1.302],[-.443,1.267],[-.446,1.196],[-.470,1.165],
+   [-.4945,1.165],[-.466,1.200],[-.463,1.258],[-.498,1.282],[-.672,1.280],[-.744,1.245]],-.76,.76,'#424749');
+  // The binnacle hood is a 15 mm shell over the instrument cluster.
+  r.profile([[-.601,1.25],[-.601,1.324],[-.542,1.376],[-.444,1.367],[-.419,1.327],[-.421,1.29],
+   [-.436,1.29],[-.434,1.322],[-.452,1.352],[-.537,1.360],[-.586,1.318],[-.586,1.25]],-.613,-.209,'#3c4143');
   // The installed electrical.cluster owns the gauge faces and rear housing.
-  r.profile([[-.625,.826],[-.584,1.244],[-.452,1.244],[-.424,1.199],[-.453,.862],[-.513,.814]],-.144,.144,wood);
+  // The center stack is a fascia over a hollow: COMAND, the upper control
+  // panel and the climate panel sit behind it, the HVAC housing behind them.
+  // The climate panel and COMAND fill an opening in the fascia from z 0.89 to 1.112.
+  const face=z=>-.453+.029*(z-.862)/.337;
+  r.profile([[-.453,.862],[face(.89),.89],[face(.89)-.02,.89],[-.473,.862]],-.144,.144,wood);
+  r.profile([[face(1.112),1.112],[-.424,1.199],[-.452,1.244],[-.464,1.226],[-.444,1.196],[face(1.112)-.02,1.112]],-.144,.144,wood);
+  for(const [z0,z1,w] of [[.89,.975,.117],[.975,1.112,.102]])for(const s of [-1,1])
+   r.profile([[face(z0),z0],[face(z1),z1],[face(z1)-.02,z1],[face(z0)-.02,z0]],s<0?-.144:w,s<0?-w:.144,wood);
+  // Side cheeks close the stack above the console and stop at the HVAC housing.
+  for(const s of [-1,1])r.profile([[-.578,.880],[-.578,1.244],[-.452,1.244],[-.424,1.199],[-.453,.880]],s<0?-.144:.134,s<0?-.134:.144,wood);
   r.box(-.433,-.102,.978,-.428,.102,1.116,rubber);
   r.box(-.427,-.083,1.008,-.424,.083,1.098,'#202d30');
   for(const cy of [-.104,0,.104]){
@@ -126,14 +146,15 @@ function dashboard(r){
   upholstery(r,[[-.310,-.410,1.169,.022,.055],[-.309,-.410,1.203,.034,.084],[-.313,-.410,1.258,.034,.094],[-.319,-.410,1.282,.026,.076]],'#484e4e');
   // The console stands on the carpeted tunnel and is tall enough to house the
   // selector, transmission, restraint, yaw, transfer-case and rear SAM units.
-  const shell=[0,0,.812,.500,.140];
-  upholstery(r,[shell,[-.002,0,.930,.496,.143],[-.001,0,.990,.484,.130]],'#474b4d',true,.25);
+  // It starts in front of the stack fascia so its top stays clear of COMAND.
+  const shell=[.04,0,.812,.460,.140];
+  upholstery(r,[shell,[.038,0,.930,.456,.143],[.039,0,.990,.444,.130]],'#474b4d',true,.15);
   // An open skirt carries the shell down toward the carpet, following the tunnel.
   // It stops 40 mm short of the carpet facets so the harnesses on the carpet pass under its edge.
-  {const arc=t=>Math.sign(t)*Math.abs(t)**.25,[cx,cy,cz,d,w]=shell;
+  {const arc=t=>Math.sign(t)*Math.abs(t)**.15,[cx,cy,cz,d,w]=shell;
    const ring=Array.from({length:16},(_,i)=>{const a=i*Math.PI/8,x=cx+d*arc(Math.cos(a)),y=cy+w*arc(Math.sin(a));return [x,y,cabinFloorTop('g500',x,y)+.040];});
    for(let i=0;i<16;i++){const a=ring[i],b=ring[(i+1)%16];r.polygon([[a[0],a[1],cz],[b[0],b[1],cz],b,a],tint('#474b4d',.80),false);}}
-  r.box(-.423,-.091,.992,-.161,.094,1.002,wood);
+  r.box(-.400,-.091,.992,-.161,.094,1.002,wood);
   r.box(-.359,-.027,1.003,-.185,.022,1.006,rubber);
   r.rod([-.292,-.013,1.001],[-.267,-.013,1.092],.012,silver,9);
   upholstery(r,[[-.268,-.013,1.078,.025,.024],[-.26,-.013,1.106,.032,.029],[-.261,-.013,1.128,.026,.025]],rubber);

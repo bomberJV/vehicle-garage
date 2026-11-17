@@ -204,7 +204,37 @@ export function utilityWheelSpokes(r,{vehicle,x,y,z,side,rim,finish,design='stoc
   }
  };
  if(vehicle==='g500'){
-  // Ashtaroth and Atik, Mercedes-Benz wheel programme, pp. 87–88.
+  // Photographed 2002 US trucks (Bring a Trailer lot 271820 and others): a
+  // broad hub, five straight spokes, each with a sunken center groove, and
+  // windows open to the rim flange. Spoke width and groove depth are read
+  // from photographs; the hub covers the 130 mm bolt circle.
+  const stockG500Face=()=>{
+   const hub=.40*rim,tip=rim-.010,dish=rad=>.004+.020*(rad/rim)**2,steps=8;
+   for(let i=0;i<5;i++){
+    const axis=(.75+i)*2*Math.PI/5+Math.PI/5;
+    for(let k=0;k<steps;k++){
+     const r0=hub*.94+(tip-hub*.94)*k/steps,r1=hub*.94+(tip-hub*.94)*(k+1)/steps;
+     const half=rad=>.032-.006*(rad-hub)/(tip-hub),groove=rad=>.36*half(rad);
+     const at=(rad,offset,drop)=>point(axis+offset/rad,rad,dish(rad)-drop);
+     const quad=(o0,o1,d0,d1,c)=>r.polygon([at(r0,o0(r0),d0),at(r1,o0(r1),d0),at(r1,o1(r1),d1),at(r0,o1(r0),d1)],c,false);
+     const hw=rad=>half(rad),gw=rad=>groove(rad),n=f=>rad=>-f(rad);
+     quad(n(hw),n(gw),0,0,shade(finish,.97));
+     quad(gw,hw,0,0,shade(finish,1.02));
+     quad(n(gw),gw,.008,.008,shade(finish,.72));
+     quad(n(gw),n(gw),0,.008,shade(finish,.66));
+     quad(gw,gw,0,.008,shade(finish,.80));
+     quad(n(hw),n(hw),0,.030,shade(finish,.60));
+     quad(hw,hw,0,.030,shade(finish,.74));
+    }
+   }
+   band(.041,hub,.012,dish(hub),shade(finish,.95));
+   band(hub,hub,dish(hub),dish(hub)-.030,shade(finish,.64));
+   band(.038,.041,.014,.012,finish);
+   r.ringY(x,y+side*.014,z,.038,0,'#6a7375',36);
+   starBadge(r,[x,y+side*.015,z],.036,'y',side);
+   lugs(5,.065,.013,.008,.75*2*Math.PI/5);
+  };
+  // Atik, Mercedes-Benz wheel programme, p. 88.
   // One continuous cast web surrounds five broad, round-cornered triangular
   // windows. The outboard edge rolls into each open window.
   const atik=design==='atik',root=atik?.370:.345,edge=(rim-.018)/rim;
@@ -216,6 +246,7 @@ export function utilityWheelSpokes(r,{vehicle,x,y,z,side,rim,finish,design='stoc
      lowerBack:section(low,.017),upperBack:section(high,.017),
      padBack:section(root,.017),lipBack:section(edge,.017)};
   };
+  if(!atik){stockG500Face();return;}
   for(let i=0;i<5;i++){
    const axis=(.75+i)*2*Math.PI/5;
    const rows=[station(axis,-halfSector,.755,.755)];

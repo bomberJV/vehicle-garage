@@ -10,7 +10,9 @@ const epc={label:'Mercedes-Benz Classic USA · 2002 G500 exhaust fittings',url:'
 const photo={label:'2002 G500 · U.S. undercarriage photograph',url:'https://bringatrailer.com/wp-content/uploads/2018/03/1520349820cf2af4d3f8707cDSC_0053.jpg'};
 const outletRef={label:'March 2002 G500 road test · left-side outlet',url:'https://www.auto123.com/en/news/mercedes-benz-g500-dare-to-be-original/30886/?page=3'};
 const sensors={label:'2002 G500 · oxygen sensor locations',url:wisBase+'Sensors%20and%20Switches/Sensors%20and%20Switches%20-%20Powertrain%20Management/Sensors%20and%20Switches%20-%20Computers%20and%20Control%20Systems/Oxygen%20Sensor/Locations/O2%20Sensor%20Downstream%20TWC%20%5BKAT%5D%2C%20Left/'};
-const iron='#76675c',pipe='#88847b',seam='#aaa89c',can='#9a9b90',black='#384144',core='#b29c83',shield='#b9b9ac';
+// Weathered underbody tones: the shells sit in shadow below the running boards,
+// so they read dark in photographs rather than as bright stainless.
+const iron='#5f554d',pipe='#6b6962',seam='#8a887e',can='#62635d',black='#384144',core='#b29c83',shield='#7f8078';
 const cx=-2.85/2+.19;
 
 const sides=[[-1,'left','Left'],[1,'right','Right']];
@@ -55,7 +57,8 @@ const endCats=s=>[-.115,s*pipeY,pipeZ];
 const frontMufflerEnd=s=>[.47,s*pipeY,pipeZ];
 const mainZ=.330;
 const leftIn=[.80,-.195,mainZ],rightIn=[.855,.195,mainZ];
-const tailStart=[.90,-.195,mainZ],tailEnd=[.715,-.877,.359];
+// The outlet tucks up under the left running board (board underside z .47).
+const tailStart=[.90,-.195,mainZ],tailEnd=[.715,-.877,.405];
 // Each branch drops under its trailing arm before turning in to the shell.
 const branchEnds=s=>s>0?[frontMufflerEnd(s),[.63,.688,.456],[.70,.660,.400],[.76,.600,.362],[.80,.500,.356],[.852,.384,.356],rightIn]:
   [frontMufflerEnd(s),[.555,-.689,.457],[.62,-.660,.400],[.68,-.600,.362],[.74,-.480,.353],[.772,-.386,.351],leftIn];
@@ -91,7 +94,7 @@ function ovalMuffler(r){
  r.polygon(rings[0],pipe,false);r.polygon(rings.at(-1),pipe,false);
 }
 function tailpipe(r){
- const path=[tailStart,[.900,-.390,.335],[.884,-.557,.343],[.859,-.651,.370],[.814,-.734,.370],tailEnd];
+ const path=[tailStart,[.900,-.390,.335],[.884,-.557,.343],[.859,-.651,.375],[.814,-.734,.395],tailEnd];
  pipeRun(r,path,.033,pipe);
  lip(r,tailEnd,difference(tailEnd,path.at(-2)),.033);
 }

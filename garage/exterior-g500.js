@@ -130,7 +130,8 @@ function bodyShell(r,paint) {
     drawG500Cabin(r);
     for(const side of [-1,1]) {
       const y=side*width;
-      lowerPanel(r,front,-.755,side,1.206,paint);
+      // The wing side runs up to the fender-top deck, so no slit opens into the bay.
+      lowerPanel(r,front,-.755,side,1.239,paint);
       lowerPanel(r,1.130,2.083,side,1.223,paint);
       // Quarter sheet under the diagonal hem meets the arch at the sill.
       sideSheet(r,[[.835,.538],[.958,.538],[1.025,.682],[1.130,.804],[1.130,.974]],side*width,side*(width-.044),paint);
@@ -153,8 +154,15 @@ function bodyShell(r,paint) {
       }
       for(const axle of axles){wheelhouse(r,axle,side);wingFlare(r,axle,side,width,paint);}
       wingIntake(r,side,width);
-      r.box(-.943,side*.912-.051,.47,.938,side*.912+.051,.507,'#6f7778');
-      for (let j=-1;j<=1;j++) r.box(-.917,side*.912+j*.035-.008,.508,.915,side*.912+j*.035+.008,.515,bright);
+      // Running board: a stainless pressing with a ribbed outboard face, black
+      // rubber treads between its raised ribs and black end caps, as on the
+      // photographed 2002 US trucks. Rib count and pitch are read from photos.
+      const yy=(a,b)=>[Math.min(side*a,side*b),Math.max(side*a,side*b)];
+      const board=(x0,x1,a,b,z0,z1,color)=>{const [y0,y1]=yy(a,b);r.box(x0,y0,z0,x1,y1,z1,color);};
+      board(-.930,.925,.861,.963,.452,.507,'#aab3b5');
+      for(let j=-1;j<=1;j++)board(-.917,.912,.912+j*.033-.012,.912+j*.033+.012,.507,.513,'#272d2e');
+      for(const z of [.462,.475,.488,.500])board(-.928,.923,.963,.967,z-.0035,z+.0035,'#d6dcdd');
+      for(const [x0,x1] of [[-.943,-.930],[.925,.938]])board(x0,x1,.861,.963,.450,.509,'#2b3132');
       if(side===1) {
         r.box(1.777,.889,1.055,1.96,.897,1.204,tone(paint,.56));
         r.box(1.785,.899,1.062,1.952,.904,1.197,paint);
@@ -228,19 +236,14 @@ function nose(r,paint) {
         for(const key of h4Components)drawH4(r,fitted,key,true);
       });
       r.tag('lighting.headlamp',()=>{
-        const glass=r.lights?'#d6dbce':'#91a5aa';
+        // Photographed 2002 US trucks: a clear, smooth glass lens. The
+        // reflector bowl and the H4 bulb read through it, lit or unlit.
+        const glass=r.lights?'#eef2ee':'#c9d6da';
         const profile=(angle,radius)=>[front-.057-.016*(1-(radius/.132)**2),y+Math.cos(angle)*radius,1.001+Math.sin(angle)*radius];
         for(let j=0;j<4;j++)for(let i=0;i<36;i++){
           const a=i/36*Math.PI*2,b=(i+1)/36*Math.PI*2,lo=.132*j/4,hi=.132*(j+1)/4;
           const points=j?[profile(a,lo),profile(a,hi),profile(b,hi),profile(b,lo)]:[profile(0,0),profile(a,hi),profile(b,hi)];
-          glazingFace(r,points,tone(glass,.93+.075*Math.sin(a)*(.35+j*.17)),.26);
-        }
-        for(let i=-5;i<=5;i++){
-          const h=i*.021,half=Math.sqrt(.124**2-h**2);
-          for(let n=0;n<4;n++){
-            const pt=v=>{const k=half*v;return [front-.058-.016*(1-(h*h+k*k)/(.132**2)),y+h,1.001+k];};
-            r.rod(pt(n*.5-1),pt((n+1)*.5-1),.00115,r.lights?'#d2d4c7':'#a6b6b5',5);
-          }
+          glazingFace(r,points,tone(glass,.96+.05*Math.sin(a)*(.35+j*.17)),.13);
         }
       });
       drawHeadlampWasher(r,side);
@@ -278,7 +281,7 @@ export const G500_BODY_PARTS = [
   ['roof','Roof & rain gutters','The pressed roof skin, six rear reinforcing ribs and gutters lift above the door frames.'],
   ['tailgate','Side-hinged cargo door','Two hinges on the left carry the narrow door. Its pushbutton handle is on the right. The glass, overhead wiper and spare move with the door.'],
   ['spare','Spare-wheel cover & carrier','A painted cover and bright surround enclose the spare wheel on the cargo door.'],
-  ['grille','Radiator grille','Seven bright-edged vanes sit inside the painted surround. The star stands ahead of the vanes, and the lower valance meets the bumper.'],
+  ['grille','Radiator grille','Seven vanes, painted like the surround, sit inside the grille opening. The star stands ahead of the vanes, and the lower valance meets the bumper.'],
   ['rear-lights','Rear combination lamps','The two rectangular lamp clusters are mounted at the fixed rear corners above the bumper.'],
   ['fog-lamps','Front fog lamp trim','The black rectangular surrounds frame the two clear lenses low in the front bumper. Open a lamp to see the reflector, bulb and spring clip.']
 ].map(([key,name,description])=>({id:'body.'+key,name,description,source:['front-seats','rear-bench','dashboard','rearview-mirror'].includes(key)?g500CabinSource:g500BodyReferences[key]||g500BodyReferences.structure,...(key==='fog-lamps'?{source:lampRefs.fog}:key==='rear-lights'?{source:lampRefs.manual}:key==='grille'?{source:{label:'Mercedes-Benz Classic · 2002 G500 grille plate',url:'https://classicparts.mbusa.com/v-2002-mercedes-benz-g500--base--5-0l-v8-gas/body--grille-and-components'}}:{})}));

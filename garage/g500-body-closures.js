@@ -157,9 +157,13 @@ export const g500GateParts={
   spare(r,paint){
     const y=-.115,z=1.056;
     const hoop=(x,rad)=>Array.from({length:48},(_,i)=>[x,y+rad*Math.cos(i*Math.PI/24),z+rad*Math.sin(i*Math.PI/24)]);
-    const rims=[[2.196,.376],[2.211,.390],[2.405,.390],[2.422,.380],[2.430,.365]];
-    for(let k=1;k<rims.length;k++)ring(r,hoop(...rims[k-1]),hoop(...rims[k]),['','#818d8c','#aeb8b8','#909d9e','#bbc2c1'][k]);
-    r.discX(2.431,y,z,.365,shade(paint,.96),48);
+    // A painted hard cover: its side wall rolls over a rounded shoulder into
+    // the face, and only a narrow bright ring trims the face's outer edge, as
+    // on the photographed 2002 US trucks.
+    const rims=[[2.196,.370],[2.206,.384],[2.230,.392],[2.380,.392],[2.405,.386],[2.420,.374],[2.428,.360],[2.431,.335]];
+    const tones=['',shade(paint,.58),shade(paint,.78),shade(paint,.86),shade(paint,.82),shade(paint,.92),'#c4cbca','#e1e6e4'];
+    for(let k=1;k<rims.length;k++)ring(r,hoop(...rims[k-1]),hoop(...rims[k]),tones[k]);
+    r.discX(2.431,y,z,.335,shade(paint,.96),48);
     starBadge(r,[2.4417,y,z],.123,'x',1,{backing:false});
   }
 };

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {GarageRenderer} from '../garage/render.js';
 import {utilityWheelSpokes} from '../garage/exterior-utility.js';
 import {buildG500Exterior} from '../garage/exterior-g500.js';
+import {g500SpareStar} from '../garage/g500-body-closures.js';
 import {buildBmwExterior} from '../garage/exterior-bmw.js';
 import {VEHICLES} from '../garage/catalog.js';
 import {softwareDepthRender} from '../garage/surface-materials.js';
@@ -29,10 +30,10 @@ test('clear panels transmit enclosed colors and do not paint over closer solid p
     assert.deepEqual(at(8,5),[0,100,0,128]);
   }
 });
-test('G500 grille, spare cover, and wheel centers carry one vertical upper blade',()=>{
+test('G500 grille, spare-cover star and wheel centers carry one vertical upper blade',()=>{
   const r=Object.assign(Object.create(GarageRenderer.prototype),{faces:[],currentPart:null,lights:true});
   buildG500Exterior(r,'#58634d');
-  for(const [part,center,radius] of [['body.grille',[0,1.007],.132],['body.spare',[-.115,1.056],.123]]){
+  for(const [part,center,radius] of [['body.grille',[0,1.007],.132],['body.spare',g500SpareStar.center,g500SpareStar.radius]]){
     const fins=r.faces.filter(f=>f.part===part&&f.color==='#e2e4df');
     assert.equal(fins.length,3);
     const extremes=fins.map(f=>f.points.reduce((a,b)=>Math.hypot(b[1]-center[0],b[2]-center[1])>Math.hypot(a[1]-center[0],a[2]-center[1])?b:a));

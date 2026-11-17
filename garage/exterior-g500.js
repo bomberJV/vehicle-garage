@@ -11,6 +11,7 @@ import {roofFrontLip} from './g500-roof-datums.js';
 import {drawG500Bonnet,drawG500FrontDeck,drawG500Scuttle} from './g500-bonnet.js';
 import {drawG500Cabin,drawG500DoorTrim,g500CabinSource} from './g500-cabin.js';
 import {fittedWindow,starBadge} from './exterior-trim.js';
+import {drawLettering,letteringWidth} from './badge-lettering.js';
 /* Early W463 long-wheelbase body. Longitudinal X increases toward the rear.
    Physical panel mounts are independent of their selectable component tags. */
 const dark = '#242a2c';
@@ -154,6 +155,10 @@ function bodyShell(r,paint) {
       }
       for(const axle of axles){wheelhouse(r,axle,side);wingFlare(r,axle,side,width,paint);}
       wingIntake(r,side,width);
+      // Chrome "V8" script on each front wing, below the rub strip and just
+      // ahead of the door, as on the photographed 2002 US trucks.
+      {const h=.030,span=letteringWidth('V8',h),x0=-.80-span/2;
+       drawLettering(r,'V8',h,(u,v)=>[side<0?x0+u:x0+span-u,side*(width+.004),.885+v],{color:'#dfe4e3'});}
       // Running board: a stainless pressing with a ribbed outboard face, black
       // rubber treads between its raised ribs and black end caps, as on the
       // photographed 2002 US trucks. Rib count and pitch are read from photos.
@@ -214,6 +219,8 @@ function endGlassAndCargoDoor(r,paint) {
 
 }
 
+// A lit H4 behind clear glass reads as bright silver-white, not cream.
+const halogen={litBase:[150,156,158],litMax:[252,252,248],litCap:'#fbfaf2'};
 function nose(r,paint) {
   r.rigid('nose-carrier',[0,0,0],()=>{
     r.tag('body.grille',()=>{
@@ -230,7 +237,7 @@ function nose(r,paint) {
           r.polygon([at(a,.137),at(a,.152),at(b,.152),at(b,.137)],tone(bright,.84+.17*Math.sin(a)),false);
         }
       });
-      r.tag('lighting.reflector',()=>reflectorBowl(r,(u,v,d)=>[front-d,y+u,1.001+v],.137,-.019,.073,r.lights,false));
+      r.tag('lighting.reflector',()=>reflectorBowl(r,(u,v,d)=>[front-d,y+u,1.001+v],.137,-.019,.073,r.lights,false,halogen));
       r.tag('lighting.h4-'+(side<0?'left':'right'),()=>{
         const fitted=(u,v,d)=>[front+.018-d/1000,y+u/1000,1.001+v/1000];
         for(const key of h4Components)drawH4(r,fitted,key,true);
@@ -280,7 +287,7 @@ export const G500_BODY_PARTS = [
   ['quarter-glass','Rear quarter windows','The cargo-area side windows sit in fixed apertures behind the rear passenger doors.'],
   ['roof','Roof & rain gutters','The pressed roof skin, six rear reinforcing ribs and gutters lift above the door frames.'],
   ['tailgate','Side-hinged cargo door','Two hinges on the left carry the narrow door. Its pushbutton handle is on the right. The glass, overhead wiper and spare move with the door.'],
-  ['spare','Spare-wheel cover & carrier','A painted cover and bright surround enclose the spare wheel on the cargo door.'],
+  ['spare','Spare-wheel cover & carrier','A painted cover with a polished stainless face, star and Mercedes-Benz wordmark encloses the spare wheel on the cargo door.'],
   ['grille','Radiator grille','Seven vanes, painted like the surround, sit inside the grille opening. The star stands ahead of the vanes, and the lower valance meets the bumper.'],
   ['rear-lights','Rear combination lamps','The two rectangular lamp clusters are mounted at the fixed rear corners above the bumper.'],
   ['fog-lamps','Front fog lamp trim','The black rectangular surrounds frame the two clear lenses low in the front bumper. Open a lamp to see the reflector, bulb and spring clip.']

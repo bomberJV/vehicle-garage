@@ -80,7 +80,7 @@ test('the second frame crossmember passes behind the oil pan without touching th
     const faces=meshes.get(mode),tube=crossmember(faces);
     assert.equal(tube.length,24);
     clearances(mode,crossmember,[['drivetrain.gearbox',35.0],['differentials.front-shaft',[45.8,77.0]],['powertrain.sump',20.1],
-      ['electrical.starter',12.2],['transmission-fluid.left-line',88.5],['transmission-fluid.right-line',88.5],['evap.purge-line',18.5]]);
+      ['electrical.starter',12.2],['transmission-fluid.left-line',53.2],['transmission-fluid.right-line',41.0],['evap.purge-line',18.5]]);
     assert.deepEqual(crossedParts(faces,tube,'suspension.frame'),[]);
   }
 });

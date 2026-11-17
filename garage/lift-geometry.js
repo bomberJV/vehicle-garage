@@ -11,7 +11,7 @@ function movementWeight(vehicle,id,p,instance){
  if(vehicle==='g500'){
   // The steering box and pitman arm rise with the chassis. The far drag-link
   // stud and the tie rod follow the rigid front axle at wheel height.
-  if(id==='steering.linkage'&&instance==='drag-link')return clamp((.680-yy)/(.680+.527));
+  if(id==='steering.linkage'&&instance==='drag-link')return clamp((.622-yy)/(.622+.530));
   if(fixedG.has(id))return 0;
   if(id==='suspension.radius-arms'||id==='suspension.trailing-arms')return clamp((1.425-Math.abs(xx)-.13)/(.83-.13));
   if(id==='suspension.front-track-bar'||id==='suspension.rear-track-bar')return clamp((zz-(.4276+.060))/(.609-(.4276+.060)));

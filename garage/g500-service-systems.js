@@ -239,16 +239,18 @@ function fuseSite(r,c,orientation=0){
 }
 function cabinBattery(r){
  // Below the rear cup holder, in front of the rear bench: not in the engine bay.
- r.box(.537,-.175,.487,.917,.175,.507,steel);
- for(const s of [-1,1])r.box(.537,s*.170-.008,.507,.917,s*.170+.008,.563,steel);
- r.box(.555,-.151,.508,.897,.151,.716,rubber);r.box(.548,-.157,.716,.904,.157,.737,dark);
- for(let i=0;i<6;i++)r.box(.579+i*.052,-.112,.737,.611+i*.052,.112,.744,rubber);
+ // The well's floor sits 50 mm above the rear propeller shaft.
+ const h=.050;
+ r.box(.537,-.175,.487+h,.917,.175,.507+h,steel);
+ for(const s of [-1,1])r.box(.537,s*.170-.008,.507+h,.917,s*.170+.008,.563+h,steel);
+ r.box(.555,-.151,.508+h,.897,.151,.716+h,rubber);r.box(.548,-.157,.716+h,.904,.157,.737+h,dark);
+ for(let i=0;i<6;i++)r.box(.579+i*.052,-.112,.737+h,.611+i*.052,.112,.744+h,rubber);
  for(const [xx,yy,color] of [[.603,-.106,red],[.849,.106,metal]]){
-  cyl(r,[xx,yy,.744],z,0,.022,.017,metal,12);sleeve(r,[xx,yy,.755],z,-.001,.010,.024,.016,color,12);
+  cyl(r,[xx,yy,.744+h],z,0,.022,.017,metal,12);sleeve(r,[xx,yy,.755+h],z,-.001,.010,.024,.016,color,12);
  }
  // A short positive connection reaches the nearby fuse block; negative bonds to the body.
- line(r,[[.603,-.106,.760],[.553,-.106,.775],[.482,-.074,.754]],.011,red);
- line(r,[[.849,.106,.760],[.906,.122,.750],[.929,.221,.688]],.011,rubber);
+ line(r,[[.603,-.106,.760+h],[.553,-.106,.790],[.482,-.074,.754]],.011,red);
+ line(r,[[.849,.106,.760+h],[.906,.122,.770],[.929,.221,.688]],.011,rubber);
  cyl(r,[.929,.221,.688],z,-.010,.005,.021,metal,10);
 }
 // Factory height is measured from the tire contact plane, z=.040 in this model.

@@ -21,13 +21,15 @@ function joint(r,c){
  cyl(r,c,z,.029,.044,.010,metal,6);
 }
 export function drawG500SteeringLinkage(r){
- const tie=[[-1.306,-.672,.397],[-1.306,.672,.397]];
+ // The cross rod runs behind the axle and below the differential's pinion housing.
+ const tie=[[-1.303,-.620,.275],[-1.303,.620,.275]];
  const rodWithJoints=(a,b)=>{r.rod(a,b,.015,metal,9);for(const p of [a,b])joint(r,p);};
  r.instance('drag-link',()=>rodWithJoints(pitmanTip,rightJoint));
  r.instance('tie-rod',()=>rodWithJoints(...tie));
- // The two rearward steering arms move together; the cross rod meets their ends.
- for(const [i,side] of [-1,1].entries())r.rod([-1.425,side*.674,.401],tie[i],.019,iron,8);
- r.rod([-1.425,.674,.401],rightJoint,.021,iron,8);
+ // The two rearward steering arms move together; each leaves the lower rear of
+ // its knuckle, clear of the axle shaft joint inside, and meets the cross rod.
+ for(const [i,side] of [-1,1].entries())r.rod([-1.370,side*.674,.375],tie[i],.019,iron,8);
+ r.rod([-1.500,.674,.412],rightJoint,.021,iron,8);
 }
 export const steeringRows=[
  ['pump','Belt-driven hydraulic pump','A pulley on the accessory drive turns the pump. The reservoir feeds its inlet and the threaded outlet feeds the pressure hose.',[-.30,-.10,.10],ref.steeringInstall,r=>{
@@ -56,8 +58,10 @@ export const steeringRows=[
   path(r,[base,[-1.589,-.541,.505],pitmanTip],.019,iron);
  }],
  ['cooler','Steering-oil cooler loop','Return oil passes through an exposed metal loop before it reaches the reservoir. The G500 uses a separate front cooler for the automatic transmission.',[-.34,.06,-.13],ref.steering,r=>{
-  path(r,[feed,[-2.016,-.502,.563],[-2.016,.469,.563],[-2.016,.488,.572],[-2.016,.488,.591],[-2.016,.471,.601],[-2.016,-.502,.601],returnEnd],.007,metal);
-  for(const side of [-1,1])box(r,[-2.005,side*.369,.580],[.017,.021,.057],iron);
+  // The 10 mm loop runs in the gap between the body's front crossmember and the
+  // radiator's lower tank, below the condenser.
+  path(r,[feed,[-2.036,-.502,.563],[-2.036,.469,.563],[-2.036,.488,.572],[-2.036,.488,.591],[-2.036,.471,.601],[-2.036,-.502,.601],returnEnd],.005,metal);
+  for(const side of [-1,1])box(r,[-2.036,side*.369,.580],[.008,.021,.057],iron);
  }],
  ['return-lines','Steering-box and reservoir return hoses','One hose carries oil from the box to the cooler. The second runs from the other cooler port back to the reservoir.',[.05,-.28,-.16],ref.steering,r=>{
   hose(r,[outlet,[-1.650,-.566,.701],[-1.705,-.596,.630],[-1.930,-.591,.576],feed],.009);

@@ -141,7 +141,8 @@ export function drawG500PickupFilter(r,c,scale=1){
  for(const [u,v] of [[-.078,-.018],[-.070,.022],[-.044,-.021],[.013,-.033],[.026,.015],[.053,-.022]])cyl(r,position(u,v,.018),z,0,.0017*scale,.003*scale,iron,9);
 }
 const cooler=[-2.066,0,.712];
-const coolerPorts=[[-2.060,-.407,.687],[-2.060,.407,.737]];
+// The header unions stand 3 mm proud of the condenser face.
+const coolerPorts=[[-2.063,-.407,.687],[-2.063,.407,.737]];
 const union=s=>[-.644,s*.155,.426];
 export const atfRows=[
  ['pan','Transmission oil pan','The shallow stamped pan holds the fluid beneath the five-speed automatic. Its rim and the case clamp the perimeter gasket.',[.14,-.10,-.27],ref.atfPan,r=>panShell(r,pan)],

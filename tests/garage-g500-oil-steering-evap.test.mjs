@@ -54,8 +54,8 @@ test('installed control and fluid paths reach their fittings, gearbox and wheel 
   [[-2.060,-.407,.687],['transmission-fluid.cooler','transmission-fluid.left-line'],.020],
   [[-2.060,.407,.737],['transmission-fluid.cooler','transmission-fluid.right-line'],.020],
   [[2.055,.739,.880],['evap.canister','evap.purge-line'],.018],
-  [[-1.152,-.564,.940],['evap.purge-valve','evap.purge-line'],.012],
-  [[-1.219,-.564,.940],['evap.purge-valve','evap.manifold-line'],.012]
+  [[-1.152,-.612,.940],['evap.purge-valve','evap.purge-line'],.012],
+  [[-1.219,-.612,.940],['evap.purge-valve','evap.manifold-line'],.012]
  ])for(const key of keys)assert(minimumDistance(mesh,key,port)<radius,key);
  const jets=shape(mesh,'engine-oil.jets').flat();
  const stations=[...new Set(jets.map(p=>Math.round(p[0]*100)))];

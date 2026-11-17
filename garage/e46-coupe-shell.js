@@ -98,7 +98,7 @@ const tailProfile=plotted([[.28,.040],[.30,.030],[.34,.010],[.42,.002],[.50,0],[
 const OUTLINE=(()=>{
   const front=[[NOSE,0],[-2.160,.32],[-2.146,.52],[-2.116,.655],[-2.064,.747],[-1.986,.820],[-1.791,.856]];
   const side=stations.filter(([x])=>x>-1.7&&x<2.0).map(([x,w])=>[x,w]);
-  const back=[[1.961,.844],[2.088,.806],[2.216,.762],[2.272,.705],[2.300,.600],[2.314,.40],[TAIL,0]];
+  const back=[[2.088,.806],[2.216,.762],[2.272,.705],[2.300,.600],[2.314,.40],[TAIL,0]];
   const dense=catmull([...front,...side,...back],28);
   // Running length for arc-length sampling at the ends.
   let s=0;return dense.map((p,i)=>{if(i)s+=Math.hypot(p[0]-dense[i-1][0],p[1]-dense[i-1][1]);return [...p,s];});

@@ -184,6 +184,14 @@ export const bmwCabinParts=[
  ['quarter-left','Left electric rear vent window','The coupé quarter pane pivots outward at the rear. Open its electric drive and attachment hardware.'],
  ['quarter-right','Right electric rear vent window','The right-hand motor and attachment mirror the left. This is a hinged vent pane, not a vertically lowered convertible window.']
 ].map(([id,name,description])=>({id:'body.'+id,name,description,source:id.startsWith('quarter')?bmwCabinSources.vent:bmwCabinSources.cabin,category:'exterior'}));
+// Seats, dashboard and console alone, for the E90 sedan, whose own shell carries
+// the door cards and trim.
+export function drawBmwSeatsAndDash(r){
+ r.tag('body.front-seats',()=>{for(const s of [-1,1])r.rigid('front-seat-'+(s<0?'left':'right'),[0,s*.55,.04],()=>r.instance(s<0?'front-left':'front-right',()=>frontSeat(r,s*.372)));});
+ r.rigid('rear-seat-bench',[.10,0,.35],()=>r.tag('body.rear-bench',()=>rearSeats(r)));
+ r.rigid('dashboard',[.05,0,.40],()=>r.tag('body.dashboard',()=>dashboard(r)));
+ r.rigid('centre-console',[.12,0,.32],()=>r.tag('body.console',()=>console(r)));
+}
 export function drawBmwCabin(r){
  // The inspection route takes the seats through the vacated door apertures.
  r.tag('body.front-seats',()=>{for(const s of [-1,1])r.rigid('front-seat-'+(s<0?'left':'right'),[0,s*.55,.04],()=>r.instance(s<0?'front-left':'front-right',()=>frontSeat(r,s*.362)));});

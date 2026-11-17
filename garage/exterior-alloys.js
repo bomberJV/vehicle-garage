@@ -5,7 +5,7 @@ import {style43Face} from './e46-wheels.js';
 
 export function roadWheelSpokes(r,{vehicle,x,y,z,side,rim,finish}){
  if(vehicle==='bmw325ci')return style43Face(r,{x,y,z,side,rim,finish});
- const honda=vehicle==='hrv',amg=vehicle==='c63';
+ const honda=vehicle==='hrv',amg=vehicle==='c63',e90=vehicle==='bmw328xi';
  const skin=honda?tint(finish,.96):finish;
  const vertex=(angle,radius,depth)=>[x+Math.cos(angle)*radius,y+side*depth,z+Math.sin(angle)*radius];
  function blade(angle,stations){
@@ -20,7 +20,10 @@ export function roadWheelSpokes(r,{vehicle,x,y,z,side,rim,finish}){
  }
  for(let i=0;i<5;i++){
   const a=i/5*Math.PI*2+Math.PI*.5;
-  if(amg){
+  if(e90){
+   // Star Spoke 156: five V-shaped pairs that meet at the hub and spread to the rim.
+   for(const branch of [-1,1])blade(a,[[.26,branch*.040,.055,-.008],[.52,branch*.105,.048,.004],[.93,branch*.175,.040,.014]]);
+  }else if(amg){
    // The W204 factory 18-inch face has five pairs with narrow parallel arms.
    for(const branch of [-1,1])blade(a,[[.245,branch*.125,.087,-.008],[.48,branch*.140,.062,.003],[.92,branch*.122,.043,.013]]);
   }else{

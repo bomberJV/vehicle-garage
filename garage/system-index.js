@@ -14,6 +14,7 @@ const highlights={
  bmws1000rr:['k67-shiftcam','k67-combined-pump','k67-pump-seal','k67-throttles','k67-final','wetclutch'],
  f350:['service-f350-brakes-rear-drum','service-f350-fuel-sender'],
  c63:['launch-clutch','diff'],
+ bmw328xi:['e90-transfer-clutch','diff'],
  boeing747:['jumbo-wheel-brake','jumbo-fuel-bays','jumbo-ac','cf6-80c2-fan','747-windshield'],
  cessna172:['sky-fuel','sky-brake','skyhawk-dc','172s-propeller'],
  piperj5:['cub-expander-brake','cub-tank','cub-carb','j5-propeller'],

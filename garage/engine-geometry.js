@@ -24,6 +24,7 @@ const METAL='#8f9b9f',CAST='#65747c',DARK='#303c43',BLACK='#20292f',RUBBER='#273
 export const ENGINE_LAYOUTS={
  g500:{layout:'v8',count:8,banks:2,cams:2,valves:3,plugs:2,length:.82,orientation:'longitudinal',wheelbase:2.85,base:.57},
  bmw325ci:{layout:'inline6',count:6,banks:1,cams:2,valves:4,plugs:1,length:.98,orientation:'longitudinal',wheelbase:2.725,base:.53},
+ bmw328xi:{layout:'inline6',count:6,banks:1,cams:2,valves:4,plugs:1,length:.98,orientation:'longitudinal',wheelbase:2.760,base:.48},
  bmw328i:{layout:'inline6',count:6,banks:1,cams:2,valves:4,plugs:1,length:.98,orientation:'longitudinal',wheelbase:2.725,base:.53},
  c63:{layout:'v8',count:8,banks:2,cams:4,valves:4,plugs:1,length:.86,orientation:'longitudinal',wheelbase:2.76,base:.51},
  hrv:{layout:'inline4',count:4,banks:1,cams:2,valves:4,plugs:1,length:.66,orientation:'transverse',wheelbase:2.654,base:.52,center:-1.46},
@@ -58,7 +59,8 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  const ford=id==='f350',front=-cfg.wheelbase/2,cx=cfg.center??front+.19,base=cfg.base,trans=cfg.orientation==='transverse',slope=cfg.slope||.65;
  // The M156 section drawing exaggerates the air boxes and stacked valve gear.
  // Fit its upper half beneath the W204 bonnet, keeping the crank/sump datum.
- const fitHeight=z=>id==='c63'&&z>base?base+(z-base)*.74:z;
+ // The E90 bonnet is lower still over the N52; its upper half is fitted the same way.
+ const fitHeight=z=>(id==='c63'||id==='bmw328xi')&&z>base?base+(z-base)*(id==='c63'?.74:.70):z;
  // Honda turns its transverse engine the other way: the transaxle sits on the
  // driver's (left) side, the intake manifold faces the radiator and the
  // exhaust faces the firewall. The K20 section is also compacted to its real
@@ -135,7 +137,8 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
   const path=[crank,...cams,[...crank]];for(let i=1;i<path.length;i++){const a=path[i-1],b=path[i];route([a,b],.007,DARK,6);for(let n=1;n<9;n++){const q=a.map((v,j)=>v+(b[j]-v)*n/9);cyl([q[0]-.009,q[1],q[2]],[q[0]+.009,q[1],q[2]],.008,METAL,6);}}
  });
  const camAdjust=(name)=>tag(name,()=>{for(const s of banks)for(let cam=0;cam<cfg.cams/cfg.banks;cam++){const yy=bankY(s)+(cfg.cams/cfg.banks===1?0:(cam?.065:-.065));cyl([-L/2-.11,yy,headZ+.115],[-L/2-.05,yy,headZ+.115],.052,CAST,14);tube([-L/2-.116,yy,headZ+.115],[-L/2-.108,yy,headZ+.115],.043,.015,GOLD,12);}});
- if(id==='bmw328i')camAdjust('vanos');if(id==='c63')camAdjust('cam-adjusters');if(id==='hrv')camAdjust('vtc-actuators');
+ if(id==='bmw328i'||id==='bmw328xi')camAdjust('vanos');
+ if(id==='bmw328xi')tag('valvetronic',()=>{box(-L/2+.02,-.05,headZ+.135,L/2-.06,.05,headZ+.175,CAST);cyl([-L/2-.02,.07,headZ+.155],[-L/2+.10,.07,headZ+.155],.032,BLACK,12);});if(id==='c63')camAdjust('cam-adjusters');if(id==='hrv')camAdjust('vtc-actuators');
  if(id==='g500'){
   const oilOwner=r.inspection?.assembly==='engine-oil';
   if(!oilOwner)for(const key of sharedOilKeys)tag(key,()=>drawG500EngineOilPart(r,key));
@@ -182,6 +185,14 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
   bay.route([world([0,.30,-.07]),[cx+.32,.0,base-.18],[-.95,-.06,base-.19],[-.86,-.095,base-.19]],.026,tone(COPPER,.6),10);
  });
  if(!honda&&id!=='g500'&&!m54&&!ford)tag('exhaust-manifold',()=>{for(const s of (cfg.banks===2?[-1,1]:[1])){const yy=cfg.banks===2?s*.36:.20;for(const x of xs)route([[x,yy,.34],[x,yy+s*.12,.23],[L/2+.08,yy+s*.10,.10]],.023,COPPER,8);route([[L/2+.08,yy+s*.10,.10],[L/2+.34,yy+s*.1,-.04]],.038,tone(COPPER,.75),10);}});
+ // The 328xi's two pipes run back under the right of the tunnel to a centre
+ // silencer, then cross to the rear silencer and the twin tips at the left.
+ if(id==='bmw328xi')tag('exhaust-manifold',()=>{
+  for(const dy of [-.035,.035])bay.route([[-.95,.26+dy,.30],[-.55,.13+dy,.20],[.40,.12+dy,.19],[1.30,.10+dy,.22],[1.70,-.10+dy,.23]],.024,'#4f5452',10);
+  bay.cyl([.15,.12,.19],[.65,.12,.19],.075,'#474b48',16);
+  bay.cyl([1.86,-.62,.28],[1.86,.05,.28],.105,'#4a4e4b',18);
+  for(const ty of [-.50,-.42]){bay.route([[1.86,ty,.28],[2.10,ty,.27],[2.33,ty,.27]],.030,'#7c8384',12);bay.tube([2.29,ty,.27],[2.345,ty,.27],.040,.033,'#a7b0b2',16);}
+ });
  if(id==='bmw328i'){
   tag('disa',()=>{box(.02,-.365,.31,.18,-.31,.43,BLACK);cyl([.08,-.37,.37],[.08,-.345,.37],.035,CAST,10);});
   tag('ccv',()=>{cyl([.20,-.30,.10],[.20,-.30,.20],.045,BLACK,12);route([[.20,-.30,.20],[.27,-.20,.38],[.30,-.08,.50]],.010,RUBBER,8);route([[.20,-.30,.11],[.23,-.25,-.20]],.009,RUBBER,8);});
@@ -190,7 +201,7 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  // whether the engine itself runs along or across the car.
  const bayTag=(name,fn)=>tag(name,()=>fn(bay));
  // The HR-V's radiator and fan sit lower, under its lower bonnet line.
- const radX=front-.62,radY=0,radZ=base+(id==='hrv'?.16:.20),radTop=id==='hrv'?.40:.55,fanR=id==='hrv'?.20:.245;
+ const radX=front-.62,radY=0,radZ=base+(id==='hrv'?.16:.20),radTop=id==='hrv'?.40:id==='bmw328xi'?.44:.55,fanR=id==='hrv'?.20:.245;
  if(id==='g500'){
   if(!g500ServiceOwnsFlow)drawG500CoolingCircuit(r,'powertrain');
  }else{

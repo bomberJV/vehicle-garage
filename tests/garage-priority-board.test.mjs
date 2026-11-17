@@ -16,7 +16,7 @@ const directory=new URL('../garage/',import.meta.url);
 
 test('every vehicle has a variant-specific next check, the first reference from the ledger and three real destinations',()=>{
   assert.deepEqual(vehiclePriorities.map(v=>v.id).sort(),Object.keys(VEHICLES).sort());
-  assert.equal(vehiclePriorities.length,37);
+  assert.equal(vehiclePriorities.length,38);
   for(const id of ['porsche993cab','porsche992scab']){
     const v=vehiclePriorities.find(row=>row.id===id);
     assert(v.evidence.some(row=>row.label.includes('Cabriolet outline')));

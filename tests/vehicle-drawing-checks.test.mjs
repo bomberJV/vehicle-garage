@@ -28,6 +28,7 @@ const checks = {
   g500:['differentials.center',['spider','bevel-1','bevel-2','bevel-3','bevel-4','front-gear','rear-gear']],
   f350:['body.deck',['handle','latch','supports','hinge']],
   c63:['body.deck',['pressing','hinge','latch']],
+  bmw328xi:['body.deck',['pressing','hinge','latch']],
   hrv:['body.door',['hinge','check','frame']],
   bmw325ci:['door-bmw325ci-front-left.regulator',['track','carriage','cable','motor']],
   porsche993cab:['engine.case',['left','right','crankshaft','bearings','nose']],

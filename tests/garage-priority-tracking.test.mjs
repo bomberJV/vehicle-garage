@@ -13,7 +13,7 @@ test('every registered vehicle and request has explicitly assigned priority, wor
   assert.deepEqual(workflows,['todo','in-progress','done','parked']);
   assert.deepEqual(workflowStatuses.map(row=>row.label),['To do','In progress','Done','Parked']);
   const seenLevels=new Set(),seenWorkflows=new Set();
-  assert.equal(vehicleMap.size,37);
+  assert.equal(vehicleMap.size,38);
   for(const [kind,records] of [['request',requests],['vehicle',vehiclePriorities]]){
     for(const row of records){
       const defaults=trackingDefaults(kind,row.id);

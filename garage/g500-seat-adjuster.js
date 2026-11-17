@@ -24,7 +24,9 @@ export function drawG500SeatHardware(r,key,side,cy){
  const shell=(profile,lo,hi,color)=>{const a=cy+side*lo,b=cy+side*hi;r.profile(profile,Math.min(a,b),Math.max(a,b),color);};
  const block=(xx,yy,zz,sizes,col)=>box(r,pt(xx,yy,zz),sizes,col);
  if(key==='tracks'){
-  for(const band of [-.167,.167]){
+  // The passenger seat's inner track sits 47 mm further outboard, clear of the
+  // floor hump over the transfer case; the driver's tracks are symmetric.
+  for(const band of [side>0?-.120:-.167,.167]){
    block(-.17,band,.622,[.437,.036,.009],iron);
    for(const edge of [-.014,.014])block(-.17,band+edge,.634,[.437,.007,.018],iron);
    block(-.165,band,.647,[.374,.023,.018],alloy);
@@ -63,9 +65,10 @@ export function drawG500SeatHardware(r,key,side,cy){
   shell([[.010,.746],[.029,.788],[.057,.796],[.076,.759],[.052,.730]],.212,.220,black);return;
  }
  if(key==='anchor'){
-  block(.000,-.182,.658,[.051,.028,.005],iron);block(.000,-.195,.675,[.051,.005,.039],iron);
-  const c=pt(.005,-.194,.676);
-  cyl(r,c,y,-.014,.014,.005,alloy,12);cyl(r,pt(.005,-.211,.676),y,-.004,.004,.008,iron,12);return;
+  const o=side>0?.047:0;
+  block(.000,-.182+o,.658,[.051,.028,.005],iron);block(.000,-.195+o,.675,[.051,.005,.039],iron);
+  const c=pt(.005,-.194+o,.676);
+  cyl(r,c,y,-.014,.014,.005,alloy,12);cyl(r,pt(.005,-.211+o,.676),y,-.004,.004,.008,iron,12);return;
  }
  if(key==='lumbar'){
   shell([[.059,.921],[.086,.925],[.124,1.104],[.112,1.151],[.095,1.126]],-.119,.119,'#677373');

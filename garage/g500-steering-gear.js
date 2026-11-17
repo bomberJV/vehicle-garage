@@ -3,12 +3,12 @@ import {box,path,plus,metal,alloy,iron,rubber} from './road-service-geometry.js'
 import {slab} from './section-primitives.js';
 import {fluidRefs as ref} from './g500-fluid-refs.js';
 
-const pump=[-1.706,-.351,.819],gear=[-1.602,-.544,.627];
+const pump=[-1.706,-.351,.819],gear=[-1.660,-.544,.650];
 // The drag link runs ahead of the differential housing, below the cooler pipes.
 const pitmanTip=[-1.625,-.530,.440],rightJoint=[-1.612,.622,.380];
 const press=plus(pump,[.040,-.045,.008]),inlet=plus(gear,[.046,-.030,.072]),outlet=plus(gear,[-.004,-.030,.072]);
 // The ports sit on the outboard half of the box top, clear of the frame rail beneath it.
-const feed=[-1.997,-.566,.577],returnEnd=[-1.997,-.566,.604],reservoirIn=plus(pump,[.045,-.067,.069]);
+const feed=[-1.997,-.566,.577],returnEnd=[-1.997,-.566,.604],reservoirIn=plus(pump,[-.012,-.112,.069]);
 function hose(r,points,rad){
  path(r,points,rad,rubber);
  for(const seq of [points,[...points].reverse()]){
@@ -40,18 +40,21 @@ export const steeringRows=[
   sleeve(r,press,y,-.011,.010,.014,.008,metal,8);
  }],
  ['reservoir','Steering-fluid reservoir','The reservoir mounts directly to the pump. A filler cap closes the top and the cooler return enters the side.',[.06,-.27,.32],ref.steeringInstall,r=>{
-  const c=plus(pump,[.008,.002,.054]);slab(r,...c,.138,.121,.092,rubber,.026);
-  slab(r,c[0],c[1],c[2]+.091,.134,.117,.009,iron,.025);
+  // It sits forward and outboard on the pump, clear of the head's front face and the oil filter.
+  const c=plus(pump,[-.012,-.048,.054]);slab(r,...c,.100,.121,.092,rubber,.026);
+  slab(r,c[0],c[1],c[2]+.091,.096,.117,.009,iron,.025);
   cyl(r,plus(c,[-.025,0,.095]),z,0,.020,.030,rubber,12);cyl(r,reservoirIn,y,-.012,.015,.011,iron,10);
  }],
  ['pressure-line','High-pressure hose','A crimped hose joins the pump outlet to the control valve in the steering gear. The parts catalog lists a chassis-number break for this line.',[-.12,-.32,.10],ref.steering,r=>hose(r,[press,[-1.653,-.459,.811],[-1.590,-.574,.780],inlet],.011)],
  ['steering-box','Recirculating-ball steering box','The steering shaft turns a worm. A ball-supported rack piston acts on a sector shaft, whose splined end carries the pitman arm.',[.06,-.35,-.03],ref.gear,r=>{
-  turn(r,gear,x,[[-.095,0],[-.095,.057],[-.080,.072],[.073,.072],[.092,.053],[.113,.029],[.113,0]],iron,{n:14});
+  turn(r,gear,x,[[-.075,0],[-.075,.057],[-.060,.072],[.073,.072],[.092,.053],[.113,.029],[.113,0]],iron,{n:14});
   cyl(r,plus(gear,[-.010,0,-.014]),z,-.095,.044,.052,iron,12);
   for(const port of [inlet,outlet])cyl(r,port,z,-.016,.006,.014,metal,6);
  }],
  ['shaft','Lower steering shaft and joints','The lower shaft joins the cabin column to the steering-box input. Universal joints accommodate the change in angle across the bulkhead.',[.20,-.20,.19],ref.gear,r=>{
-  const joints=[[-.625,-.410,1.109],[-.846,-.446,1.009],[-1.282,-.509,.733],plus(gear,[.111,0,.003])];
+  // The shaft drops behind the cylinder head, runs forward inboard of the left spring
+  // and reaches the box input ahead of the spring.
+  const joints=[[-.625,-.410,1.109],[-.790,-.400,.830],[-1.300,-.370,.780],[-1.535,-.370,.790],plus(gear,[.105,.020,.066])];
   path(r,joints,.013,metal);
   for(const p of joints.slice(1,3)){cyl(r,p,y,-.020,.020,.021,iron,8);cyl(r,p,z,-.020,.020,.012,alloy,8);}
  }],
@@ -66,7 +69,7 @@ export const steeringRows=[
   for(const side of [-1,1])box(r,[-2.036,side*.369,.580],[.008,.021,.057],iron);
  }],
  ['return-lines','Steering-box and reservoir return hoses','One hose carries oil from the box to the cooler. The second runs from the other cooler port back to the reservoir.',[.05,-.28,-.16],ref.steering,r=>{
-  hose(r,[outlet,[-1.650,-.566,.701],[-1.705,-.596,.630],[-1.930,-.591,.576],feed],.009);
+  hose(r,[outlet,[-1.700,-.570,.722],[-1.705,-.596,.630],[-1.930,-.591,.576],feed],.009);
   hose(r,[returnEnd,[-1.925,-.564,.620],[-1.900,-.578,.705],[-1.852,-.510,.745],[-1.780,-.487,.862],reservoirIn],.009);
  }]
 ];

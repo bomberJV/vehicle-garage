@@ -106,7 +106,7 @@ test('the vapor purge line crosses the bulkhead above the bellhousing instead of
   for(const mode of poses){
     const faces=meshes.get(mode);
     const run=worldTriangles(faces,f=>f.part==='evap.purge-line'&&f.points.every(p=>p[0]<-.40&&p[0]>-.87));
-    assert.equal(run.length,64);
+    assert.equal(run.length,84);
     assert.deepEqual(crossedParts(faces,run,'evap.purge-line'),[]);
   }
 });

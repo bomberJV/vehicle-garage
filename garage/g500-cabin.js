@@ -28,8 +28,9 @@ function upholstery(r,levels,color,openBase=false,power=.47){
  }));
  bands(r,rings,color,openBase);
 }
-function cushion(r,x,y,z,halfWidth,depth=.23){
- upholstery(r,[[x,y,z-.074,depth*.80,halfWidth*.83],[x,y,z-.053,depth*.95,halfWidth*.96],[x,y,z-.005,depth,halfWidth],[x+.008,y,z+.02,depth*.96,halfWidth*.98],[x+.013,y,z+.042,depth*.84,halfWidth*.84]],leather);
+function cushion(r,x,y,z,halfWidth,depth=.23,thin=false){
+ // A thin cushion has a flat base 26 mm below the seating line.
+ upholstery(r,[[x,y,z-(thin?.026:.074),depth*.80,halfWidth*.83],[x,y,z-(thin?.018:.053),depth*.95,halfWidth*.96],[x,y,z-.005,depth,halfWidth],[x+.008,y,z+.02,depth*.96,halfWidth*.98],[x+.013,y,z+.042,depth*.84,halfWidth*.84]],leather);
  for(const side of [-1,1]){
   const sideY=y+side*halfWidth*.80;
   upholstery(r,[[x,sideY,z-.008,depth*.83,halfWidth*.12],[x,sideY,z+.023,depth*.90,halfWidth*.15],[x+.012,sideY,z+.056,depth*.72,halfWidth*.13],[x+.02,sideY,z+.062,depth*.60,halfWidth*.07]],bolster);
@@ -97,8 +98,9 @@ function rearBench(r){
    const cy=(a+b)/2,w=(b-a)/2;
    upholstery(r,[[.980,cy,.792,.050,w*.97],[1.001,cy,.89,.057,w],[1.104,cy,1.317,.053,w*.99],[1.113,cy,1.365,.043,w*.955]],rubber);
   }
+  // The center cushion is thin: the battery lies beneath it, under the floor.
   for(const [cy,w] of [[-.451,.218],[0,.207],[.451,.218]]){
-   cushion(r,.757,cy,.79,w,.220);
+   cushion(r,.757,cy,.79,w,.220,cy===0);
    backrest(r,.963,cy,.821,.54,w);
    headrest(r,1.104,cy,1.397,.128);
   }

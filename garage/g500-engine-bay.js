@@ -143,7 +143,8 @@ export function g500ExpansionTank(t){
     // Inner right fender. Dark upper tank and translucent lower body hang
     // beside the engine, with the filler near the aft end.
     const rows=[[.108,.052],[.142,.074],[.353,.074],[.399,.057]];
-    const shape=(row,sign,z)=>[row[0],.632+sign*row[1],z];
+    // The inner face is set 25 mm outboard so the tank clears the right manifold.
+    const shape=(row,sign,z)=>[row[0],.632+sign*row[1]+(sign<0?.025:0),z];
     for(let i=1;i<rows.length;i++){
       for(const [lo,hi,color] of [[.322,.404,'#b1bbb0'],[.404,.523,'#474d4c']])
         for(const s of [-1,1])t.poly([shape(rows[i-1],s,lo),shape(rows[i],s,lo),shape(rows[i],s,hi),shape(rows[i-1],s,hi)],color);
@@ -154,5 +155,5 @@ export function g500ExpansionTank(t){
     }
     // Side lug bears on the adjacent fender mounting point.
     t.box(.22,.698,.363,.25,.739,.376,dark);
-    t.cyl([.34,.635,.520],[.34,.635,.547],.037,dark,16);
+    t.cyl([.34,.635,.520],[.34,.635,.547],.037,dark,12);
 }

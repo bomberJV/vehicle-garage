@@ -112,7 +112,9 @@ function bodyShell(r,paint) {
     // steep ends of both propeller shafts.
     // The floor plate lies directly under the floor pan, above the exhaust and its shields.
     for(const side of [-1,1])r.box(-.40,Math.min(side*.31,side*.83),.575,.55,Math.max(side*.31,side*.83),.595,tone(paint,.53));
-    r.box(.55,-.83,.575,.95,.83,.595,tone(paint,.53));
+    // Under the center rear seat the plate opens for the battery well.
+    for(const side of [-1,1])r.box(.55,Math.min(side*.18,side*.83),.575,.95,Math.max(side*.18,side*.83),.595,tone(paint,.53));
+    r.box(.92,-.18,.575,.95,.18,.595,tone(paint,.53));
     // The floor steps up over the rear axle to the cargo floor, which sits on
     // the frame rails. Between the arches it stays clear of the tyres, and it
     // opens beside the spring and damper towers and behind each wheel, where

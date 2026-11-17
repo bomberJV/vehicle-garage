@@ -71,13 +71,15 @@ export function formedRoof(r,paint){
 
 // The inner wheelhouse closes the view through the gap above the tyre. Its
 // back lies inboard of the entire 265-mm tyre section; the flare is separate.
+// The inboard wall is a flange 50 mm deep that follows the arch; below it the
+// axle, springs and dampers pass into the wheel opening.
 export function wheelhouse(r,axle,side){
-  const c=[axle,.4276],outer=.448,edge=.899,back=.610;
+  const c=[axle,.4276],outer=.448,inner=.398,edge=.899,back=.610;
   const point=(angle,y,rad)=>[c[0]+rad*Math.cos(angle),side*y,c[1]+rad*Math.sin(angle)];
   for(let i=0;i<24;i++){
     const a=i*Math.PI/24,b=(i+1)*Math.PI/24;
     r.polygon([point(a,edge,outer),point(b,edge,outer),point(b,back,outer),point(a,back,outer)],'#424748',false);
-    r.polygon([[axle,side*back,c[1]],point(a,back,outer),point(b,back,outer)],'#353a3a',false);
+    r.polygon([point(a,back,inner),point(a,back,outer),point(b,back,outer),point(b,back,inner)],'#353a3a',false);
   }
 }
 

@@ -56,7 +56,8 @@ export function drawG500Frame(r){
  for(const side of [-1,1])r.box(-1.99,Math.min(side*.455,side*.481),.505,-1.962,Math.max(side*.455,side*.481),.585,dark);
  // The second crossmember passes behind the oil pan and ahead of the
  // bellhousing, above the front propeller shaft and the fluid cooler lines.
- for(const [station,height,radius=.040] of [[-.94,.55,.030],[1.87,.641]])
+ // The last crossmember closes the rail ends behind the fuel tank.
+ for(const [station,height,radius=.040] of [[-.94,.55,.030],[1.99,.625,.035]])
    r.rod([station,-.49,height],[station,.49,height],radius,dark,12);
  // The transfer-case crossmember hangs below the rails on drop plates and
  // passes under the case.

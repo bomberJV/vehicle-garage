@@ -26,7 +26,7 @@ const options={
     source:link('Core Moto K67 specifications and fitment','https://www.coremoto.com/Apex_6_forged_wheel_by_Core_Moto_USA_S1000RR_p/s1kr3a6.htm'),
     buy:link('Motomillion Apex-6 S 1000 RR set','https://www.motomillion.com/collections/core-moto/products/core-moto-s1kr3a6-ablu-apex-6-forged-aluminum-blue-wheel-set-for-s1000rr-k67')
   }],
-  g500:[{...stock('18-inch five-spoke',[18],'Five broad cast arms and a raised Mercedes center cap.',gManual,gTrade),
+  g500:[{...stock('18-inch five-spoke',[18],'Five straight grooved spokes run from a broad painted hub to the rim, with a Mercedes center cap.',gManual,gTrade),
     fitment:'2002 US G 500, front and rear. 7.5J × 18 H2, ET43. The manual specifies 265/60 R18 110V.'},{
     id:'atik',name:'Atik',maker:'Mercedes-Benz',partNumber:'A 463 401 07 02',frontDiameter:16,rearDiameter:16,lugs:5,boltCircle:130,
     description:'A deep, rounded five-arm face with more tire sidewall than the 18-inch wheel.',

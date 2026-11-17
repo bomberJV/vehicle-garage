@@ -14,13 +14,15 @@ export function radiatorGrille(r,front,paint){
  // their leading edges, with a physical gap in each blade across its back.
  // The physical fan and condenser meshes behind the slots supply the dark backing.
  for(const y of [-.31,-.151,.151,.31])r.box(front-.017,y-.005,.804,front+.001,y+.005,1.185,'#434d4e');
+ // Photographed 2002 US trucks: the seven vanes are painted body colour like
+ // the surround, with dark gaps between them. Only the star is bright.
  for(let i=0;i<7;i++){
   const z=.835+i*.054,c=Math.abs(z-1.007)<.124?Math.sqrt(.124**2-(z-1.007)**2):0;
   const ranges=c?[[-.438,-c],[c,.438]]:[[-.438,.438]];
   for(const [a,b] of ranges){
    const at=(y,d,h)=>[front-d+.005*(y/.44)**2,y,z+h];
-   r.polygon([at(a,.048,.012),at(b,.048,.012),at(b,.042,.018),at(a,.042,.018)],'#c3cac7',false);
-   r.polygon([at(a,.048,.012),at(b,.048,.012),at(b,.047,-.003),at(a,.047,-.003)],'#9ca8a7',false);
+   r.polygon([at(a,.048,.012),at(b,.048,.012),at(b,.042,.018),at(a,.042,.018)],tint(paint,1.10),false);
+   r.polygon([at(a,.048,.012),at(b,.048,.012),at(b,.047,-.003),at(a,.047,-.003)],tint(paint,.97),false);
    r.polygon([at(a,.047,-.003),at(b,.047,-.003),at(b,.022,-.013),at(a,.022,-.013)],tint(paint,.63),false);
    r.polygon([at(a,.042,.018),at(b,.042,.018),at(b,.018,.020),at(a,.018,.020)],tint(paint,.92),false);
   }

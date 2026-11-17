@@ -57,7 +57,8 @@ test('all four mounted G 500 tires, bead seats and hub mounting pads match the U
   }
 });
 
-test('the stock Ashtaroth face has five wide triangular windows within a continuous outer cast web',()=>{
+test('the stock 2002 face has five straight spokes from a broad hub, with windows open to the rim',()=>{
+  // Photographed 2002 US trucks: grooved spokes, no cast web between their tips.
   const r=Object.assign(Object.create(GarageRenderer.prototype),{
     faces:[], canvas:{getBoundingClientRect:()=>({left:0,top:0})},
     project:([x,y,z])=>({x,y:z,depth:y}),build:{vehicle:'g500'}
@@ -66,13 +67,11 @@ test('the stock Ashtaroth face has five wide triangular windows within a continu
   r.faces=r.faces.filter(f=>f.part==='wheels.rim');
   const hit=(angle,radius)=>r.hitTest(.2286*radius*Math.cos(angle),.4276+.2286*radius*Math.sin(angle));
   for(let i=0;i<5;i++){
-    const window=(i+.75)*2*Math.PI/5;
-    // Narrow tip at the hub, broad shoulder at the lip, cast aluminum
-    // connecting the spoke tips outside the five cutouts.
-    assert(!hit(window,.45));
-    assert(hit(window+.32,.45));
-    assert(!hit(window+.32,.75));
-    assert(hit(window,.93));
+    const window=(i+.75)*2*Math.PI/5,spoke=window+Math.PI/5;
+    assert(hit(window,.30),'the hub covers the bolt circle');
+    for(const radius of [.6,.85])assert(!hit(window,radius),'open window at '+radius);
+    for(const radius of [.6,.85])assert(hit(spoke,radius),'spoke at '+radius);
+    assert(!hit(spoke+.35,.6),'spokes stay narrow');
   }
 });
 

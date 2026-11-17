@@ -7,7 +7,8 @@ function dashDisc(r,origin,u,v,color,n){
   r.polygon(Array.from({length:n},(_,i)=>origin.map((x,j)=>x+u[j]*Math.cos(i*TAU/n)+v[j]*Math.sin(i*TAU/n))),color,false);
 }
 function seat(r,x,y,modern){
-  const color=modern?'#6e6154':'#aa9580',edge=modern?'#958474':'#c3ae99';
+  // The 993 follows the reference car's graphite-grey leather.
+  const color=modern?'#6e6154':'#6f7375',edge=modern?'#958474':'#8b8f90';
   // Contour sections form two lateral bolsters and the recessed seating surface.
   const widths=[-1,-.90,-.74,-.52,0,.52,.74,.90,1],
     bulge=[0,.027,.044,.013,.001,.013,.044,.027,0];
@@ -160,7 +161,7 @@ function dash(r,car){
   r.profile([[-.335,.56],[-.33,.612],[-.08,.625],[.022,.590],[.30,.575],[.33,.55]],-.091,.091,'#51504e');
   ellipsoid(r,[-.108,0,.619],[.079,.062,.038],'#323233',12,4);
   pipe(r,[[-.108,0,.624],[-.111,0,.688],[-.124,0,.703]],.010,'#9a9c98',8);
-  ellipsoid(r,[-.124,0,.711],[.029,.027,.036],modern?'#343638':'#5a4c41',12,5);
+  ellipsoid(r,[-.124,0,.711],[.029,.027,.036],modern?'#343638':'#3b3d3f',12,5);
   if(modern){
     r.box(dsx+.019,-.071,top-.084,dsx+.023,.190,top+.01,'#2e3639');
     r.box(dsx+.025,-.054,top-.071,dsx+.028,.176,top,'#526367');
@@ -169,7 +170,7 @@ function dash(r,car){
   }
 }
 function flooring(r,car){
-  const carpet=car.modern?'#42423f':'#796e60',mats=car.modern?'#515048':'#958774';
+  const carpet=car.modern?'#42423f':'#45484a',mats=car.modern?'#515048':'#55585a';
   r.box(-.57,-.609,.396,.65,.609,.420,carpet);
   for(const s of [-1,1]){
     const outline=[[-.41,.13],[-.49,.18],[-.463,.507],[-.377,.56],[.177,.53],[.212,.37],[.172,.151]];

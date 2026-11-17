@@ -144,7 +144,9 @@ function contourAt(outline,t){
 }
 const planScale=2.272/372;
 const lampCenter=[-1.16+(70.6-175)*planScale,(156-63.5)*planScale];
-const lampPlane=(x,y)=>.665+.87*(x-lampCenter[0])-.09*(Math.abs(y)-lampCenter[1]);
+// Lens plane. Head-on photographs show a nearly round lamp, so the glass
+// stands at about 47 degrees rather than lying back along the wing.
+const lampPlane=(x,y)=>.663+1.08*(x-lampCenter[0])-.09*(Math.abs(y)-lampCenter[1]);
 // The outer lens sits in a recessed fender stamping. The seat uses the same
 // wheelbase-scaled plan as the lens so the shoulder cannot obscure its glass.
 export function headlampSeat993(point){
@@ -302,4 +304,31 @@ export function classicDeckScript(r,car,deck){
     start+=advance;
   }
   r.polygon(points,'#343734',false);r.faces.at(-1).triangles=indices;
+}
+
+// Fresh-air inlet at the trailing edge of the luggage lid, ahead of the
+// windscreen. Photographs of the US Carrera show a black slot about half the
+// lid's rear width with a painted lip ahead of it and fine fore-aft fins.
+export function cowlInlet993(r,car,paint,deck){
+  r.tag('shell.luggage',()=>{
+    const n=24,half=.27,front=-.712,rear=-.668;
+    const at=(x,u,lift)=>{const p=deck(car,x,u*half);p[2]+=lift;return p;};
+    // Rounded ends: the slot narrows over the last 4 cm of each side.
+    const edge=(u,which)=>{
+      const a=Math.abs(u),round=Math.max(0,(a-.85)/.15),pinch=1-Math.sqrt(Math.max(0,1-round*round));
+      return which?rear-.018*pinch:front+.018*pinch;
+    };
+    const us=Array.from({length:n+1},(_,i)=>i/n*2-1);
+    const lipF=us.map(u=>at(edge(u,0)-.012,u,.0015)),lipB=us.map(u=>at(edge(u,0),u,.004));
+    for(let i=1;i<=n;i++)paintCoach(r,[lipF[i-1],lipF[i],lipB[i],lipB[i-1]],paint,[-.4,0,1]);
+    // The painted lid is continuous beneath, so the opening is laid on it as
+    // a dark shadowed slot rather than cut through the panel.
+    const top=us.map(u=>at(edge(u,0),u,.0022)),bottom=us.map(u=>at(edge(u,1),u,.0012));
+    const mid=us.map((u,i)=>top[i].map((v,k)=>(v+bottom[i][k])/2));
+    strip(r,top,mid,'#121517');strip(r,mid,bottom,'#24292b');
+    for(let i=1;i<14;i++){
+      const u=i/7-1,a=at(edge(u,0)+.003,u,.0026),b=at(edge(u,1)-.003,u,.0018);
+      strip(r,[a,b],[[a[0],a[1]+.0025,a[2]],[b[0],b[1]+.0025,b[2]]],'#3c4244');
+    }
+  });
 }

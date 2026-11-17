@@ -45,7 +45,25 @@ function wheelMesh(r,{x,y,z,radius,width,rim,brakeRim=rim,side=1,moto=false,rear
   const bead=moto?(width<.15?.04445:.0762)/width:0;
   const section=drawRim&&!moto?[[-.50,rim/radius],[-.49,.95],[-.39,1],[.39,1],[.49,.95],[.50,rim/radius]]:moto?[[-bead,(rim+.002)/radius],[-.50,.74],[-.48,.81],[-.38,.91],[-.2,.978],[0,1],[.2,.978],[.38,.91],[.48,.81],[.50,.74],[bead,(rim+.002)/radius]]:
     [[-.50,rim/radius],[-.504,.87],[-.48,.966],[-.38,1],[-.15,1],[.15,1],[.38,1],[.48,.966],[.504,.87],[.50,rim/radius]];
-  r.tag(tags.tire,()=>{for(let i=1;i<section.length;i++)strip(r,ring(section[i-1][0]*width,section[i-1][1]*radius),ring(section[i][0]*width,section[i][1]*radius),i%2?'#272a2e':'#22252a');});
+  r.tag(tags.tire,()=>{
+    if(drawRim&&!moto){
+      // A radial tire's sidewall bulges past the rim flange and catches a soft
+      // sheen at its widest point, then rolls over a darker shoulder.
+      const k=rim/radius,at=t=>k+(.95-k)*t;
+      // The nominal section width is measured across the bulge.
+      const side=[[-.455,at(0),'#1e2124'],[-.485,at(.22),'#262a2e'],[-.50,at(.5),'#30343a'],[-.493,at(.78),'#2a2e33'],[-.475,.95,'#22252a'],[-.44,.985,'#1f2226'],[-.38,1,'#1d2024']];
+      const rows=[...side,...side.slice().reverse().map(([dy,rad,c])=>[-dy,rad,c])];
+      // Each band is one indexed mesh, which keeps the scene's face count low.
+      for(let i=1;i<rows.length;i++){
+        const a=ring(rows[i-1][0]*width,rows[i-1][1]*radius),b=ring(rows[i][0]*width,rows[i][1]*radius),points=[],triangles=[];
+        for(let j=0;j<=N;j++){points.push(a[j],b[j]);if(j){const q=j*2;triangles.push(q-2,q-1,q+1,q-2,q+1,q);}}
+        r.polygon(points,rows[i-1][1]>rows[i][1]?rows[i][2]:rows[i-1][2],false);
+        if(r.faces?.length)r.faces.at(-1).triangles=triangles;
+      }
+      return;
+    }
+    for(let i=1;i<section.length;i++)strip(r,ring(section[i-1][0]*width,section[i-1][1]*radius),ring(section[i][0]*width,section[i][1]*radius),i%2?'#272a2e':'#22252a');
+  });
   r.tag(tags.rim,()=>{
     if(drawRim){drawRim(r,{x,y,z,rim,width,side,finish});return;}
     for(const s of (moto?[-1,1]:[side])) {

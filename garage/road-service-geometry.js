@@ -8,12 +8,15 @@ export function path(r,pts,rad,col){for(let i=1;i<pts.length;i++)r.rod(pts[i-1],
 export function box(r,c,dim,col){const a=c.map((v,i)=>v-dim[i]/2),b=c.map((v,i)=>v+dim[i]/2);r.box(...a,...b,col);}
 function arc(r,c,axis,inner,outer,a,b,thick,col){turn(r,c,axis,[[-thick/2,inner],[-thick/2,outer],[thick/2,outer],[thick/2,inner],[-thick/2,inner]],col,{start:a,sweep:b-a,n:18});}
 export function wheelSites(p,rear){const i=rear?1:0,sides=p.bike&&rear?[1]:[-1,1];return sides.map(s=>[p.axles[i],s*(p.track[i]-(p.bike?0:.014)),p.wheel[i]]);}
+// Machined cast-iron friction rings are a dull dark grey in photographs,
+// far darker than polished alloy. Bike discs stay bright stainless steel.
+const rotorFace='#757a7a';
 export function disc(r,c,R,vented,drilled,bike){
-  const depth=R*(bike?.034:.12),inner=R*(bike?.69:.59),n=bike?30:38;
+  const depth=R*(bike?.034:.12),inner=R*(bike?.69:.59),n=bike?30:38,face=bike?metal:rotorFace;
   if(vented){
-    for(const sign of [-1,1])sleeve(r,c,y,sign*depth*.50,sign*depth*.30,R,inner,metal,n);
+    for(const sign of [-1,1])sleeve(r,c,y,sign*depth*.50,sign*depth*.30,R,inner,face,n);
     for(let j=0;j<24;j++){const angle=j*TAU/24;turn(r,c,y,[[-depth*.30,inner],[-depth*.30,R*.98],[depth*.30,R*.98],[depth*.30,inner]],iron,{start:angle,sweep:.046,n:1});}
-  }else sleeve(r,c,y,-depth/2,depth/2,R,inner,metal,n);
+  }else sleeve(r,c,y,-depth/2,depth/2,R,inner,face,n);
   if(bike){for(let j=0;j<8;j++){const a=j*TAU/8;r.rod(plus(c,[Math.cos(a)*R*.24,0,Math.sin(a)*R*.24]),plus(c,[Math.cos(a+.12)*R*.72,0,Math.sin(a+.12)*R*.72]),.006,iron,6);}}
   else sleeve(r,c,y,-depth*.6,depth*.56,inner*1.035,R*.30,iron,24);
   if(drilled)for(const side of [-1,1])for(let j=0;j<20;j++){

@@ -1,7 +1,7 @@
 // Outer skin in metres. X increases from the nose to the engine. Station widths
 // exclude the mirrors. Wheelbase/width/overall length anchor the loft. The panel
 // sweeps, crowns and upholstery follow photographs rather than tooling drawings.
-import {fixedStopLamp,washerNozzle,classicBodyTrim,classicDeckScript,classicMirror,frontSignals993,rearOptics993,classicSignalPocket,headlamp993,headlampSeat993} from './porsche993-trim.js';
+import {fixedStopLamp,washerNozzle,classicBodyTrim,classicDeckScript,classicMirror,frontSignals993,rearOptics993,classicSignalPocket,headlamp993,headlampSeat993,cowlInlet993} from './porsche993-trim.js';
 import {faceTriangles} from './mesh-triangles.js';
 import {headlampSeat992,rocker992,stations992,sideLevels992,spoiler992,sweep992,bonnetStart,bonnetHalfWidth,bonnetPressing,frontCrown992,door992,doorRibX,fascia992} from './porsche992-skin.js';
 import {classicStations,classicSpoiler,classicGrilleSpan,sweepClassicBody,classicBonnetStart,classicBonnetWidth,classicBonnetRib,classicDoor,classicDoorHem,classicDoorRib,classicSillHeight,classicLowerBands,classicBumperInset,classicBonnetValley,drawClassicCornerVents} from './porsche993-body-profile.js';
@@ -26,7 +26,7 @@ export const coupeShape=[
 // Rows through the classic flank and over its shoulder. The 993 panels are
 // continuous compound curves, so a coarse row pitch reads as flat facets.
 const classicFlankLevels=[classicDoorHem,.35,.42,.49,.56,.63,.70,.755,.81,.87,.915,.96,1];
-const classicShoulderRows=[.875,.75,.62,.49,.355,.22,.11,0];
+const classicShoulderRows=[.9,.8,.7,.6,.5,.4,.3,.2,.1,0];
 function station(car,x){
   const rows=car.stations;let i=1;
   while(i<rows.length-1 && rows[i][0]<x)i++;
@@ -63,7 +63,7 @@ function top(car,x,y){
   const rounded=Math.sin(inner*Math.PI/2)**3.2;
   // Toward the 993's nose the luggage lid stays nearly flat across and the
   // wings rise steeply outside its shut lines to carry the headlamps.
-  const haunch=car.modern?frontCrown992(x,Math.min(u,crestU),crestU,rounded):Math.sin(inner*Math.PI/2)**(3.2+3.6*clamp((-1.30-x)/.55));
+  const haunch=car.modern?frontCrown992(x,Math.min(u,crestU),crestU,rounded):Math.sin(inner*Math.PI/2)**(3.2+11*clamp((-1.30-x)/.62)**1.5);
   const drop=clamp((u-crestU)/(.958-crestU));
   const crown=(z-c)*haunch+(car.modern?bonnetPressing(x,y):classicBonnetValley(x,y));
   const p=swept(car,[x,y,c+crown-.076*(car.modern?drop**2.65:1-Math.cos(drop*Math.PI/2))]);
@@ -170,10 +170,11 @@ function uBreaks(car){
   // its reflections continuous.
   const step=.055;
   for(let i=1;i<ordered.length;i++){
-    const gap=ordered[i]-ordered[i-1];
     // The classic skin has no feature lines to hide facets either; it uses a
-    // 75 mm pitch.
-    const pitch=car.modern?step:.075;
+    // 75 mm pitch. The headlamp seat is pressed into the front of the wing
+    // and needs a closer pitch to stay smooth around the bezel.
+    const gap=ordered[i]-ordered[i-1],lamp=!car.modern&&ordered[i]>-2.0&&ordered[i-1]<-1.66;
+    const pitch=car.modern?step:lamp?.03:.075;
     if(gap>pitch){const n=Math.ceil(gap/pitch);for(let k=1;k<n;k++)result.push(ordered[i-1]+gap*k/n);}
     result.push(ordered[i]);
   }
@@ -288,7 +289,7 @@ function skin(r,car,paint,phase){
         if(cabin){
           const la=[ta[0],ta[1]-s*.012,ta[2]-.032],lb=[tb[0],tb[1]-s*.012,tb[2]-.032];
           r.polygon([ta,tb,lb,la],'#282b2e',false);
-          r.polygon([la,lb,[lb[0],lb[1]+s*.032,.40],[la[0],la[1]+s*.032,.40]],car.modern?'#42454a':'#877665',false);
+          r.polygon([la,lb,[lb[0],lb[1]+s*.032,.40],[la[0],la[1]+s*.032,.40]],car.modern?'#42454a':'#55595b',false);
         }
       });
       if(!cabin){
@@ -323,7 +324,8 @@ function skin(r,car,paint,phase){
       panelSeam(r,car,'door'+s,seam,car.modern?.0065:.0055,s,car.modern?'#2a2d2f':tint(paint,.48));
       const hw=car.modern?.133:.116,hz=car.modern?.750:.733,hx=b-.18;
       const handle=cheek(hx,hz);
-      ellipsoid(r,handle,[hw*.63,.014,.023],car.modern?tint(paint,.67):'#343537',12,4);
+      // The 993 pull handle is a body-colour moulding over a shallow dark recess.
+      ellipsoid(r,handle,[hw*.63,.014,.023],car.modern?tint(paint,.67):'#4a4d4f',12,4);
       ellipsoid(r,[hx,handle[1]+s*.012,hz+.005],[hw*.52,.013,.009],tint(paint,1.05),12,4);
       const foot=top(car,a+.108,s*station(car,a+.108)[0]*.858);
       if(car.modern){
@@ -520,7 +522,7 @@ function exteriorLights(r,car,paint){
       for(const i of [0,8])r.polygon([low[i],high[i],upper[i],inner[i]],'#393e3e',false);
     }
   });
-  if(!modern){fixedStopLamp(r,car,paint,top);classicBodyTrim(r,car,paint,top,tail.point,sideRaw);r.tag('shell.deck',()=>classicDeckScript(r,car,top));}
+  if(!modern){fixedStopLamp(r,car,paint,top);cowlInlet993(r,car,paint,top);classicBodyTrim(r,car,paint,top,tail.point,sideRaw);r.tag('shell.deck',()=>classicDeckScript(r,car,top));}
   const hoodX=car.stations[0][0]+(modern?.20:.16);
   r.tag('shell.luggage',()=>{
     const gap=Array.from({length:29},(_,i)=>{
@@ -528,8 +530,16 @@ function exteriorLights(r,car,paint){
       return top(car,x,side*lidWidth(car,x,station(car,x)[0],true));
     });
     panelSeam(r,car,'bonnet-front',gap,modern?.007:.0063,0,modern?'#2c2f31':tint(paint,.47));
-    const badge=[[-.027,-.017],[-.027,.017],[.011,.015],[.038,0],[.011,-.015]].map(([dx,y])=>{const p=top(car,(modern?hoodX:classicBonnetStart+.085)+dx,y);p[2]+=.005;return p;});
+    const at=(dx,y,lift)=>{const p=top(car,(modern?hoodX:classicBonnetStart+.085)+dx,y);p[2]+=lift;return p;};
+    const badge=[[-.027,-.017],[-.027,.017],[.011,.015],[.038,0],[.011,-.015]].map(([dx,y])=>at(dx,y,.005));
     r.polygon(badge,'#b2945d',false);
+    if(!modern){
+      // Enamelled crest: a gold rim around red and black quarters.
+      const q=(dx0,dx1,y0,y1,color)=>r.polygon([at(dx0,y0,.0056),at(dx0,y1,.0056),at(dx1,y1,.0056),at(dx1,y0,.0056)],color,false);
+      q(-.022,-.004,-.012,0,'#9a2c27');q(-.022,-.004,0,.012,'#2b2523');
+      q(-.004,.016,-.011,0,'#2b2523');q(-.004,.016,0,.011,'#9a2c27');
+      r.polygon([[-.009,-.005],[-.009,.005],[.004,.005],[.004,-.005]].map(([dx,y])=>at(dx,y,.0062)),'#c9a85e',false);
+    }
   });
 }
 function engineGrille(r,car,paint,phase){

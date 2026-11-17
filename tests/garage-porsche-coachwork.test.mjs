@@ -93,7 +93,8 @@ test('painted Porsche door and luggage joints use continuous ribbons with a visi
   for(const car of cars){
     const faces=mesh(r=>car.draw(r,'#f4c430','#c2c2c2'));
     const seams=faces.filter(f=>f.panelJoint&&f.triangles);
-    assert.equal(seams.length,7);
+    // The 993 adds the bumper-cover joint on each wing.
+    assert.equal(seams.length,car.year===1998?9:7);
     for(const face of seams){
       const door=face.panelJoint==='door',n=face.points.length/(door?2:3),index=door?2:1;
       assert(Number.isInteger(n)&&n>10);

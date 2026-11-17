@@ -234,6 +234,15 @@ function floorAndSills(r,car,paint){
       strip(r,lip,inner,'#33363b');
       for(let j=0;j<26;j++)r.polygon([[axle,s*.535,.17],inner[j],inner[j+1]],'#292d31',false);
       if(!car.modern){
+        // The 993 wheelhouse is a closed tub: carry the inner wall down to the
+        // floor line at both ends so the cabin floor and oil lines behind it
+        // cannot be seen past the tire.
+        for(const j of [0,26]){
+          const end=inner[j],x=end[0];
+          r.polygon([[axle,s*.535,.17],end,[x,s*.535,.12],[axle,s*.535,.12]],'#292d31',false);
+        }
+      }
+      if(!car.modern){
         // The wheelhousing continues below axle height at both ends. This
         // lower splash shield closes the view through to the opposite rocker.
         for(const j of [0,26]){
@@ -349,6 +358,17 @@ function skin(r,car,paint,phase){
         [b,low+.012],[b,low+.05],[b,.54],[b,.76],[b,.9],[b,1]];
       const seam=rows.map(([x,t])=>sideRaw(car,car.modern?doorRibX(x,t):classicDoorRib(car,x,t),t,s));
       panelSeam(r,car,'door'+s,seam,car.modern?.0065:.0055,s,car.modern?'#2a2d2f':tint(paint,.48));
+      if(!car.modern){
+        // The front bumper cover meets the wing in a level joint at the top of
+        // the indicator, running from the wheel opening to the front corner,
+        // as photographed on the US Carrera.
+        const level=.447,joint=[];
+        for(let i=0;i<=12;i++){
+          const x=mix(-1.508,-2.03,i/12),low=wheelCut(car,x),high=top(car,x,station(car,x)[0]*.958)[2];
+          joint.push(sideRaw(car,x,clamp((level+.012*(i/12)**2-low)/(high-low)),s));
+        }
+        r.tag('shell.fenders',()=>panelSeam(r,car,'bumper-wing'+s,joint,.0055,s,tint(paint,.5)));
+      }
       const hw=car.modern?.133:.116,hz=car.modern?.750:.733,hx=b-.18;
       const handle=cheek(hx,hz);
       // The 993 pull handle is a body-colour moulding over a shallow dark recess.
@@ -677,7 +697,7 @@ function fairNormals(faces,shared,key,paint,passes=8){
   }
   for(const item of items)item.color=coachPaintColor(paint,item.normal);
 }
-function softenPaint(faces,paint){
+function softenPaint(faces,paint,passes=8){
   // Gouraud shading across the continuous skins preserves the subtle waist of the
   // door and shoulder. Opposing bumper/lid normals stay split at the panel seam.
   const shared=new Map(),paintedFaces=faces.filter(f=>f.paintNormal);
@@ -697,7 +717,7 @@ function softenPaint(faces,paint){
     const length=Math.hypot(...item.normal)||1;
     item.normal=item.loft||item.normal.map(value=>value/length);
   }
-  if(paint)fairNormals(paintedFaces,shared,key,paint);
+  if(paint)fairNormals(paintedFaces,shared,key,paint,passes);
   for(const face of paintedFaces){
     const vertices=face.points.map(p=>shared.get(face.part+key(p)));
     face.vertexColors=vertices.map(item=>item.color);
@@ -738,7 +758,9 @@ function packCoachworkReturns(faces,start,modern){
 export function drawCoachwork(r,car,paint,phase=0){
   const start=r.faces?.length||0;
   skin(r,car,paint,phase);exteriorLights(r,car,paint);engineGrille(r,car,paint,phase);drawSpoilerDrive(r,car.modern,phase);
-  if(r.faces)softenPaint(r.faces.slice(start),car.modern?paint:null);
+  // The 993's shoulder turns over through a narrow bridging row; three fairing
+  // passes let its shading roll round the wing instead of reading as a fold.
+  if(r.faces)softenPaint(r.faces.slice(start),paint,car.modern?8:3);
   if(r.faces)packCoachworkReturns(r.faces,start,car.modern);
   if(r.faces&&!car.modern)packClassicSkin(r.faces,start);
 }
@@ -784,5 +806,5 @@ export function drawPorscheSpoilerMotion(r,modern,paint,phase=0){
   }
   if(!modern)engineGrille(r,car,paint,phase);
   drawSpoilerDrive(r,modern,phase);
-  if(r.faces)softenPaint(r.faces.slice(start),modern?paint:null);
+  if(r.faces)softenPaint(r.faces.slice(start),paint,modern?8:3);
 }

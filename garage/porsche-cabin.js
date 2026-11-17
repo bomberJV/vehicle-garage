@@ -7,9 +7,101 @@ const TAU=2*Math.PI,mix=(a,b,t)=>a+(b-a)*t;
 function dashDisc(r,origin,u,v,color,n){
   r.polygon(Array.from({length:n},(_,i)=>origin.map((x,j)=>x+u[j]*Math.cos(i*TAU/n)+v[j]*Math.sin(i*TAU/n))),color,false);
 }
+// Smooth indexed upholstery surface. rows[i][j] is a grid of points; each
+// vertex is lit from its grid neighbours so leather reads as a soft, matte
+// curved surface instead of flat facets.
+function upholstery(r,rows,color,closed=false){
+  const n=rows.length,m=rows[0].length,points=[],colors=[],triangles=[];
+  const base=[1,3,5].map(i=>parseInt(color.slice(i,i+2),16));
+  const light=[-.35,-.25,.9],ll=Math.hypot(...light);
+  const at=(i,j)=>rows[Math.max(0,Math.min(n-1,i))][closed?(j+m)%m:Math.max(0,Math.min(m-1,j))];
+  for(let i=0;i<n;i++)for(let j=0;j<m;j++){
+    const a=at(i+1,j),b=at(i-1,j),c=at(i,j+1),d=at(i,j-1);
+    const u=a.map((v,k)=>v-b[k]),v=c.map((q,k)=>q-d[k]);
+    let nn=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+    const l=Math.hypot(...nn)||1;nn=nn.map(q=>q/l);
+    const lambert=Math.abs(nn[0]*light[0]+nn[1]*light[1]+nn[2]*light[2])/ll;
+    const k=.58+.42*lambert+.06*Math.max(0,nn[2]);
+    points.push(rows[i][j]);
+    colors.push('#'+base.map(c=>Math.min(255,Math.round(c*k)).toString(16).padStart(2,'0')).join(''));
+  }
+  const cols=closed?m:m-1;
+  for(let i=1;i<n;i++)for(let j=0;j<cols;j++){
+    const a=(i-1)*m+j,b=(i-1)*m+(j+1)%m,c=i*m+(j+1)%m,d=i*m+j;
+    triangles.push(a,b,c,a,c,d);
+  }
+  r.polygon(points,color,false);
+  const face=r.faces?.at(-1);
+  if(face){face.triangles=triangles;face.vertexColors=colors;}
+}
+const catmull=(rows,steps)=>{
+  // Interpolate numeric section rows so the surface is continuous between them.
+  const out=[];
+  for(let i=0;i<rows.length-1;i++)for(let s=0;s<steps;s++){
+    const t=s/steps,p0=rows[Math.max(0,i-1)],p1=rows[i],p2=rows[i+1],p3=rows[Math.min(rows.length-1,i+2)];
+    out.push(p1.map((_,k)=>.5*(2*p1[k]+(-p0[k]+p2[k])*t+(2*p0[k]-5*p1[k]+4*p2[k]-p3[k])*t*t+(-p0[k]+3*p1[k]-3*p2[k]+p3[k])*t*t*t)));
+  }
+  out.push(rows.at(-1));return out;
+};
+// 1998 Carrera standard seat, as photographed on the reference car: a deep
+// cushion with raised side bolsters and a rolled front edge, and a one-piece
+// backrest whose bolsters fade into the rounded, integrated head restraint.
+function seat993(r,x,y,color){
+  const floor=.454;
+  // Cushion: [x offset, half width, crown height] from front to rear.
+  const cushion=catmull([[-.295,.192,.487],[-.243,.205,.525],[-.155,.212,.540],[.005,.218,.514],[.12,.205,.519],[.17,.18,.535]],3);
+  const us=[-1,-.97,-.9,-.8,-.68,-.5,-.25,0,.25,.5,.68,.8,.9,.97,1];
+  const bolster=u=>.040*Math.exp(-(((Math.abs(u)-.8)/.13)**2));
+  const cross=([dx,w,zc],roll)=>us.map(u=>{
+    const a=Math.abs(u),edge=a>.9?(a-.9)/.1:0;
+    const top=zc+bolster(u)-.008*(1-u*u)*(1-roll);
+    const z=a>=1?floor:top-(top-floor)*edge**2.2*.85;
+    return [x+dx+(roll?.012*(1-edge):0),y+w*u*(1-.04*edge),z];
+  });
+  const front=cushion[0];
+  const rows=[cross([front[0]+.02,front[1]*.93,floor+.012],1),cross([front[0]+.004,front[1]*.98,front[2]-.03],1),...cushion.map(row=>cross(row,0))];
+  upholstery(r,rows,color);
+  // Backrest: [z, half width, front x, back x] from the base to the crown.
+  const back=catmull([[.51,.164,.113,.15],[.571,.204,.108,.174],[.66,.216,.122,.197],[.78,.211,.146,.214],[.855,.194,.163,.224],[.907,.168,.179,.245],[.95,.140,.19,.253],[.99,.122,.205,.268],[1.017,.110,.218,.276],[1.033,.085,.232,.274]],3);
+  const loopU=[-1,-.92,-.8,-.62,-.4,-.15,0,.15,.4,.62,.8,.92,1];
+  const ring=([z,w,fx,bx])=>{
+    const head=Math.max(0,Math.min(1,(z-.88)/.07)),pad=.055*(1-head)+.012*head;
+    const frontFace=loopU.map(u=>[x+fx-pad*Math.exp(-(((Math.abs(u)-.82)/.14)**2))+.012*(1-u*u)*(1-head),y+w*u,z]);
+    const side=[.35,.7].map(t=>[x+fx+(bx-fx)*t+.006,y+w*(1.02+.02*Math.sin(Math.PI*t)),z]);
+    const backFace=loopU.slice().reverse().map(u=>[x+bx+.014*(1-u*u),y+w*u*.98,z]);
+    return [...frontFace,...side,...backFace,...side.slice().reverse().map(([a,b,c])=>[a,2*y-b,c])];
+  };
+  const rings=back.map(ring);
+  // Close the crown with a rounded cap one centimetre above the last section.
+  const crown=back.at(-1),cap=ring([crown[0]+.010,crown[1]*.55,crown[2]+.016,crown[3]-.01]);
+  upholstery(r,[...rings,cap],color,true);
+  // Horizontal stitching across the centre panel of backrest and cushion.
+  for(const z of [.66,.79]){
+    const row=back.reduce((best,s)=>Math.abs(s[0]-z)<Math.abs(best[0]-z)?s:best);
+    const seam=[-.55,-.3,0,.3,.55].map(u=>[x+row[2]-.012*(1-u*u)-.003,y+row[1]*u,row[0]]);
+    strip(r,seam,seam.map(([a,b,c])=>[a,b,c+.004]),tint(color,.70));
+  }
+  const mid=cushion[Math.floor(cushion.length/2)];
+  const seat=[-.5,-.25,0,.25,.5].map(u=>[x+mid[0],y+mid[1]*u,mid[2]+.002]);
+  strip(r,seat,seat.map(([a,b,c])=>[a+.004,b,c]),tint(color,.70));
+}
 function seat(r,x,y,modern){
   // The 993 follows the reference car's graphite-grey leather.
   const color=modern?'#6e6154':'#6f7375',edge=modern?'#958474':'#8b8f90';
+  if(!modern){
+    seat993(r,x,y,color);
+    // The small rear seats keep their simple cushion and backrest.
+    const ry=y*.93;
+    ellipsoid(r,[.538,ry,.603],[.159,.186,.066],color,14,6);
+    // Rear backrest: a padded panel leaning on the rear bulkhead.
+    const rows=[0,.25,.5,.75,1].map(t=>{
+      const fx=.56+.105*t,bx=fx+.05,z=.627+.2*t,w=.147*(1-.12*t*t);
+      const us=[-1,-.85,-.5,0,.5,.85,1];
+      return [...us.map(u=>[fx+.008*(1-u*u),ry+w*u,z]),[bx,ry+w,z],...us.slice().reverse().map(u=>[bx-.006*(1-u*u),ry+w*u,z]),[fx,ry-w,z]];
+    });
+    upholstery(r,rows,tint(color,.92),true);
+    return;
+  }
   // Contour sections form two lateral bolsters and the recessed seating surface.
   const widths=[-1,-.90,-.74,-.52,0,.52,.74,.90,1],
     bulge=[0,.027,.044,.013,.001,.013,.044,.027,0];

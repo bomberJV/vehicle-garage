@@ -6,7 +6,9 @@ import {get993Study} from './porsche993-system-studies.js';
 
 import {refs} from './porsche993-sources.js';
 const steel='#8d9a9b',black='#41494a',alloy='#a7ada1',brass='#ac916c',plastic='#394043';
-const oilCore=[-1.72,.57,.43],condCore=[-1.72,-.57,.43],thermo=[.67,.58,.31],oilTank=[.65,.64,.50],pump=[1.39,0,.389];
+// The tank, thermostat and filter sit in the body ahead of the right rear
+// wheelhouse tub, clear of the wheel-well volume.
+const oilCore=[-1.72,.57,.43],condCore=[-1.72,-.57,.43],thermo=[.60,.58,.31],oilTank=[.58,.64,.50],pump=[1.39,0,.389];
 const rearBlower=[1.41,-.48,.673],compressor=[1.61,.352,.641],evap=[-.745,0,.68];
 const dryer=[-.766,-.597,.462],valve=[-.78,-.219,.741];
 const row=(key,name,description,offset,source,draw)=>({...part(key,name,description,offset,draw),source});
@@ -27,9 +29,12 @@ function oilReservoir(r){
  cyl(r,add(oilTank,[-.08,.046,.076]),y,0,.012,.044,steel,12);
 }
 function oilPipe(r,k){
- // Both pipes go inboard and up around the forward wheel before reaching the cooler.
+ // Both pipes leave the sill behind the front wheel opening, turn inboard of
+ // the wheelhouse and run over it inside the luggage compartment, so they
+ // never pass through the wheel well, then drop to the cooler ahead of it.
+ // Over the wheelhouse the pair is stacked vertically to stay inboard.
  const b=k*.032;
- channel(r,[[.665,.561+b,.303],[.52,.62+b,.247],[.40,.673+b,.228],[-.75,.673+b,.228],[-.90,.547+b,.29],[-1.12,.498+b,.565],[-1.35,.50+b,.62],[-1.53,.54+b,.58],[-1.71,.54+b,.565]],.0135,brass);
+ channel(r,[[.595,.561+b,.303],[.50,.62+b,.247],[.40,.673+b,.228],[-.66,.673+b,.228],[-.74,.492+b*.3,.27+b],[-.86,.492+b*.3,.46+b],[-1.08,.492+b*.3,.60+b],[-1.38,.492+b*.3,.62+b],[-1.56,.50+b,.585],[-1.71,.54+b,.565]],.0135,'#7f898a');
  for(const xx of [-.53,.22])box(r,[xx,.673+b,.227],[.022,.032,.035],black);
 }
 function matrix(r,c,w,h,d){
@@ -74,9 +79,9 @@ const oilRows=[
  }),
  row('tank','External oil tank and level sender','The tank stands ahead of the right rear wheel. Its sender measures the tank level. Oil from the bottom feeds the pressure pump.',[.10,.33,.17],refs.tank,oilReservoir),
  row('connections','Tank feed, return and filler neck','Two lower connections link the tank, engine and thermostat. The filler reaches up into the engine bay.',[.16,.28,.22],refs.tank,r=>{
-  channel(r,[[.62,.615,.335],[.64,.51,.302],[.81,.46,.29],[1.12,.424,.30],[1.35,.15,.319],[1.37,.029,.374]],.021,black);
-  channel(r,[[1.41,.033,.377],[1.43,.206,.334],[1.35,.416,.322],[.84,.50,.325],[.682,.561,.321]],.0165,steel);
-  channel(r,[[.69,.64,.653],[.85,.635,.693],[1.10,.60,.729],[1.38,.573,.753],[1.49,.53,.771]],.020,black);
+  channel(r,[[.55,.615,.335],[.57,.51,.302],[.81,.46,.29],[1.12,.424,.30],[1.35,.15,.319],[1.37,.029,.374]],.021,black);
+  channel(r,[[1.41,.033,.377],[1.43,.206,.334],[1.35,.416,.322],[.84,.50,.325],[.612,.561,.321]],.0165,steel);
+  channel(r,[[.62,.64,.653],[.85,.635,.693],[1.10,.60,.729],[1.38,.573,.753],[1.49,.53,.771]],.020,black);
   cyl(r,[1.49,.53,.776],z,-.003,.012,.029,'#c69a52',12);
  }),
  row('thermostat','External oil thermostat','The regulator diverts warm return oil to the cooler ahead of the right front wheel. Open the housing to find its regulator, springs and retaining clip.',[-.20,.31,-.18],refs.thermostat,thermostat),

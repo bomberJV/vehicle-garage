@@ -12,7 +12,7 @@ const profiles={
  f350:{front:-1.17,rear:.12,width:.80,height:.59,tunnel:.30,rise:.26,rows:1,description:'This regular cab has one seating row and a wide, short floor. Ford offered different tunnel heights. This estimated contour rises over the E4OD automatic.',ref:source('LMC Truck · regular-cab carpet and floor hump variants','https://www.lmctruck.com/interior%2Fcarpet-insulation%2Ffd-1980-96-molded-carpet')},
  c63:{front:-.94,rear:1.26,width:.75,height:.35,tunnel:.17,rise:.23,rows:2,description:'The W204 sedan floor rises over the longitudinal driveline. Two front seat mounts sit between the tunnel and the sill on each side.',ref:source('Mercedes-Benz · W204 floor and seat crossmember','https://classicparts.mbusa.com/v-2013-mercedes-benz-c63-amg--base--6-3l-v8-gas/body--floor')},
  hrv:{front:-.92,rear:.98,width:.77,height:.48,tunnel:.15,rise:.083,rows:2,description:'The HR-V parts diagram lists the fitted floor carpet, separate mats, holders and grommets. The back of each front footwell runs under a seat.',ref:source('Honda parts diagram · 2026 HR-V floor carpet and mat holders','https://www.hondapartsnow.com/parts-list/2026-honda-hr_v--5_door_lx_awd-cvt/interior_bumper/floor_mat.html')},
- porsche993cab:{front:-.96,rear:.96,width:.70,height:.400,seatWidth:.336,carpet:'#45484a',mat:'#55585a',tunnel:.12,rise:.14,rows:2,description:'The short 993 footwells flank a narrow tunnel. Behind the front buckets, separate carpet pieces follow the raised rear seat wells and the lower back wall.',ref:source('Porsche Classic · 993 parts catalogue, group 807','https://assets-v2.porsche.com/us/-/media/Project/PCOM/SharedSite/PorscheClassic/Original-Parts-Catalogue/PDF-EN-US/KAT517_USA_911_98_KATALOG')},
+ porsche993cab:{front:-.96,rear:.96,width:.70,toe:.30,wells:[[-1.60,-.74,.515],[.70,1.50,.515]],height:.400,seatWidth:.336,carpet:'#45484a',mat:'#55585a',tunnel:.12,rise:.14,rows:2,description:'The short 993 footwells flank a narrow tunnel. Behind the front buckets, separate carpet pieces follow the raised rear seat wells and the lower back wall.',ref:source('Porsche Classic · 993 parts catalogue, group 807','https://assets-v2.porsche.com/us/-/media/Project/PCOM/SharedSite/PorscheClassic/Original-Parts-Catalogue/PDF-EN-US/KAT517_USA_911_98_KATALOG')},
  porsche992scab:{front:-1.02,rear:1.09,width:.77,height:.400,seatWidth:.356,carpet:'#42423f',mat:'#515048',tunnel:.20,rise:.19,rows:2,description:'The 992.1 Cabriolet has a wide center console above the tunnel and short rear footwells. The Cabriolet trim diagram identifies the floor lining and shaped foam pieces.',ref:source('Porsche parts diagram 807-110 · 992.1 Cabriolet','https://www.pitp.club/diagrams/d/50852/0')},
 };
 
@@ -32,11 +32,19 @@ function surface(p,u,v,extra){
  const crest=Math.max(0,1-(Math.abs(y)/tunnel)**3);
  // Where the frame climbs over the rear axle, the step starts sooner and rises higher.
  const from=p.stepFrom??.82,kick=Math.max(0,1-u/.18),step=p.rows===2?Math.max(0,(u-from)/(1-from)):0;
- const sill=Math.max(0,(Math.abs(v)-.90)/.1),end=1-.15*kick-.055*step-(p.narrow||0)*step;
+ // A short floor whose toe boards sit between the front wheelhouses narrows
+ // further (toe) so it stays inboard of the wheel wells.
+ const sill=Math.max(0,(Math.abs(v)-.90)/.1),end=1-(p.toe??.15)*kick-.055*step-(p.narrow||0)*step;
  // The sills keep the original gentle step, so the side harnesses stay clear.
  const late=p.rows===2?Math.max(0,(u-.82)/.18):0,edge=Math.min(1,sill*4);
  const stepZ=(1-edge)*(p.stepRise??.095)*step*step+edge*.095*late*late;
- return [x,y*end,p.height+p.rise*crest+.13*kick*kick+stepZ+.044*sill*sill+hump+extra];
+ // Between wheelhouse tubs the covering stops at the tub's inner wall.
+ let side=y*end;
+ for(const [x0,x1,limit] of p.wells||[]){
+  const inside=Math.min(1,Math.max(0,Math.min(x-x0,x1-x)/.05));
+  if(inside>0&&Math.abs(side)>limit)side=Math.sign(side)*(Math.abs(side)-(Math.abs(side)-limit)*inside);
+ }
+ return [x,side,p.height+p.rise*crest+.13*kick*kick+stepZ+.044*sill*sill+hump+extra];
 }
 function clothFacet(r,points,color){
  const a=points[0],u=points[1].map((v,i)=>v-a[i]),v=points[2].map((n,i)=>n-a[i]);

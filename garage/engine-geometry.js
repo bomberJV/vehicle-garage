@@ -3,6 +3,8 @@ import {drawG500Gearbox} from './g500-propeller-shafts.js';
 import {sharedOilKeys,drawG500EngineOilPart} from './g500-oil-circuits.js';
 import {drawG500ElectronicShared} from './g500-electronic-network.js';
 import {drawRoadBrakeMaster} from './road-service-systems.js';
+import {battery as serviceBattery} from './road-service-geometry.js';
+import {roadSystems} from './road-service-data.js';
 import {drawG500BrakeHydraulics} from './g500-brake-hydraulics.js';
 import {engineShapes as tools,tone} from './engine-shapes.js';
 import {m54InstalledPoint,m54InstalledHeight,m54EngineX} from './bmw-m54-installation.js';
@@ -24,7 +26,7 @@ export const ENGINE_LAYOUTS={
  bmw325ci:{layout:'inline6',count:6,banks:1,cams:2,valves:4,plugs:1,length:.98,orientation:'longitudinal',wheelbase:2.725,base:.53},
  bmw328i:{layout:'inline6',count:6,banks:1,cams:2,valves:4,plugs:1,length:.98,orientation:'longitudinal',wheelbase:2.725,base:.53},
  c63:{layout:'v8',count:8,banks:2,cams:4,valves:4,plugs:1,length:.86,orientation:'longitudinal',wheelbase:2.76,base:.51},
- hrv:{layout:'inline4',count:4,banks:1,cams:2,valves:4,plugs:1,length:.66,orientation:'transverse',wheelbase:2.654,base:.52},
+ hrv:{layout:'inline4',count:4,banks:1,cams:2,valves:4,plugs:1,length:.66,orientation:'transverse',wheelbase:2.654,base:.52,center:-1.46},
  // 4.36 in bore. The block length gives the 460's 4.90 in bore spacing; the
  // 45° cylinder axes give the 90° V. Height and fore-aft station are estimated.
  f350:{layout:'v8',count:8,banks:2,cams:1,valves:2,plugs:1,length:F350_ENGINE.length,orientation:'longitudinal',wheelbase:3.3782,base:F350_ENGINE.base,center:F350_ENGINE.center,bore:.0554,wall:.006,slope:1,pushrod:true},
@@ -46,7 +48,7 @@ const OFFSETS={
 const VEHICLE_OFFSETS={f350:{camshafts:[-.62,0,.12],'timing-drive':[-.40,0,.30]}};
 export function enginePartOffset(id,vehicle='g500'){
  const key=id.replace(/^powertrain\./,''),p=VEHICLE_OFFSETS[vehicle]?.[key]||OFFSETS[key]||[0,0,.35];
- return ENGINE_LAYOUTS[vehicle]?.orientation==='transverse'?[ -p[1],p[0],p[2] ]:[...p];
+ return vehicle==='hrv'?[p[1],-p[0],p[2]]:ENGINE_LAYOUTS[vehicle]?.orientation==='transverse'?[ -p[1],p[0],p[2] ]:[...p];
 }
 export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail=false,g500ServiceOwnsFlow=false}={}){
  if(!detail)return; // Hidden under the closed hood; avoid a proxy piercing the exterior.
@@ -57,7 +59,14 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  // The M156 section drawing exaggerates the air boxes and stacked valve gear.
  // Fit its upper half beneath the W204 bonnet, keeping the crank/sump datum.
  const fitHeight=z=>id==='c63'&&z>base?base+(z-base)*.74:z;
- const world=m54?m54InstalledPoint:([x,y,z])=>[cx+(trans?-y:x),trans?x:y,fitHeight(base+z)],t=tools(r,world);
+ // Honda turns its transverse engine the other way: the transaxle sits on the
+ // driver's (left) side, the intake manifold faces the radiator and the
+ // exhaust faces the firewall. The K20 section is also compacted to its real
+ // ~0.7 m height about the crank line.
+ // Its crank line sits 40 mm above the bay datum so the block and sump clear
+ // the half-shafts; the radiator and bay fittings keep the datum.
+ const honda=id==='hrv',engineZ=z=>honda?base+.04+z*.80:fitHeight(base+z);
+ const world=m54?m54InstalledPoint:([x,y,z])=>[cx+(trans?(honda?y:-y):x),trans?(honda?-x:x):y,engineZ(z)],t=tools(r,world);
  const crankRise=id==='g500'?m113CrankZ-base:0;
  const rotating=id==='g500'?tools(r,([x,y,z])=>world([x,y,z+crankRise])):t;
  // Bay fixtures use vehicle coordinates. Apply the same fitted height datum
@@ -87,7 +96,7 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  });
  tag('crankshaft',()=>{
   if(id==='g500'){drawM113Group(r,rotating,'crankshaft');return;}
-  cyl([-L/2-.08,0,0],[L/2+.07,0,0],.024,METAL,12);
+  cyl([-L/2-.08,0,0],[L/2+(honda?.01:.07),0,0],.024,METAL,12);
   for(let i=0;i<rows;i++){const x=xs[i],sign=i%2?1:-1;cyl([x-.035,sign*.037,0],[x+.035,sign*.037,0],.027,METAL,10);for(const xx of [x-.038,x+.038])cyl([xx,0,0],[xx,sign*.037,0],.047,CAST,10);}
  });
  tag('main-bearings',()=>{for(let i=0;i<=rows;i++)r.instance('journal-'+i,()=>{const x=id==='g500'?-.212+i*.106:-L/2+.07+i*(L-.14)/rows;rotating.tube([x-.014,0,0],[x+.014,0,0],.037,.025,GOLD,id==='g500'?10:12);rotating.box(x-.018,-.05,-.06,x+.018,.05,-.032,CAST);});});
@@ -132,22 +141,29 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
   if(!oilOwner)for(const key of sharedOilKeys)tag(key,()=>drawG500EngineOilPart(r,key));
   g500FluidAccess((key,fn)=>{if(key!=='oil-filter')tag(key,fn);},t);
  }else{
-  if(!ford)tag('sump',()=>{box(-L/2+.06,-.17,-.31,L/2-.05,.17,-.14,CAST);box(-L/2+.04,-.21,-.15,L/2-.03,.21,-.13,METAL);for(const x of [-.2,0,.2])box(x-.008,-.15,-.315,x+.008,.15,-.30,tone(CAST,.8));});
+  if(!ford)tag('sump',()=>{const [y0,y1]=honda?[-.20,-.04]:[-.17,.17];box(-L/2+.06,y0,-.31,L/2-.05,y1,-.14,CAST);box(-L/2+.04,y0-(honda?.01:.04),-.15,L/2-.03,y1+(honda?.02:.04),-.13,METAL);for(const x of [-.2,0,.2])box(x-.008,y0+.02,-.315,x+.008,y1-.02,-.30,tone(CAST,.8));});
   tag('oil-pump',()=>{cyl([-L/2-.015,0,-.085],[-L/2+.07,0,-.085],.065,CAST,12);tube([-L/2-.02,0,-.085],[-L/2-.014,0,-.085],.058,.025,METAL,12);});
-  if(!ford)tag('oil-pickup',()=>{route([[-L/2+.06,0,-.10],[-.02,0,-.19],[.08,0,-.26]],.015,OIL,8);cyl([.08,0,-.28],[.08,0,-.255],.047,CAST,12);for(const yy of [-.025,0,.025])box(.045,yy-.002,-.281,.115,yy+.002,-.278,METAL);});
-  if(!ford)tag('oil-filter',()=>{cyl([-.24,-.30,.10],[-.24,-.30,.29],.054,CAST,14);tube([-.24,-.30,.29],[-.24,-.30,.305],.057,.043,BLACK,12);for(let i=0;i<4;i++)box(-.28+i*.023,-.30-.047,.305,-.276+i*.023,-.30+.047,.31,BLACK);route([[-.24,-.30,.12],[-.24,-.20,.06]],.017,METAL);});
+  if(!ford)tag('oil-pickup',()=>{const py=honda?-.12:0;route([[-L/2+.06,py,-.10],[-.02,py,-.19],[.08,py,-.26]],.015,OIL,8);cyl([.08,py,-.28],[.08,py,-.255],.047,CAST,12);for(const yy of [-.025,0,.025])box(.045,py+yy-.002,-.281,.115,py+yy+.002,-.278,METAL);});
+  if(!ford)tag('oil-filter',()=>{const fx=honda?-.20:-.24,dz=honda?-.12:0;cyl([fx,-.30,.10+dz],[fx,-.30,.29+dz],.054,CAST,14);tube([fx,-.30,.29+dz],[fx,-.30,.305+dz],.057,.043,BLACK,12);for(let i=0;i<4;i++)box(fx-.04+i*.023,-.30-.047,.305+dz,fx-.036+i*.023,-.30+.047,.31+dz,BLACK);route([[fx,-.30,.12+dz],[fx,-.20,.06+dz]],.017,METAL);});
  }
- if(id!=='g500'&&!m54)tag('intake',()=>{if(cfg.banks===2){box(-L/2+.06,-.11,.51,L/2-.02,.11,.61,id==='c63'?'#a5adb0':DARK);for(const {x,side}of cells)route([[x,0,.55],[x,side*.12,.53],[x,side*.29,.40]],.031,id==='c63'?METAL:BLACK,10);}else{box(-L/2+.03,-.33,.30,L/2-.04,-.22,.43,BLACK);for(const x of xs)route([[x,-.28,.35],[x,-.19,.44],[x,-.14,.36]],.026,BLACK,10);}});
- const intakeY=cfg.banks===2?0:-.27,intakeZ=cfg.banks===2?.56:.37,throttleX=-L/2-.08;
- if(id!=='g500'&&!m54)tag('throttle',()=>{tube([throttleX-.02,intakeY,intakeZ],[throttleX+.085,intakeY,intakeZ],.062,.048,METAL,14);box(throttleX+.005,intakeY+.055,intakeZ-.035,throttleX+.085,intakeY+.10,intakeZ+.035,BLACK);cyl([throttleX+.03,intakeY-.045,intakeZ],[throttleX+.03,intakeY+.045,intakeZ],.004,GOLD,6);});
+ if(id!=='g500'&&!m54)tag('intake',()=>{if(cfg.banks===2){box(-L/2+.06,-.11,.51,L/2-.02,.11,.61,id==='c63'?'#a5adb0':DARK);for(const {x,side}of cells)route([[x,0,.55],[x,side*.12,.53],[x,side*.29,.40]],.031,id==='c63'?METAL:BLACK,10);}else{box(honda?-L/2+.06:-L/2+.03,-.33,.30,honda?L/2-.002:L/2-.04,-.22,.43,BLACK);for(const x of xs)route([[x,-.28,.35],[x,-.19,.44],[x,-.14,.36]],.026,BLACK,10);}});
+ const intakeY=cfg.banks===2?0:-.27,intakeZ=cfg.banks===2?.56:.37,throttleX=honda?L/2+.025:-L/2-.08;
+ if(id!=='g500'&&!m54)tag('throttle',()=>{tube([throttleX-.02,intakeY,intakeZ],[throttleX+.085,intakeY,intakeZ],.062,.048,METAL,14);box(throttleX+.005,intakeY+(honda?-.10:.055),intakeZ-.035,throttleX+.085,intakeY+(honda?-.055:.10),intakeZ+.035,BLACK);cyl([throttleX+.03,intakeY-.045,intakeZ],[throttleX+.03,intakeY+.045,intakeZ],.004,GOLD,6);});
  if(m54){
   if(!fuelSystemOwnsRail){
    tag('fuel-rail',()=>drawM54FuelRail(r));
    tag('injectors',()=>drawM54Injectors(r));
   }
  }else{
+ if(honda){
+  // The rail sits under the runner arch, ahead of the head; the feed enters
+  // at its timing-end.
+  tag('fuel-rail',()=>r.instance('bank-0',()=>{cyl([-L/2+.03,-.172,.335],[L/2-.02,-.172,.335],.012,METAL,10);}));
+  tag('injectors',()=>{for(const {x,side,index}of cells)r.instance(side+'-'+index,()=>{cyl([x,-.172,.322],[x,-.150,.290],.010,DARK,8);cyl([x,-.168,.316],[x,-.162,.307],.014,'#416454',8);});});
+ }else{
  tag('fuel-rail',()=>{for(const s of banks)r.instance('bank-'+s,()=>{const yy=cfg.banks===2?s*.29:-.14;cyl([-L/2+.03,yy,.435],[L/2-.02,yy,.435],.012,METAL,10);if(ford)route([[-L/2+.03,yy,.435],[-L/2-.02,yy,.425]],.007,RUBBER,6);else route([[L/2-.02,yy,.435],[L/2+.06,yy,.35]],.007,RUBBER,6);});});
  tag('injectors',()=>{for(const {x,side,index}of cells)r.instance(side+'-'+index,()=>{const yy=cfg.banks===2?side*.29:-.14;cyl([x,yy,.43],[x,yy*.95,.355],.012,DARK,8);box(x-.012,yy-.016,.41,x+.014,yy+.016,.44,'#416454');});});
+ }
  }
  if(id==='g500')g500Ignition(r,tag,t,cells);
  else if(!ford){
@@ -155,7 +171,17 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  tag('spark-plugs',()=>{for(const {x,side,index}of cells)for(let p=0;p<cfg.plugs;p++)r.instance(side+'-'+index+'-'+p,()=>{const yy=cfg.banks===2?side*.41:0,dx=cfg.plugs===2?(p? .027:-.027):0;cyl([x+dx,yy,headZ-.04],[x+dx,yy,headZ+.012],.007,'#d5d8cb',8);cyl([x+dx,yy,headZ-.058],[x+dx,yy,headZ-.04],.005,GOLD,6);});});
  }
  if(id==='g500'&&!g500ServiceOwnsFlow)tag('exhaust-manifold',()=>drawG500ExhaustManifold(r));
- if(id!=='g500'&&!m54&&!ford)tag('exhaust-manifold',()=>{for(const s of (cfg.banks===2?[-1,1]:[1])){const yy=cfg.banks===2?s*.36:.20;for(const x of xs)route([[x,yy,.34],[x,yy+s*.12,.23],[L/2+.08,yy+s*.10,.10]],.023,COPPER,8);route([[L/2+.08,yy+s*.10,.10],[L/2+.34,yy+s*.1,-.04]],.038,tone(COPPER,.75),10);}});
+ if(honda)tag('exhaust-manifold',()=>{
+  // Four short runners merge behind the head into a close-coupled catalyst;
+  // the down-pipe drops toward the tunnel ahead of the toe board.
+  const col=[0,.275,.25];
+  for(const x of xs)route([[x,.162,.34],[x,.20,.33],[x*.45,.255,.28],col],.021,COPPER,8);
+  cyl([0,.275,.27],[0,.275,.20],.050,tone(COPPER,.85),12);
+  cyl([0,.30,.19],[0,.30,-.07],.066,tone(COPPER,.7),14);
+  for(const z of [.17,-.05])tube([0,.30,z],[0,.30,z+.012],.073,.066,METAL,14);
+  bay.route([world([0,.30,-.07]),[cx+.32,.0,base-.18],[-.95,-.06,base-.19],[-.86,-.095,base-.19]],.026,tone(COPPER,.6),10);
+ });
+ if(!honda&&id!=='g500'&&!m54&&!ford)tag('exhaust-manifold',()=>{for(const s of (cfg.banks===2?[-1,1]:[1])){const yy=cfg.banks===2?s*.36:.20;for(const x of xs)route([[x,yy,.34],[x,yy+s*.12,.23],[L/2+.08,yy+s*.10,.10]],.023,COPPER,8);route([[L/2+.08,yy+s*.10,.10],[L/2+.34,yy+s*.1,-.04]],.038,tone(COPPER,.75),10);}});
  if(id==='bmw328i'){
   tag('disa',()=>{box(.02,-.365,.31,.18,-.31,.43,BLACK);cyl([.08,-.37,.37],[.08,-.345,.37],.035,CAST,10);});
   tag('ccv',()=>{cyl([.20,-.30,.10],[.20,-.30,.20],.045,BLACK,12);route([[.20,-.30,.20],[.27,-.20,.38],[.30,-.08,.50]],.010,RUBBER,8);route([[.20,-.30,.11],[.23,-.25,-.20]],.009,RUBBER,8);});
@@ -172,12 +198,12 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  bayTag('fan',({tube,poly,cyl})=>{const x=radX+.09,z=radZ+.07;tube([x-.012,0,z],[x+.012,0,z],fanR,fanR-.02,DARK,20);cyl([x-.018,0,z],[x+.025,0,z],.051,BLACK,12);for(let i=0;i<7;i++){const a=i*Math.PI*2/7,pt=(rad,t,xx)=>[xx,Math.cos(t)*rad,z+Math.sin(t)*rad];poly([pt(.05,a,x+.016),pt(fanR-.025,a+.19,x+.004),pt(fanR-.028,a+.38,x-.004),pt(.066,a+.48,x+.020)],'#4b565c');}});
  tag('water-pump',()=>{cyl([-L/2-.13,0,.21],[-L/2-.045,0,.21],.067,CAST,12);tube([-L/2-.14,0,.21],[-L/2-.13,0,.21],.081,.026,DARK,16);});
  tag('thermostat',()=>{box(-L/2-.11,-.14,.12,-L/2+.01,-.045,.23,CAST);cyl([-L/2-.05,-.16,.18],[-L/2-.05,-.12,.18],.030,DARK,10);});
- const hoseAnchor=([x,y,z])=>[cx+(trans?-y:x),trans?x:y,base+z];
- const upperEngine=hoseAnchor([-L/2-.04,-.12,.24]),lowerEngine=hoseAnchor([-L/2-.09,.03,.10]);
- bayTag('upper-hose',({route,tube})=>{route([[radX+.02,-.48,base+radTop-.07],[radX+.20,-.48,base+radTop-.01],[upperEngine[0]-.09,upperEngine[1]-.07,upperEngine[2]+.10],upperEngine],.025,RUBBER,8);});
- bayTag('lower-hose',({route})=>{route([[radX+.025,.47,base+.015],[radX+.17,.47,base-.015],[lowerEngine[0]-.10,lowerEngine[1]+.08,lowerEngine[2]-.10],lowerEngine],.026,RUBBER,8);});
+ const hoseAnchor=honda?world:([x,y,z])=>[cx+(trans?-y:x),trans?x:y,base+z];
+ const upperEngine=hoseAnchor([-L/2-.04,-.12,.24]),lowerEngine=hoseAnchor([honda?-L/2-.11:-L/2-.09,.03,.10]);
+ bayTag('upper-hose',({route,tube})=>{const hy=honda?.42:-.48;route([[radX+.02,hy,base+radTop-.07],[radX+.20,hy,base+radTop-.01],[upperEngine[0]-.09,upperEngine[1]+(honda?.05:-.07),upperEngine[2]+.10],upperEngine],.025,RUBBER,8);});
+ bayTag('lower-hose',({route})=>{const ly=honda?.44:.47;route([[radX+.025,ly,base+.015],[radX+.17,ly,base-.015],[lowerEngine[0]-.10,lowerEngine[1]+(honda?0:.08),lowerEngine[2]-.10],lowerEngine],.026,RUBBER,8);});
  }
- if(id!=='g500'&&!m54)bayTag('coolant-reservoir',({box,cyl,route})=>{const x=front+.32,y=.61,z=base+.28;box(x-.09,y-.065,z,x+.09,y+.065,z+.22,'#aebdb5');box(x-.09,y-.066,z+.045,x+.09,y-.063,z+.11,COOL);cyl([x,y,z+.22],[x,y,z+.25],.036,BLACK,12);route([[x-.05,y,z+.02],[radX+.16,.48,base+.32]],.008,RUBBER,6);});
+ if(id!=='g500'&&!m54)bayTag('coolant-reservoir',({box,cyl,route})=>{const x=honda?-1.79:front+.32,y=honda?.53:.61,z=base+(honda?.20:.28);box(x-.09,y-.065,z,x+.09,y+.065,z+.22,'#aebdb5');box(x-.09,y-.066,z+.045,x+.09,y-.063,z+.11,COOL);cyl([x,y,z+.22],[x,y,z+.25],.036,BLACK,12);route([[x-.05,y,z+.02],[radX+.16,.48,base+.32]],.008,RUBBER,6);});
  if(id==='g500'&&!g500ServiceOwnsFlow)tag('alternator',()=>drawG500ElectronicShared(r,'alternator'));
  if(id!=='g500')tag('alternator',()=>{const x=-L/2-.01,y=-.28,z=.09;cyl([x-.10,y,z],[x+.02,y,z],.073,CAST,14);for(let i=0;i<5;i++)tube([x-.09+i*.02,y,z],[x-.085+i*.02,y,z],.075,.058,DARK,12);tube([x-.125,y,z],[x-.105,y,z],.052,.021,BLACK,12);box(x+.02,y-.04,z-.03,x+.055,y+.04,z+.03,BLACK);});
  if(id==='g500'&&!g500ServiceOwnsFlow)tag('ac-compressor',()=>drawG500AcCompressor(r));
@@ -185,8 +211,8 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  tag('tensioner',()=>{box(-L/2-.095,.11,-.02,-L/2-.04,.20,.10,CAST);tube([-L/2-.136,.17,.09],[-L/2-.113,.17,.09],.047,.015,DARK,12);});
  tag('belt',()=>{const x=-L/2-.148,points=[[x,0,crankRise-.07],[x,-.29,.04],[x,-.28,.145],[x,0,.28],[x,.22,.12],[x,.31,-.04],[x,0,crankRise-.07]];for(let i=1;i<points.length;i++){const a=points[i-1],b=points[i],v=b.map((q,j)=>q-a[j]),len=Math.hypot(v[1],v[2]),n=[0,-v[2]/len*.006,v[1]/len*.006];poly([a.map((q,j)=>q+n[j]),b.map((q,j)=>q+n[j]),b.map((q,j)=>q-n[j]),a.map((q,j)=>q-n[j])],BLACK);}rotating.tube([x-.004,0,0],[x+.008,0,0],.071,.033,DARK,14);});
  if(id==='g500'&&!g500ServiceOwnsFlow)tag('starter',()=>drawG500ElectronicShared(r,'starter'));
- if(id!=='g500'&&!ford)tag('starter',()=>{cyl([L/2+.01,.21,-.08],[L/2+.19,.21,-.08],.045,CAST,12);cyl([L/2+.04,.25,-.025],[L/2+.15,.25,-.025],.022,BLACK,10);});
- tag('transmission',()=>{if(id==='g500'){drawG500Gearbox(r);return;}if(ford){drawE4OD(r);return;}if(m54){drawE46Gearbox(r);return;}const a=[L/2+.03,0,-.035],b=[L/2+.56,0,-.06];if(trans){box(L/2+.01,-.17,-.20,L/2+.36,.18,.15,CAST);for(let x=L/2+.03;x<L/2+.34;x+=.065)box(x,-.185,-.16,x+.014,.185,-.13,METAL);}else{cyl(a,[L/2+.15,0,-.035],.18,CAST,14);cyl([L/2+.15,0,-.035],b,.105,CAST,12);for(let x=L/2+.22;x<L/2+.53;x+=.08)tube([x,0,-.06],[x+.012,0,-.06],.115,.10,DARK,12);}});
+ if(id!=='g500'&&!ford)tag('starter',()=>{const end=honda?.15:.19,sz=honda?.04:0;cyl([L/2+(honda?.03:.01),.21,-.08+sz],[L/2+end,.21,-.08+sz],.045,CAST,12);cyl([L/2+.04,.25,-.025+sz],[L/2+.15,.25,-.025+sz],.022,BLACK,10);});
+ tag('transmission',()=>{if(id==='g500'){drawG500Gearbox(r);return;}if(ford){drawE4OD(r);return;}if(m54){drawE46Gearbox(r);return;}if(honda){cyl([L/2+.02,0,0],[L/2+.06,0,0],.145,CAST,18);cyl([L/2+.06,0,0],[L/2+.10,0,0],.12,CAST,18);for(const a of [0,1,2,3,4,5]){const q=a*Math.PI/3;cyl([L/2+.021,.14*Math.cos(q),.14*Math.sin(q)],[L/2+.035,.14*Math.cos(q),.14*Math.sin(q)],.010,METAL,8);}return;}const a=[L/2+.03,0,-.035],b=[L/2+.56,0,-.06];if(trans){box(L/2+.01,-.17,-.20,L/2+.36,.18,.15,CAST);for(let x=L/2+.03;x<L/2+.34;x+=.065)box(x,-.185,-.16,x+.014,.185,-.13,METAL);}else{cyl(a,[L/2+.15,0,-.035],.18,CAST,14);cyl([L/2+.15,0,-.035],b,.105,CAST,12);for(let x=L/2+.22;x<L/2+.53;x+=.08)tube([x,0,-.06],[x+.012,0,-.06],.115,.10,DARK,12);}});
  tag('engine-mounts',()=>{for(const side of [-1,1]){
   if(id==='g500'){
    // Each rubber mount stands on a bracket on the inner face of the frame rail,
@@ -198,8 +224,9 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
    route([[.02,side*.185,crankRise+.015],[.03,side*.385,.10]],.025,CAST,8);
    continue;
   }
-  cyl([.03,side*.32,-.19],[.03,side*.32,-.10],.046,BLACK,10);box(-.02,side*.32-.055,-.21,.08,side*.32+.055,-.19,METAL);
-  route([[.02,side*.20,-.05],[.03,side*.32,-.11]],.025,CAST,8);}});
+  const mx=honda?-.15:0;
+  cyl([mx+.03,side*.32,-.19],[mx+.03,side*.32,-.10],.046,BLACK,10);box(mx-.02,side*.32-.055,-.21,mx+.08,side*.32+.055,-.19,METAL);
+  route([[mx+.02,side*.20,-.05],[mx+.03,side*.32,-.11]],.025,CAST,8);}});
  const airX=front-.16,airY=-.61,airZ=base+.22;
  if(id==='g500'){if(!g500ServiceOwnsFlow)drawG500InductionCircuit(r,'powertrain');}
  else if(ford){}
@@ -207,16 +234,25 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
   tag('airbox',()=>{for(const side of [-1,1]){const y=side*.34,z=headZ+.25;box(-L/2+.03,y-.135,z,L/2+.01,y+.135,z+.12,BLACK);for(let x=-L/2+.06;x<L/2;x+=.065)box(x,y-.11,z+.12,x+.012,y+.11,z+.127,DARK);}});
   tag('maf',()=>{const xx=-L/2-.16;tube([xx-.045,0,intakeZ],[xx+.045,0,intakeZ],.052,.040,DARK,12);box(xx-.025,-.025,intakeZ+.049,xx+.025,.025,intakeZ+.074,BLACK);});
   tag('intake-duct',()=>{for(const side of [-1,1]){const y=side*.34,z=headZ+.30;route([[-L/2-.37,side*.56,z-.14],[-L/2-.15,side*.48,z-.08],[-L/2+.04,y,z]],.061,RUBBER,10);for(let n=0;n<5;n++){const xx=-L/2-.24+n*.025;tube([xx,side*.50,z-.10],[xx+.008,side*.50,z-.10],.065,.058,DARK,10);}const outlet=-L/2-.12;route([[outlet,y,z],[outlet,side*.13,z-.04],[outlet,0,intakeZ],[throttleX+.02,0,intakeZ]],.042,RUBBER,10);}});
+ }else if(honda){
+  // Airbox over the CVT, inboard of the left strut, behind the battery. The
+  // duct turns into the throttle body at the transmission end of the plenum.
+  const throttlePoint=world([throttleX+.085,intakeY,intakeZ]);
+  bayTag('airbox',({box,route})=>{box(-1.60,-.70,.74,-1.425,-.44,.90,BLACK);for(let x=-1.585;x<-1.43;x+=.04)box(x,-.69,.90,x+.012,-.45,.912,DARK);route([[-1.60,-.64,.875],[-1.70,-.64,.89],[-1.85,-.64,.89]],.033,DARK,10);});
+  bayTag('maf',({tube,box})=>{tube([-1.665,-.474,.856],[-1.615,-.474,.856],.050,.041,DARK,12);box(-1.655,-.50,.904,-1.625,-.45,.926,BLACK);});
+  bayTag('intake-duct',({route,tube})=>{route([[-1.56,-.44,.85],[-1.615,-.474,.856],[-1.70,-.474,.856],throttlePoint.map((v,i)=>i===1?-.474:v),throttlePoint],.040,RUBBER,10);for(let i=0;i<4;i++){const x=-1.70+i*.014;tube([x,-.474,.856],[x+.006,-.474,.856],.045,.040,DARK,10);}});
  }else if(!m54){
   bayTag('airbox',({box})=>{box(airX-.18,airY-.12,airZ,airX+.18,airY+.12,airZ+.18,BLACK);for(let x=airX-.15;x<airX+.17;x+=.045)box(x,airY-.12,airZ+.18,x+.013,airY+.12,airZ+.192,DARK);box(airX-.20,airY-.10,airZ+.06,airX-.18,airY+.10,airZ+.11,DARK);});
   const throttlePoint=world([throttleX,intakeY,intakeZ]),mafPoint=[airX+.24,airY,airZ+.11];
   bayTag('maf',({tube,box})=>{tube([mafPoint[0]-.055,mafPoint[1],mafPoint[2]],[mafPoint[0]+.055,mafPoint[1],mafPoint[2]],.052,.041,DARK,12);box(mafPoint[0]-.025,mafPoint[1]-.025,mafPoint[2]+.048,mafPoint[0]+.025,mafPoint[1]+.025,mafPoint[2]+.075,BLACK);});
   bayTag('intake-duct',({route,tube})=>{const turn=[mafPoint[0]+.11,mafPoint[1],mafPoint[2]],bend=[throttlePoint[0]-.11,throttlePoint[1]-.12,throttlePoint[2]];route([[airX+.18,airY,airZ+.11],mafPoint,turn,bend,throttlePoint],.042,RUBBER,10);for(let i=0;i<5;i++){const x=mafPoint[0]+.065+i*.017;tube([x,airY,airZ+.11],[x+.007,airY,airZ+.11],.047,.042,DARK,10);}});
  }
- if(!ford)bayTag('battery',({box,cyl,route})=>{const g=id==='g500',x=front+.64-(g?.025:0),y=g?-.68:.64,z=base+.18+(g?.050:0);if(id==='g500'||id.startsWith('bmw')){box(x-.045,y-.045,z,x+.045,y+.045,z+.07,BLACK);box(x-.050,y-.050,z+.07,x+.050,y+.050,z+.095,'#a45045');cyl([x,y,z+.095],[x,y,z+.12],.014,GOLD,10);if(id!=='g500')route([[x,y,z+.02],[x+.12,y,z-.10],[x+.12,y*.70,z-.15]],.009,'#7a534a',8);}else{box(x-.14,y-.10,z,x+.14,y+.10,z+.19,BLACK);box(x-.15,y-.105,z+.19,x+.15,y+.105,z+.22,DARK);for(const [yy,c]of [[y-.06,'#b55c52'],[y+.06,METAL]])cyl([x+.09,yy,z+.22],[x+.09,yy,z+.245],.012,c,8);route([[x+.09,y-.06,z+.24],[x+.25,y-.06,z+.24],[x+.25,.32,z+.09]],.007,'#a05d4f',6);}});
+ // One physical HR-V battery serves the engine and electrical menus.
+ if(honda)tag('battery',()=>serviceBattery(r,roadSystems.hrv.battery));
+ else if(!ford)bayTag('battery',({box,cyl,route})=>{const g=id==='g500',x=front+.64-(g?.025:0),y=g?-.68:.64,z=base+.18+(g?.050:0);if(id==='g500'||id.startsWith('bmw')){box(x-.045,y-.045,z,x+.045,y+.045,z+.07,BLACK);box(x-.050,y-.050,z+.07,x+.050,y+.050,z+.095,'#a45045');cyl([x,y,z+.095],[x,y,z+.12],.014,GOLD,10);if(id!=='g500')route([[x,y,z+.02],[x+.12,y,z-.10],[x+.12,y*.70,z-.15]],.009,'#7a534a',8);}else{box(x-.14,y-.10,z,x+.14,y+.10,z+.19,BLACK);box(x-.15,y-.105,z+.19,x+.15,y+.105,z+.22,DARK);for(const [yy,c]of [[y-.06,'#b55c52'],[y+.06,METAL]])cyl([x+.09,yy,z+.22],[x+.09,yy,z+.245],.012,c,8);route([[x+.09,y-.06,z+.24],[x+.25,y-.06,z+.24],[x+.25,.32,z+.09]],.007,'#a05d4f',6);}});
  if(id==='g500'){if(!g500ServiceOwnsFlow)tag('brake-reservoir',()=>drawG500BrakeHydraulics(r));}
  else if(['bmw325ci','c63','hrv','f350'].includes(id))tag('brake-reservoir',()=>drawRoadBrakeMaster(r,id));
  else bayTag('brake-reservoir',({cyl,box})=>{const x=front+.78,y=-.62,z=base+.43;cyl([x-.045,y,z-.04],[x+.04,y,z-.04],.097,BLACK,16);box(x-.05,y-.055,z,x+.09,y+.055,z+.11,'#c0c9b9');cyl([x+.04,y,z+.11],[x+.04,y,z+.13],.027,BLACK,10);});
  if(id==='g500'&&!g500ServiceOwnsFlow)tag('ecu',()=>drawG500ElectronicShared(r,'ecu'));
- if(id!=='g500'&&!ford)bayTag('ecu',({box,route})=>{const x=front+.77,y=m54?-.47:.39,z=base+.45;box(x-.11,y-.075,z,x+.11,y+.075,z+.07,BLACK);for(let yy=y-.055;yy<y+.07;yy+=.021)box(x-.10,yy,z+.07,x+.10,yy+.007,z+.08,DARK);route([[x-.1,y,z+.025],[x-.18,y,z-.04],[front+.13,m54?-.20:.20,base+.43]],.012,RUBBER,6);});
+ if(id!=='g500'&&!ford)bayTag('ecu',({box,route})=>{const x=honda?-1.10:front+.77,y=m54?-.47:honda?.56:.39,z=honda?.80:base+.45;box(x-.11,y-.075,z,x+.11,y+.075,z+.07,BLACK);for(let yy=y-.055;yy<y+.07;yy+=.021)box(x-.10,yy,z+.07,x+.10,yy+.007,z+.08,DARK);route(honda?[[x-.1,y,z+.025],[-1.20,.46,.90],[-1.285,.30,.95]]:[[x-.1,y,z+.025],[x-.18,y,z-.04],[front+.13,m54?-.20:.20,base+.43]],.012,RUBBER,6);});
 }

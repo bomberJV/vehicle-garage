@@ -56,6 +56,32 @@ function shaft(r,axle,height,solid=false,hubY=.72){
  }
 }
 function gearbox(r,c,axis,rad=.18,len=.55){housing(r,c,axis,rad,len);}
+// HR-V transaxle (Honda layout): the CVT bolts to the left end of the engine.
+// The crank line is x -1.46, z .56 (see engine-geometry.js). The converter
+// sits inside the engine's bellhousing; the CVT case continues outboard ahead
+// of the strut; the final drive sits below and behind, at the axle line, so the
+// right half-shaft passes behind the oil pan.
+const hrvCrank=[-1.46,0,.56],hrvAxle=[-1.327,0,.37];
+function hrvCvtCase(r){
+ // The outboard cover stops short of the strut's lower mount.
+ const c=[-1.52,-.488,.58];
+ turn(r,c,y,[[-.056,0],[-.056,.074],[-.046,.096],[-.02,.105],[.04,.105],[.056,.098],[.056,0]],steel,{n:18});
+ for(const t of [-.03,.01])sleeve(r,c,y,t,t+.008,.110,.08,metal,18);
+ // Pulley-shaft bosses on the end cover.
+ turn(r,[c[0]-.035,-.544,c[2]+.02],y,[[-.012,0],[-.012,.045],[.0,.05],[.0,0]],dark,{n:14});
+ turn(r,[c[0]+.040,-.544,c[2]-.03],y,[[-.012,0],[-.012,.035],[.0,.04],[.0,0]],dark,{n:14});
+}
+function hrvConverter(r){turn(r,[hrvCrank[0],-.39,hrvCrank[2]],y,[[-.028,0],[-.028,.07],[-.012,.09],[.012,.09],[.028,.075],[.028,0]],steel,{n:16});}
+function hrvFinalDrive(r){
+ const c=[hrvAxle[0],-.30,hrvAxle[2]];
+ turn(r,c,y,[[-.038,0],[-.038,.045],[-.02,.065],[.02,.065],[.038,.05],[.038,0]],dark,{n:16});
+}
+function hrvShafts(r){
+ const c=hrvAxle;
+ cyl(r,c,y,-.345,-.72,.025,metal,15);
+ cyl(r,c,y,-.255,.72,.025,metal,15);
+ for(const [s,p] of [[-1,.62],[1,.62],[1,.17]]){const ring=[];for(let i=0;i<4;i++){const d=p+i*.016;ring.push([s*d,.045+i*.003],[s*(d+.008),.052+i*.003]);}turn(r,c,y,ring,dark,{n:14});}
+}
 const g500FrontProp=g500AxleShaftStudy(true),g500RearProp=g500AxleShaftStudy(false);
 const layouts={
  g500:{wheelbase:2.85,box:'Five-speed automatic',desc:'The longitudinal five-speed drives a separate two-speed VG150E. A center differential feeds both solid axles in normal driving. Selecting low range and locking the center differential operate separate mechanisms.'},
@@ -76,11 +102,11 @@ function inputComponent(id,spec,draw){
 function sedan(id){
  const spec=layouts[id],ax=spec.wheelbase/2,front=-ax,z0=.39;
  const transverse=id==='hrv',g=id==='g500',c=transverse?[front+.16,.39,.50]:[front+.82,0,.49];
- const arr=[inputComponent(id,spec,g?drawG500Gearbox:r=>gearbox(r,c,transverse?y:x,.174,transverse?.40:.58))];
+ const arr=[inputComponent(id,spec,g?drawG500Gearbox:transverse?hrvCvtCase:r=>gearbox(r,c,x,.174,.58))];
  if(transverse){
-  arr.push(['torque-converter','Torque converter','Engine torque enters the transaxle through the fluid coupling.',[-.17,-.33,.32],r=>housing(r,[front+.15,.19,.50],y,.154,.12)],
-  ['front-differential','Front differential','The final reduction turns the differential carrier. The side gears drive the front wheels.',[-.25,.40,-.13],r=>finalDrive(r,[front,0,.37],true)],
-  ['halfshafts','Front half-shafts','An inboard and outboard joint on each side allow steering and suspension motion.',[0,.24,-.31],r=>shaft(r,front,.37)]);
+  arr.push(['torque-converter','Torque converter','Engine torque enters the transaxle through the fluid coupling.',[-.17,-.33,.32],hrvConverter],
+  ['front-differential','Front differential','The final reduction turns the differential carrier. The side gears drive the front wheels.',[-.25,.40,-.13],hrvFinalDrive],
+  ['halfshafts','Front half-shafts','An inboard and outboard joint on each side allow steering and suspension motion.',[0,.24,-.31],hrvShafts]);
   if(id==='hrv')arr.push(...hrvAwdRows);
  }else {
   const tail=c[0]+.29,center=.02;

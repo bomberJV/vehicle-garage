@@ -74,7 +74,7 @@ export function compressorPiece(r,key,c=comp,s=1){
 export function drawG500AcCompressor(r){
  // Because the two assemblies share this installed envelope, the higher
  // resolution pulley grooves and bored ears live in the component study.
- turn(r,comp,x,[[-.071,0],[-.071,.059],[-.051,.068],[.045,.068],[.064,.055],[.064,0]],alloy,{n:10});
+ turn(r,comp,x,[[-.071,0],[-.071,.059],[-.051,.068],[.040,.068],[.056,.055],[.056,0]],alloy,{n:10});
  turn(r,comp,x,[[-.108,0],[-.108,.060],[-.101,.060],[-.100,.054],[-.094,.060],[-.080,.060],[-.076,.052],[-.076,0]],iron,{n:10});
  cyl(r,comp,x,-.117,-.109,.041,iron,8);
  box(r,add(comp,[.036,0,.065]),[.052,.068,.017],iron);

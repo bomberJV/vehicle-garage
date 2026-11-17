@@ -56,8 +56,9 @@ const frontMufflerEnd=s=>[.47,s*pipeY,pipeZ];
 const mainZ=.330;
 const leftIn=[.80,-.195,mainZ],rightIn=[.855,.195,mainZ];
 const tailStart=[.90,-.195,mainZ],tailEnd=[.715,-.877,.359];
-const branchEnds=s=>s>0?[frontMufflerEnd(s),[.63,.688,.456],[.733,.623,.452],[.798,.517,.410],[.852,.384,.356],rightIn]:
-  [frontMufflerEnd(s),[.555,-.689,.457],[.632,-.656,.434],[.710,-.545,.395],[.772,-.386,.351],leftIn];
+// Each branch drops under its trailing arm before turning in to the shell.
+const branchEnds=s=>s>0?[frontMufflerEnd(s),[.63,.688,.456],[.70,.660,.400],[.76,.600,.362],[.80,.500,.356],[.852,.384,.356],rightIn]:
+  [frontMufflerEnd(s),[.555,-.689,.457],[.62,-.660,.400],[.68,-.600,.362],[.74,-.480,.353],[.772,-.386,.351],leftIn];
 function catalyst(r,c,axis,length,radius,cut=false){
  const h=length/2,shape=[[-h,.028],[-h+.012,.032],[-h+.040,radius],[-h+.055,radius*1.02],[h-.043,radius*1.02],[h-.017,.036],[h,.028]];
  turn(r,c,axis,shape,can,{n:cut?22:12,...(cut?{start:Math.PI*1.46,sweep:Math.PI*1.43}:{})});
@@ -90,7 +91,7 @@ function ovalMuffler(r){
  r.polygon(rings[0],pipe,false);r.polygon(rings.at(-1),pipe,false);
 }
 function tailpipe(r){
- const path=[tailStart,[.900,-.390,.347],[.884,-.557,.363],[.859,-.651,.376],[.814,-.734,.370],tailEnd];
+ const path=[tailStart,[.900,-.390,.335],[.884,-.557,.343],[.859,-.651,.370],[.814,-.734,.370],tailEnd];
  pipeRun(r,path,.033,pipe);
  lip(r,tailEnd,difference(tailEnd,path.at(-2)),.033);
 }

@@ -73,6 +73,7 @@ export const mounts=[
   ['steering-assist.pitman','steering.linkage','the drag link hangs from the pitman arm'],
   ['suspension.rear-axle','wheels.hub','the hubs turn on the axle'],
   ['suspension.rear-axle','wheels.caliper','the caliper brackets are on the axle'],
+  ['differentials.rear','wheels.caliper','the caliper brackets bolt to the axle-tube flanges'],
   ['differentials.center','drivetrain.input-shaft','the shaft enters the transfer case'],
   ['intake.intake','powertrain.head','the manifold bolts to the heads'],
   ['exhaust.manifold-left','powertrain.head','the manifold bolts to the head'],

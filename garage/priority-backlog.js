@@ -100,15 +100,15 @@ export const additionalRequestSections=[
     work('github-project-links','P2',[],'Link the playable projects to their GitHub source',
       'The project downloads already include source and run instructions. Select the projects for GitHub, publish the intended repositories, and link each project page to its matching repository. Verify that its instructions run from a fresh checkout.',
       'Source downloads are available on the site. The repository links are still outstanding.',
-      [link('Playground projects','https://brandon-huang-studio.brainyalbatross8.chatgpt.site/curiosities/#labs')]),
+      [link('Projects','https://brandonfhuang.com/projects/#labs')]),
     work('portfolio-responsive-review','P2',[],'Check the portfolio refinements on mobile, tablet and desktop',
-      'Review the homepage, Curiosities and the six original apps at 390 px, 768 px and a wide desktop size. Check the full name, headline and captions for clipping. Follow links by keyboard and verify that the interactive opening allows normal page scrolling.',
+      'Review the homepage, the Projects page and the six original apps at 390 px, 768 px and a wide desktop size. Check the full name, headline and captions for clipping. Follow links by keyboard and verify that the interactive opening allows normal page scrolling.',
       'Check the approved design across the published pages and record any issues by page and viewport.',
-      [link('Portfolio homepage','https://brandon-huang-studio.brainyalbatross8.chatgpt.site/'),link('Curiosities','https://brandon-huang-studio.brainyalbatross8.chatgpt.site/curiosities/')]),
+      [link('Portfolio homepage','https://brandonfhuang.com/'),link('Projects','https://brandonfhuang.com/projects/')]),
     work('portfolio-public-launch','P1',[],'Prepare the portfolio for a secure public launch',
       'Review which pages, downloadable files and contact details are intended for public access. Check the proposed domain, HTTPS and visitor access, then verify the intended public pages from a signed-out browser when the launch is approved.',
       'The current portfolio uses restricted access. Public launch is a separate publishing decision.',
-      [link('Portfolio homepage','https://brandon-huang-studio.brainyalbatross8.chatgpt.site/')])
+      [link('Portfolio homepage','https://brandonfhuang.com/')])
   ]},
   {id:'next-inspection',name:'Installed geometry and inspection',items:[
     work('installed-complete','P0',all,'Keep the full model assembled in the ordinary view',

@@ -11,6 +11,8 @@ const closures={
     text:'The hatch turns on two roof hinges. The rear glass sits in a stationary opening in the hatch shell. Side stays support the open hatch and the latch meets the lower sill.'},
   c63:{name:'W204 sedan trunk lid',width:1.28,height:.53,source:references.benzLid,
     text:'The pressed outer lid and folded inner structure form a curved panel behind the fixed rear window. A central latch meets the trunk sill.'},
+  bmw328xi:{name:'E90 sedan trunk lid',width:1.30,height:.55,source:references.e90Lid,
+    text:'The lid curves from the rear window down to the tail. The inner sections of the tail lamps ride on it. The central latch meets the trunk sill.'},
   bmw325ci:{name:'E46 coupe trunk lid',width:1.27,height:.57,source:references.bmwLid,
     text:'The luggage lid curves over the rear panel. Its liner covers the lower face, with the central latch standing proud of the lining.'}
 };

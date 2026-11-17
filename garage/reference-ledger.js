@@ -1,6 +1,7 @@
 import {slReferences} from './sl550-sources.js';
 import {addedServiceGroups} from './vehicle-service.js';
-import {bodyDrawing,coupeFiling} from './factory-dimensions.js';
+import {bodyDrawing,coupeFiling,e90Specs} from './factory-dimensions.js';
+import {e90Sources} from './e90-xdrive.js';
 import {g500AxleSources} from './g500-underbody.js';
 import {e46Sources} from './e46-running-gear.js';
 import {bmwServicePlacementSources} from './bmw-fuel-system.js';
@@ -56,6 +57,14 @@ const references = {
   ],
   hrv: [
     parts('Honda · front door panel and hinges', 'https://www.hondapartsnow.com/parts-list/2026-honda-hr_v--5_door_ex_l_awd-cvt/body_air_conditioning/front_door_panels.html', 'US 2026 EX-L AWD catalog plate showing the bare front door, upper and lower hinges, door check and attachments.')
+  ],
+  bmw328xi: [
+    specs('Edmunds · 2008 328xi sedan specifications',e90Specs,'Length, width, height, wheelbase, both tracks and the 16 × 7 in wheels with 205/55R16 tires for the US 328xi sedan.'),
+    photo('NHTSA · 2006 US 325i sedan, front three-quarter','https://commons.wikimedia.org/wiki/File:2006_BMW_325i_--_NHTSA.jpg','The pre-facelift US sedan body, headlamps, kidneys, front bumper and wheels; the 328xi shares this body and its lamps.'),
+    photo('NHTSA · 2006 US 325i sedan, rear three-quarter','https://commons.wikimedia.org/wiki/File:2006_BMW_325i_--_NHTSA_02.jpg','The two-piece tail lamps, lid, plate recess and rear bumper of the pre-facelift US sedan.'),
+    drawing('BMW · N52 engine, ST501 technical training','https://archive.org/download/BMWTechnicalTrainingDocuments/ST501%20New%20Engine%20Technology%20%28Archive%201%29/04_N52%20Engine.pdf','Magnesium-aluminium crankcase, Valvetronic, double VANOS and the electric coolant pump of the N52.'),
+    drawing(e90Sources.xdrive.label,e90Sources.xdrive.url,'How the ATC 300 transfer case clamps its multi-plate clutch and drives the front axle through gears.'),
+    parts(e90Sources.brakes.label,e90Sources.brakes.url,'The ventilated discs listed for the 2008 328xi sedan.'),
   ],
   bmw325ci: [
     specs('BMW of North America · model 0334 filing',coupeFiling,'The 2003 filing lists the 325Ci separately from the SULEV and 330Ci. Row 0334 gives the front track as 57.5 inches.'),

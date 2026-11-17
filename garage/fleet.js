@@ -19,7 +19,7 @@ export const FLEET = Object.fromEntries(exhibits.map(exhibit => {
   }];
 }));
 
-export const ROAD_TYPES = {g500:'SUVs', hrv:'SUVs', f350:'Trucks', c63:'Cars', bmw325ci:'Cars'};
+export const ROAD_TYPES = {g500:'SUVs', hrv:'SUVs', f350:'Trucks', c63:'Cars', bmw325ci:'Cars', bmw328xi:'Cars'};
 
 export function vehicleDomain(id) { return FLEET[id]?.domain || 'Land'; }
 export function vehicleType(id) { return FLEET[id]?.type || ROAD_TYPES[id]; }

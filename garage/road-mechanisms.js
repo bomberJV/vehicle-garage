@@ -2,6 +2,7 @@ import {drawG500InputShaft,drawG500Gearbox,g500InputShaftStudy,g500AxleShaftStud
 import {TAU,steel,metal,dark,gold,cyl,sleeve,turn,gear,bead,part,study,x,y,z,origin} from './mechanism-shapes.js';
 import {vehicleServiceDetail} from './vehicle-service.js';
 import {e46Drivetrain,getE46RunningDetail} from './e46-running-gear.js';
+import {e90Drivetrain,e90Sources} from './e90-xdrive.js';
 import {getG500SuspensionDetail} from './g500-underbody.js';
 import {getG500DiffDetail,getG500Differentials,drawG500RearShafts} from './g500-differentials.js';
 import {isFleetPlug} from './fleet-ignition.js';
@@ -187,7 +188,8 @@ function motorcycle(){
 const fleetSpark={...spark,description:spark.description+' The enlarged section uses a representative single-strap electrode. The fitted plug’s tip and seat depend on its part number.'};
 const launchClutch={...multiClutch,id:'launch-clutch',name:'Wet start-up clutch',source:references.c63,description:'The C63 uses an oil-cooled clutch stack for launch. This representative section shows how alternating plates couple the basket to the hub. The plate count is illustrative.'};
 const map=Object.fromEntries(Object.keys(layouts).map(id=>[id,id==='bmws1000rr'?motorcycle():id==='f350'?truck():id.startsWith('porsche')?carrera(id):sedan(id)]));
-export function getRoadDrivetrain(id){return id==='bmw325ci'?e46Drivetrain:Object.hasOwn(map,id)?map[id]:null;}
+export function getRoadDrivetrain(id){return id==='bmw325ci'?e46Drivetrain:id==='bmw328xi'?e90Drivetrain:Object.hasOwn(map,id)?map[id]:null;}
+const xdriveClutch={...multiClutch,id:'e90-transfer-clutch',name:'xDrive transfer-case clutch',source:e90Sources.xdrive,description:'In the ATC 300, a servo motor and control cam clamp a pack of alternating plates. Open, the clutch leaves all drive at the rear axle; as it closes, more torque reaches the gears to the front output. This representative section shows the plate pack, not the case’s exact plate count.'};
 export function drawRoadDrivetrain(r,id,{skipGearbox=false,installedG500=false}={}){
  for(const p of getRoadDrivetrain(id)?.parts||[]){
   if(skipGearbox&&p.id==='drivetrain.gearbox')continue;
@@ -200,6 +202,11 @@ export function getRoadDetail(vehicleId,partId){
  if(service)return service;
  if(!getRoadDrivetrain(vehicleId))return null;
  if(vehicleId==='bmw325ci'){const study=getE46RunningDetail(partId);if(study)return study;}
+ if(vehicleId==='bmw328xi'){
+   if(['powertrain.transmission','drivetrain.gearbox'].includes(partId))return manual;
+   if(partId==='drivetrain.transfer')return xdriveClutch;
+   if(partId==='drivetrain.front-halfshafts')return axleStudy;
+ }
  if(vehicleId==='g500'){
    const suspension=getG500SuspensionDetail(partId);
    if(suspension)return suspension;

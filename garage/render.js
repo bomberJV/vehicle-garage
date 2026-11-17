@@ -33,6 +33,7 @@ import {getRoadDrivetrain, drawRoadDrivetrain} from './road-mechanisms.js';
 import {FLEET} from './fleet.js';
 import {VEHICLES,PAINTS,FINISHES,PARTS} from './catalog.js';
 import {buildBmwExterior} from './exterior-bmw.js';
+import {buildE90Exterior} from './exterior-e90.js';
 import {buildG500Exterior,buildFordExterior,utilityWheelSpokes} from './exterior-utility.js';
 import {roadWheelSpokes} from './exterior-alloys.js';
 import {wheelDesign} from './wheel-designs.js';
@@ -736,7 +737,7 @@ export class GarageRenderer{
  const movingAssembly=topMotion&&phase?(topMotion.assembly||assembly):null;
  const bikeLegacyGroup=b.vehicle==='bmws1000rr'&&['engine','drive'].includes(assembly)?assembly:null;
  const isolatedPorscheEngine=Boolean(exhibit?.inspectionSections?.engine && assembly==='engine' && this.isolate && !focusView);
- const bodyModules=assembly==='body'&&['bmw325ci','c63','hrv'].includes(b.vehicle);
+ const bodyModules=assembly==='body'&&['bmw325ci','bmw328xi','c63','hrv'].includes(b.vehicle);
  const sourceKey=JSON.stringify([isolatedPorscheEngine,bikeLegacyGroup,bodyModules,b.vehicle,b.paint,b.finish,b.wheelDesign,b.roofPosition,b.slGlass,b.slWindstop,b.slComfort,this.inspection?.studySeat,this.slRoofFraction,b.bmwVentPosition,Boolean(this.inspection?.engineCutaway),b.parts,this.lights,!exhibit,engineOwnsM54Rail,ownGearbox,porscheLegacy,showDrive,showFloor,activeService?.id,focusView?.id,movingAssembly,phase]);
  const lift=!focusView&&b.lift?.mm?b.lift:null;
  const key=lift?sourceKey+JSON.stringify(lift):sourceKey;
@@ -774,7 +775,7 @@ export class GarageRenderer{
    }
    else {
      const v=VEHICLES[b.vehicle], selected=b.parts.map(id=>PARTS.find(p=>p.id===id)).filter(Boolean);
-     const exterior={g500:buildG500Exterior,f350:buildFordExterior,c63:buildC63Exterior,hrv:buildHrvExterior,bmw325ci:buildBmwExterior}[b.vehicle];
+     const exterior={g500:buildG500Exterior,f350:buildFordExterior,c63:buildC63Exterior,hrv:buildHrvExterior,bmw325ci:buildBmwExterior,bmw328xi:buildE90Exterior}[b.vehicle];
      exterior(this,paint,selected);
      this.mechanicalMesh();
      if(b.vehicle==='g500'&&!showDrive)drawG500Differentials(this);

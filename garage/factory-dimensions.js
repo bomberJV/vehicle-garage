@@ -7,6 +7,8 @@ const g500Dimensions=[
   ['frontTrack','Front track',1515],['rearTrack','Rear track',1515]
 ];
 export const coupeManual='https://bmw330ci.net/the330ci/2003Manual-3SeriesCoupe.pdf#page=147';
+export const e90Specs='https://www.edmunds.com/bmw/3-series/2008/st-100946472/features-specs';
+export const e90Widths='https://www.auto-data.net/en/compare&carId1=51944&carId2=&carId3=';
 export const coupeFiling='https://static.nhtsa.gov/nhtsa/downloads/MfrMail/01-022-N11B-9574.pdf#page=5';
 const source=(label,url)=>({label,url});
 const carreraBrochure='https://files.porsche.com/filestore/download/international/en/modelseries-911carrera992-downloads-catalogue/default/64090fb6-12a5-11ea-80c6-005056bbdc38/911-Carrera-Brochure.pdf';
@@ -35,6 +37,12 @@ export const dimensionStudies={
     description:'The 2002 US manual gives six exterior dimensions. Compare them with measurements from the stock model in three views.',
     note:'Measurements use the stock wheels, closed roof and spare cover. Track is the distance between the tire centerlines on one axle.',
     sources:[source('2002 US manual · p. 360',dimensionManual),source('Later W463 body drawing · p. 25',bodyDrawing)]},
+  bmw328xi:{name:'2008 US 328xi sedan · N52 · xDrive',make:'BMW',short:'2008 328xi',unit:'in',
+    rows:[['length','Length across bumpers',178.2],['bodyWidth','Body width',71.5],['width','Width across mirrors',79.3],
+      ['height','Height from tire contact',55.9],['wheelbase','Wheelbase',108.7],['frontTrack','Front track',59.1],['rearTrack','Rear track',59.6]],
+    description:'View the stock sedan from the side, front or rear and compare its seven spans with the published 328xi figures.',
+    note:'Edmunds lists the 328xi sedan’s length, width, height, wheelbase and tracks. The 2,013-mm width across the mirrors is from auto-data.net’s 328xi sedan entry. Stock 16-inch wheels and closed windows are shown.',
+    sources:[source('Edmunds · 2008 328xi sedan specifications',e90Specs),source('auto-data.net · 328xi sedan (E90) dimensions',e90Widths)]},
   bmw325ci:{name:'2003 US 325Ci coupé · M54 · model 0334',make:'BMW',short:'2003 325Ci',unit:'in',
     rows:[['length','Length across bumpers',176.7],['bodyWidth','Body width',69.2],['width','Width across mirrors',76.7],
       ['height','Height from tire contact',53.9],['wheelbase','Wheelbase',107.3],['frontTrack','Front track',57.5],['rearTrack','Rear track',58.4]],
@@ -84,10 +92,10 @@ export function measureStockMesh(vehicle,faces){
   const meters={length:max[0]-min[0],width:max[1]-min[1],height:max[2]-ground,
     wheelbase:motorcycle?rear[0]-front[0]:(rl[0]+rr[0]-fl[0]-fr[0])/2};
   if(!motorcycle){meters.frontTrack=fr[1]-fl[1];meters.rearTrack=rr[1]-rl[1];}
-  const longitudinal=vehicle==='bmw325ci'?bumpers:envelope;
+  const longitudinal=['bmw325ci','bmw328xi'].includes(vehicle)?bumpers:envelope;
   if(!Number.isFinite(longitudinal.min[0]))throw new Error('Missing bumper geometry for this coupe.');
   meters.length=longitudinal.max[0]-longitudinal.min[0];
-  if(cabriolet||vehicle==='bmw325ci')meters.bodyWidth=body.max[1]-body.min[1];
+  if(cabriolet||['bmw325ci','bmw328xi'].includes(vehicle))meters.bodyWidth=body.max[1]-body.min[1];
   const mm=Object.fromEntries(Object.entries(meters).map(([id,v])=>[id,Math.round(v*1000)]));
   return {meters,mm,min,max,ground,wheels,longitudinal};
 }

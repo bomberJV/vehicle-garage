@@ -20,6 +20,7 @@ export const detailBenchmark={
 const work={
  sl550:['Check the AIRSCARF duct and pneumatic seat circuits against the equipment codes on a donor car.','Checked roof travel, seatback and windscreen clearances, component selection, and the closed bonnet and cockpit floor from above.'],
  g500:['Compare door-jamb, gutter and hinge sections with an early US body; check the remaining hidden cable routes.','Move each wheel and door; inspect lamp housings, glazing and axle parts for bleed-through at low angles.'],
+ bmw328xi:['Check the xDrive front driveline route beside the sump and the N52 cover and Valvetronic placement against underbody and engine-bay photographs.','Open all four doors, the trunk and the moonroof; check the kidneys, headlamp strip and tail-lamp split against the NHTSA photographs.'],
  bmw325ci:['Check measured rear-vent travel, frameless door seals and the M54 saddle-tank connections against the coupé plates.','Cycle both rear vents; check seat separation, cowl coverage, rear-floor coverage and wheel faces in the stock view.'],
  f350:['Build the decided 7.5-litre V8, E4OD and Sterling 10.25 rear axle, then replace the underhood and brake placeholders for that regular-cab truck.','Inspect bed ribs, tailgate supports, rear drums and both wheel ends; confirm no placeholder is presented as a fitted part.'],
  c63:['Separate the M156 intake, accessory drive and cooling connections; match the sedan’s brake and roof options.','Orbit the bumper corners and rear glass; inspect fixed calipers and the roof opening for intersecting surfaces.'],

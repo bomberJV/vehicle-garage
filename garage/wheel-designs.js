@@ -7,6 +7,7 @@ const cBook=link('2014 Mercedes-Benz C-Class brochure','https://cdn.dealereproce
 const cParts=link('Mercedes-Benz USA parts catalogue','https://classicparts.mbusa.com/v-2014-mercedes-benz-c63-amg--base--6-3l-v8-gas/tire-and-wheel--wheel');
 const hParts=link('College Hills Honda wheels','https://www.collegehillshonda.com/category/2ndgen-honda-hrv-wheels.html');
 const eParts=link('BMW 325Ci Style 43 parts plate','https://www.bmwpartsdeal.com/parts-list/2003-bmw-325ci-coupe_m54_engine_e46/wheels/bmw_light_alloy_wheel_star_spokes.html');
+const e90Spec=link('Edmunds · 2008 BMW 328xi sedan features and specifications','https://www.edmunds.com/bmw/3-series/2008/st-100946472/features-specs');
 const p993=link('Porsche 993 summer wheel bulletin','https://members.rennlist.com/geolab/summer%20tire4440_1997_64047.pdf');
 const p992=link('Porsche 992 wheel identification plates','https://static.nhtsa.gov/odi/tsbs/2023/MC-10231381-0001.pdf');
 const p992Shop=link('Suncoast Porsche wheel sets','https://www.suncoastparts.com/category/9922020SCHASWHLS.html');
@@ -54,6 +55,8 @@ const options={
     source:link('Honda HPD wheel and installation sheet','https://www.collegehillshonda.com/product/08W17-3V0-100.html'),
     buy:link('Honda Automotive Parts HPD wheel','https://www.hondaautomotiveparts.com/oem-parts/honda-17-inch-glint-black-hpd-alloy-wheels-8w173v0100')
   }],
+  bmw328xi:[{...stock('Star Spoke 156',[16],'Five pairs of spokes meet at the hub and spread toward the rim.',e90Spec),
+    maker:'BMW',fitment:'2008 U.S. 328xi sedan. Standard 7J × 16 with 205/55R16 tires; Sport Package cars use 17-inch wheels.'}],
   bmw325ci:[{...stock('Star Spoke 43',[16],'Five broad cast spokes surround a recessed hub and roundel.',eParts,link('ECS Tuning · BMW Style 43 wheel','https://www.ecstuning.com/b-genuine-bmw-parts/whl7x16styl43/36111094505/')),
     maker:'BMW',partNumber:'36 11 1 094 505',fitment:'2003 U.S. 325Ci coupe. Standard 7J × 16 ET47, front and rear, with 205/55 R16 91H M+S tires.'},{
     id:'style68',name:'M Double Spoke 68',maker:'BMW',partNumber:'36 11 2 229 180 front / 36 11 2 229 135 rear',frontDiameter:17,rearDiameter:17,lugs:5,boltCircle:120,

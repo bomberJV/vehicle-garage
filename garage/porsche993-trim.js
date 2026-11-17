@@ -150,11 +150,15 @@ const lampPlane=(x,y)=>.663+1.08*(x-lampCenter[0])-.09*(Math.abs(y)-lampCenter[1
 // The outer lens sits in a recessed fender stamping. The seat uses the same
 // wheelbase-scaled plan as the lens so the shoulder cannot obscure its glass.
 export function headlampSeat993(point){
-  const [x,y,z]=point,dx=(x-lampCenter[0])/.091,dy=(Math.abs(y)-lampCenter[1])/.129,d=dx*dx+dy*dy;
+  const [x,y,z]=point,ex=x-lampCenter[0],dy=(Math.abs(y)-lampCenter[1])/.129;
   // The fender is pressed tight around the bezel; a wide seat reads as a dent.
+  const core=(ex/.091)**2+dy*dy,d=core;
   if(d>=1.6)return point;
-  const t=Math.max(0,Math.min(1,(1.6-d)/.61));
-  return [x,y,z+Math.min(0,lampPlane(x,y)-.008-z)*t*t*(3-2*t)];
+  // The seat must not reach the shoulder line, which also bounds the flank.
+  const shoulder=Math.max(0,Math.min(1,(.745-Math.abs(y))/.045));
+  let t=core<=.99?1:Math.max(0,Math.min(1,(1.6-d)/.61));
+  t=t*t*(3-2*t)*shoulder;
+  return [x,y,z+Math.min(0,lampPlane(x,y)-.008-z)*t];
 }
 export function headlamp993(r,car,s,paint,deck,litronic=false){
   const px=planScale,center=[70.6,63.5];

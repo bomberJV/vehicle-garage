@@ -68,7 +68,7 @@ function brakes(id,p){
   parts.push(component(key+'-disc',label+(p.bike&&rear?' disc':' discs'),rotorNote,[rear?.31:-.30,rear?.51:-.54,.04],
    r=>atSites(r,(c,s)=>e46?drawE46Rotor(r,rear,s):disc(r,c,R,!p.bike&&!(rear&&p.rearSolid),p.drilled,p.bike))));
   parts.push(component(key+'-caliper',label+(n>1?' fixed caliper':n?' floating caliper':' brake caliper'),caliperNote,[rear?.46:-.49,rear?-.33:.39,.28],
-   r=>atSites(r,(c,s)=>e46?drawE46Caliper(r,rear,s):caliper(r,c,R,n,p.bike,n>=4?(id==='porsche992scab'?'#a9473c':'#525e5f'):'#626e70'))));
+   r=>atSites(r,(c,s)=>e46?drawE46Caliper(r,rear,s):caliper(r,c,R,n,p.bike,n>=4?(id==='porsche992scab'?'#a9473c':id==='porsche993cab'?'#2b2e30':'#525e5f'):'#626e70'))));
  }
  parts.push(component('master',p.bike?'Front brake master cylinder':'Master cylinder & reservoir',p.bike?'The right-hand lever acts on the front circuit. The rear pedal has a separate master cylinder.':'A fluid reservoir sits on the tandem cylinder at the driver’s side of the vehicle.',[-.40,0,.40],r=>drawRoadBrakeMaster(r,id)),component('abs',p.park==='drum'?'Rear anti-lock circuit':'ABS hydraulic unit',p.park==='drum'?'The rear anti-lock system acts on the rear axle brake circuit. The diagram omits option-specific valve plumbing.':'The hydraulic block modulates brake pressure. An electric pump and valve passages share the module.',[.03,.44,.36],r=>{box(r,mod,[.099,.066,.075],metal);cyl(r,plus(mod,[.065,0,0]),X,-.038,.046,.033,rubber,16);for(let j=0;j<(p.bike?3:4);j++)cyl(r,plus(mod,[-.03+j*.020,0,.034]),Z,0,.019,.006,copper,8);}),
  component('lines','Hard lines & flexible hoses','The fixed lines carry fluid along the chassis. A flexible section follows each moving wheel. Routes are schematic.',[.03,.14,-.40],r=>{

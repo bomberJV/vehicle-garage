@@ -1,7 +1,7 @@
 // Outer skin in metres. X increases from the nose to the engine. Station widths
 // exclude the mirrors. Wheelbase/width/overall length anchor the loft. The panel
 // sweeps, crowns and upholstery follow photographs rather than tooling drawings.
-import {fixedStopLamp,washerNozzle,classicBodyTrim,classicDeckScript,classicMirror,frontSignals993,rearOptics993,classicSignalPocket,headlamp993,headlampSeat993} from './porsche993-trim.js';
+import {fixedStopLamp,washerNozzle,classicBodyTrim,classicDeckScript,classicMirror,frontSignals993,rearOptics993,classicSignalPocket,headlamp993,headlampSeat993,cowlInlet993} from './porsche993-trim.js';
 import {faceTriangles} from './mesh-triangles.js';
 import {headlampSeat992,rocker992,stations992,sideLevels992,spoiler992,sweep992,bonnetStart,bonnetHalfWidth,bonnetPressing,frontCrown992,door992,doorRibX,fascia992} from './porsche992-skin.js';
 import {classicStations,classicSpoiler,classicGrilleSpan,sweepClassicBody,classicBonnetStart,classicBonnetWidth,classicBonnetRib,classicDoor,classicDoorHem,classicDoorRib,classicSillHeight,classicLowerBands,classicBumperInset,classicBonnetValley,drawClassicCornerVents} from './porsche993-body-profile.js';
@@ -23,6 +23,10 @@ export const coupeShape=[
     stations:stations992}
 ];
 
+// Rows through the classic flank and over its shoulder. The 993 panels are
+// continuous compound curves, so a coarse row pitch reads as flat facets.
+const classicFlankLevels=[classicDoorHem,.35,.42,.49,.56,.63,.70,.755,.81,.87,.915,.96,1];
+const classicShoulderRows=[.9,.8,.7,.6,.5,.4,.3,.2,.1,0];
 function station(car,x){
   const rows=car.stations;let i=1;
   while(i<rows.length-1 && rows[i][0]<x)i++;
@@ -57,7 +61,9 @@ function top(car,x,y){
   const crestU=car.modern?.766:.77;
   const inner=Math.min(u/crestU,1);
   const rounded=Math.sin(inner*Math.PI/2)**3.2;
-  const haunch=car.modern?frontCrown992(x,Math.min(u,crestU),crestU,rounded):rounded;
+  // Toward the 993's nose the luggage lid stays nearly flat across and the
+  // wings rise steeply outside its shut lines to carry the headlamps.
+  const haunch=car.modern?frontCrown992(x,Math.min(u,crestU),crestU,rounded):Math.sin(inner*Math.PI/2)**(3.2+11*clamp((-1.30-x)/.62)**1.5);
   const drop=clamp((u-crestU)/(.958-crestU));
   const crown=(z-c)*haunch+(car.modern?bonnetPressing(x,y):classicBonnetValley(x,y));
   const p=swept(car,[x,y,c+crown-.076*(car.modern?drop**2.65:1-Math.cos(drop*Math.PI/2))]);
@@ -106,6 +112,7 @@ function sideRaw(car,x,t,s){
   p[1]-=s*(fore*fore+aft*aft)*.024*toe;
   return p;
 }
+export {painted as paintCoach};
 function painted(r,ps,paint,sign,vertexNormals){
   const [p,a,,b]=ps,ab=a.map((v,i)=>v-p[i]),ac=b.map((v,i)=>v-p[i]);
   let n=[ab[1]*ac[2]-ab[2]*ac[1],ab[2]*ac[0]-ab[0]*ac[2],ab[0]*ac[1]-ab[1]*ac[0]];
@@ -160,12 +167,15 @@ function uBreaks(car){
   const ordered=[...new Set(xs.map(x=>Math.round(x*1e7)/1e7))].sort((a,b)=>a-b);
   const result=[ordered[0]];
   // The 992 loft is shaded per vertex. Rows no more than 55 mm apart keep
-  // its reflections continuous; the 993 keeps its original sampling.
-  const step=car.modern?.055:.18;
+  // its reflections continuous.
+  const step=.055;
   for(let i=1;i<ordered.length;i++){
-    const gap=ordered[i]-ordered[i-1];
-    if(car.modern){const n=Math.ceil(gap/step);for(let k=1;k<n;k++)result.push(ordered[i-1]+gap*k/n);}
-    else if(gap>step)result.push((ordered[i]+ordered[i-1])/2);
+    // The classic skin has no feature lines to hide facets either; it uses a
+    // 75 mm pitch. The headlamp seat is pressed into the front of the wing
+    // and needs a closer pitch to stay smooth around the bezel.
+    const gap=ordered[i]-ordered[i-1],lamp=!car.modern&&ordered[i]>-2.0&&ordered[i-1]<-1.66;
+    const pitch=car.modern?step:lamp?.03:.075;
+    if(gap>pitch){const n=Math.ceil(gap/pitch);for(let k=1;k<n;k++)result.push(ordered[i-1]+gap*k/n);}
     result.push(ordered[i]);
   }
   stationBreaks.set(car,result);return result;
@@ -224,7 +234,7 @@ function lidStrip(r,car,paint,phase,a,b,s,front,moves){
     const paintedPoint=(pos,t)=>open?
       spoilerPoint(false,top(car,pos,s*mix(classicGrilleSpan(pos),bladeSpan(car,pos),t)),phase):f(pos,t);
     let da=paintedPoint(a,0),db=paintedPoint(b,0);
-    const steps=car.modern?lidSteps992(front):open?1:4;
+    const steps=car.modern?lidSteps992(front):open?1:8;
     for(let j=1;j<=steps;j++){
       const na=paintedPoint(a,j/steps),nb=paintedPoint(b,j/steps);
       painted(r,[da,db,nb,na],paint,[0,0,1]);da=na;db=nb;
@@ -263,7 +273,7 @@ function skin(r,car,paint,phase){
       };
       r.tag(door?sideDoor:'shell.fenders',()=>{
         let levelBelow=0,fa=flank(a,0),fb=flank(b,0);
-        for(const level of (car.modern?sideLevels992:[classicDoorHem,.49,.70,.87,1])){
+        for(const level of (car.modern?sideLevels992:classicFlankLevels)){
           const na=flank(a,level),nb=flank(b,level);
           const normals=car.modern?[flankFrame(a,levelBelow,s).n,flankFrame(b,levelBelow,s).n,flankFrame(b,level,s).n,flankFrame(a,level,s).n]:null;
           const panel=()=>{if(!car.modern||fa[2]!==na[2]||fb[2]!==nb[2])painted(r,[fa,fb,nb,na],paint,[0,s,0],normals);};
@@ -273,13 +283,13 @@ function skin(r,car,paint,phase){
         // At the shoulder the side panel turns over toward the inside of the car.
         let ta=deck(a,1),tb=deck(b,1);
         painted(r,[fa,fb,tb,ta],paint,[0,s,.5]);
-        for(const t of car.modern?deckRows992:[.75,.49,.22,0]){
+        for(const t of car.modern?deckRows992:classicShoulderRows){
           const na=deck(a,t),nb=deck(b,t);painted(r,[ta,tb,nb,na],paint,[0,s*.25,1]);ta=na;tb=nb;
         }
         if(cabin){
           const la=[ta[0],ta[1]-s*.012,ta[2]-.032],lb=[tb[0],tb[1]-s*.012,tb[2]-.032];
           r.polygon([ta,tb,lb,la],'#282b2e',false);
-          r.polygon([la,lb,[lb[0],lb[1]+s*.032,.40],[la[0],la[1]+s*.032,.40]],car.modern?'#42454a':'#877665',false);
+          r.polygon([la,lb,[lb[0],lb[1]+s*.032,.40],[la[0],la[1]+s*.032,.40]],car.modern?'#42454a':'#55595b',false);
         }
       });
       if(!cabin){
@@ -314,7 +324,8 @@ function skin(r,car,paint,phase){
       panelSeam(r,car,'door'+s,seam,car.modern?.0065:.0055,s,car.modern?'#2a2d2f':tint(paint,.48));
       const hw=car.modern?.133:.116,hz=car.modern?.750:.733,hx=b-.18;
       const handle=cheek(hx,hz);
-      ellipsoid(r,handle,[hw*.63,.014,.023],car.modern?tint(paint,.67):'#343537',12,4);
+      // The 993 pull handle is a body-colour moulding over a shallow dark recess.
+      ellipsoid(r,handle,[hw*.63,.014,.023],car.modern?tint(paint,.67):'#4a4d4f',12,4);
       ellipsoid(r,[hx,handle[1]+s*.012,hz+.005],[hw*.52,.013,.009],tint(paint,1.05),12,4);
       const foot=top(car,a+.108,s*station(car,a+.108)[0]*.858);
       if(car.modern){
@@ -412,8 +423,12 @@ function fascia(r,car,front,paint){
         for(const [y,m,n] of [[l,0,3],[h,1,2]]){
           if(Math.abs(Math.abs(y)-w*.730)<.0001)r.polygon([corners[m],corners[n],back[n],back[m]],'#536069',false);
         }
-        const slat=[0,1].map((i)=>corners[i].map((v,a)=>mix(v,corners[3-i][a],.50)));
-        strip(r,slat.map(([xx,y,z])=>[xx+.013,y,z]),slat.map(([xx,y,z])=>[xx+.02,y,z+.006]),'#899297');
+        // Two horizontal bars split the mouth into three slots.
+        for(const k of [.36,.68]){
+          const slat=[0,1].map((i)=>corners[i].map((v,a)=>mix(v,corners[3-i][a],k)));
+          strip(r,slat.map(([xx,y,z])=>[xx+.010,y,z]),slat.map(([xx,y,z])=>[xx+.018,y,z+.007]),'#7d868a');
+          strip(r,slat.map(([xx,y,z])=>[xx+.018,y,z+.007]),slat.map(([xx,y,z])=>[xx+.03,y,z+.007]),'#3d4549');
+        }
       }
     }
     // Connect the wrapped bumper skin to the flank at both corners.
@@ -507,7 +522,7 @@ function exteriorLights(r,car,paint){
       for(const i of [0,8])r.polygon([low[i],high[i],upper[i],inner[i]],'#393e3e',false);
     }
   });
-  if(!modern){fixedStopLamp(r,car,paint,top);classicBodyTrim(r,car,paint,top,tail.point,sideRaw);r.tag('shell.deck',()=>classicDeckScript(r,car,top));}
+  if(!modern){fixedStopLamp(r,car,paint,top);cowlInlet993(r,car,paint,top);classicBodyTrim(r,car,paint,top,tail.point,sideRaw);r.tag('shell.deck',()=>classicDeckScript(r,car,top));}
   const hoodX=car.stations[0][0]+(modern?.20:.16);
   r.tag('shell.luggage',()=>{
     const gap=Array.from({length:29},(_,i)=>{
@@ -515,8 +530,16 @@ function exteriorLights(r,car,paint){
       return top(car,x,side*lidWidth(car,x,station(car,x)[0],true));
     });
     panelSeam(r,car,'bonnet-front',gap,modern?.007:.0063,0,modern?'#2c2f31':tint(paint,.47));
-    const badge=[[-.027,-.017],[-.027,.017],[.011,.015],[.038,0],[.011,-.015]].map(([dx,y])=>{const p=top(car,(modern?hoodX:classicBonnetStart+.085)+dx,y);p[2]+=.005;return p;});
+    const at=(dx,y,lift)=>{const p=top(car,(modern?hoodX:classicBonnetStart+.085)+dx,y);p[2]+=lift;return p;};
+    const badge=[[-.027,-.017],[-.027,.017],[.011,.015],[.038,0],[.011,-.015]].map(([dx,y])=>at(dx,y,.005));
     r.polygon(badge,'#b2945d',false);
+    if(!modern){
+      // Enamelled crest: a gold rim around red and black quarters.
+      const q=(dx0,dx1,y0,y1,color)=>r.polygon([at(dx0,y0,.0056),at(dx0,y1,.0056),at(dx1,y1,.0056),at(dx1,y0,.0056)],color,false);
+      q(-.022,-.004,-.012,0,'#9a2c27');q(-.022,-.004,0,.012,'#2b2523');
+      q(-.004,.016,-.011,0,'#2b2523');q(-.004,.016,0,.011,'#9a2c27');
+      r.polygon([[-.009,-.005],[-.009,.005],[.004,.005],[.004,-.005]].map(([dx,y])=>at(dx,y,.0062)),'#c9a85e',false);
+    }
   });
 }
 function engineGrille(r,car,paint,phase){
@@ -530,14 +553,17 @@ function engineGrille(r,car,paint,phase){
       const x=stations[i-1],xx=stations[i],w=classicGrilleSpan(x),ww=classicGrilleSpan(xx);
       for(let j=0;j<4;j++){
         const t=j/2-1,u=(j+1)/2-1;
-        r.polygon([p(x,t*w,.003),p(x,u*w,.003),p(xx,u*ww,.003),p(xx,t*ww,.003)],'#20272b',false);
+        // The grille is let into the lid: its floor and louvres sit below the
+        // painted surround, which forms the silhouette in side elevation.
+        r.polygon([p(x,t*w,-.016),p(x,u*w,-.016),p(xx,u*ww,-.016),p(xx,t*ww,-.016)],'#1b2124',false);
       }
     }
-    for(let i=0;i<12;i++){
-      const x=mix(grilleFront,grilleRear,(i+.5)/12),w=classicGrilleSpan(x);
+    for(let i=0;i<16;i++){
+      const x=mix(grilleFront,grilleRear,(i+.5)/16),w=classicGrilleSpan(x)*.985;
       for(let j=0;j<4;j++){
         const a=(j/2-1)*w,b=((j+1)/2-1)*w;
-        r.polygon([p(x,a,.014),p(x,b,.014),p(x+.012,b,.010),p(x+.012,a,.010)],'#53595a',false);
+        r.polygon([p(x,a,-.003),p(x,b,-.003),p(x+.010,b,-.007),p(x+.010,a,-.007)],'#4a5153',false);
+        r.polygon([p(x+.010,a,-.007),p(x+.010,b,-.007),p(x+.010,b,-.015),p(x+.010,a,-.015)],'#262c2f',false);
       }
     }
   });
@@ -648,6 +674,37 @@ export function drawCoachwork(r,car,paint,phase=0){
   skin(r,car,paint,phase);exteriorLights(r,car,paint);engineGrille(r,car,paint,phase);drawSpoilerDrive(r,car.modern,phase);
   if(r.faces)softenPaint(r.faces.slice(start),car.modern?paint:null);
   if(r.faces)packCoachworkReturns(r.faces,start,car.modern);
+  if(r.faces&&!car.modern)packClassicSkin(r.faces,start);
+}
+// The finely divided 993 skin is batched into one indexed mesh per panel and
+// side. Vertex colours and clear-coat normals stay per vertex, so the shading
+// is unchanged while the panel costs one face in the scene budget.
+function packClassicSkin(faces,start){
+  const batches=new Map(),pieces=faces.splice(start);
+  for(const face of pieces){
+    const part=face.part;
+    if(!face.vertexColors||!face.clearcoatNormals||face.triangles||!part?.startsWith('shell.')||part==='shell.spoiler'){
+      faces.push(face);continue;
+    }
+    const side=Math.sign(face.points[0][1]),end=Math.sign(face.points[0][0]);
+    const key=[part,side,end].join('/');
+    let batch=batches.get(key);
+    if(!batch){
+      batch={...face,points:[],triangles:[],vertexColors:[],clearcoatNormals:[],index:new Map()};
+      batches.set(key,batch);faces.push(batch);
+    }
+    const local=face.points.map((p,i)=>{
+      const id=p.map(v=>Math.round(v*1e5)).join('/')+face.vertexColors[i];
+      let at=batch.index.get(id);
+      if(at===undefined){
+        at=batch.points.length;batch.index.set(id,at);
+        batch.points.push(p);batch.vertexColors.push(face.vertexColors[i]);batch.clearcoatNormals.push(face.clearcoatNormals[i]);
+      }
+      return at;
+    });
+    for(const i of faceTriangles(face.points))batch.triangles.push(local[i]);
+  }
+  for(const batch of batches.values())delete batch.index;
 }
 
 // Whole-car motion redraws only the blade and its mechanism. All unaffected

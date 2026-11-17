@@ -31,7 +31,8 @@ test('both Cabriolet spoiler paths redraw the same moving geometry as the comple
     for(const part of ['shell.deck','shell.bumpers','lights.tail','shell.left-door','cabin.carpet']){
       assert.deepEqual(shape(parked,part),shape(raised,part));
     }
-    assert(moving.length<parked.length*.08);
+    const triangles=faces=>faces.reduce((n,f)=>n+(f.triangles?f.triangles.length/3:Math.max(1,f.points.length-2)),0);
+    assert(triangles(moving)<triangles(parked)*.08);
     // Painted panels may be packed into shared-vertex batches; count shaded vertices.
     const shaded=parked.filter(f=>f.vertexColors?.length===f.points.length);
     assert(shaded.reduce((sum,f)=>sum+f.points.length,0)>4000);

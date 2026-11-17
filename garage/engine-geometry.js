@@ -119,7 +119,7 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  if(id==='hrv')tag('vtec-rockers',()=>{for(const x of xs)for(const yy of [-.065,.065]){box(x-.025,yy-.017,headZ+.125,x+.025,yy+.017,headZ+.155,METAL);cyl([x-.030,yy,headZ+.14],[x+.030,yy,headZ+.14],.005,GOLD,6);}});
  // The G500's covers are low magnesium shells over the camshafts, so the air
  // cleaner pods above them stay clear.
- if(!m54)tag('valve-cover',()=>{const top=id==='g500'?.162:.19,rib=id==='g500'?.003:.006,bolt=id==='g500'?.005:.012;for(const s of banks){const y=bankY(s),half=headWidth/2+.025;box(-L/2-.025,y-half,headZ+.15,L/2+.025,y+half,headZ+top,BLACK);for(let x=-L/2+.025;x<L/2;x+=.15)for(const sy of [-1,1])cyl([x,y+sy*(half-.012),headZ+top],[x,y+sy*(half-.012),headZ+top+bolt],.008,METAL,6);for(const yy of [y-.06,y-.035,y+.035,y+.06])box(-L/2+.04,yy-.003,headZ+top,L/2-.04,yy+.003,headZ+top+rib,tone(METAL,.8));}});
+ if(!m54)tag('valve-cover',()=>{const top=id==='g500'?.162:id==='hrv'?.17:.19,rib=id==='g500'?.003:.006,bolt=id==='g500'?.005:.012;for(const s of banks){const y=bankY(s),half=headWidth/2+.025;box(-L/2-.025,y-half,headZ+.15,L/2+.025,y+half,headZ+top,BLACK);for(let x=-L/2+.025;x<L/2;x+=.15)for(const sy of [-1,1])cyl([x,y+sy*(half-.012),headZ+top],[x,y+sy*(half-.012),headZ+top+bolt],.008,METAL,6);for(const yy of [y-.06,y-.035,y+.035,y+.06])box(-L/2+.04,yy-.003,headZ+top,L/2-.04,yy+.003,headZ+top+rib,tone(METAL,.8));}});
  tag('timing-drive',()=>{
   const xx=-L/2-.037,crank=[xx,0,crankRise],cams=cfg.pushrod?f350Cams(xx):banks.flatMap(s=>Array.from({length:cfg.cams/cfg.banks},(_,i)=>[xx,bankY(s)+(cfg.cams/cfg.banks===1?0:(i? .065:-.065)),headZ+.115]));
   for(const p of [crank,...cams]){tube([xx-.01,p[1],p[2]],[xx+.01,p[1],p[2]],p===crank?.057:.048,p===crank?.025:.014,GOLD,14);}
@@ -151,7 +151,7 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  }
  if(id==='g500')g500Ignition(r,tag,t,cells);
  else if(!ford){
- tag('coils',()=>{for(const {x,side,index}of cells)r.instance(side+'-'+index,()=>{const yy=cfg.banks===2?side*.43:0,zz=headZ+.23;box(x-.030,yy-.030,zz-.045,x+.030,yy+.030,zz+.025,BLACK);if(cfg.plugs===2){for(const shift of [-.035,.035])route([[x,yy,zz-.02],[x+shift,yy+side*.06,headZ-.015]],.004,RUBBER,6);}else cyl([x,yy,headZ+.03],[x,yy,zz-.045],.008,DARK,6);});});
+ tag('coils',()=>{for(const {x,side,index}of cells)r.instance(side+'-'+index,()=>{const yy=cfg.banks===2?side*.43:0,zz=headZ+(id==='hrv'?.16:.23);box(x-.030,yy-.030,zz-.045,x+.030,yy+.030,zz+.025,BLACK);if(cfg.plugs===2){for(const shift of [-.035,.035])route([[x,yy,zz-.02],[x+shift,yy+side*.06,headZ-.015]],.004,RUBBER,6);}else cyl([x,yy,headZ+.03],[x,yy,zz-.045],.008,DARK,6);});});
  tag('spark-plugs',()=>{for(const {x,side,index}of cells)for(let p=0;p<cfg.plugs;p++)r.instance(side+'-'+index+'-'+p,()=>{const yy=cfg.banks===2?side*.41:0,dx=cfg.plugs===2?(p? .027:-.027):0;cyl([x+dx,yy,headZ-.04],[x+dx,yy,headZ+.012],.007,'#d5d8cb',8);cyl([x+dx,yy,headZ-.058],[x+dx,yy,headZ-.04],.005,GOLD,6);});});
  }
  if(id==='g500'&&!g500ServiceOwnsFlow)tag('exhaust-manifold',()=>drawG500ExhaustManifold(r));
@@ -163,17 +163,18 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  // External cooling/accessory components use vehicle coordinates, independent of
  // whether the engine itself runs along or across the car.
  const bayTag=(name,fn)=>tag(name,()=>fn(bay));
- const radX=front-.62,radY=0,radZ=base+.20;
+ // The HR-V's radiator and fan sit lower, under its lower bonnet line.
+ const radX=front-.62,radY=0,radZ=base+(id==='hrv'?.16:.20),radTop=id==='hrv'?.40:.55,fanR=id==='hrv'?.20:.245;
  if(id==='g500'){
   if(!g500ServiceOwnsFlow)drawG500CoolingCircuit(r,'powertrain');
  }else{
- bayTag('radiator',({box})=>{box(radX-.045,-.59,base-.03,radX+.025,.59,base+.55,DARK);for(let z=base+.005;z<base+.53;z+=.035)box(radX-.050,-.53,z,radX-.046,.53,z+.009,'#9ca9ad');for(const y of [-.60,.54])box(radX-.045,y,base-.04,radX+.03,y+.06,base+.56,BLACK);});
- bayTag('fan',({tube,poly,cyl})=>{const x=radX+.09,z=radZ+.07;tube([x-.012,0,z],[x+.012,0,z],.245,.225,DARK,20);cyl([x-.018,0,z],[x+.025,0,z],.051,BLACK,12);for(let i=0;i<7;i++){const a=i*Math.PI*2/7,pt=(rad,t,xx)=>[xx,Math.cos(t)*rad,z+Math.sin(t)*rad];poly([pt(.05,a,x+.016),pt(.22,a+.19,x+.004),pt(.217,a+.38,x-.004),pt(.066,a+.48,x+.020)],'#4b565c');}});
+ bayTag('radiator',({box})=>{box(radX-.045,-.59,base-.03,radX+.025,.59,base+radTop,DARK);for(let z=base+.005;z<base+radTop-.02;z+=.035)box(radX-.050,-.53,z,radX-.046,.53,z+.009,'#9ca9ad');for(const y of [-.60,.54])box(radX-.045,y,base-.04,radX+.03,y+.06,base+radTop+.01,BLACK);});
+ bayTag('fan',({tube,poly,cyl})=>{const x=radX+.09,z=radZ+.07;tube([x-.012,0,z],[x+.012,0,z],fanR,fanR-.02,DARK,20);cyl([x-.018,0,z],[x+.025,0,z],.051,BLACK,12);for(let i=0;i<7;i++){const a=i*Math.PI*2/7,pt=(rad,t,xx)=>[xx,Math.cos(t)*rad,z+Math.sin(t)*rad];poly([pt(.05,a,x+.016),pt(fanR-.025,a+.19,x+.004),pt(fanR-.028,a+.38,x-.004),pt(.066,a+.48,x+.020)],'#4b565c');}});
  tag('water-pump',()=>{cyl([-L/2-.13,0,.21],[-L/2-.045,0,.21],.067,CAST,12);tube([-L/2-.14,0,.21],[-L/2-.13,0,.21],.081,.026,DARK,16);});
  tag('thermostat',()=>{box(-L/2-.11,-.14,.12,-L/2+.01,-.045,.23,CAST);cyl([-L/2-.05,-.16,.18],[-L/2-.05,-.12,.18],.030,DARK,10);});
  const hoseAnchor=([x,y,z])=>[cx+(trans?-y:x),trans?x:y,base+z];
  const upperEngine=hoseAnchor([-L/2-.04,-.12,.24]),lowerEngine=hoseAnchor([-L/2-.09,.03,.10]);
- bayTag('upper-hose',({route,tube})=>{route([[radX+.02,-.48,base+.48],[radX+.20,-.48,base+.54],[upperEngine[0]-.09,upperEngine[1]-.07,upperEngine[2]+.10],upperEngine],.025,RUBBER,8);});
+ bayTag('upper-hose',({route,tube})=>{route([[radX+.02,-.48,base+radTop-.07],[radX+.20,-.48,base+radTop-.01],[upperEngine[0]-.09,upperEngine[1]-.07,upperEngine[2]+.10],upperEngine],.025,RUBBER,8);});
  bayTag('lower-hose',({route})=>{route([[radX+.025,.47,base+.015],[radX+.17,.47,base-.015],[lowerEngine[0]-.10,lowerEngine[1]+.08,lowerEngine[2]-.10],lowerEngine],.026,RUBBER,8);});
  }
  if(id!=='g500'&&!m54)bayTag('coolant-reservoir',({box,cyl,route})=>{const x=front+.32,y=.61,z=base+.28;box(x-.09,y-.065,z,x+.09,y+.065,z+.22,'#aebdb5');box(x-.09,y-.066,z+.045,x+.09,y-.063,z+.11,COOL);cyl([x,y,z+.22],[x,y,z+.25],.036,BLACK,12);route([[x-.05,y,z+.02],[radX+.16,.48,base+.32]],.008,RUBBER,6);});

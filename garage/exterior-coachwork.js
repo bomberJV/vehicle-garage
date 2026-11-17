@@ -67,11 +67,11 @@ function skin(r,cfg,paint){
    // sides of a door opening. A combined bounds box would fill that doorway.
    const mount=piece==='shell'?(mid<cfg.door[0]?'front-fender':'rear-quarter'):piece;
    sidePanel(r,mount,side,partId(piece,side),()=>{
-    const levels=cfg.cladding?[0,.16,.38,.68,.86,1]:[0,.12,.38,.72,.86,1];
+    const levels=cfg.sideLevels??(cfg.cladding?[0,.16,.38,.68,.86,1]:[0,.12,.38,.72,.86,1]);
     for(let j=1;j<levels.length;j++){
      const p=(x,h,t,low)=>creasePoint(cfg,side,x,Math.max(mix(cfg.base,h,t),low));
      if(mix(cfg.base,z,levels[j])<=bottom&&mix(cfg.base,zz,levels[j])<=bottomB)continue;
-     const color=cfg.cladding&&j===1?TRIM:tint(paint,[.68,.85,.91,1.00,1.07][j-1]*(side<0?.95:1));
+     const color=cfg.cladding&&j===1?TRIM:tint(paint,(cfg.sideTints??[.68,.85,.91,1.00,1.07])[j-1]*(side<0?.95:1));
      face(r,[p(a,z,levels[j-1],bottom),p(b,zz,levels[j-1],bottomB),p(b,zz,levels[j],bottomB),p(a,z,levels[j],bottom)],color);
     }
     if(mid>=cfg.hoodEnd&&mid<cfg.deckStart){
@@ -119,7 +119,7 @@ function skin(r,cfg,paint){
     const lanes=isHood&&cfg.hoodLanes?cfg.hoodLanes:[0,.55,1];
     for(let k=1;k<lanes.length;k++){
      const lo=lanes[k-1],hi=lanes[k];
-     const p=(x,sw,h,t)=>[x,s*(sw*frac-.008)*t,h+.016+.036*(1-t*t)+(isHood&&cfg.hoodPress?cfg.hoodPress(t):0)];
+     const p=(x,sw,h,t)=>[x,s*(sw*frac-.008)*t,h+.016+(isHood&&cfg.hoodCrown!=null?cfg.hoodCrown:.036)*(1-t*t)+(isHood&&cfg.hoodPress?cfg.hoodPress(t):0)];
      face(r,[p(x0,...section(cfg.stations,x0),lo),p(x1,...section(cfg.stations,x1),lo),p(x1,...section(cfg.stations,x1),hi),p(x0,...section(cfg.stations,x0),hi)],tint(paint,(s<0?1.11:1.17)-.035*lo+(isHood&&cfg.hoodPress&&lo===.68?.045:0)));
     }
    }};
@@ -146,7 +146,7 @@ function skin(r,cfg,paint){
    sidePanel(r,mount,side,partId(which,side),()=>{
     const p=ring(a,cfg.arch),q=ring(b,cfg.arch);
     face(r,[p,q,[q[0],q[1]-side*.067,q[2]],[p[0],p[1]-side*.067,p[2]]],SEAL);
-    const lip=cfg.cladding?.028:.009;
+    const lip=cfg.cladding?(cfg.claddingLip??.028):.009;
     face(r,[p,q,ring(b,cfg.arch+lip),ring(a,cfg.arch+lip)],cfg.cladding?TRIM:tint(paint,.93));
    });
   }
@@ -238,7 +238,7 @@ function cabin(r,cfg,paint){
    const a=us[i-1],b=us[i],c=vs[j-1],d=vs[j],edge=i===1||i===us.length-1||j===1||j===vs.length-1;
    const points=[point(a,c),point(b,c),point(b,d),point(a,d)];
    if(edge)face(r,points,SEAL);
-   else glazingFace(r,points,tint('#91aab4',.91+.1*c+.035*(1-Math.abs(a))),back&&cfg.cladding?.51:.28+.07*d);
+   else glazingFace(r,points,tint(back&&cfg.backGlassColor?cfg.backGlassColor:'#91aab4',.91+.1*c+.035*(1-Math.abs(a))),back&&cfg.cladding?(cfg.backGlassOpacity??.51):.28+.07*d);
   }
   if(!back&&!cfg.fixedWipers){
    const lower=us.map(u=>point(u,0));
@@ -313,7 +313,7 @@ function cabin(r,cfg,paint){
  // through the apertures left by the doors. No full-volume cabin block remains.
  if(cfg.drawCabin){cfg.drawCabin(r);return;}
  panel(r,'passenger-compartment',fixed,'body.structure',()=>{
-  const floor=base+.025,front=door[0]-.035,end=cfg.deckStart+.03;
+  const floor=cfg.cabinFloor??base+.025,front=door[0]-.035,end=cfg.deckStart+.03;
   driverControls(r,[front+.337,-.366,cfg.belt-.064],cfg.coupe?.151:.162,cfg.coupe?3:4);
   r.box(front+.18,-.101,floor+.071,front+.94,.101,floor+.225,'#41484a');
   r.rod([front+.46,0,floor+.22],[front+.49,0,floor+.334],.012,'#7c898a',8);

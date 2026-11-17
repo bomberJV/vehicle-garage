@@ -227,7 +227,8 @@ function chassisControl(r){
 function rearHeaterCircuit(r){
  const start=g500ElectronicPorts['rear-seat-heat'];
  line(r,[A.prefuse,[.39,-.42,.729],[1.20,-.756,.738],[1.80,-.790,.784],start],.004,black);
- for(const s of [-1,1])line(r,[start,[1.74,-.756,.748],[.96,-.720,.745],[.86,s*.530,.751]],.003,black);
+ // The right branch crosses behind the cabin battery.
+ for(const s of [-1,1])line(r,[start,[1.74,-.756,.748],[.96,-.720,.745],...(s>0?[[.935,-.20,.750],[.935,.20,.750]]:[]),[.86,s*.530,.751]],.003,black);
 }
 function relayBank(r){
  for(let i=0;i<3;i++){box(r,plus(A.rearRelays,[(i-1)*.043,0,0]),[.032,.034,.040],i===1?gold:black);}

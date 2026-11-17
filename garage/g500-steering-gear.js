@@ -4,7 +4,8 @@ import {slab} from './section-primitives.js';
 import {fluidRefs as ref} from './g500-fluid-refs.js';
 
 const pump=[-1.706,-.351,.819],gear=[-1.602,-.544,.627];
-const pitmanTip=[-1.516,-.527,.473],rightJoint=[-1.542,.680,.412];
+// The drag link runs ahead of the differential housing, below the cooler pipes.
+const pitmanTip=[-1.625,-.530,.440],rightJoint=[-1.612,.622,.380];
 const press=plus(pump,[.040,-.045,.008]),inlet=plus(gear,[.046,.027,.072]),outlet=plus(gear,[-.004,.027,.072]);
 const feed=[-1.997,-.566,.577],returnEnd=[-1.997,-.566,.604],reservoirIn=plus(pump,[.045,-.067,.069]);
 function hose(r,points,rad){
@@ -55,7 +56,7 @@ export const steeringRows=[
  }],
  ['pitman','Pitman arm','The arm fixes to the lower end of the sector shaft. The outer end meets the drag-link ball stud.',[.13,-.10,-.30],ref.gear,r=>{
   const base=plus(gear,[-.010,0,-.101]);sleeve(r,base,z,-.011,.008,.033,.017,metal,12);
-  path(r,[base,[-1.589,-.541,.505],pitmanTip],.019,iron);
+  path(r,[base,[-1.610,-.540,.490],pitmanTip],.019,iron);
  }],
  ['cooler','Steering-oil cooler loop','Return oil passes through an exposed metal loop before it reaches the reservoir. The G500 uses a separate front cooler for the automatic transmission.',[-.34,.06,-.13],ref.steering,r=>{
   // The 10 mm loop runs in the gap between the body's front crossmember and the

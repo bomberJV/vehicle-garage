@@ -9,7 +9,8 @@ function bounds(faces,id){const p=faces.filter(f=>f.part===id).flatMap(f=>f.poin
 test('the post-2000 cabin battery and nearby fuse block occupy separate volumes',()=>{
  const fs=mesh('electrical'),[bx,by,bz]=bounds(fs,'electrical.battery'),[fx,,fz]=bounds(fs,'electrical.battery-box');
  // Leads extend outside the case, but the whole assembly stays centrally ahead of the rear seat.
- assert(bx[0]>.35&&bx[1]<1.05);assert(by[0]>-.25&&by[1]<.30);assert(bz[0]>.45&&bz[1]<.80);
+ // The case sits on a raised tray so the rear propeller shaft passes beneath it.
+ assert(bx[0]>.35&&bx[1]<1.05);assert(by[0]>-.25&&by[1]<.30);assert(bz[0]>.50&&bz[1]<.83);
  // The distribution block is in front of the battery case, not occupying its body.
  assert(fx[1]<.537);assert(fz[1]<.80);
  assert(fs.some(f=>f.part==='electrical.battery'&&f.points.some(p=>Math.abs(p[0]-.482)<.015&&Math.abs(p[1]+.074)<.015&&Math.abs(p[2]-.754)<.015)));

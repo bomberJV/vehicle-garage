@@ -103,7 +103,8 @@ function axleLinks(r,{axle,dir}){
 }
 function trackBar(r,{axle,dir}){
   const station=axle-dir*.117;
-  const a=[station,dir*.627,g500HubZ+.060],b=[station,-dir*.495,.609];
+  // The front frame eye sits on the inner face of the rail, inboard of the steering box.
+  const a=[station,dir*.627,g500HubZ+.060],b=[station,dir===1?-.430:-dir*.495,.609];
   const shape=dir===1?[a,[station,.33,.525],[station,-.24,.525],b]:[a,b];
   for(let i=1;i<shape.length;i++)r.rod(shape[i-1],shape[i],.021,steel,12);
   for(const eye of [a,b]){

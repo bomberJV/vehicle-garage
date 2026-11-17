@@ -1,4 +1,5 @@
 import {transferMotorPlug} from './g500-propeller-shafts.js';
+import {floorTop,on,drape} from './g500-cabin-routing.js';
 // Original installed teaching geometry for the early US 463.249 electrical network.
 // OEM location photographs establish compartments and relationships, not measured
 // case dimensions or harness bends. Circuit boards below are functional sections;
@@ -22,30 +23,45 @@ const black='#303a3e',alloy='#9ba6a5',metal='#7b8d92',gold='#b39a69',board='#456
 const up=[0,0,.48],down=[0,0,-.42],left=[0,-.50,.04],right=[0,.50,.04],aft=[.50,0,.04];
 const plus=(a,b)=>a.map((n,i)=>n+b[i]);
 const box=(r,c,d,col)=>r.box(...c.map((n,i)=>n-d[i]/2),...c.map((n,i)=>n+d[i]/2),col);
-const line=(r,pts,rad=.003,col=black)=>{for(let i=1;i<pts.length;i++)r.rod(pts[i-1],pts[i],rad,col,6);};
+const line=(r,pts,rad=.003,col=black)=>{const d=drape(pts,rad);for(let i=1;i<d.length;i++)r.rod(d[i-1],d[i],rad,col,6);};
 function terminal(r,p,axis=z){sleeve(r,p,axis,-.003,.003,.008,.003,alloy,6);}
 
 // All coordinates are shared model anchors, in metres. -Y is the driver's side.
-export const g500ElectronicAnchors={
- prefuse:[.482,-.074,.754],jump:[-.785,-.680,.870],alternator:[-1.600,-.280,.690],starter:[-.965,.300,.713],
- ecu:[-.640,.710,1.075],tcm:[-.355,-.115,.729],esm:[-.290,0,.790],transfer:[.245,-.035,.718],esp:[-.435,.485,.780],
- frontSam:[-.645,.565,1.065],rearSam:[.245,-.025,.793],cluster:[-.480,-.415,1.291],eis:[-.465,-.202,1.158],
+const placed={
+ prefuse:[.482,-.074,.754],jump:[-.810,-.680,.920],alternator:[-1.600,-.280,.690],starter:[-.965,.300,.713],
+ ecu:[-.640,.710,1.075],tcm:[-.300,-.105,.729],esm:[-.290,0,.790],transfer:[.2425,0,.718],esp:[-.435,.485,.780],
+ frontSam:[-.645,.565,1.065],rearSam:[.2425,-.005,.793],cluster:[-.480,-.415,1.291],eis:[-.465,-.202,1.158],
  column:[-.510,-.410,1.215],upper:[-.496,0,1.163],overhead:[-.361,0,1.904],comand:[-.509,0,1.054],
- locks:[-.469,0,1.263],abs:[-1.085,-.694,1.023],valves:[-.802,-.507,1.163],yaw:[.058,-.128,.696],srs:[-.066,.067,.702],
- rearHeat:[1.835,-.819,.911],rearRelays:[1.835,-.820,.824],canB6:[-.563,-.635,.994],canB4:[-.562,.735,.886],canB7:[-.449,.735,.836],canC:[-.072,.163,.759],
+ locks:[-.469,0,1.263],abs:[-1.085,-.694,1.023],valves:[-.802,-.507,1.163],yaw:[-.130,-.060,.696],srs:[.0615,0,.702],
+ rearHeat:[1.835,-.819,.911],rearRelays:[1.835,-.820,.824],canB6:[-.563,-.635,.994],canB4:[-.562,.735,.886],canB7:[-.449,.735,.836],canC:[-.120,.120,.759],
  doorFL:[-.180,-.855,.937],doorFR:[-.180,.855,.937],doorRL:[.660,-.855,1.005],doorRR:[.660,.855,1.005],
  seatL:[-.067,-.418,.665],seatR:[-.067,.418,.665],diagnostic:[-.446,-.616,.961],roofMotor:[1.770,-.789,1.125],
  maf:[-.786,-.028,1.192],throttle:[-.780,-.080,1.088],transferActuator:transferMotorPlug,transmissionPlug:[-.382,.110,.505]
 };
+// Units placed on the tunnel or under the seats rest on the fitted floor.
+// Their planned positions predate the raised W463 tunnel, so each is lifted
+// to clear the carpet under its footprint (plugs included) and no further.
+
+const resting={tcm:[.205,.033,.145],transfer:[.225,.142+.058,.029],esm:[.148,.143+.058,.078],esp:[.211,.188+.058,.037],
+ rearSam:[.246,.213+.058,.060],yaw:[.076,.058+.058,.025],srs:[.129,.102+.058,.030],canC:[.098,.040,.030],seatL:[.220,.084+.058,.025],seatR:[.220,.084+.058,.025]};
+function settle(c,[w,h,t]){
+ let top=-Infinity;
+ for(const i of [-1,-.5,0,.5,1])for(const j of [-1,-.5,0,.5,1]){const f=floorTop(c[0]+i*w/2,c[1]+j*h/2);if(f!=null)top=Math.max(top,f);}
+ return top>-Infinity&&c[2]-t/2<top+.004?[c[0],c[1],+(top+t/2+.004).toFixed(4)]:c;
+}
+export const g500ElectronicAnchors=Object.fromEntries(Object.entries(placed).map(([k,c])=>[k,resting[k]?settle(c,resting[k]):c]));
+// The rear SAM sits on its own tray above the transfer-case module inside the console.
+{const t=g500ElectronicAnchors.transfer,s=g500ElectronicAnchors.rearSam;s[2]=Math.max(s[2],+(t[2]+.029/2+.012+.030).toFixed(4));}
 const A=g500ElectronicAnchors;
 const modules={
  ecu:{c:A.ecu,size:[.225,.206,.035],axis:'y',metal:true,plugs:4},
- tcm:{c:A.tcm,size:[.205,.145,.033],plugs:2,metal:true},
- esm:{c:A.esm,size:[.148,.143,.078],plugs:2},
- transfer:{c:A.transfer,size:[.225,.142,.029],plugs:2,metal:true},
+ // The transmission controller stands on edge against the left wall of the console, plugs up.
+ tcm:{c:A.tcm,size:[.205,.145,.033],axis:'y',plugs:2,metal:true,face:1},
+ esm:{c:A.esm,size:[.148,.143,.078],plugs:2,face:1},
+ transfer:{c:A.transfer,size:[.225,.142,.029],plugs:2,metal:true,face:1},
  esp:{c:A.esp,size:[.211,.188,.037],plugs:2,metal:true},
  'sam-front':{c:A.frontSam,size:[.212,.242,.046],axis:'y',plugs:5,sam:true},
- 'sam-rear':{c:A.rearSam,size:[.246,.213,.060],plugs:5,sam:true},
+ 'sam-rear':{c:A.rearSam,size:[.246,.213,.060],plugs:5,sam:true,face:1},
  eis:{c:A.eis,size:[.100,.088,.055],axis:'x',plugs:2},
  'steering-column':{c:A.column,size:[.095,.087,.045],axis:'x',plugs:2},
  'upper-panel':{c:A.upper,size:[.160,.060,.029],axis:'x',plugs:2},
@@ -62,7 +78,7 @@ const modules={
  'yaw-sensor':{c:A.yaw,size:[.076,.058,.025],plugs:1,metal:true}
 };
 function localPoint(m,u,v,w){return m.axis==='x'?[m.c[0]+w,m.c[1]+u,m.c[2]+v]:m.axis==='y'?[m.c[0]+u,m.c[1]+w,m.c[2]+v]:[m.c[0]+u,m.c[1]+v,m.c[2]+w];}
-export const g500ElectronicPorts=Object.fromEntries(Object.entries(modules).map(([key,m])=>[key,localPoint(m,-(m.plugs-1)/2*m.size[0]*.76/m.plugs,-m.size[1]/2-.020,0)]));
+export const g500ElectronicPorts=Object.fromEntries(Object.entries(modules).map(([key,m])=>[key,localPoint(m,-(m.plugs-1)/2*m.size[0]*.76/m.plugs,(m.face||-1)*(m.size[1]/2+.020),0)]));
 g500ElectronicPorts.cluster=[-.554,-.415,1.255];
 g500ElectronicPorts['diff-lock-control']=[-.507,0,1.263];
 const hubPort=c=>[c[0]-.0055,c[1],c[2]+.013];
@@ -80,8 +96,10 @@ function controller(r,key){
   localBox(r,m,0,h*.13,t/2+.004,w*.40,h*.20,.002,'#b3b3a5');
   for(let i=0;i<m.plugs;i++){
    const u=(i-(m.plugs-1)/2)*w*.76/m.plugs,wide=w*.59/m.plugs;
-   localBox(r,m,u,-h/2-.009,0,wide,.022,t*.85,black);
-   localBox(r,m,u,-h/2-.020,0,wide*.77,.003,t*.55,gold);
+   // Console units face their plugs toward the right-hand harness lane.
+   const f=m.face||-1;
+   localBox(r,m,u,f*(h/2+.009),0,wide,.022,t*.85,black);
+   localBox(r,m,u,f*(h/2+.020),0,wide*.77,.003,t*.55,gold);
   }
   if(m.sam){
    // Fuse/relay sockets are visible in the training photographs. Counts below
@@ -152,7 +170,7 @@ function busConnector(r,c,count=6){
  }
 }
 function twin(r,pts,colA=red,colB=brown){
- for(const [d,color] of [[-.007,colA],[.007,colB]])line(r,pts.map(p=>[p[0],p[1]+d,p[2]]),.0018,color);
+ for(const [d,color] of [[-.007,colA],[.007,colB]])line(r,pts.map(p=>Object.assign([p[0],p[1]+d,p[2]],{floor:p.floor})),.0018,color);
 }
 export const g500CanBMembership={
  canB6:['eis','cluster','steering-column','door-front-left'],
@@ -161,6 +179,15 @@ export const g500CanBMembership={
 };
 export const g500CanCMembership=['ecu','tcm','esm','transfer','esp','eis','cluster','steering-column'];
 const keys={eis:'eis',cluster:'cluster','steering-column':'column','upper-panel':'upper','overhead-panel':'overhead','sam-front':'frontSam','sam-rear':'rearSam','comand-electronics':'comand','seat-left':'seatL','seat-right':'seatR','door-front-left':'doorFL','door-front-right':'doorFR','door-rear-left':'doorRL','door-rear-right':'doorRR','hvac.panel':null};
+// A floor route from a kick-panel hub on side sgn to a console or seat unit.
+// Units on the far side are reached around the back of the console.
+function lowPath(sgn,dest){
+ const near=Math.abs(dest[1])<.14||Math.sign(dest[1])===sgn;
+ return near?[on(-.52,sgn*.158),on(dest[0],sgn*.158),on(dest[0],dest[1]),dest]:
+  [on(-.52,sgn*.158),on(.45,sgn*.158),on(.45,-sgn*.158),on(dest[0],-sgn*.158),on(dest[0],dest[1]),dest];
+}
+// Units in the console or under the front seats are wired along the floor.
+const low=id=>['tcm','esm','transfer','sam-rear','srs-control','yaw-sensor','seat-left','seat-right'].includes(id);
 const anchor=id=>id==='hvac.panel'?[-.447,0,.918]:(g500ElectronicPorts[id]||A[keys[id]||id]);
 const targetId=id=>id.includes('.')?id:'electrical.'+id;
 function bodyNetwork(r){
@@ -173,21 +200,31 @@ function bodyNetwork(r){
   const path=id==='overhead-panel'?[base,[-.712,.813,1.335],[-.574,.810,1.620],
    [-.458,.805,1.851],[-.391,.798,1.901],[-.374,.380,1.909],dest]:
    id.startsWith('door-')?[base,[-.60,Math.sign(dest[1])*.739,.844],[dest[0],Math.sign(dest[1])*.777,.844],dest]:
+   low(id)?[base,[-.50,base[1]*.71,.840],...lowPath(Math.sign(base[1]),dest)]:
    [base,[-.50,base[1]*.71,.840],[dest[0],dest[1],.840],dest];
   twin(r,path);
  }
 }
 function drivetrainNetwork(r){
  for(const key of g500CanCMembership){
-  const dest=anchor(key);twin(r,[hubPort(A.canC),[-.16,.188,.784],[-.48,.218,.843],[dest[0],dest[1],.843],dest],green,blue);
+  const dest=anchor(key),hub=hubPort(A.canC);
+  // Console units are reached along the tunnel top; the rest leave under the
+  // console's right edge and climb to the dashboard.
+  // The pairs leave the connector's front end before dropping to the carpet.
+  const out=[hub[0]-.065,hub[1],hub[2]];
+  // The transmission controller's plugs face up, so its pair crosses above the selector module.
+  twin(r,key==='tcm'?[hub,[hub[0],hub[1],.935],[dest[0],dest[1]+.03,.955],dest]:
+   low(key)?[hub,out,on(out[0],hub[1]),on(dest[0],hub[1]),on(dest[0],dest[1]),dest]:
+   [hub,out,on(out[0],hub[1]),on(out[0],.158),on(-.45,.158),[-.50,.218,.843],[dest[0],dest[1],.843],dest],green,blue);
  }
 }
 function primaryPower(r){
  const junction=[-.651,-.388,.742];
- line(r,[A.prefuse,[.33,-.077,.708],[-.25,-.175,.708],junction,A.jump],.009,red);
+ // The cable rises from the prefuse beside the rear-seat battery and runs along the tunnel foot.
+ line(r,[A.prefuse,on(.40,-.158),on(-.45,-.158),junction,[-.70,-.56,.88],[-.80,-.64,.955],A.jump],.009,red);
  // The starter cable leaves the jump-start terminal, crosses the back of the
  // engine bay above the bellhousing and drops to the starter on the right.
- line(r,[A.jump,[-.788,-.58,.87],[-.788,-.18,.925],[-.788,.18,.925],[-.80,.33,.83],[-.87,.33,.80],[-.93,.31,.75],A.starter],.008,red);
+ line(r,[A.jump,[-.81,-.62,.955],[-.788,-.58,.87],[-.788,-.18,.925],[-.788,.18,.925],[-.80,.33,.83],[-.87,.33,.80],[-.93,.31,.75],A.starter],.008,red);
  // The charging cable follows the right side of the block above the pan rail,
  // passes over the engine-mount arm, drops in front of the pan and crosses
  // below the crank nose to the alternator.
@@ -210,25 +247,34 @@ function lightingHarness(r){
  for(const s of [-1,1]){
   const nose=[-2.063,s*.680,1.024];line(r,[A.frontSam,[-.72,s*.688,1.157],[-1.68,s*.688,1.157],nose],.004,black);
   line(r,[nose,[-2.05,s*.65,1.169],[-2.04,s*.70,1.288]],.0028,black);
-  line(r,[A.rearSam,[.39,s*.709,.744],[1.61,s*.757,.737],[2.130,s*.692,.897]],.004,black);
+  // Rear lamp runs leave the console along the tunnel foot, follow the sill and
+  // climb over the rear wheelhouse instead of passing through the wheel.
+  const sp=g500ElectronicPorts['sam-rear'];
+  line(r,[sp,on(sp[0],sp[1]),on(sp[0],.158),on(.45,.158),...(s<0?[on(.45,-.158)]:[]),on(.48,s*.60),[.50,s*.709,.744],[.95,s*.757,.737],[1.00,s*.757,.900],[1.88,s*.757,.900],[2.130,s*.692,.897]],.004,black);
  }
 }
 function lockCircuit(r){
  line(r,[g500ElectronicPorts['diff-lock-control'],[-.59,-.15,1.168],A.valves],.0035,black);
- line(r,[g500ElectronicPorts['sam-rear'],[.24,-.14,.86],[-.49,-.15,1.00],g500ElectronicPorts['diff-lock-control']],.0035,black);
+ const sp=g500ElectronicPorts['sam-rear'];
+ line(r,[sp,on(sp[0],sp[1]),on(sp[0],.158),on(-.40,.158),[-.49,.15,1.00],g500ElectronicPorts['diff-lock-control']],.0035,black);
 }
-function roofCircuit(r){line(r,[g500ElectronicPorts['sam-rear'],[.40,-.692,.740],[1.73,-.765,.751],A.roofMotor],.004,black);}
+function roofCircuit(r){const sp=g500ElectronicPorts['sam-rear'];line(r,[sp,on(sp[0],sp[1]),on(sp[0],.158),on(.45,.158),on(.45,-.158),on(.48,-.60),[.50,-.709,.744],[.95,-.765,.751],[1.00,-.765,.910],[1.70,-.765,.950],[1.765,-.775,.960],A.roofMotor],.004,black);}
 function chassisControl(r){
-  line(r,[g500ElectronicPorts.transfer,[.178,.113,.687],[.082,.211,.685],A.transferActuator],.004,black);
- line(r,[g500ElectronicPorts.tcm,[-.430,-.110,.679],[-.492,.067,.599],A.transmissionPlug],.004,black);
+  // Both drivetrain leads drop through grommets in the tunnel to their plugs.
+  const tp=g500ElectronicPorts.transfer,cp=g500ElectronicPorts.tcm;
+  line(r,[tp,on(tp[0],tp[1]),on(.178,.113),[.082,.211,.640],A.transferActuator],.004,black);
+ line(r,[cp,[cp[0],cp[1],cp[2]+.012],[-.41,cp[1],cp[2]+.012],on(-.41,-.125),[-.470,.058,.612],A.transmissionPlug],.004,black);
  line(r,[g500ElectronicPorts.esp,[-.607,.514,.827],[-.728,.42,1.235],[-.728,-.55,1.235],[-1.02,-.756,1.139],plus(A.abs,[-.012,-.078,-.008])],.004,black);
- line(r,[g500ElectronicPorts.esp,[-.250,.228,.714],g500ElectronicPorts['yaw-sensor']],.003,black);
+ // The yaw-sensor lead passes under the front of the console to the sensor's plug.
+ const yp=g500ElectronicPorts['yaw-sensor'];
+ line(r,[g500ElectronicPorts.esp,on(-.45,.158),on(-.47,.158),on(-.47,-.13),on(yp[0],-.13),on(yp[0],yp[1]),yp],.003,black);
 }
 function rearHeaterCircuit(r){
  const start=g500ElectronicPorts['rear-seat-heat'];
- line(r,[A.prefuse,[.39,-.42,.729],[1.20,-.756,.738],[1.80,-.790,.784],start],.004,black);
- // The right branch crosses behind the cabin battery.
- for(const s of [-1,1])line(r,[start,[1.74,-.756,.748],[.96,-.720,.745],...(s>0?[[.935,-.20,.750],[.935,.20,.750]]:[]),[.86,s*.530,.751]],.003,black);
+ line(r,[A.prefuse,on(.40,-.158),on(.47,-.60),[.50,-.701,.744],[.95,-.749,.737],[1.00,-.749,.890],[1.80,-.749,.890],start],.004,black);
+ // The branches cross the cargo floor inboard of the wheelhouses and run
+ // forward over the kick-up to the cushion mats.
+ for(const s of [-1,1])line(r,[start,[1.80,-.70,.900],[1.70,-.35,.748],...(s>0?[[1.70,.35,.748]]:[]),[1.05,s*.35,.748],[.86,s*.530,.751]],.003,black);
 }
 function relayBank(r){
  for(let i=0;i<3;i++){box(r,plus(A.rearRelays,[(i-1)*.043,0,0]),[.032,.034,.040],i===1?gold:black);}

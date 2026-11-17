@@ -4,12 +4,13 @@ import {tint} from './road-primitives.js';
 import {drawHeaterMat,frontHeaterCenter} from './g500-seat-heaters.js';
 import {drawG500WindowLift} from './g500-window-lifter.js';
 import {part,study} from './mechanism-shapes.js';
+import {cabinFloorTop} from './floor-trim.js';
 import {seatHardwareRows,drawG500SeatHardware,seatTrackPlate,seatTrimPlate,seatAdjusterPlate} from './g500-seat-adjuster.js';
 export const g500CabinSource={label:'RM Sotheby’s · 2002 US G500 cabin photographs, Arizona lot R0041',url:'https://rmsothebys.com/auctions/az23/lots/r0041-2002-mercedesbenz-g-500/'};
 const leather='#4b4d4e',bolster='#484b4c',seam='#353738',rubber='#303437',silver='#a4a7a5',wood='#6c4532';
 
-function bands(r,rings,color){
- r.polygon(rings[0].slice().reverse(),tint(color,.77),false);
+function bands(r,rings,color,openBase=false){
+ if(!openBase)r.polygon(rings[0].slice().reverse(),tint(color,.77),false);
  for(let j=1;j<rings.length;j++){
   const a=rings[j-1],b=rings[j];
   for(let i=0;i<a.length;i++){
@@ -20,12 +21,12 @@ function bands(r,rings,color){
  r.polygon(rings.at(-1),tint(color,1.03),false);
 }
 // Rounded rectangular cross-sections with a slightly crowned face. Every strip shares its edge.
-function upholstery(r,levels,color){
- const arc=t=>Math.sign(t)*Math.abs(t)**.47;
+function upholstery(r,levels,color,openBase=false,power=.47){
+ const arc=t=>Math.sign(t)*Math.abs(t)**power;
  const rings=levels.map(([x,y,z,depth,width])=>Array.from({length:16},(_,i)=>{
   const a=i*Math.PI/8;return [x+depth*arc(Math.cos(a)),y+width*arc(Math.sin(a)),z];
  }));
- bands(r,rings,color);
+ bands(r,rings,color,openBase);
 }
 function cushion(r,x,y,z,halfWidth,depth=.23){
  upholstery(r,[[x,y,z-.074,depth*.80,halfWidth*.83],[x,y,z-.053,depth*.95,halfWidth*.96],[x,y,z-.005,depth,halfWidth],[x+.008,y,z+.02,depth*.96,halfWidth*.98],[x+.013,y,z+.042,depth*.84,halfWidth*.84]],leather);
@@ -123,12 +124,20 @@ function dashboard(r){
   }
   for(const a of [.08,Math.PI-.08,1.25*Math.PI,1.75*Math.PI])r.rod(center,P(a),.023,rubber,9);
   upholstery(r,[[-.310,-.410,1.169,.022,.055],[-.309,-.410,1.203,.034,.084],[-.313,-.410,1.258,.034,.094],[-.319,-.410,1.282,.026,.076]],'#484e4e');
-  upholstery(r,[[-.085,0,.681,.411,.124],[-.087,0,.792,.407,.127],[-.086,0,.842,.396,.113]],'#474b4d');
-  r.box(-.423,-.091,.844,-.161,.094,.854,wood);
-  r.box(-.359,-.027,.855,-.185,.022,.858,rubber);
-  r.rod([-.292,-.013,.853],[-.267,-.013,.944],.012,silver,9);
-  upholstery(r,[[-.268,-.013,.930,.025,.024],[-.26,-.013,.958,.032,.029],[-.261,-.013,.980,.026,.025]],rubber);
-  upholstery(r,[[.107,0,.829,.160,.101],[.107,0,.881,.164,.103],[.107,0,.901,.15,.095]],leather);
+  // The console stands on the carpeted tunnel and is tall enough to house the
+  // selector, transmission, restraint, yaw, transfer-case and rear SAM units.
+  const shell=[0,0,.812,.500,.140];
+  upholstery(r,[shell,[-.002,0,.930,.496,.143],[-.001,0,.990,.484,.130]],'#474b4d',true,.25);
+  // An open skirt carries the shell down toward the carpet, following the tunnel.
+  // It stops 35 mm short so the harnesses on the carpet pass under its edge.
+  {const arc=t=>Math.sign(t)*Math.abs(t)**.25,[cx,cy,cz,d,w]=shell;
+   const ring=Array.from({length:16},(_,i)=>{const a=i*Math.PI/8,x=cx+d*arc(Math.cos(a)),y=cy+w*arc(Math.sin(a));return [x,y,cabinFloorTop('g500',x,y)+.035];});
+   for(let i=0;i<16;i++){const a=ring[i],b=ring[(i+1)%16];r.polygon([[a[0],a[1],cz],[b[0],b[1],cz],b,a],tint('#474b4d',.80),false);}}
+  r.box(-.423,-.091,.992,-.161,.094,1.002,wood);
+  r.box(-.359,-.027,1.003,-.185,.022,1.006,rubber);
+  r.rod([-.292,-.013,1.001],[-.267,-.013,1.092],.012,silver,9);
+  upholstery(r,[[-.268,-.013,1.078,.025,.024],[-.26,-.013,1.106,.032,.029],[-.261,-.013,1.128,.026,.025]],rubber);
+  upholstery(r,[[.107,0,.977,.160,.101],[.107,0,1.029,.164,.103],[.107,0,1.049,.15,.095]],leather);
  });
 }
 function rearviewMirror(r){

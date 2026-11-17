@@ -36,8 +36,8 @@ function exchanger(r,c,w,h,t,s,section,measured=false){
 }
 export const g500HeaterPorts=[[-.665,-.048,1.075],[-.665,.010,1.075]];
 export const coreCenter=[-.505,.028,1.080],evapCenter=[-.608,.035,1.081];
-const comp=[-1.655,.294,.573],con=[-2.040,0,.856],drier=[-1.985,.506,.905];
-const metering=[-.691,.147,1.114],blower=[-.602,.374,1.065],filter=[-.789,.100,1.200];
+const comp=[-1.655,.294,.573],con=[-2.040,0,.856],drier=[-1.985,.506,.870]/* below the intake duct */;
+const metering=[-.691,.147,1.114],blower=[-.602,.374,1.065],filter=[-.780,.190,1.200]; // The cabin filter stands right of the throttle body, behind the valve cover.
 export const climateTargets={comp,con,drier,metering,blower,filter};
 export function drawCore(r,type,section,c=type==='heater'?coreCenter:type==='condenser'?con:evapCenter,scale=1){
  const dim=type==='heater'?[.234,.175,.032]:type==='condenser'?[.813,.431,.017]:[.308,.200,.065];
@@ -90,7 +90,8 @@ export function rotaryFan(r,c,axis,rad,angle=0){
  cyl(r,c,axis,-rad*.07,rad*.07,.25*rad,'#41484a',16);
 }
 export function fanPair(r,key,section=null,c=null,s=1,angle=0){
- const site=c||[-2.074,key==='left'?-.208:.208,.854],rad=.185*s;
+ // The fans sit high in front of the condenser, above the transmission cooler.
+ const site=c||[-2.074,key==='left'?-.208:.208,.959],rad=.185*s;
  if(section===null||section==='blade')rotaryFan(r,site,x,rad,angle);
  if(section===null||section==='motor')motor(r,add(site,[-.019*s,0,0]),x,.048*s,.034*s,'#424b4e');
  if(section===null||section==='shroud'){

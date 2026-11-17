@@ -156,7 +156,7 @@ function bodyShell(r,paint) {
       r.rod([-.768,y-.118,1.358],[-.742,y+.157,1.417],.009,dark,8);
       r.rod([-.749,y+.002,1.401],[-.734,y+.278,1.434],.011,dark,8);
     }
-    bumperSkin(r,{face:front-.116,back:front+.077,width:.923,low:.480,high:.685,span:.229,center:.598,lightZ:.553,lightHeight:.092,paint:tone(paint,.8)});
+    bumperSkin(r,{face:front-.116,back:front+.037,width:.923,low:.480,high:.685,span:.229,center:.598,lightZ:.553,lightHeight:.092,paint:tone(paint,.8)});
     drawFrontBumperFittings(r);
     bumperSkin(r,{face:2.225,back:2.039,width:.926,low:.483,high:.680,span:.147,center:.641,lightZ:.552,lightHeight:.077,paint:tone(paint,.82)});
     for(const y of [-.662,.662]){

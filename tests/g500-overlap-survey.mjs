@@ -70,7 +70,6 @@ export const mounts=[
   ...['suspension.rear-axle','wheels.hub','suspension.trailing-arms','suspension.rear-track-bar'].map(id=>['differentials.rear',id,'the rear axle carries it']),
   ['steering.axle','suspension.radius-arms','the radius arms bolt to the axle'],
   ['steering.axle','suspension.spring','the springs sit on the axle'],
-  ['steering.linkage','wheels.hub','the tie rod ends meet the steering arms'],
   ['steering-assist.pitman','steering.linkage','the drag link hangs from the pitman arm'],
   ['suspension.rear-axle','wheels.hub','the hubs turn on the axle'],
   ['suspension.rear-axle','wheels.caliper','the caliper brackets are on the axle'],
@@ -93,6 +92,7 @@ export const mounts=[
   ['roof.cable','roof.cassette','the cables run inside the cassette'],
   ['body.roof','roof.cable','the cables run inside the roof'],
   ['body.roof','roof.drainage','the drain tubes run inside the roof and pillars'],
+  ['transmission-fluid.brackets','hvac.condenser','the transmission cooler brackets bolt to the condenser side tanks'],
 ];
 // Reviewed pairs that the rules would pass but are wrong.
 export const errors=[];

@@ -57,7 +57,7 @@ export function headlampSeat992(point){
     const rim=.7015+.688*dx-.4155*e+.143*dx*dx+.2075*e*e-.134*dx*e;
     const cap=rim-.004+slope*(dy-e)-1.6*Math.max(0,dy-e)**2,k=.008;
     const soft=-k*Math.log(Math.exp(-seated/k)+Math.exp(-cap/k));
-    const outboard=smooth((dy-.08)/.06)*(1-smooth((Math.abs(dx)-.25)/.15));
+    const outboard=smooth((dy-.08)/.06)*(1-smooth((Math.abs(dx)-.12)/.26));
     seated=mix(seated,Math.min(seated,soft),outboard);
   }
   return [point[0],y,seated];
@@ -137,6 +137,7 @@ export function doorRibX(x,t){
 // Rows follow the stock 992.1 cover: one continuous black front grille surround
 // behind a painted upper nose. The lower front lip and the rear apron carry a
 // separate narrow painted edge. The sport-exhaust outlets use the inboard pair.
+const wrapSteps=4;
 export function fascia992(r,front,paint,w,x,point,cap,flank,painted,sideHeights,outer){
   const sign=front?-1:1;
   const bands=y=>{
@@ -243,9 +244,36 @@ export function fascia992(r,front,paint,w,x,point,cap,flank,painted,sideHeights,
       };
       const corner=z=>along(row,k=>vertex(s*w,k),z);
       const side=z=>along(sideHeights,k=>flank(s,sideHeights[k]),z);
+      // The cover wraps round onto the wing in a continuous radius. At each
+      // height a Hermite curve leaves the flank along its own run and arrives
+      // tangent to the bumper face, instead of one straight chord that leaves
+      // a crease at both edges.
+      const faceIn=z=>along(row,k=>vertex(s*w*.96,k),z);
+      const curve=z=>{
+        const p0=side(z),p1=corner(z),prev=flank.at?flank.at(s,z,-sign*.06):null;
+        if(!prev)return [p0,p1];
+        const unit=v=>{const l=Math.hypot(v[0],v[1])||1;return [v[0]/l,v[1]/l];};
+        const chord=unit([p1[0]-p0[0],p1[1]-p0[1]]);
+        // Keep each end tangent leaning along the chord. Where the wing's low
+        // tuck pulls its last point back, its own run would fold the corner.
+        const lean=v=>{
+          const d=v[0]*chord[0]+v[1]*chord[1];
+          if(d>=.35)return v;
+          const w=(.35-d)/(1.35-d);
+          return unit([mix(v[0],chord[0],w),mix(v[1],chord[1],w)]);
+        };
+        const inner=faceIn(z);
+        const t0=lean(unit([p0[0]-prev[0],p0[1]-prev[1]])),t1=lean(unit([inner[0]-p1[0],inner[1]-p1[1]]));
+        const span=Math.hypot(p1[0]-p0[0],p1[1]-p0[1]);
+        return Array.from({length:wrapSteps+1},(_,i)=>{
+          const u=i/wrapSteps,u2=u*u,u3=u2*u;
+          const h00=2*u3-3*u2+1,h10=u3-2*u2+u,h01=-2*u3+3*u2,h11=u3-u2;
+          return [0,1].map(j=>h00*p0[j]+h10*span*t0[j]+h01*p1[j]+h11*span*t1[j]).concat(mix(p0[2],p1[2],u));
+        });
+      };
       for(let k=1;k<stops.length;k++){
-        const a=stops[k-1],b=stops[k];
-        painted(r,[corner(a),corner(b),side(b),side(a)],paint,[sign*.46,s,0]);
+        const a=curve(stops[k-1]),b=curve(stops[k]);
+        for(let i=1;i<a.length;i++)painted(r,[b[i],a[i],a[i-1],b[i-1]],paint,[sign*.46,s,0]);
       }
     }
     const under=(p)=>[p[0]-sign*.064,p[1]*.970,p[2]+.008];

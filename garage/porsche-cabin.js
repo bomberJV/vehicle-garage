@@ -1,4 +1,5 @@
 import {raisedTop} from './porsche-raised-top.js';
+import {porscheDeckPoint} from './porsche-coachwork.js';
 import {glazingFace} from './surface-materials.js';
 import {pipe, strip, tint, ellipsoid, ellipse} from './road-primitives.js';
 
@@ -92,6 +93,25 @@ export function drawPorscheCompartmentLid(r,paint){
   strip(r,inner,outer,paint);
   strip(r,outer,outer.map(([x,y,z])=>[x+.005,y,z+.001]),tint(paint,.65));
 }
+// Rear edge of the stowed front bow in plan: furthest aft on the centreline,
+// curving forward to meet the haunches above the rear axle.
+const bowRear=y=>1.40-.25*(Math.abs(y)/.66)**2;
+function stowedBow(r,car,outer){
+  const fabric='#3f4142',n=outer.length,rows=10,first=r.faces.length;
+  const front=[...outer].sort((a,b)=>a[1]-b[1]);
+  const point=(i,t)=>{
+    const [x0,y]=front[i],x=mix(x0,bowRear(y),t);
+    const p=porscheDeckPoint(car,x,y);
+    return [x,y,Math.max(p[2],x0<.84&&t<.4?front[i][2]:p[2])+.004];
+  };
+  const grid=Array.from({length:n},(_,i)=>Array.from({length:rows+1},(_,k)=>point(i,k/rows)));
+  for(let i=1;i<n;i++)for(let k=1;k<=rows;k++){
+    r.polygon([grid[i-1][k-1],grid[i][k-1],grid[i][k],grid[i-1][k]],fabric,false);
+  }
+  const edge=grid.map(row=>row[rows]);
+  strip(r,edge,edge.map(([x,y,z])=>[x+.004,y,z-.012]),'#2b2d2e');
+  for(let i=first;i<r.faces.length;i++){r.faces[i].roofServicePart='roof.fabric';r.faces[i].stowedCover=true;}
+}
 function softTop(r,car,paint){
   if(!car.modern){
     // Fitted boot wraps the lowered fabric stack in a U behind the rear seats.
@@ -125,12 +145,16 @@ function softTop(r,car,paint){
       r.polygon(stud,'#807e79',false);
     }
   }else{
-    // The 992 top folds into a flush body-colour compartment around a dark apron.
-    const {apron,inner}=compartmentEdges();
+    // The 992 top folds in a Z into the compartment behind the rear seats. Its
+    // fabric-covered front bow then lies flush on top as the cover: photographs
+    // of the car with the top down show black fabric from behind the seats to
+    // a curved edge just ahead of the engine grille, not painted bodywork.
+    const {apron,inner,outer}=compartmentEdges();
     strip(r,apron,inner,'#393a3b');
     const first=r.faces.length;
     drawPorscheCompartmentLid(r,paint);
     for(let i=first;i<r.faces.length;i++)r.faces[i].roofServicePart='roof.compartment-lid';
+    stowedBow(r,car,outer);
   }
 }
 function dash(r,car){

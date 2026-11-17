@@ -22,7 +22,10 @@ for(const [index,vehicle] of vehicles.entries()){
    for(const f of frame.authored)assert.equal(frame.r.faces.filter(v=>v===f).length,1);
    assert(!frame.r.faces.some(f=>f.part==='cabin.top'));
   }
-  const stowed=down.r.faces.filter(f=>f.part.startsWith('roof.')).flatMap(f=>f.points);
+  // The 992's fabric front bow lies flush on the body as the compartment cover
+  // when the top is down (photographs); only the folded frame stays low.
+  const stowed=down.r.faces.filter(f=>f.part.startsWith('roof.')&&!f.stowedCover).flatMap(f=>f.points);
+  if(index===1)assert(down.r.faces.some(f=>f.stowedCover&&f.part==='roof.fabric'),'flush fabric cover over the stowed top');
   assert(extremes(stowed,2)[1]<car.belt+.17);
   assert(extremes(down.points('rear-window'),0)[0]>.75);
   assert(extremes(down.points('header'),0)[0]>.70);

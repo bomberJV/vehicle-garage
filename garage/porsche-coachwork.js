@@ -373,6 +373,11 @@ function fascia(r,car,front,paint){
   if(car.modern){
     const cap=y=>top(car,x,y)[2],bottom=wheelCut(car,x);
     const flank=(s,z)=>sideRaw(car,x,clamp((z-bottom)/(cap(s*w)-bottom)),s);
+    // The same height a little way along the wing, for the corner's tangent.
+    flank.at=(s,z,dx)=>{
+      const xx=x+dx,low=wheelCut(car,xx),high=top(car,xx,s*station(car,xx)[0]*.958)[2];
+      return sideRaw(car,xx,clamp((z-low)/(high-low)),s);
+    };
     // Both joins reuse the polygon edges of the adjoining loft. An analytic
     // point on a curved skin can sit millimetres off a chord between vertices.
     const side=sideLevels992.map(t=>sideRaw(car,x,t,1)[2]);
@@ -448,6 +453,23 @@ function fascia(r,car,front,paint){
 }
 function exteriorLights(r,car,paint){
   const nose=fascia(r,car,true,paint),tail=fascia(r,car,false,paint),modern=car.modern;
+  // Outermost crossing of a horizontal ray with the painted rear quarters.
+  const cornerTris=modern&&r.faces?r.faces.filter(f=>f.paintNormal&&f.points.some(p=>p[0]>1.45&&Math.abs(p[1])>.45&&p[2]>.6&&p[2]<.9))
+    .flatMap(f=>{const idx=faceTriangles(f.points),out=[];for(let i=0;i<idx.length;i+=3)out.push([f.points[idx[i]],f.points[idx[i+1]],f.points[idx[i+2]]]);return out;}):[];
+  const cornerSurface=(o,d)=>{
+    let best=null;
+    for(const [a,b,c] of cornerTris){
+      const e1=b.map((v,i)=>v-a[i]),e2=c.map((v,i)=>v-a[i]);
+      const p=[d[1]*e2[2]-d[2]*e2[1],d[2]*e2[0]-d[0]*e2[2],d[0]*e2[1]-d[1]*e2[0]];
+      const det=e1[0]*p[0]+e1[1]*p[1]+e1[2]*p[2];if(Math.abs(det)<1e-12)continue;
+      const tv=o.map((v,i)=>v-a[i]),u=(tv[0]*p[0]+tv[1]*p[1]+tv[2]*p[2])/det;if(u<0||u>1)continue;
+      const q=[tv[1]*e1[2]-tv[2]*e1[1],tv[2]*e1[0]-tv[0]*e1[2],tv[0]*e1[1]-tv[1]*e1[0]];
+      const v=(d[0]*q[0]+d[1]*q[1]+d[2]*q[2])/det;if(v<0||u+v>1)continue;
+      const dist=(e2[0]*q[0]+e2[1]*q[1]+e2[2]*q[2])/det;
+      if(dist>0&&(!best||dist>best.dist))best={dist,point:o.map((v,i)=>v+d[i]*dist)};
+    }
+    return best?.point;
+  };
   for(const s of [-1,1]){
     r.tag('lights.headlamps',()=>{
       if(modern)draw992Headlamp(r,car,s,top);
@@ -470,6 +492,23 @@ function exteriorLights(r,car,paint){
         const proud=modern?.008:.006368;
         if(t<=.84)return tail.point(s*y,z,depth-proud);
         const base=tail.point(s*tail.w,z,depth-proud),k=(t-.84)/.16;
+        if(modern){
+          // The lens wraps the rounded corner flush with the paint and ends in a
+          // point on the flank below the haunch's shoulder. Find the actual
+          // painted surface with a horizontal ray that turns from straight aft
+          // to straight outboard, starting inside the corner.
+          // Rays fan from one point inside the corner, level with the lamp's
+          // outer end and its last aft-facing station, so their hits run in
+          // order from the rear face round to the tip on the flank.
+          const eased=k*k*(3-2*k),zz=z-.010*eased;
+          const origin=[1.665,base[1],zz];
+          const dir=[Math.cos(k*Math.PI/2),s*Math.sin(k*Math.PI/2),0];
+          const hit=cornerSurface(origin,dir);
+          if(hit){
+            const out=proud-depth+.002;
+            return [hit[0]+dir[0]*out,hit[1]+dir[1]*out,zz];
+          }
+        }
         const actualZ=z+(modern?.047:.055)*k;
         let xx=tail.x-.438*k;
         const flank=raw=>sideRaw(car,raw,clamp((actualZ-wheelCut(car,raw))/(top(car,raw,station(car,raw)[0]*.958)[2]-wheelCut(car,raw))),s);

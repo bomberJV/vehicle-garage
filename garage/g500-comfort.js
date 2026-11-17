@@ -185,7 +185,7 @@ export const g500ComfortElectricalRows=[
   // Both branches lie on the carpet at the foot of the tunnel, inboard of the seat runners.
   // The feed rises off the prefuse stud and clears the battery box before dropping to the tunnel foot;
   // it climbs to the top of the footwell fuse box outboard of the stability controller.
-  const feed=[[.482,-.074,.754],[.482,-.074,.800],[.40,.10,.800],on(.38,.158),on(.044,.158),on(-.35,.158),on(-.45,.158),[-.58,.30,.78],[-.568,.445,.78],[-.568,.445,.754]];
+  const feed=[[.482,-.074,.754],[.482,-.074,.800],[.40,.10,.800],on(.38,.158),on(.044,.158),on(-.35,.158),on(-.45,.158),[-.58,.30,.748],[-.568,.445,.748],[-.568,.445,.754]];
   floorLine(r,feed,.0085,'#7b4c44');floorLine(r,[feed[3],on(.45,-.145),on(-.40,-.145),[-.564,-.667,.837],[-.571,-.718,1.055]],.0065,rubber);
  }],
  ['comfort-harness','Cabin equipment harness','Separate branches carry power and signals to the seat connectors, ventilation unit and column drives. The drawing shows destinations and omits terminal numbers.',rear,comfortSources.power,r=>{
@@ -193,7 +193,7 @@ export const g500ComfortElectricalRows=[
   for(const s of [-1,1]){const base=on(.30,s*(s>0?.158:.145)),turn=on(.12,s*.36);
    floorLine(r,[base,turn,[.10,s*.43,.735],[-.037,s*.513,.764]],.0035,rubber);
    floorLine(r,[base,on(.49,s*.375),[.84,s*.53,.751]],.0035,rubber);}
-  line(r,[[-.568,.445,.754],[-.607,.401,.857],[-.591,.374,.992]],.005,rubber);
+  line(r,[[-.568,.445,.754],[-.640,.420,.745],[-.640,.400,.857],[-.591,.374,.992]],.005,rubber);
   line(r,[[-.571,-.718,1.055],[-.573,-.599,1.044],[-.526,-.454,1.084],[-.531,-.374,1.108]],.004,rubber);
  }]
 ];

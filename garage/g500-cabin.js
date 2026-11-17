@@ -129,9 +129,9 @@ function dashboard(r){
   const shell=[0,0,.812,.500,.140];
   upholstery(r,[shell,[-.002,0,.930,.496,.143],[-.001,0,.990,.484,.130]],'#474b4d',true,.25);
   // An open skirt carries the shell down toward the carpet, following the tunnel.
-  // It stops 35 mm short so the harnesses on the carpet pass under its edge.
+  // It stops 40 mm short of the carpet facets so the harnesses on the carpet pass under its edge.
   {const arc=t=>Math.sign(t)*Math.abs(t)**.25,[cx,cy,cz,d,w]=shell;
-   const ring=Array.from({length:16},(_,i)=>{const a=i*Math.PI/8,x=cx+d*arc(Math.cos(a)),y=cy+w*arc(Math.sin(a));return [x,y,cabinFloorTop('g500',x,y)+.035];});
+   const ring=Array.from({length:16},(_,i)=>{const a=i*Math.PI/8,x=cx+d*arc(Math.cos(a)),y=cy+w*arc(Math.sin(a));return [x,y,cabinFloorTop('g500',x,y)+.040];});
    for(let i=0;i<16;i++){const a=ring[i],b=ring[(i+1)%16];r.polygon([[a[0],a[1],cz],[b[0],b[1],cz],b,a],tint('#474b4d',.80),false);}}
   r.box(-.423,-.091,.992,-.161,.094,1.002,wood);
   r.box(-.359,-.027,1.003,-.185,.022,1.006,rubber);

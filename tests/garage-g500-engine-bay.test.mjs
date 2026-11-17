@@ -37,7 +37,7 @@ function clearances(mode,a,list){
 test('the G500 gearbox clears the floor, the bulkhead, the frame and the console at either depicted pose',()=>{
   assert.deepEqual(poses,['stock','g500-orc-40']);
   const gaps=[['floor.pan',8.0],['floor.underlay',34.7],['floor.carpet',34.6],['body.structure',32.1],['suspension.frame',35.0],
-    ['body.dashboard',2.0],['electrical.starter',36.9],['electrical.primary-power',85.0],['evap.purge-line',125.1]];
+    ['body.dashboard',55.8],['electrical.starter',36.9],['electrical.primary-power',85.0],['evap.purge-line',125.1]];
   for(const mode of poses){
     clearances(mode,faces=>part(faces,'drivetrain.gearbox'),gaps);
     // The transmission plug is the only other part that enters the case.
@@ -94,7 +94,7 @@ test('the starter lies along the block ahead of the bellhousing and its cables s
     assert.deepEqual(crossedParts(faces,part(faces,'electrical.starter'),'electrical.starter'),['electrical.primary-power']);
     // Ahead of the bulkhead the cables meet only their three terminals.
     const cables=bayCables(faces);
-    assert.equal(cables.length,168);
+    assert.equal(cables.length,192);
     assert.deepEqual(crossedParts(faces,cables,'electrical.primary-power'),['electrical.alternator','electrical.starter','powertrain.battery']);
     clearances(mode,bayCables,[['drivetrain.gearbox',85.0],['powertrain.sump',27.7],['evap.purge-line',11.5],['powertrain.fuel-rail',9.5],
       ['powertrain.head',11.3],['powertrain.oil-dipstick',13.6],['floor.carpet',16.2]]);

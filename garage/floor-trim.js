@@ -105,6 +105,24 @@ function floorPieces(p){
  }));
  return pieces;
 }
+// Upper bound of the fitted floor (carpet, mats and seat rails) at a world point,
+// for parts that rest on it. Returns null outside the carpet. The carpet is drawn
+// as flat facets between nodes, so the highest corner of the facet is used.
+const carpetUs=[.005,.06,.13,.18,.34,.55,.75,.82,.90,.993];
+const carpetVs=[-.987,-.95,-.9,-.42,-.30,-.25,-.20,-.16,-.1,0,.1,.16,.20,.25,.30,.42,.9,.95,.987];
+const bracket=(list,t)=>{let i=1;while(i<list.length-1&&list[i]<t)i++;return [list[i-1],list[i]];};
+export function cabinFloorTop(vehicle,x,y){
+ const p=profiles[vehicle];if(!p)return null;
+ const u=(x-p.front)/(p.rear-p.front);if(u<carpetUs[0]||u>carpetUs[carpetUs.length-1])return null;
+ const half=surface(p,u,1,0)[1],v=y/half;if(Math.abs(v)>.987)return null;
+ let top=-Infinity;
+ for(const uu of bracket(carpetUs,u))for(const vv of bracket(carpetVs,v))top=Math.max(top,surface(p,uu,vv,.003)[2]);
+ const av=Math.abs(v);
+ if(u>.07&&u<.475&&av>.30&&av<.885)top=Math.max(top,surface(p,u,v,.036)[2]);
+ const rails=p.seatWidth?[(p.seatWidth-.135)/p.width,(p.seatWidth+.135)/p.width]:[.39,.82];
+ if(Math.abs(u-.53)<.115)for(const r of rails)if(Math.abs(y-Math.sign(y||1)*r*half)<.040)top=Math.max(top,surface(p,u,v,.054)[2]);
+ return top;
+}
 const floors=new Map(),details=new Map();
 export function getCabinFloor(vehicle){
  const p=profiles[vehicle];if(!p)return null;

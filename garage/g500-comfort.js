@@ -1,6 +1,8 @@
 // 463.249 US, MY 2002. Public plates establish component type and connections.
 // Pipes, harness runs, folded metal, actuator gearing and winding patterns are illustrative.
 import {part,study} from './mechanism-shapes.js';
+import {on,drape} from './g500-cabin-routing.js';
+const floorLine=(r,pts,rad,color)=>line(r,drape(pts,rad),rad,color);
 import {heaterPad,frontHeaterCenter,drawHeaterMat} from './g500-seat-heaters.js';
 import {g500FrontSeatStudy} from './g500-cabin.js';
 import {cyl,sleeve,turn,TAU,x,y,z,O,add,box,line,port,blockShell,motor,alloy,iron,foam,black,rubber,copper,blue,
@@ -180,12 +182,17 @@ const column=assembly('column-adjustment','Electrically adjustable steering colu
 ]);
 export const g500ComfortElectricalRows=[
  ['main-feed','Cabin fused-power distribution','The positive battery lead connects to the nearby prefuse block. The distribution harness feeds the passenger compartment. The routes represent branches, with fuse assignments and wire colors left to the vehicle wiring diagram.',down,comfortSources.power,r=>{
-  const feed=[[.482,-.074,.754],[.464,-.089,.708],[.273,.117,.688],[.044,.159,.681],[-.350,.166,.706],[-.568,.445,.754]];
-  line(r,feed,.0085,'#7b4c44');line(r,[feed[2],[.181,-.208,.679],[-.208,-.407,.689],[-.564,-.667,.837],[-.571,-.718,1.055]],.0065,rubber);
+  // Both branches lie on the carpet at the foot of the tunnel, inboard of the seat runners.
+  // The feed rises off the prefuse stud and clears the battery box before dropping to the tunnel foot;
+  // it climbs to the top of the footwell fuse box outboard of the stability controller.
+  const feed=[[.482,-.074,.754],[.482,-.074,.800],[.40,.10,.800],on(.38,.158),on(.044,.158),on(-.35,.158),on(-.45,.158),[-.58,.30,.78],[-.568,.445,.78],[-.568,.445,.754]];
+  floorLine(r,feed,.0085,'#7b4c44');floorLine(r,[feed[3],on(.45,-.145),on(-.40,-.145),[-.564,-.667,.837],[-.571,-.718,1.055]],.0065,rubber);
  }],
  ['comfort-harness','Cabin equipment harness','Separate branches carry power and signals to the seat connectors, ventilation unit and column drives. The drawing shows destinations and omits terminal numbers.',rear,comfortSources.power,r=>{
-  for(const s of [-1,1]){line(r,[[.273,.117,.689],[.235,s*.29,.672],[-.043,s*.381,.673],[-.037,s*.513,.764]],.0035,rubber);
-   line(r,[[.235,s*.29,.672],[.49,s*.375,.684],[.84,s*.53,.751]],.0035,rubber);}
+  // Each seat branch leaves the tunnel behind the seat runners and climbs to the seat connector.
+  for(const s of [-1,1]){const base=on(.30,s*(s>0?.158:.145)),turn=on(.12,s*.36);
+   floorLine(r,[base,turn,[.10,s*.43,.735],[-.037,s*.513,.764]],.0035,rubber);
+   floorLine(r,[base,on(.49,s*.375),[.84,s*.53,.751]],.0035,rubber);}
   line(r,[[-.568,.445,.754],[-.607,.401,.857],[-.591,.374,.992]],.005,rubber);
   line(r,[[-.571,-.718,1.055],[-.573,-.599,1.044],[-.526,-.454,1.084],[-.531,-.374,1.108]],.004,rubber);
  }]

@@ -41,6 +41,15 @@ function piercing(p,q,a,b,c){
   const x=lerp(p,q,dp/(dp-dq));
   return [[a,b],[b,c],[c,a]].every(([u,v])=>dot(cross(sub(v,u),sub(x,u)),n)>=-1e-15*nn)?x:null;
 }
+// A point where two triangles pass through each other, or null. Triangles that
+// only touch along a shared plane do not count.
+export function trianglesCross(A,B){
+  for(let i=0;i<3;i++){
+    const at=piercing(A[i],A[(i+1)%3],...B)||piercing(B[i],B[(i+1)%3],...A);
+    if(at)return at;
+  }
+  return null;
+}
 function triangleDistance(A,B){
   for(let i=0;i<3;i++){
     const at=piercing(A[i],A[(i+1)%3],...B)||piercing(B[i],B[(i+1)%3],...A);
@@ -87,4 +96,55 @@ export function crossedParts(faces,tris,own){
     (groups.get(face.part)??groups.set(face.part,[]).get(face.part)).push(face);
   }
   return [...groups].filter(([,group])=>meshSeparation(tris,worldTriangles(group,()=>true)).crossings).map(([id])=>id).sort();
+}
+// Every pair of parts whose installed surfaces cross, found through a uniform
+// grid so the whole vehicle can be checked at once. Each entry gives the two
+// part ids in order, the number of crossing triangle pairs, the number of
+// separate places where they cross and the span of the largest place.
+export function crossingPairs(faces,cell=.05){
+  const tris=worldTriangles(faces,()=>true),owner=[];
+  for(const face of faces)for(let k=0;k<face.triangles.length;k+=3)owner.push(face.part);
+  const grid=new Map(),at=v=>Math.floor(v/cell),key=(x,y,z)=>(x+512)*1048576+(y+512)*1024+(z+512);
+  tris.forEach((t,i)=>{
+    for(let x=at(t.min[0]);x<=at(t.max[0]);x++)for(let y=at(t.min[1]);y<=at(t.max[1]);y++)for(let z=at(t.min[2]);z<=at(t.max[2]);z++){
+      const k=key(x,y,z),list=grid.get(k);if(list)list.push(i);else grid.set(k,[i]);
+    }
+  });
+  const pairs=new Map();
+  for(const [k,list] of grid){
+    for(let a=0;a<list.length;a++)for(let b=a+1;b<list.length;b++){
+      const i=list[a],j=list[b];if(owner[i]===owner[j])continue;
+      const A=tris[i],B=tris[j],lo=[0,1,2].map(n=>Math.max(A.min[n],B.min[n]));
+      if([0,1,2].some(n=>lo[n]>Math.min(A.max[n],B.max[n])))continue;
+      // Each overlapping pair is tested once, in the cell that holds the low corner of its shared box.
+      if(key(at(lo[0]),at(lo[1]),at(lo[2]))!==k)continue;
+      const p=trianglesCross(A.t,B.t);if(!p)continue;
+      const ids=owner[i]<owner[j]?[owner[i],owner[j]]:[owner[j],owner[i]],name=ids.join(' + ');
+      const hit=pairs.get(name)??pairs.set(name,{a:ids[0],b:ids[1],points:[]}).get(name);
+      hit.points.push(p);
+    }
+  }
+  return [...pairs.values()].map(({a,b,points})=>({a,b,crossings:points.length,...crossingSpan(points)}))
+    .sort((u,v)=>u.a.localeCompare(v.a)||u.b.localeCompare(v.b));
+}
+// Crossing points fall into separate places where two parts meet: a hose that
+// ends in a fitting crosses it in one small place, a hose that runs through a
+// casing crosses it along its length. Points closer than `reach` share a place.
+// `span` is the longest diagonal of any one place, in metres.
+export function crossingSpan(points,reach=.025){
+  const cells=new Map(),at=v=>Math.floor(v/reach),parent=points.map((_,i)=>i);
+  const find=i=>{while(parent[i]!==i)i=parent[i]=parent[parent[i]];return i;};
+  points.forEach((p,i)=>{
+    const c=p.map(at);
+    for(let x=-1;x<=1;x++)for(let y=-1;y<=1;y++)for(let z=-1;z<=1;z++)
+      for(const j of cells.get(`${c[0]+x},${c[1]+y},${c[2]+z}`)||[])if(Math.hypot(p[0]-points[j][0],p[1]-points[j][1],p[2]-points[j][2])<=reach)parent[find(i)]=find(j);
+    const k=c.join(','),list=cells.get(k);if(list)list.push(i);else cells.set(k,[i]);
+  });
+  const boxes=new Map();
+  points.forEach((p,i)=>{
+    const r=find(i),box=boxes.get(r)??boxes.set(r,{min:[...p],max:[...p]}).get(r);
+    for(let n=0;n<3;n++){box.min[n]=Math.min(box.min[n],p[n]);box.max[n]=Math.max(box.max[n],p[n]);}
+  });
+  const spans=[...boxes.values()].map(b=>Math.hypot(b.max[0]-b.min[0],b.max[1]-b.min[1],b.max[2]-b.min[2]));
+  return {places:spans.length,span:Math.max(...spans)};
 }

@@ -83,7 +83,9 @@ const widthLine=plotted(stations.map(([x,w])=>[x,w]));
 // to the top of the tail lamp, just above the door handle.
 const shoulderGap=plotted([[-2.20,.012],[-2.064,.016],[-1.80,.024],[-1.36,.033],[-.90,.058],[-.40,.066],[.10,.068],[.60,.070],[1.00,.066],[1.36,.062],[1.627,.060],[1.82,.110],[1.961,.080],[2.088,.058],[2.216,.040],[2.32,.034]]);
 const topInset=plotted([[-2.20,.040],[-1.36,.043],[-.95,.046],[-.75,.062],[.60,.071],[1.36,.068],[1.627,.064],[1.82,.048],[2.32,.044]]);
-const lowerHem=x=>.204+.077*Math.max(0,(-x-1.688)/.376)+.095*Math.max(0,(x-1.700)/.516);
+// Behind the rear wheels the bumper's lower edge sits level at about 25 cm
+// and rises toward the tailpipes, as on the car.
+const lowerHem=x=>x>1.700?.252+.040*clamp((x-1.700)/.516,0,1):.204+.077*Math.max(0,(-x-1.688)/.376);
 const archTop=x=>{let z=-1;for(const a of [-AXLE,AXLE]){const t=Math.abs(x-a);if(t<ARCH)z=Math.max(z,AXLE_Z+Math.sqrt(ARCH*ARCH-t*t));}return z;};
 // The centre-line profile of the nose and tail: bumper faces stand furthest out
 // at mid height; the lamp band and the lid face sit back above them.

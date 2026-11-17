@@ -18,7 +18,7 @@ export const hrvBody={
  wb:2.654,arch:.44,axleZ:.398,base:.33,hoodEnd:-.98,deckStart:2.04,
  door:[-.87,.30,1.01],belt:1.125,roofZ:1.59,roofWidth:.686,cabinWidth:.806,hoodFrac:.77,hoodCrown:.012,
  hatch:true,cladding:true,claddingLip:.05,customEnds:true,sideSection:(w,l)=>w+hrvSide(l),
- sideLevels:[0,.07,.28,.48,.66,.72,.86,1],sideTints:[.70,.92,.84,.90,1.08,.98,1.03],cabinFloor:.44,backGlassOpacity:.86,backGlassColor:'#26313a',
+ sideLevels:[0,.07,.28,.48,.66,.72,.86,1],sideTints:[.70,.92,.84,.90,1.08,.98,1.03],cabinFloor:.44,cabin:{cargo:[.98,.48,.60],sillEnd:.92,rearSeat:[.48,.88,.57,.70,.86,.96]},backGlassOpacity:.86,backGlassColor:'#26313a',
  stations:[[-2.2235,.74,.862],[-2.10,.83,.915],[-1.90,.88,.99],[-1.60,.905,1.068],[-1.327,.912,1.10],[-.98,.905,1.126],[-.70,.905,1.128],
   [.30,.912,1.135],[1.00,.915,1.158],[1.30,.912,1.168],[1.70,.892,1.168],[2.04,.85,1.13],[2.2235,.78,1.06]],
  wind:[[-.98,1.155],[-.32,1.555]],roof:[[-.32,1.555],[-.05,1.578],[.30,1.592],[.70,1.590],[1.05,1.575],[1.35,1.552],[1.66,1.515]],rear:[[1.66,1.515],[2.04,1.21]],

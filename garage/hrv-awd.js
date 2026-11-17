@@ -24,7 +24,7 @@ const shaftDirection=unit(hrvPropshaft.rear.map((v,i)=>v-hrvPropshaft.front[i]))
 export const hrvCenterSupport=add(hrvCenterJoint,shaftDirection,-hrvPropshaft.supportBack);
 export const hrvDiffCenter=[halfWheelbase,0,hrvRearDriveZ];
 // The rear half-shafts end at the knuckle face; the hub bearing is part of the wheel end.
-export const hrvRearShaftEnd=.733;
+export const hrvRearShaftEnd=.697;
 
 function transferCase(r){
  const {case:c,caseRadius:R,caseHalf:h,output:o,noseStart,noseRadius:n}=hrvTransfer;

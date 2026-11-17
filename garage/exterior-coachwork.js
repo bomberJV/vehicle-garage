@@ -318,19 +318,25 @@ function cabin(r,cfg,paint){
   r.box(front+.18,-.101,floor+.071,front+.94,.101,floor+.225,'#41484a');
   r.rod([front+.46,0,floor+.22],[front+.49,0,floor+.334],.012,'#7c898a',8);
   r.box(front+.465,-.023,floor+.324,front+.515,.023,floor+.358,'#484e4e');
-  r.box(front,-.70,floor,end,.70,floor+.048,TRIM);
+  // cfg.cabin (optional): a vehicle with its own floor module keeps only a
+  // cargo deck between the wheelhouses, ends the sills at the rear door and
+  // places the rear bench at its real station.
+  const cab=cfg.cabin;
+  if(cab)r.box(cab.cargo[0],-cab.cargo[1],cab.cargo[2],end,cab.cargo[1],cab.cargo[2]+.04,TRIM);
+  else r.box(front,-.70,floor,end,.70,floor+.048,TRIM);
   r.box(front-.03,-.71,cfg.belt-.14,front+.21,.71,cfg.belt-.035,'#404447');
   for(const s of [-1,1]){
    const sill=side=>[door[0],side*.755,floor+.068];
-   const tip=sill(s);r.rod(tip,[end,tip[1],tip[2]],.043,tint(paint,.66),8);
+   const tip=sill(s);r.rod(tip,[cab?.sillEnd??end,tip[1],tip[2]],.043,tint(paint,.66),8);
    const y=s*.385,seat=door[0]+.43;
    r.box(seat-.16,y-.19,floor+.065,seat+.19,y+.19,floor+.177,LINER);
    r.profile([[seat+.115,floor+.135],[seat+.22,floor+.135],[seat+.32,cfg.belt-.065],[seat+.25,cfg.belt-.055]],y-.174,y+.174,LINER);
    r.box(seat+.23,y-.104,cfg.belt-.042,seat+.31,y+.104,cfg.belt+.081,LINER);
   }
-  for(const s of [-1,1])r.box(end-.079,s*.363-.095,cfg.belt-.037,end-.003,s*.363+.095,cfg.belt+.079,LINER);
-  r.box(end-.31,-.58,floor+.09,end,.58,floor+.22,LINER);
-  r.box(end-.09,-.58,floor+.21,end,.58,cfg.belt-.046,LINER);
+  const [b0,b1,c0,c1,k0,k1]=cab?.rearSeat??[end-.31,end,floor+.09,floor+.22,end-.09,end];
+  for(const s of [-1,1])r.box(k1-.079,s*.363-.095,cfg.belt-.037,k1-.003,s*.363+.095,cfg.belt+.079,LINER);
+  r.box(b0,-.58,c0,b1,.58,c1,LINER);
+  r.box(k0,-.58,c1-.01,k1,.58,cfg.belt-.046,LINER);
  });
 }
 export function coachwork(r,cfg,paint){skin(r,cfg,paint);cabin(r,cfg,paint);}

@@ -28,7 +28,9 @@ export const evapRows=[
   box(r,plus(pressure,[-.023,0,.015]),[.017,.018,.012],iron);
  }],
  ['purge-line','Long vapor purge line','A separate line carries recovered vapor forward from the canister. It passes the engine-bay bulkhead and reaches the purge valve.',[0,.27,-.15],ref.evapRoute,r=>{
-  path(r,[canPorts.purge,[2.097,.746,.836],[1.976,.639,.717],[1.659,.575,.597],[1.291,.512,.520],[.490,.473,.512],[-.397,.465,.532],[-.70,.44,.53],[-.885,.44,.53],[-.885,.44,.80],[-.80,.44,.80],[-.762,.18,.955],[-.762,-.18,.955],[-.762,-.45,.80],[-.858,-.535,.826],plus(purge,[.033,0,0])],.0065,iron);
+  // It drops behind the canister, passes under it above its bracket, then runs
+  // forward outboard of the right frame rail and inboard of the rear spring and damper.
+  path(r,[canPorts.purge,[2.063,.739,.860],[2.063,.739,.770],[1.930,.700,.770],[1.930,.600,.620],[1.650,.600,.570],[1.460,.622,.550],[1.368,.549,.550],[1.270,.478,.550],[1.120,.560,.548],[1.000,.580,.540],[.490,.580,.555],[-.397,.580,.550],[-.450,.465,.532],[-.70,.44,.53],[-.885,.44,.53],[-.885,.44,.80],[-.80,.44,.80],[-.762,.18,.955],[-.762,-.18,.955],[-.762,-.45,.80],[-.858,-.535,.826],plus(purge,[.033,0,0])],.0065,iron);
  }],
  ['purge-valve','Engine-bay purge valve · Y58/1','The engine controller opens the valve in pulses. Intake vacuum then draws stored vapor out of the carbon bed and into the engine.',[-.17,-.28,.20],ref.evapControls,r=>{
   cyl(r,purge,x,-.022,.024,.021,rubber,12);
@@ -36,6 +38,8 @@ export const evapRows=[
   box(r,plus(purge,[0,0,.025]),[.023,.018,.025],rubber);
  }],
  ['manifold-line','Purge outlet to intake','The short outlet hose joins the metering valve to manifold vacuum downstream of the throttle.',[-.13,-.14,-.15],ref.evapControls,r=>{
-  path(r,[plus(purge,[-.034,0,0]),[-1.265,-.546,.968],[-1.220,-.491,1.003],[-.906,-.459,1.019],[-.825,-.310,1.035],manifold],.007,rubber);
+  // The hose rises outboard of the manifold, runs back over the brake booster under
+  // the bonnet, crosses behind the cylinder heads and drops to the intake below the throttle.
+  path(r,[plus(purge,[-.034,0,0]),[-1.240,-.600,.960],[-1.220,-.600,1.150],[-.850,-.600,1.150],[-.850,-.550,1.124],[-.850,-.130,1.124],[-.850,-.130,1.021],manifold],.007,rubber);
  }]
 ];

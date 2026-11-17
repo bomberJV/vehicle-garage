@@ -29,7 +29,8 @@ export const g500RadiatorCore={width:.537,height:.569,depth:.040};
 const upperNeck=[radiatorX+.033,-.284,1.034],lowerNeck=[radiatorX+.033,.284,.592];
 const hotPort=[-.849,.236,.974],pumpIn=plus(pump,[.018,.104,-.040]);
 const heaterPump=[-1.840,.574,.777];
-const returnTube=[[-.782,.422,.971],[-.834,.523,.903],[-1.37,.522,.855],[-1.658,.520,.804]];
+// The return tube runs forward in the lane outboard of the coils, above the right manifold.
+const returnTube=[[-.790,.530,1.000],[-1.200,.530,1.000],[-1.700,.530,1.000]];
 // Both heater hoses pass under the rear throttle body to the tubes at its left.
 const supplyTube=[hotPort,[-.787,.236,.986],[-.790,.100,1.010],[-.790,-.120,1.015]];
 const hose=(r,points,radius)=>{
@@ -92,19 +93,22 @@ const coolingParts=[
   for(const dy of [-.052,.052])cyl(r,plus(stat,[.027,dy,0]),x,-.012,.018,.012,iron,7);
  }],
  ['upper-hose','Upper radiator hose','The upper hose meets the thermostat housing at the front of the engine.',[-.26,-.24,.37],g500FlowRefs.pump,r=>hose(r,[upperNeck,[-1.882,-.293,1.039],[-1.809,-.261,1.012],[-1.768,-.248,.902],plus(stat,[-.019,-.038,.031])],.026)],
- ['lower-hose','Lower radiator hose','The other large hose joins the lower radiator tank to the engine pump inlet.',[-.23,.32,-.19],g500FlowRefs.pump,r=>hose(r,[lowerNeck,[-1.863,.298,.614],[-1.794,.248,.635],[-1.751,.170,.692],pumpIn],.028)],
+ ['lower-hose','Lower radiator hose','The other large hose joins the lower radiator tank to the engine pump inlet.',[-.23,.32,-.19],g500FlowRefs.pump,r=>hose(r,[lowerNeck,[-1.863,.298,.614],[-1.765,.235,.765],[-1.725,.175,.748],pumpIn],.028)],
  ['bypass','Short bypass hose','This short engine-side connection supplies a return path as the thermostat restricts the radiator circuit.',[.10,-.31,-.13],g500FlowRefs.pump,r=>hose(r,[plus(stat,[.023,.027,-.017]),[-1.680,-.087,.793],plus(pump,[.032,-.029,0])],.018)],
  ['coolant-reservoir','Expansion tank and vent line','The capped tank sits on the right inner fender. Its small vent line runs forward to the radiator.',[.11,.41,.29],g500FlowRefs.bay,r=>{
   g500ExpansionTank(engineShapes(r,enginePoint));
-  hose(r,[enginePoint([.12,.632,.406]),[-1.258,.653,.932],[-1.578,.635,.894],[-1.844,.627,.961],[radiatorX+.030,.286,1.066]],.008);
-  hose(r,[enginePoint([.14,.632,.330]),[-1.273,.632,.843],[-1.543,.548,.736],[-1.863,.298,.614]],.012);
+  // The vent line runs forward above the manifold and the spring tower. The
+  // outlet drops beside the tank, passes under the manifold, then runs forward
+  // inboard of the right spring to the pump suction.
+  hose(r,[enginePoint([.12,.632,.406]),[-1.600,.590,1.070],[-1.844,.627,.961],[radiatorX+.030,.286,1.066]],.008);
+  hose(r,[enginePoint([.14,.596,.330]),[-1.095,.596,.700],[-1.150,.450,.700],[-1.300,.370,.750],[-1.550,.370,.750],[-1.620,.300,.750],[-1.880,.320,.700],[-1.863,.298,.614]],.012);
  }],
  ['heater-feed','Heater supply and bulkhead coupling','Warm coolant reaches the cabin heat exchanger through this branch. The two bulkhead connections meet the tubes in the HVAC view.',[.22,-.17,.30],g500FlowRefs.heater,r=>hose(r,[...supplyTube,g500HeaterPorts[0]],.014)],
  ['heater-return','Heater return tube and molded hoses','The return passes through the second coupling and along the engine bay. Hose bends and clip stations are approximate.',[.30,.31,-.05],g500FlowRefs.heater,r=>{
-  hose(r,[g500HeaterPorts[1],[-.790,-.170,1.040],[-.800,-.170,.975],[-.805,.100,.975],[-.800,.338,.990],returnTube[0]],.014);
+  hose(r,[g500HeaterPorts[1],[-.790,-.170,1.040],[-.795,-.170,.975],[-.795,.100,.975],[-.795,.338,.990],returnTube[0]],.014);
   path(r,returnTube,.014,'#8b928e');
-  hose(r,[returnTube.at(-1),[-1.765,.523,.792],plus(heaterPump,[.035,-.015,.015])],.014);
-  hose(r,[plus(heaterPump,[-.033,.002,.003]),[-1.899,.471,.730],[-1.840,.283,.696],pumpIn],.014);
+  hose(r,[returnTube.at(-1),[-1.765,.555,.850],plus(heaterPump,[.035,-.015,.015])],.014);
+  hose(r,[plus(heaterPump,[-.033,.002,.003]),[-1.899,.471,.760],[-1.840,.283,.735],pumpIn],.014);
  }],
  ['heater-pump','Electric heater circulation pump','A separate electric pump circulates coolant through the heater circuit. Its mounting bracket and hose bends are represented schematically.',[-.14,.42,-.04],g500FlowRefs.heater,r=>{
   cyl(r,heaterPump,x,-.035,.051,.030,rubber,12);

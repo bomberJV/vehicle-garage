@@ -86,8 +86,12 @@ function refrigerantPipes(r){
  const cp=add(comp,[.036,0,.084]),top=add(con,[0,.406,.14]),bottom=add(con,[0,.406,-.15]);
  line(r,[add(cp,[0,.02,0]),[-1.675,.352,.70],[-1.95,.395,.72],[con[0]+.054,.436,.953],top],.009,alloy);
  line(r,[bottom,[con[0]+.042,.473,.710],[-2.003,.497,.786],add(drier,[0,.017,.108])],.0068,alloy);
- line(r,[add(drier,[0,-.017,.108]),[-1.80,.530,.955],[-1.71,.550,1.013],[-1.18,.521,1.050],[-.800,.408,1.118],add(metering,[-.018,0,-.014])],.0068,alloy);
- line(r,[add(metering,[-.018,0,.014]),[-.800,.455,1.126],[-1.16,.483,.985],[-1.52,.421,.792],add(cp,[0,-.02,0])],.012,rubber);
+ // Both lines share a lane outboard of the coils and above the right manifold
+ // with the heater return, then cross behind the valve cover to the expansion valve.
+ line(r,[add(drier,[0,-.017,.108]),[-1.900,.500,.950],[-1.650,.530,1.075],[-1.180,.530,1.075],[-.820,.530,1.100],[-.786,.530,1.100],add(metering,[-.018,0,-.014])],.0068,alloy);
+ // The suction hose leaves the lane past the tank, drops ahead of the right
+ // damper and reaches the compressor inboard of the spring.
+ line(r,[add(metering,[-.018,0,.014]),[-.786,.530,1.128],[-.830,.530,1.040],[-1.200,.530,1.040],[-1.300,.565,1.030],[-1.600,.565,1.030],[-1.620,.565,.850],[-1.620,.420,.760],add(cp,[0,-.02,0])],.012,rubber);
 }
 function flaps(r,c=[-.635,.082,1.183],s=1,angle=0){
  for(const hand of [-1,1]){

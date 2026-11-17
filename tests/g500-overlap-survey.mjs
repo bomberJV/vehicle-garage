@@ -62,8 +62,8 @@ export const mounts=[
   ['body.grille','lighting.housing','the headlamp housings meet the grille surround'],
   ['body.roof','roof.sunshade','the sunshade runs in the roof'],
   ['body.structure','suspension.frame','the body is bolted to the frame'],
-  // The console and seat units rest on the carpet; these four sit in or under the floor.
-  ...['tunnel','footwell','battery','battery-box']
+  // The console and seat units rest on the carpet; these three sit in or under the floor.
+  ...['footwell','battery','battery-box']
     .map(id=>['electrical.'+id,'floor','the unit is fixed to the floor under the carpet']),
   ...['steering.axle','wheels.hub','wheels.inner-bearing','suspension.radius-arms','suspension.front-track-bar']
     .map(id=>['differentials.front',id,'the front axle carries it']),

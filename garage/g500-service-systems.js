@@ -230,6 +230,16 @@ function installedDisc(r,rear){
  }
 }
 function fuseSite(r,c,orientation=0){
+ if(orientation===2){
+  // Standing against the right inner wall of the console, its fuses facing the side cover.
+  const [xx,yy,zz]=c,dx=.055,dz=.055;
+  r.box(xx-dx,yy-.042,zz-dz,xx+dx,yy-.005,zz+dz,dark);
+  for(let i=0;i<5;i++)for(let j=0;j<2;j++){
+   const px=xx+(i-2)*dx*.29,pz=zz+(j-.5)*dz*.74,map=(u,v,h)=>[px+u*.001,yy-.006+(h-8.5)*.001,pz+v*.001];
+   for(const key of fuseSections)if(key!=='link')drawBladeFuse(r,map,key,[blue,red,'#be9f31',ivory][(i+j)%4]);
+  }
+  return;
+ }
  const [xx,yy,zz]=c,dx=orientation?.11:.155,dy=orientation?.06:.09;
  r.box(xx-dx,yy-dy,zz-.042,xx+dx,yy+dy,zz-.005,dark);
  for(let i=0;i<5;i++)for(let j=0;j<2;j++) {
@@ -238,20 +248,21 @@ function fuseSite(r,c,orientation=0){
  }
 }
 function cabinBattery(r){
- // Below the rear cup holder, in front of the rear bench: not in the engine bay.
- // The well's floor sits 50 mm above the rear propeller shaft.
+ // Under the floor below the center rear seat, in front of the rear axle.
+ // A 353 × 175 × 190 mm battery stands in a well hung from the tunnel flanges,
+ // 50 mm above the rear propeller shaft and clear of the thin center cushion.
  const h=.050;
  r.box(.537,-.175,.487+h,.917,.175,.507+h,steel);
- for(const s of [-1,1])r.box(.537,s*.170-.008,.507+h,.917,s*.170+.008,.563+h,steel);
- r.box(.555,-.151,.508+h,.897,.151,.716+h,rubber);r.box(.548,-.157,.716+h,.904,.157,.737+h,dark);
- for(let i=0;i<6;i++)r.box(.579+i*.052,-.112,.737+h,.611+i*.052,.112,.744+h,rubber);
- for(const [xx,yy,color] of [[.603,-.106,red],[.849,.106,metal]]){
-  cyl(r,[xx,yy,.744+h],z,0,.022,.017,metal,12);sleeve(r,[xx,yy,.755+h],z,-.001,.010,.024,.016,color,12);
+ for(const s of [-1,1])r.box(.537,s*.170-.008,.507+h,.917,s*.170+.008,.524+h,steel);
+ r.box(.555,-.088,.508+h,.897,.088,.678+h,rubber);r.box(.551,-.088,.678+h,.901,.088,.693+h,dark);
+ for(let i=0;i<5;i++)r.box(.640+i*.048,-.060,.693+h,.664+i*.048,.060,.697+h,rubber);
+ for(const [xx,yy,color] of [[.596,-.055,red],[.596,.055,metal]]){
+  cyl(r,[xx,yy,.693+h],z,0,.008,.015,metal,12);sleeve(r,[xx,yy,.701+h],z,0,.007,.015,.010,color,12);
  }
- // A short positive connection reaches the nearby fuse block; negative bonds to the body.
- line(r,[[.603,-.106,.760+h],[.553,-.106,.790],[.482,-.074,.754]],.011,red);
- line(r,[[.849,.106,.760+h],[.906,.122,.770],[.929,.221,.688]],.011,rubber);
- cyl(r,[.929,.221,.688],z,-.010,.005,.021,metal,10);
+ // A short positive connection reaches the nearby fuse block; negative bonds to the well.
+ line(r,[[.596,-.055,.700+h],[.545,-.065,.745],[.482,-.074,.754]],.011,red);
+ line(r,[[.596,.055,.700+h],[.600,.110,.735],[.610,.120,.700],[.610,.120,.535+h],[.640,.120,.517+h]],.011,rubber);
+ cyl(r,[.640,.120,.507+h],z,0,.006,.014,metal,10);
 }
 // Factory height is measured from the tire contact plane, z=.040 in this model.
 export const g500InstalledRoofTop=2.017;
@@ -320,7 +331,7 @@ const groups=[
   ...g500ComfortElectricalRows,
   ['dashboard','Driver’s instrument-panel fuse carrier','The left dashboard cover carries the fuse chart and puller. The carrier stays inside the dashboard end, clear of the outer door skin.',fore,src.fuseMap,r=>fuseSite(r,[-.585,-.715,1.136],1)],
   ['footwell','Front passenger footwell fuse box','The operator’s manual shows the footwell box behind two covers. Open its carrier to follow the fuse blades into their sockets.',right,src.fuseMap,r=>fuseSite(r,[-.556,.445,.740])],
-  ['tunnel','Center-tunnel fuse box','The passenger seat and tunnel cover are adjacent to this fuse box.',left,src.fuseMap,r=>fuseSite(r,[.273,.132,.676],1)],
+  ['tunnel','Center-tunnel fuse box','The passenger seat and tunnel cover are adjacent to this fuse box.',left,src.fuseMap,r=>fuseSite(r,[.060,.135,.900],2)],
   ['battery','Cabin battery and terminal leads','The battery lies under the cup holder in front of the rear seat, as shown by the 2002 manual and Mercedes’ post-12/2000 rescue layout. Its positive lead reaches the adjacent fuse block; its negative lead bonds to the body.',[.20,0,-.45],src.battery,cabinBattery],
   ['battery-box','Battery-box fuse block','This separate distribution block is beside the physical battery, below the rear cup holder. The short positive lead ends at its main stud. Circuit assignments and ratings are not reconstructed.',aft,src.fuseMap,r=>{
    r.box(.412,-.125,.626,.519,.125,.733,dark);

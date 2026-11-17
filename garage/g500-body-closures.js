@@ -1,3 +1,4 @@
+import {drawLettering,letteringWidth} from './badge-lettering.js';
 import {cassetteSetback,roofFrontLip} from './g500-roof-datums.js';
 import {fittedWindow,starBadge} from './exterior-trim.js';
 
@@ -127,6 +128,11 @@ const gateSurface=(contour,offset=0)=>contour.map(([y,z])=>[gateX(z)+offset,y,z]
 
 // Both the mounted exterior and the working bench use these same stampings,
 // optics and fittings. The tags are assigned by the caller in each context.
+// Star and wordmark across the stainless spare face, left to right from behind.
+const spareText='Mercedes-Benz',spareTextHeight=.036,spareStar=.058,spareGap=.026;
+const spareBadge={height:spareTextHeight,text:spareText,star:spareStar,gap:spareGap,
+  start:-.115-(letteringWidth(spareText,spareTextHeight)+2*spareStar+spareGap)/2};
+export const g500SpareStar={center:[spareBadge.start+spareStar,1.056],radius:spareStar};
 export const g500GateParts={
   skin(r,paint){
     backSheet(r,[[-.513,.630],[.513,.630],[.513,1.211],[-.513,1.211]],paint);
@@ -157,14 +163,28 @@ export const g500GateParts={
   spare(r,paint){
     const y=-.115,z=1.056;
     const hoop=(x,rad)=>Array.from({length:48},(_,i)=>[x,y+rad*Math.cos(i*Math.PI/24),z+rad*Math.sin(i*Math.PI/24)]);
-    // A painted hard cover: its side wall rolls over a rounded shoulder into
-    // the face, and only a narrow bright ring trims the face's outer edge, as
-    // on the photographed 2002 US trucks.
+    // The 2002 US cover: a painted side wall rolls over a rounded shoulder
+    // into a polished stainless face with a bright edge ring. The star sits
+    // left of a "Mercedes-Benz" wordmark across the middle (BaT lot 271820).
     const rims=[[2.196,.370],[2.206,.384],[2.230,.392],[2.380,.392],[2.405,.386],[2.420,.374],[2.428,.360],[2.431,.335]];
-    const tones=['',shade(paint,.58),shade(paint,.78),shade(paint,.86),shade(paint,.82),shade(paint,.92),'#c4cbca','#e1e6e4'];
+    const tones=['',shade(paint,.58),shade(paint,.78),shade(paint,.86),shade(paint,.82),shade(paint,.92),'#d4dadb','#eef1f1'];
     for(let k=1;k<rims.length;k++)ring(r,hoop(...rims[k-1]),hoop(...rims[k]),tones[k]);
-    r.discX(2.431,y,z,.335,shade(paint,.96),48);
-    starBadge(r,[2.4417,y,z],.123,'x',1,{backing:false});
+    // The face is a shallow polished dome. Its shading follows height, as a
+    // mirror does: bright sky above, a dark horizon just below the middle,
+    // grey ground underneath.
+    const crown=.016,dome=rho=>2.431+crown*(1-(rho/.335)**2);
+    const stops=[[-1,[150,159,163]],[-.35,[120,130,135]],[-.08,[86,96,101]],[.12,[178,187,190]],[.55,[214,220,222]],[1,[198,206,209]]];
+    const sky=v=>{for(let i=1;i<stops.length;i++)if(v<=stops[i][0]){const [a,ca]=stops[i-1],[b,cb]=stops[i],t=(v-a)/(b-a);
+      return '#'+ca.map((c,k)=>Math.round(c+(cb[k]-c)*t).toString(16).padStart(2,'0')).join('');}return '#c6ced1';};
+    const radii=[.335,.29,.24,.19,.14,.09,.04,0];
+    for(let k=1;k<radii.length;k++){
+      const a=hoop(dome(radii[k-1]),radii[k-1]),b=hoop(dome(radii[k]),radii[k]);
+      for(let i=0;i<48;i++){const j=(i+1)%48,mid=(a[i][2]+a[j][2]+b[i][2]+b[j][2])/4;
+        r.polygon([a[i],a[j],b[j],b[i]],sky((mid-z)/.335),false);}
+    }
+    const {height:h,text,star,gap,start}=spareBadge,on=(dy,dz,lift)=>dome(Math.hypot(dy,dz))+lift;
+    starBadge(r,[on(start+star-y,0,.005),start+star,z],star,'x',1,{backing:false});
+    drawLettering(r,text,h,(u,v)=>{const yy=start+2*star+gap+u,zz=z-h*.38+v;return [on(yy-y,zz-z,.0035),yy,zz];},{color:'#2f3537',radius:h*.07});
   }
 };
 export function cargoDoor(r,paint){

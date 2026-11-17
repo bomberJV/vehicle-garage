@@ -16,13 +16,17 @@ export function alloy993(r,{x,y,z,rim,width,side,finish}){
   }
   const circle=(radius,inset)=>u=>point(u*TAU,radius,inset);
   const ring=(ra,da,rb,db,color)=>band(circle(ra*rim,da),circle(rb*rim,db),60,color);
-  ring(.911,beadWidth+.009,.911,.008,'#4b5359');
+  // The barrel sits in the shadow of the wheel well.
+  ring(.911,beadWidth+.009,.911,.008,'#2e3337');
   ring(.911,beadWidth+.009,1,beadWidth+.013,tint(finish,.67));
   ring(.90,.015,.937,.001,tint(finish,.83));
   ring(.937,.001,1,0,tint(finish,1.09));
   // The inner contour traces one kidney-shaped opening. Its polar counterpart
   // on the sector perimeter joins the neighbouring sector without overlapping.
   const section=[[-.31,.53],[-.40,.62],[-.418,.74],[-.398,.816],[-.316,.865],[-.17,.887],[0,.892],[.18,.876],[.33,.836],[.402,.778],[.40,.69],[.33,.60],[.21,.513],[.086,.472],[-.047,.47],[-.204,.489]];
+  // Photographs of the 16-inch Cup Design '93 show slimmer paddles than the
+  // bulletin outline: widen each opening and carry it closer to the hub.
+  for(const q of section){q[0]*=1.15;q[1]-=.06*Math.max(0,1-(q[1]-.47)/.42);}
   const boundary=[[-.628,.395],[-.615,.47],[-.628,.69],[-.628,.913],[-.47,.931],[-.23,.931],[0,.931],[.23,.931],[.47,.931],[.628,.913],[.628,.69],[.628,.47],[.628,.395],[.25,.395],[0,.395],[-.25,.395]];
   const skinDepth=k=>.027-.024*Math.sin(Math.PI*Math.max(0,Math.min(1,(k-.33)/.65))*.80);
   for(let spoke=0;spoke<5;spoke++){
@@ -32,7 +36,7 @@ export function alloy993(r,{x,y,z,rim,width,side,finish}){
       const face=[outline(i),outline(i+1),outer(i+1),outer(i)];
       r.polygon(face,finish,false);r.faces.at(-1).vertexColors=[.83,.84,1.04,1.04].map(f=>tint(finish,f));
     }
-    band(u=>outline(Math.round(u*section.length)),u=>wall(Math.round(u*section.length)),section.length,tint(finish,.56));
+    band(u=>outline(Math.round(u*section.length)),u=>wall(Math.round(u*section.length)),section.length,tint(finish,.42));
   }
   // Five recesses on the 130 mm bolt circle. Each pocket is a genuine hole
   // through the hub surface with a conical seat and a hexagonal wheel nut.

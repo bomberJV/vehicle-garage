@@ -13,9 +13,10 @@ const panels=mesh.filter(face=>face.vertexColors);
 function halfWidth(x){
   let width=0;
   for(const face of panels){
-    const ps=face.points;
-    for(let i=0;i<ps.length;i++){
-      const a=ps[i],b=ps[(i+1)%ps.length];
+    // Panels may be packed into indexed meshes, so walk triangle edges.
+    const ps=face.points,idx=face.triangles||faceTriangles(ps);
+    for(let i=0;i<idx.length;i++){
+      const a=ps[idx[i]],b=ps[idx[i%3===2?i-2:i+1]];
       if((x-a[0])*(x-b[0])>0||Math.abs(a[0]-b[0])<1e-8)continue;
       const t=(x-a[0])/(b[0]-a[0]);
       width=Math.max(width,a[1]+t*(b[1]-a[1]));

@@ -101,7 +101,9 @@ function softTop(r,car,paint){
     }
     const row=(i,k)=>{
       const [x,y]=path[i],a=i/24*Math.PI,s=Math.sin(Math.PI*k);
-      const z=.84+.130*s+.011*Math.sin(a)+.016*Math.abs(Math.cos(a));
+      // The padded boot has a broad, nearly flat crown over the stowed
+      // fabric and turns down tightly at its edges.
+      const z=.84+.15*s**.42+.011*Math.sin(a)+.016*Math.abs(Math.cos(a));
       return [x+.218*k*Math.sin(a),y+.085*k*Math.cos(a),z];
     };
     for(let i=1;i<path.length;i++)for(let j=1;j<=6;j++)r.polygon([row(i-1,(j-1)/6),row(i,(j-1)/6),row(i,j/6),row(i-1,j/6)],tint('#3e3d40',.76+.32*Math.sin(Math.PI*j/6)),false);

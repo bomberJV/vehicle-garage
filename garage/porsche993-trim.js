@@ -1,5 +1,6 @@
 import {tint,strip} from './road-primitives.js';
 import {glazingFace} from './surface-materials.js';
+import {paintCoach} from './porsche-coachwork.js';
 
 const TAU=2*Math.PI;
 // US 993, PET 905-10. The stop lamp is a fixed bridge with a visible gap to
@@ -10,7 +11,7 @@ export function fixedStopLamp(r,car,paint,deck){
     const section=u=>{
       const a=Math.abs(u),y=.557*u,x=1.316-.070*a*a;
       const base=deck(car,x,y)[2],end=Math.min(1,Math.max(0,(a-.81)/.19));
-      const crown=base+.067-.035*end**1.45-.004*a*a,foot=base+.0008;
+      const crown=base+.052-.022*end**1.45-.004*a*a,foot=base+.0008;
       // The moulded end feet descend from the slim transverse light housing.
       const lower=crown-.029-(crown-.029-foot)*end;
       return [[x-.029,y,lower],[x-.031,y,crown-.010],[x-.021,y,crown],[x+.022,y,crown-.002],[x+.031,y,crown-.008],[x+.033,y,crown-.024],[x+.021,y,lower],[x-.029,y,lower]];
@@ -18,8 +19,12 @@ export function fixedStopLamp(r,car,paint,deck){
     const contours=stations.map(section);
     for(let i=1;i<contours.length;i++)for(let j=0;j<7;j++){
       const a=contours[i-1],b=contours[i],mid=(stations[i-1]+stations[i])/2;
-      const col=j===4&&Math.abs(mid)<.93?'#9b292f':tint(paint,[.68,.86,1.10,.96,.81,.67,.59][j]);
-      r.polygon([a[j],b[j],b[j+1],a[j+1]],col,false);
+      // Photographs show the red lens only across the middle third; the rest
+      // of the bridge is a lacquered body-colour moulding.
+      const quad=[a[j],b[j],b[j+1],a[j+1]];
+      if(j===4&&Math.abs(mid)<.36)r.polygon(quad,'#9b292f',false);
+      else if(j>=5)r.polygon(quad,tint(paint,[.67,.59][j-5]),false);
+      else paintCoach(r,quad,paint,[[-1,0,.2],[-.5,0,1],[0,0,1],[.5,0,1],[1,0,.3]][j]);
     }
     for(const end of [contours[0],contours.at(-1)])r.polygon(end.slice(0,-1),tint(paint,.79),false);
   });
@@ -144,8 +149,9 @@ const lampPlane=(x,y)=>.665+.87*(x-lampCenter[0])-.09*(Math.abs(y)-lampCenter[1]
 // wheelbase-scaled plan as the lens so the shoulder cannot obscure its glass.
 export function headlampSeat993(point){
   const [x,y,z]=point,dx=(x-lampCenter[0])/.091,dy=(Math.abs(y)-lampCenter[1])/.129,d=dx*dx+dy*dy;
-  if(d>=1.88)return point;
-  const t=Math.max(0,Math.min(1,(1.88-d)/.89));
+  // The fender is pressed tight around the bezel; a wide seat reads as a dent.
+  if(d>=1.6)return point;
+  const t=Math.max(0,Math.min(1,(1.6-d)/.61));
   return [x,y,z+Math.min(0,lampPlane(x,y)-.008-z)*t*t*(3-2*t)];
 }
 export function headlamp993(r,car,s,paint,deck,litronic=false){
@@ -165,17 +171,22 @@ export function headlamp993(r,car,s,paint,deck,litronic=false){
   };
   const n=40,ring=(k,height,outline)=>Array.from({length:n+1},(_,i)=>sample(i/n,k,height,outline));
   const bright=ring(.970,.0052),bezel=ring(1.018,.0028),lip=ring(1,.001,lipOutline);
-  strip(r,lip,bezel,tint(paint,.99));strip(r,bezel,bright,'#444748');
-  strip(r,bright,ring(.928,.0064),'#e1e2dd');
+  // The fender return around the bezel is painted and lit like the wing, so it
+  // reads as one pressing rather than a grey collar.
+  for(let i=1;i<=n;i++)paintCoach(r,[lip[i-1],lip[i],bezel[i],bezel[i-1]],paint,[-.66,0,.75]);
+  strip(r,bezel,bright,'#3a3d3e');
+  strip(r,bright,ring(.928,.0064),'#eef0ea');
   // The glass is a shallow dome over two optical chambers. Concentric glass
   // contours stay inside the traced opening and leave a real retaining seal.
   const outer=ring(.928,.0067),mid=ring(.61,.015),inner=ring(.22,.021);
   const rows=[outer,mid,inner];
+  // Behind the clear lens the halogen unit is mostly polished reflector: bright
+  // where it faces the studio, with a warm cast in the lower beam chamber.
   for(let k=1;k<rows.length;k++)for(let i=1;i<=n;i++){
-    const a=rows[k-1],b=rows[k],angle=TAU*(i-.5)/n;
-    r.polygon([a[i-1],a[i],b[i],b[i-1]],tint('#b7b9b5',.78+.30*Math.cos(angle-.25)+.07*k),false);
+    const a=rows[k-1],b=rows[k],angle=TAU*(i-.5)/n,lower=Math.max(0,-Math.cos(angle));
+    r.polygon([a[i-1],a[i],b[i],b[i-1]],tint(lower>.35?'#d9d5c6':'#d2d4cf',.80+.24*Math.cos(angle-.25)+.06*k),false);
   }
-  r.polygon(inner.slice(0,-1),'#c5c6c0',false);
+  r.polygon(inner.slice(0,-1),'#e2e3dd',false);
   const optic=(u,v,rx,ry,lift)=>Array.from({length:25},(_,i)=>surface(u+rx*Math.cos(TAU*i/24),v+ry*Math.sin(TAU*i/24),lift));
   if(litronic){
     // The xenon low beam has a deep projector bowl, optical lens and bright retaining ring.
@@ -185,10 +196,12 @@ export function headlamp993(r,car,s,paint,deck,litronic=false){
     strip(r,lens,crown,'#718390');r.polygon(crown.slice(0,-1),'#98a9b0',false);
     r.polygon(optic(74.9,61.4,1.0,1.6,.028).slice(0,-1),'#dae2df',false);
   }else{
-    const shell=optic(74.4,62.2,4.5,6.1,.0215),rim=optic(74.4,62.2,3.8,5.3,.023),glass=optic(74.4,62.2,3.2,4.5,.0245);
-    strip(r,shell,rim,'#a9aba6');strip(r,rim,glass,'#dcddd5');
-    r.polygon(glass.slice(0,-1),'#7b817f',false);
-    const glint=optic(74.8,61.4,1.8,2.6,.0255);r.polygon(glint.slice(0,-1),'#969d9a',false);
+    // The round high/low-beam bowl fills the upper half of the lens. Its
+    // polished dome is ringed by a darker seam where it meets the lower chamber.
+    const bowl=[[1,.0195,'#5d6260'],[.9,.0205,'#c3c8c4'],[.72,.0222,'#d6dad5'],[.52,.0238,'#e4e7e1'],[.32,.0250,'#d0d4cf'],[.16,.0257,'#f3f4ef']];
+    const ringAt=([k,lift])=>optic(72.6,63.0,5.5*k,7.6*k,lift);
+    for(let i=1;i<bowl.length;i++)strip(r,ringAt(bowl[i-1]),ringAt(bowl[i]),bowl[i-1][2]);
+    r.polygon(ringAt(bowl.at(-1)).slice(0,-1),bowl.at(-1)[2],false);
   }
   for(let i=0;i<13;i++){
     const v=48.8+i*2.23,spread=Math.sqrt(Math.max(0,1-((v-63.3)/17.1)**2));
@@ -217,10 +230,12 @@ export function classicMirror(r,foot,side,paint){
   const sections=[curve(-.087,.12,-.030,-.008),curve(-.078,.53,-.021,-.005),curve(-.052,.84,-.012,-.002),curve(-.012,1,0,0),
     curve(.034,1.02,.001,0),curve(.047,1,0,0),curve(.053,.98,0,0),curve(.051,.89,-.001,0)];
   for(let i=1;i<sections.length;i++)for(let j=0;j<outline.length-1;j++){
-    const t=(outline[j][1]+outline[j+1][1])*.5;
-    const shade=.82+.20*t+.028*i;
-    r.polygon([sections[i-1][j],sections[i][j],sections[i][j+1],sections[i-1][j+1]],
-      i>=6?'#353a3c':tint(paint,shade),false);
+    const quad=[sections[i-1][j],sections[i][j],sections[i][j+1],sections[i-1][j+1]];
+    if(i>=6){r.polygon(quad,'#353a3c',false);continue;}
+    // The housing is painted and lacquered like the body, so it takes the
+    // same studio reflections instead of a flat tint.
+    const mid=quad.reduce((a,p)=>a.map((v,k)=>v+p[k]/4),[0,0,0]);
+    paintCoach(r,quad,paint,mid.map((v,k)=>v-center[k]));
   }
   r.polygon(sections.at(-1).slice(0,-1),'#819096',false);
 }

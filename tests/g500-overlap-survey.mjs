@@ -93,6 +93,10 @@ export const mounts=[
   ['body.roof','roof.cable','the cables run inside the roof'],
   ['body.roof','roof.drainage','the drain tubes run inside the roof and pillars'],
   ['transmission-fluid.brackets','hvac.condenser','the transmission cooler brackets bolt to the condenser side tanks'],
+  ['body.structure','fuel.filler','the filler neck passes through its sealed opening in the right rear quarter'],
+  ['evap.tank-pressure','fuel.tank','the pressure sensor is set into the tank top'],
+  ['body.structure','suspension.damper','each damper top mounts through the inner wheelhouse'],
+  ['body.structure','steering-assist.shaft','the steering shaft passes through its grommet in the bulkhead'],
 ];
 // Reviewed pairs that the rules would pass but are wrong.
 export const errors=[];

@@ -6,7 +6,7 @@ import {style43Face} from './e46-wheels.js';
 export function roadWheelSpokes(r,{vehicle,x,y,z,side,rim,finish}){
  if(vehicle==='bmw325ci')return style43Face(r,{x,y,z,side,rim,finish});
  const honda=vehicle==='hrv',amg=vehicle==='c63';
- const skin=honda?tint(finish,.68):finish;
+ const skin=honda?tint(finish,.96):finish;
  const vertex=(angle,radius,depth)=>[x+Math.cos(angle)*radius,y+side*depth,z+Math.sin(angle)*radius];
  function blade(angle,stations){
   for(let i=1;i<stations.length;i++){
@@ -24,10 +24,11 @@ export function roadWheelSpokes(r,{vehicle,x,y,z,side,rim,finish}){
    // The W204 factory 18-inch face has five pairs with narrow parallel arms.
    for(const branch of [-1,1])blade(a,[[.245,branch*.125,.087,-.008],[.48,branch*.140,.062,.003],[.92,branch*.122,.043,.013]]);
   }else{
-   // LX-pattern 17-inch wheels: an asymmetric, thick cast branch and thinner
-   // neighbour form alternating broad and narrow openings around the rim.
-   blade(a,[[.24,-.18,.19,-.004],[.43,-.13,.13,.003],[.72,-.060,.076,.013],[.92,.012,.120,.015]]);
-   blade(a,[[.24,.18,.16,-.004],[.52,.205,.069,.004],[.78,.224,.055,.009],[.92,.263,.070,.015]]);
+   // EX-L 18-inch wheels: five machined spokes leave a broad hub, twist slightly,
+   // and split into two arms before the rim, with dark painted pockets between.
+   blade(a,[[.24,0,.20,-.004],[.42,.02,.15,.004],[.58,.045,.11,.010]]);
+   blade(a,[[.58,.000,.045,.010],[.76,-.015,.040,.013],[.93,-.030,.045,.015]]);
+   blade(a,[[.58,.095,.045,.010],[.76,.12,.040,.013],[.93,.145,.045,.015]]);
 
   }
  }

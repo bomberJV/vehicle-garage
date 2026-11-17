@@ -34,18 +34,22 @@ function exchanger(r,c,w,h,t,s,section,measured=false){
    r.polygon([[c[0]-.44*t,a,za],[c[0]+.44*t,a,za],[c[0]+.44*t,b,zb],[c[0]-.44*t,b,zb]],j%2?'#819194':'#899799',false);
  }
 }
-export const g500HeaterPorts=[[-.665,-.048,1.075],[-.665,.010,1.075]];
-export const coreCenter=[-.505,.028,1.080],evapCenter=[-.608,.035,1.081];
+// The housing stands against the bulkhead behind COMAND and the climate panel
+// (W203-family unit): evaporator at the bulkhead, heater core behind it. The
+// heater tubes and expansion valve sit on the engine side of the bulkhead.
+export const g500HeaterPorts=[[-.765,-.120,1.075],[-.765,-.170,1.075]];
+export const coreCenter=[-.615,.028,1.080],evapCenter=[-.685,.035,1.081];
 const comp=[-1.655,.294,.573],con=[-2.040,0,.856],drier=[-1.985,.506,.870]/* below the intake duct */;
-const metering=[-.691,.147,1.114],blower=[-.602,.374,1.065],filter=[-.780,.190,1.200]; // The cabin filter stands right of the throttle body, behind the valve cover.
+const metering=[-.768,.147,1.114],blower=[-.602,.374,1.065],filter=[-.810,.190,1.254]; // The cabin filter stands right of the throttle body, above the valve cover and ahead of the expansion valve.
 export const climateTargets={comp,con,drier,metering,blower,filter};
 export function drawCore(r,type,section,c=type==='heater'?coreCenter:type==='condenser'?con:evapCenter,scale=1){
  const dim=type==='heater'?[.234,.175,.032]:type==='condenser'?[.813,.431,.017]:[.308,.200,.065];
  if(section!=='ports'){exchanger(r,c,dim[0]*scale,dim[1]*scale,dim[2]*scale,scale,section,type!=='condenser');return;}
  if(type==='heater'){
   for(const [i,s] of [-1,1].entries()){
-   const portStart=add(c,[-.160*scale,(-.076+i*.058)*scale,-.005*scale]);
-   const elbow=add(c,[-.067*scale,(-.076+i*.058)*scale,(i?.074:-.065)*scale]);
+   // Both tubes leave beside the rear throttle body, left of the housing.
+   const portStart=add(c,[-.150*scale,(-.148-i*.050)*scale,-.005*scale]);
+   const elbow=add(c,[-.067*scale,(-.148-i*.050)*scale,(i?.074:-.065)*scale]);
    line(r,[add(c,[0,s*.117*scale,(i?.074:-.065)*scale]),elbow,portStart],.007*scale,alloy);
    port(r,portStart,x,.011*scale);
   }
@@ -116,14 +120,16 @@ export function blowerPiece(r,key,c=blower,s=1,t=0){
 }
 export function allBlower(r){for(const key of ['scroll','motor','wheel','plug'])blowerPiece(r,key);}
 export function ducts(r,key){
- const root=[-.485,.03,1.105];
+ // Outlets on the housing top feed the vents; the footwell outlet is at its base.
+ const root=[-.620,.03,1.205],low=[-.640,.03,.975];
  const sleevePath=(pts,w,h)=>{for(let j=1;j<pts.length;j++){
   const a=pts[j-1],b=pts[j],d=b.map((x,i)=>x-a[i]),q=basis(d),face=p=>[[1,1],[-1,1],[-1,-1],[1,-1]].map(([u,v])=>p.map((x,i)=>x+q[1][i]*u*w+q[2][i]*v*h));
   const p=face(a),v=face(b);for(let k=0;k<4;k++){const n=(k+1)%4;r.polygon([p[k],p[n],v[n],v[k]],black,false);}
  }};
  for(const s of [-1,1]){
-  if(key==='demist')sleevePath([root,[-.591,s*.156,1.198],[-.680,s*.364,1.283]],.046,.011);
-  if(key==='face'){sleevePath([root,[-.538,s*.19,1.185],[-.504,s*.66,1.196],[-.452,s*.672,1.235]],.030,.017);sleevePath([root,[-.497,s*.096,1.185],[-.453,s*.103,1.246]],.030,.019);}
-  if(key==='floor')sleevePath([root,[-.603,s*.104,1.019],[-.595,s*.235,.851],[-.570,s*.271,.824]],.030,.017);
+  if(key==='demist')sleevePath([root,[-.620,s*.156,1.220],[-.680,s*.364,1.262]],.046,.011);
+  // Side branches run behind the instrument cluster and over the column to the dash ends.
+  if(key==='face'){sleevePath([root,[-.620,s*.19,1.225],[-.620,s*.635,1.235],[-.475,s*.672,1.235]],.030,.017);sleevePath([root,[-.560,s*.096,1.228],[-.475,s*.103,1.240]],.030,.019);}
+  if(key==='floor')sleevePath([low,[-.640,s*.104,.950],[-.620,s*.235,.851],[-.590,s*.271,.824]],.030,.017);
  }
 }

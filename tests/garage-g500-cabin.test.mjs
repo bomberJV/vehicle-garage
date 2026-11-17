@@ -26,8 +26,9 @@ test('five head restraints rise into the greenhouse on two front buckets and the
   assert(Math.max(...points.map(p=>p[2]))<1.65);
  }
  const rear=r.faces.filter(f=>f.part==='body.rear-bench');
- const base=rear.filter(f=>f.points.every(p=>p[2]<.79)&&Math.min(...f.points.map(p=>p[0]))>.49);
- assert(base.length);assert(base.every(f=>f.points.every(p=>p[1]<=.2160001)||f.points.every(p=>p[1]>=.2239999)));
+ const base=rear.filter(f=>f.points.every(p=>p[2]<.70)&&Math.min(...f.points.map(p=>p[0]))>.49);
+ // The seat bases stand either side of the tunnel; the center cushion bridges it.
+ assert(base.length);assert(base.every(f=>f.points.every(p=>p[1]<=-.1959)||f.points.every(p=>p[1]>=.1959)));
  const mirror=r.faces.filter(f=>f.part==='body.rearview-mirror').flatMap(f=>f.points);
  assert(mirror.every(p=>Math.abs(p[1])<.12&&p[2]>1.76&&p[2]<1.90));
 });

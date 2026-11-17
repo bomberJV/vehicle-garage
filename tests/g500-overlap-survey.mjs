@@ -42,12 +42,11 @@ const unit=(a,b)=>units.some(([u,v])=>(within(u,a)&&within(v,b))||(within(u,b)&&
 // Reviewed pairs where one part is carried by, seated in or bolted to the other.
 // Each entry is [part or system, part or system, reason].
 export const mounts=[
-  ...['electrical.cluster','electrical.dashboard','electrical.diff-lock-control','electrical.eis','electrical.upper-panel','electrical.steering-column',
+  ...['electrical.cluster','electrical.diff-lock-control','electrical.eis','electrical.upper-panel','electrical.steering-column',
     'seat-heating.front-switches'].map(id=>['body.dashboard',id,'instruments and switch panels are set into the dashboard']),
   ['body.dashboard','column-adjustment','the steering column passes through the dashboard'],
-  ['body.dashboard','steering-assist.shaft','the steering shaft passes through the dashboard'],
   ['body.dashboard','hvac','the heater and air-conditioning unit sits inside the dashboard'],
-  ['column-adjustment.door-switch','electrical.dashboard','the switch is set into the panel'],
+  ['body.door','column-adjustment.door-switch','the switch is set into the door trim'],
   ['body.door','electrical.door-front-left','the door module is inside the door'],
   ['body.front-right','electrical.door-front-right','the door module is inside the door'],
   ['body.rear-left','electrical.door-rear-left','the door module is inside the door'],
@@ -91,7 +90,8 @@ export const mounts=[
   ['body.front-seats','electrical.comfort-harness','the seat branches plug into the connectors under the cushions'],
   ['body.rear-bench','electrical.comfort-harness','the seat branches plug into the connectors under the cushion'],
   ['body.rear-bench','electrical.rear-heater-circuit','the heater branches plug into the cushion mats'],
-  ...['door','rear-left','rear-right'].map(id=>['body.'+id,'electrical.can-b','the door branch passes through its rubber boot to the door module']),
+  ...['door','front-right','rear-left','rear-right'].map(id=>['body.'+id,'electrical.can-b','the door branch passes through its rubber boot to the door module']),
+  ['body.structure','electrical.can-b','the overhead branch runs inside the right A-pillar and roof rail'],
   ['electrical.ecu','electrical.engine-harness','the harness plugs run along the control unit'],
   ['hvac.compressor','hvac.refrigerant-lines','the lines end at the compressor'],
   ['hvac.drier','hvac.refrigerant-lines','the lines end at the drier'],
@@ -105,6 +105,9 @@ export const mounts=[
   ['evap.tank-pressure','fuel.tank','the pressure sensor is set into the tank top'],
   ['body.structure','suspension.damper','each damper top mounts through the inner wheelhouse'],
   ['body.structure','steering-assist.shaft','the steering shaft passes through its grommet in the bulkhead'],
+  ...['heater-core','evaporator','expansion-valve'].map(id=>['body.structure','hvac.'+id,'the heater tubes and the evaporator connection pass through the bulkhead to the engine side']),
+  ...['engine-harness','lock-circuit'].map(id=>['body.structure','electrical.'+id,'the lead passes through a bulkhead grommet to the engine bay']),
+  ['body.structure','electrical.lighting-harness','the lamp leads pass through grommets in the bulkhead, the headlamp panels and the tail-lamp panels'],
 ];
 // Reviewed pairs that the rules would pass but are wrong.
 export const errors=[];

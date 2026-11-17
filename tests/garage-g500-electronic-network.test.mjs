@@ -129,7 +129,7 @@ test('the overhead electronics and its CAN branch stay aft of the windscreen pla
  const overhead=points(whole.meshCache.faces,'electrical.can-b').filter(([, ,z])=>z>1.36);
  assert(overhead.length>0);
  for(const [x,y,z] of overhead){
-   if(z<1.895){assert(y>.785&&y<.832);assert(x>-.793+(z-1.264)*(.325/.663));}
+   if(z<1.895){assert(y>.795&&y<.85);assert(x>-.793+(z-1.264)*(.325/.663));}
    if(Math.abs(y)<.70)assert(x>-.432&&z<1.929);
  }
  assert(near(overhead,P['overhead-panel'],.010));

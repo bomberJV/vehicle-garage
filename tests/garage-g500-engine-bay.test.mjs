@@ -37,7 +37,7 @@ function clearances(mode,a,list){
 test('the G500 gearbox clears the floor, the bulkhead, the frame and the console at either depicted pose',()=>{
   assert.deepEqual(poses,['stock','g500-orc-40']);
   const gaps=[['floor.pan',8.0],['floor.underlay',35.2],['floor.carpet',34.6],['body.structure',32.1],['suspension.frame',35.0],
-    ['body.dashboard',55.8],['electrical.starter',36.9],['electrical.primary-power',85.0],['evap.purge-line',125.1]];
+    ['body.dashboard',131.3],['electrical.starter',36.9],['electrical.primary-power',85.0],['evap.purge-line',125.1]];
   for(const mode of poses){
     clearances(mode,faces=>part(faces,'drivetrain.gearbox'),gaps);
     // The transmission plug is the only other part that enters the case.

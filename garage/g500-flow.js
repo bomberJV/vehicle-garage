@@ -30,7 +30,8 @@ const upperNeck=[radiatorX+.033,-.284,1.034],lowerNeck=[radiatorX+.033,.284,.592
 const hotPort=[-.849,.236,.974],pumpIn=plus(pump,[.018,.104,-.040]);
 const heaterPump=[-1.840,.574,.777];
 const returnTube=[[-.782,.422,.971],[-.834,.523,.903],[-1.37,.522,.855],[-1.658,.520,.804]];
-const supplyTube=[hotPort,[-.787,.236,.986],[-.748,.164,1.032],[-.727,.051,1.060]];
+// Both heater hoses pass under the rear throttle body to the tubes at its left.
+const supplyTube=[hotPort,[-.787,.236,.986],[-.790,.100,1.010],[-.790,-.120,1.015]];
 const hose=(r,points,radius)=>{
  path(r,points,radius,rubber);
  for(const [a,b] of [[points[0],points[1]],[points.at(-1),points.at(-2)]]){
@@ -100,7 +101,7 @@ const coolingParts=[
  }],
  ['heater-feed','Heater supply and bulkhead coupling','Warm coolant reaches the cabin heat exchanger through this branch. The two bulkhead connections meet the tubes in the HVAC view.',[.22,-.17,.30],g500FlowRefs.heater,r=>hose(r,[...supplyTube,g500HeaterPorts[0]],.014)],
  ['heater-return','Heater return tube and molded hoses','The return passes through the second coupling and along the engine bay. Hose bends and clip stations are approximate.',[.30,.31,-.05],g500FlowRefs.heater,r=>{
-  hose(r,[g500HeaterPorts[1],[-.697,.18,1.062],[-.718,.338,1.033],returnTube[0]],.014);
+  hose(r,[g500HeaterPorts[1],[-.790,-.170,1.040],[-.800,-.170,.975],[-.805,.100,.975],[-.800,.338,.990],returnTube[0]],.014);
   path(r,returnTube,.014,'#8b928e');
   hose(r,[returnTube.at(-1),[-1.765,.523,.792],plus(heaterPump,[.035,-.015,.015])],.014);
   hose(r,[plus(heaterPump,[-.033,.002,.003]),[-1.899,.471,.730],[-1.840,.283,.696],pumpIn],.014);

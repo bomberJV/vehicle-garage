@@ -230,7 +230,7 @@ function installedDisc(r,rear){
  }
 }
 function fuseSite(r,c,orientation=0){
- const [xx,yy,zz]=c,dx=orientation?.14:.155,dy=orientation?.075:.09;
+ const [xx,yy,zz]=c,dx=orientation?.11:.155,dy=orientation?.06:.09;
  r.box(xx-dx,yy-dy,zz-.042,xx+dx,yy+dy,zz-.005,dark);
  for(let i=0;i<5;i++)for(let j=0;j<2;j++) {
   const a=(i-2)*dx*.29,b=(j-.5)*dy*.74;
@@ -318,8 +318,8 @@ const groups=[
  assembly('electrical','Electrical power, controllers and networks',g500ElectronicAssemblyText,g500ElectronicSources.model,[
   ...g500ElectronicNetworkRows,
   ...g500ComfortElectricalRows,
-  ['dashboard','Driver’s instrument-panel fuse carrier','The left dashboard cover carries the fuse chart and puller. The carrier stays inside the dashboard end, clear of the outer door skin.',fore,src.fuseMap,r=>fuseSite(r,[-.601,-.746,1.136],1)],
-  ['footwell','Front passenger footwell fuse box','The operator’s manual shows the footwell box behind two covers. Open its carrier to follow the fuse blades into their sockets.',right,src.fuseMap,r=>fuseSite(r,[-.568,.445,.740])],
+  ['dashboard','Driver’s instrument-panel fuse carrier','The left dashboard cover carries the fuse chart and puller. The carrier stays inside the dashboard end, clear of the outer door skin.',fore,src.fuseMap,r=>fuseSite(r,[-.585,-.715,1.136],1)],
+  ['footwell','Front passenger footwell fuse box','The operator’s manual shows the footwell box behind two covers. Open its carrier to follow the fuse blades into their sockets.',right,src.fuseMap,r=>fuseSite(r,[-.556,.445,.740])],
   ['tunnel','Center-tunnel fuse box','The passenger seat and tunnel cover are adjacent to this fuse box.',left,src.fuseMap,r=>fuseSite(r,[.273,.132,.676],1)],
   ['battery','Cabin battery and terminal leads','The battery lies under the cup holder in front of the rear seat, as shown by the 2002 manual and Mercedes’ post-12/2000 rescue layout. Its positive lead reaches the adjacent fuse block; its negative lead bonds to the body.',[.20,0,-.45],src.battery,cabinBattery],
   ['battery-box','Battery-box fuse block','This separate distribution block is beside the physical battery, below the rear cup holder. The short positive lead ends at its main stud. Circuit assignments and ratings are not reconstructed.',aft,src.fuseMap,r=>{

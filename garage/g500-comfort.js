@@ -86,10 +86,10 @@ function refrigerantPipes(r){
  const cp=add(comp,[.036,0,.084]),top=add(con,[0,.406,.14]),bottom=add(con,[0,.406,-.15]);
  line(r,[add(cp,[0,.02,0]),[-1.675,.352,.70],[-1.95,.395,.72],[con[0]+.054,.436,.953],top],.009,alloy);
  line(r,[bottom,[con[0]+.042,.473,.710],[-2.003,.497,.786],add(drier,[0,.017,.108])],.0068,alloy);
- line(r,[add(drier,[0,-.017,.108]),[-1.80,.530,.955],[-1.71,.550,1.013],[-1.18,.521,1.050],[-.735,.408,1.118],add(metering,[-.018,0,-.014])],.0068,alloy);
- line(r,[add(metering,[-.018,0,.014]),[-.755,.455,1.126],[-1.16,.483,.985],[-1.52,.421,.792],add(cp,[0,-.02,0])],.012,rubber);
+ line(r,[add(drier,[0,-.017,.108]),[-1.80,.530,.955],[-1.71,.550,1.013],[-1.18,.521,1.050],[-.800,.408,1.118],add(metering,[-.018,0,-.014])],.0068,alloy);
+ line(r,[add(metering,[-.018,0,.014]),[-.800,.455,1.126],[-1.16,.483,.985],[-1.52,.421,.792],add(cp,[0,-.02,0])],.012,rubber);
 }
-function flaps(r,c=[-.513,.082,1.172],s=1,angle=0){
+function flaps(r,c=[-.635,.082,1.183],s=1,angle=0){
  for(const hand of [-1,1]){
   const q=add(c,[0,hand*.057*s,0]);cyl(r,q,y,-.052*s,.052*s,.004*s,alloy,8);
   const end=add(q,[.048*s*Math.cos(angle),0,.048*s*Math.sin(angle)]);
@@ -108,8 +108,8 @@ const climate=assembly('hvac','Climate control and air conditioning','Outside ai
  ['filter','Cabin air filter · CUK 2545','This activated-carbon replacement for Mercedes A 463 830 00 18 measures 246 × 216 × 32 mm. Its folded medium sits in the fresh-air intake.',up,comfortSources.filter,r=>{for(const [key] of filterParts)filterPiece(r,key,filter,true);}],
  ['blower','Cabin blower and motor','An electric motor spins a centrifugal wheel inside a scroll. The outlet feeds the evaporator and heater housing.',right,comfortSources.case,allBlower],
  ['case','Heating and ventilation housing','The heater and evaporator occupy a common housing behind the dashboard. Its inlet joins the passenger-side blower.',down,comfortSources.case,r=>{
-  for(const s of [-1,1])box(r,[-.554,.035+s*.170,1.080],[.191,.006,.220],black);
-  box(r,[-.554,.035,.968],[.191,.346,.006],black);box(r,[-.554,.035,1.192],[.191,.346,.006],black);
+  for(const s of [-1,1])box(r,[-.6465,.035+s*.170,1.080],[.143,.006,.220],black);
+  box(r,[-.6465,.035,.968],[.143,.346,.006],black);box(r,[-.6465,.035,1.192],[.143,.346,.006],black);
   box(r,[-.600,.232,1.030],[.106,.126,.007],black);box(r,[-.600,.232,1.104],[.106,.126,.007],black);
  }],
  ['evaporator','A/C evaporator','The core cools and dries the incoming air. The NRF 36122 replacement for A 209 830 03 58 has a 200 × 308 × 65 mm core.',fore,comfortSources.evapNrf,r=>allCore(r,'evaporator')],
@@ -120,7 +120,7 @@ const climate=assembly('hvac','Climate control and air conditioning','Outside ai
  ...[-1,1].map(s=>['fan-'+(s<0?'left':'right'),(s<0?'Left':'Right')+' electric condenser fan','This auxiliary fan pushes air into the condenser. The engine cooling fan sits on the far side of the radiator.',s<0?left:right,comfortSources.fans,r=>fanPair(r,s<0?'left':'right')]),
  ['drier','Refrigerant receiver-drier','The receiver holds liquid refrigerant. The filter and desiccant remove debris and moisture before liquid reaches the expansion valve.',right,comfortSources.drier,r=>{receiver(r,'shell');receiver(r,'head');}],
  ['refrigerant-lines','Liquid, suction and discharge lines','Follow the high-pressure line from the compressor to the condenser, the liquid line through the drier to the valve, and the suction line back to the compressor. Hose bends are schematic.',down,comfortSources.drier,refrigerantPipes],
- ['flaps','Air-mixing flaps and actuator','The flap shaft pivots in the housing. An electric actuator moves the flap through a linkage. The cutaway shows its motion.',left,comfortSources.case,r=>{flaps(r);box(r,[-.530,.180,1.155],[.055,.022,.042],iron);r.rod([-.516,.17,1.163],[-.513,.192,1.172],.004,alloy,7);}],
+ ['flaps','Air-mixing flaps and actuator','The flap shaft pivots in the housing. An electric actuator moves the flap through a linkage. The cutaway shows its motion.',left,comfortSources.case,r=>{flaps(r);box(r,[-.600,.228,1.150],[.055,.022,.042],iron);r.rod([-.600,.205,1.165],[-.600,.217,1.165],.004,alloy,7);}],
  ['face-ducts','Center and side vent ducts','Separate branches deliver air to the two center outlets and to adjustable vents at the dashboard ends.',right,comfortSources.outlets,r=>ducts(r,'face')],
  ['demist','Windshield demister ducts','The upper outlets direct air along the inside of the windshield.',up,comfortSources.outlets,r=>ducts(r,'demist')],
  ['footwell','Footwell ducts','The lower outlets deliver air to the footwells on both sides.',down,comfortSources.outlets,r=>ducts(r,'floor')],
@@ -162,7 +162,7 @@ function drive(r,key,which,c=which==='reach'?[-.511,-.464,1.096]:[-.536,-.372,1.
  }
  box(r,at(which==='reach'?[0,-.031,.015]:[-.029,0,.014]),[.024*s,.016*s,.012*s],black);
 }
-const doorSwitch=[-.583,-.800,1.090];
+const doorSwitch=[-.583,-.814,1.090];
 function columnSwitch(r){
  box(r,doorSwitch,[.026,.008,.024],black);r.rod(add(doorSwitch,[.004,.005,-.005]),add(doorSwitch,[-.005,.008,.009]),.005,iron,7);
 }

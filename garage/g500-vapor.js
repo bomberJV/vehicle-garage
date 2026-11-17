@@ -5,7 +5,8 @@ import {fluidRefs as ref} from './g500-fluid-refs.js';
 
 const can=[1.963,.710,.844],tankPort=[1.845,.381,.648],pressure=[1.805,.140,.661];
 const canPorts={tank:plus(can,[.092,-.033,.036]),purge:plus(can,[.092,.029,.036]),air:plus(can,[.031,.052,.044])};
-const shut=plus(can,[.030,.053,.088]),purge=[-1.185,-.564,.940],manifold=[-.858,-.018,1.021];
+// The purge valve sits outboard of the left exhaust manifold.
+const shut=plus(can,[.030,.053,.088]),purge=[-1.185,-.612,.940],manifold=[-.858,-.018,1.021];
 export const evapRows=[
  ['tank-vent','Tank vapor connection','Vapor leaves the high side of the tank for the charcoal canister. The underbody and wheelhouse bends show the route schematically.',[.14,.11,.23],ref.evapRoute,r=>{
   cyl(r,tankPort,z,-.009,.013,.012,iron,10);

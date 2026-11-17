@@ -50,10 +50,18 @@ export function drawG500Frame(r){
      r.box(xx-.027,side*.52-.043,.420,xx+.027,side*.52+.043,.512,dark);
    }
  }
+ // The front crossmember carries the radiator. It hangs below the rail ends on
+ // two drop plates, clear of the engine fan.
+ r.rod([-1.99,-.49,.505],[-1.99,.49,.505],.030,dark,12);
+ for(const side of [-1,1])r.box(-1.99,Math.min(side*.455,side*.481),.505,-1.962,Math.max(side*.455,side*.481),.585,dark);
  // The second crossmember passes behind the oil pan and ahead of the
  // bellhousing, above the front propeller shaft and the fluid cooler lines.
- for(const [station,height,radius=.040] of [[-1.91,.60],[-.94,.55,.030],[.22,.449],[1.87,.641]])
+ for(const [station,height,radius=.040] of [[-.94,.55,.030],[1.87,.641]])
    r.rod([station,-.49,height],[station,.49,height],radius,dark,12);
+ // The transfer-case crossmember hangs below the rails on drop plates and
+ // passes under the case.
+ r.rod([.22,-.49,.300],[.22,.49,.300],.030,dark,12);
+ for(const side of [-1,1])r.box(.192,Math.min(side*.455,side*.481),.300,.248,Math.max(side*.455,side*.481),.42,dark);
 }
 function beam(r,axle,isFront){
   for(const s of [-1,1]){
@@ -61,9 +69,12 @@ function beam(r,axle,isFront){
     cyl(r,[axle,s*.48,g500HubZ+.054],z,-.007,.005,.095,dark,16);
     if(isFront){
       // The spherical joint casing nests in the steering knuckle at each front tube end.
-      turn(r,[axle,s*.68,g500HubZ],y,[[-.071,.046],[-.043,.077],[0,.083],[.043,.077],[.071,.046]],metal,{n:14});
+      // Its outer face stops 2 mm inboard of the brake disc; the hub passes through the disc.
+      const knuckle=[[-.071,.046],[-.043,.077],[0,.083],[.026,.077],[.036,.058]];
+      turn(r,[axle,s*.68,g500HubZ],y,s>0?knuckle:knuckle.map(([u,radius])=>[-u,radius]).reverse(),metal,{n:14});
     }else{
-      sleeve(r,[axle,s*.70,g500HubZ],y,-.018,.018,.089,.030,dark,14);
+      // The tube-end flange carries the brake anchor plate, 4 mm inboard of the disc.
+      sleeve(r,[axle,s*.70,g500HubZ],y,s>0?-.026:0,s>0?0:.026,.089,.030,dark,14);
     }
   }
 }

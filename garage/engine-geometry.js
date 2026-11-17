@@ -117,7 +117,9 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
   const a=side(-.006),b=side(.006);poly(a,METAL);poly(b,METAL);for(let j=0;j<a.length;j++){const k=(j+1)%a.length;poly([a[j],a[k],b[k],b[j]],METAL);}
  }});
  if(id==='hrv')tag('vtec-rockers',()=>{for(const x of xs)for(const yy of [-.065,.065]){box(x-.025,yy-.017,headZ+.125,x+.025,yy+.017,headZ+.155,METAL);cyl([x-.030,yy,headZ+.14],[x+.030,yy,headZ+.14],.005,GOLD,6);}});
- if(!m54)tag('valve-cover',()=>{for(const s of banks){const y=bankY(s),half=headWidth/2+.025;box(-L/2-.025,y-half,headZ+.15,L/2+.025,y+half,headZ+.19,BLACK);for(let x=-L/2+.025;x<L/2;x+=.15)for(const sy of [-1,1])cyl([x,y+sy*(half-.012),headZ+.19],[x,y+sy*(half-.012),headZ+.202],.008,METAL,6);for(const yy of [y-.06,y-.035,y+.035,y+.06])box(-L/2+.04,yy-.003,headZ+.190,L/2-.04,yy+.003,headZ+.196,tone(METAL,.8));}});
+ // The G500's covers are low magnesium shells over the camshafts, so the air
+ // cleaner pods above them stay clear.
+ if(!m54)tag('valve-cover',()=>{const top=id==='g500'?.162:.19,rib=id==='g500'?.003:.006,bolt=id==='g500'?.005:.012;for(const s of banks){const y=bankY(s),half=headWidth/2+.025;box(-L/2-.025,y-half,headZ+.15,L/2+.025,y+half,headZ+top,BLACK);for(let x=-L/2+.025;x<L/2;x+=.15)for(const sy of [-1,1])cyl([x,y+sy*(half-.012),headZ+top],[x,y+sy*(half-.012),headZ+top+bolt],.008,METAL,6);for(const yy of [y-.06,y-.035,y+.035,y+.06])box(-L/2+.04,yy-.003,headZ+top,L/2-.04,yy+.003,headZ+top+rib,tone(METAL,.8));}});
  tag('timing-drive',()=>{
   const xx=-L/2-.037,crank=[xx,0,crankRise],cams=cfg.pushrod?f350Cams(xx):banks.flatMap(s=>Array.from({length:cfg.cams/cfg.banks},(_,i)=>[xx,bankY(s)+(cfg.cams/cfg.banks===1?0:(i? .065:-.065)),headZ+.115]));
   for(const p of [crank,...cams]){tube([xx-.01,p[1],p[2]],[xx+.01,p[1],p[2]],p===crank?.057:.048,p===crank?.025:.014,GOLD,14);}

@@ -117,17 +117,26 @@ export const g500FlowGroups=[
  group('intake','Air intake','Follow the two front ducts into the paired filter elements, through the single rear meter and throttle, then out to eight head ports.',g500FlowRefs.air,inductionParts),
  group('cooling','Engine and heater coolant','Trace the radiator circuit and its bypass, then follow the separate heater supply and return through the bulkhead.',g500FlowRefs.pump,coolingParts)
 ];
+// The air cleaner, its ducts and the meter stand 25 mm higher, clear of the valve covers.
+// The throttle bore stays on the manifold; only the bend above it follows.
+export const g500CleanerLift=.025;
 export function drawG500InductionCircuit(r,prefix='intake'){
- const t=engineShapes(r,intakePoint),tag=(key,fn)=>r.tag(prefix+'.'+key,fn);
- const metric=engineShapes(r,enginePoint);
+ const tag=(key,fn)=>r.tag(prefix+'.'+key,fn);
+ let raise=()=>0;
+ const t=engineShapes(r,p=>{const q=intakePoint(p);return [q[0],q[1],q[2]+raise(p)];});
+ const fixed=engineShapes(r,intakePoint);
+ const metric=engineShapes(r,p=>{const q=enginePoint(p);return [q[0],q[1],q[2]+g500CleanerLift];});
+ const lifted=new Set(['airbox','intake-duct','maf']);
  g500Induction((key,draw)=>tag(key,()=>{
+  raise=lifted.has(key)?()=>g500CleanerLift:key==='throttle'?p=>p[2]>=.60?g500CleanerLift:0:()=>0;
   draw();
+  raise=()=>0;
   if(key==='airbox')for(const s of [-1,1])drawG500FilterTray(metric,g500FilterSeat(s));
  }),t);
  tag('air-filters',()=>{
   for(const s of [-1,1])drawG500PanelFilter(metric,g500FilterSeat(s));
  });
- tag('intake',()=>intakeManifold(t));
+ tag('intake',()=>intakeManifold(fixed));
 }
 export function drawG500CoolingCircuit(r,prefix='cooling'){
  for(const [key,,,,,draw] of coolingParts){

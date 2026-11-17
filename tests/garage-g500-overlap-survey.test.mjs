@@ -18,13 +18,13 @@ test('every crossing pair of installed G500 parts is in the reviewed baseline, w
 });
 
 test('the board states the survey totals and the size of each set of errors',()=>{
-  assert.equal(pairs.length,640);
-  assert.deepEqual(['assembly','mount','terminal','through','overlap'].map(count),[167,116,126,96,135]);
+  assert.equal(pairs.length,607);
+  assert.deepEqual(['assembly','mount','terminal','through','overlap'].map(count),[164,116,127,91,109]);
   const done=row('g500-installed-overlap-survey');
   assert.equal(done.status,'shipped');
-  for(const n of [640,409,167,116,126,231,96,135])assert(done.description.includes(String(n)),`the survey row states ${n}`);
-  const sets={wiring:['g500-wiring-routes',63],lines:['g500-hose-pipe-routes',33],cabin:['g500-cabin-packaging',39],
-    underbody:['g500-underbody-overlaps',43],chassis:['g500-chassis-overlaps',53]};
+  for(const n of [607,407,164,116,127,200,91,109,231])assert(done.description.includes(String(n)),`the survey row states ${n}`);
+  const sets={wiring:['g500-wiring-routes',63],lines:['g500-hose-pipe-routes',28],cabin:['g500-cabin-packaging',36],
+    underbody:['g500-underbody-overlaps',41],chassis:['g500-chassis-overlaps',32]};
   assert.deepEqual(Object.keys(sets),Object.keys(areas));
   for(const [key,[id,n]] of Object.entries(sets)){
     assert.equal(wrong.filter(p=>area(p)===key).length,n,key);

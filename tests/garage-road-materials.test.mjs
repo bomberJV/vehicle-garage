@@ -57,7 +57,9 @@ test('the 2003 E46 windshield curves in plan and shares the roof crown',()=>{
   const verts=glass.flatMap(f=>f.points),center=verts.filter(p=>Math.abs(p[1])<1e-6),outer=verts.filter(p=>Math.abs(p[1])>.60);
   assert(Math.max(...center.map(p=>p[2]))-Math.max(...outer.map(p=>p[2]))>.038);
   assert(Math.min(...outer.map(p=>p[0]))-Math.min(...center.map(p=>p[0]))>.03);
-  const roofTop=Math.max(...r.faces.flatMap(f=>f.points.map(p=>p[2])));
+  // A loop rather than a spread: the detailed shell has more vertices than the
+  // engine accepts as call arguments.
+  let roofTop=-Infinity;for(const f of r.faces)for(const p of f.points)roofTop=Math.max(roofTop,p[2]);
   assert(Math.abs(roofTop-.040-1.369)<.001);
 });
 test('exterior photo references and real transparent surfaces are available for every road model',()=>{

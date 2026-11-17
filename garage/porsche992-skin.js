@@ -33,12 +33,34 @@ export function headlampSeat992(point){
     // The bumper remains the datum for overall length in the dimension study.
     point=[x+.046*smooth((-1.98-x)/.26),y,z];
   }
-  if(Math.abs(dx)>.39||Math.abs(dy)>.25)return point;
-  const distance=Math.hypot(dx/.21,(dy-.32*dx)/.124);
-  const weight=1-smooth((distance-.94)/.60);
-  const innerCrest=.029*Math.exp(-(((dy+.167)/.057)**2)-(((dx+.142)/.138)**2));
+  if(Math.abs(dy)>.30)return point;
   const socket=.7015+.688*dx-.4155*dy+.143*dx*dx+.2075*dy*dy-.134*dx*dy;
-  return [point[0],y,mix(z+innerCrest,socket-.004,weight)];
+  // The wing's crest runs along the inboard edge of the lens; the lamp sits
+  // on the outward-tilted face of the wing.
+  let seated=z+.029*Math.exp(-(((dy+.167)/.057)**2)-(((dx+.142)/.138)**2));
+  if(Math.abs(dx)<=.39&&Math.abs(dy)<=.25){
+    const distance=Math.hypot(dx/.21,(dy-.32*dx)/.124);
+    seated=mix(seated,socket-.004,1-smooth((distance-.94)/.60));
+  }
+  if(dx< -.10&&dx> -.70){
+    // Ahead of the lamp the wing falls away into the bumper. Continue the lens
+    // plane over the nose instead of leaving a painted lip above its lower edge.
+    const ahead=smooth((-.10-dx)/.14),lateral=1-smooth((Math.abs(dy-.02)-.05)/.16);
+    const cap=socket-.004,k=.014;
+    const soft=-k*Math.log(Math.exp(-seated/k)+Math.exp(-cap/k));
+    seated=mix(seated,Math.min(seated,soft),ahead*lateral);
+  }
+  if(dy>.08&&Math.abs(dx)<.45){
+    // Outboard of the lens the wing rolls down to its shoulder. Extend the
+    // lens plane with a convex fall instead of rising again past its rim.
+    const e=.12,slope=-.4155+.415*e-.134*dx;
+    const rim=.7015+.688*dx-.4155*e+.143*dx*dx+.2075*e*e-.134*dx*e;
+    const cap=rim-.004+slope*(dy-e)-1.6*Math.max(0,dy-e)**2,k=.008;
+    const soft=-k*Math.log(Math.exp(-seated/k)+Math.exp(-cap/k));
+    const outboard=smooth((dy-.08)/.06)*(1-smooth((Math.abs(dx)-.25)/.15));
+    seated=mix(seated,Math.min(seated,soft),outboard);
+  }
+  return [point[0],y,seated];
 }
 
 // The lower door folds inward above the raised rocker. The depression tapers
@@ -69,15 +91,40 @@ const bonnetSides=[
 ];
 export const bonnetHalfWidth=x=>interpolate(bonnetSides,x);
 export function bonnetPressing(x,y){
-  // The paired shallow channels taper and disappear before the leading edge.
-  const strength=smooth((x+1.95)/.26)*smooth((-.77-x)/.17);
-  const ridge=.267+.051*bound((x+1.95)/1.18);
-  return strength*.011*Math.exp(-(((Math.abs(y)-ridge)/.038)**2));
+  // Porsche describes a pronounced recess in the lid between the headlights,
+  // after the first 911. The centre sits low between two soft walls; the walls
+  // read as the two character lines that run from the nose to the screen.
+  const strength=smooth((x+2.10)/.30)*smooth((-1.0-x)/.40);
+  const ridge=.250+.060*bound((x+2.0)/1.2);
+  const floor=1-smooth((Math.abs(y)-ridge+.045)/.09);
+  return -strength*.012*floor;
+}
+// Transverse crown of the front end, as a fraction of the crest's rise over the
+// centreline. The lid stays almost flat across, so its leading edge reads as a
+// straight line nose-on. Outside the lid seam the wings climb steeply to their
+// crests and stand clear of the lid around each headlamp. Toward the cowl the
+// profile hands back to the rounded shoulder used over the doors.
+export function frontCrown992(x,u,crestU,shoulder){
+  const w=smooth((-.78-x)/.40);
+  if(w<=0)return shoulder;
+  const lidU=Math.min(bonnetHalfWidth(x)/.92,crestU-.08);
+  const atSeam=mix(.18,.42,smooth((x+2.0)/1.1));
+  // The wing reaches its crest a hand's width outboard of the seam, along
+  // the inboard edge of the lamp, and holds that height across its top.
+  const peakU=mix(crestU,Math.min(crestU,lidU+.12),smooth((x+2.16)/.22));
+  let f;
+  if(u<=lidU){const s=u/lidU;f=atSeam*s*s;}
+  else if(u>=peakU)f=1;
+  else{
+    const t=bound((u-lidU)/(peakU-lidU)),m0=2*atSeam/lidU*(peakU-lidU);
+    f=atSeam*(2*t**3-3*t*t+1)+m0*(t**3-2*t*t+t)+(-2*t**3+3*t*t);
+  }
+  return mix(shoulder,f,w);
 }
 // The door cut is widest at belt height. Its curved rear edge leans back and
 // then rounds forward to meet the hem above the independent rocker panel.
 export const door992=[-.603,.560];
-export const sideLevels992=[.145,.22,.34,.54,.76,.90,.965,1];
+export const sideLevels992=[.145,.18,.22,.28,.34,.44,.54,.65,.76,.83,.90,.935,.965,.985,1];
 const hangingEdge=[
   [0,-.652,.105],[.145,-.652,.105],[.22,-.668,.286],[.34,-.676,.382],
   [.54,-.683,.456],[.76,-.665,.532],[.90,-.650,.565],[1,door992[0],door992[1]]

@@ -90,7 +90,7 @@ function fuel(id,p){
  const parts=[component('tank',ford?'Midship tank · one configuration':saddle?'Saddle fuel tank':'Fuel tank',p.fuel,[0,0,-.38],r=>tankBody(r,t,p.tankShape,p.tunnel)),
   component('filler',b?'Filler cap & neck':'Filler neck',b?'The cap sits in the top of the tank ahead of the rider.':'The neck leads from the body-side filler opening to the tank.',[0,p.neckSide*.44,.27],r=>{const join=plus(t,[0,p.neckSide*(ford?.12:.23),.06]);if(!b)path(r,[neck,[neck[0]-.04,neck[1]*.86,neck[2]-.13],join],.025,rubber);cyl(r,neck,b?Z:Y,-.014,.016,b?.048:.037,iron,18);}),
   component('sender',saddle?'Right-hand delivery flange & sender':'Fuel level sender',ford?'The float tracks the fuel level. The engine specification determines the pump and sender combination.':'A float arm pivots as the liquid level changes. The electrical sender reports that position.',[-.18,.07,.52],r=>sender(r,unit,b?.64:1)),
-  component('supply','Fuel supply line',ford?'The chassis line runs inside the left frame rail and ends at the engine bay. The connection to the V8’s fuel rails and the return line are not drawn.':'The supply line runs from the tank assembly toward the engine. Its bends and clips are schematic.',[.12,-.33,-.15],r=>{const y=p.supplyY??(b?.08:.27);path(r,[unit,[unit[0],y,ford?.33:unit[2]-.13],[end[0],y,b?.65:.33],end],b?.005:.009,'#736f5a');})];
+  component('supply','Fuel supply line',ford?'The chassis line runs inside the left frame rail and ends at the engine bay. The connection to the V8’s fuel rails and the return line are not drawn.':'The supply line runs from the tank assembly toward the engine. Its bends and clips are schematic.',[.12,-.33,-.15],r=>{const y=p.supplyY??(b?.08:.27);if(id==='hrv'){path(r,[unit,[unit[0],.31,unit[2]-.13],[-1.695,.31,.32],[-1.695,.27,.40],[-1.695,.27,.78],[-1.66,.33,.81],[-1.632,.33,.828],end],.009,'#736f5a');return;}path(r,[unit,[unit[0],y,ford?.33:unit[2]-.13],[end[0],y,b?.65:.33],end],b?.005:.009,'#736f5a');})];
  if(saddle)parts.push(component('left-sender','Left tank sender','The second float measures the level across the center tunnel.',[-.29,-.41,.27],r=>sender(r,plus(t,[-.035,-.28,.07]))));
  if(!ford){
   const q=external?plus(t,[.25,-.12,-.14]):plus(unit,[.004,0,-.096]);
@@ -108,13 +108,14 @@ function fuel(id,p){
 }
 function electrical(id,p){
  const e=p.engine,b=p.bike,B=p.battery,classic=id==='porsche993cab',starter=p.starter||plus(e,[.16,b?.02:.11,-.09]),gen=classic?plus(e,[.22,0,.18]):plus(e,[-.13,b?-.10:-.20,.04]);
- const fuse=b?plus(B,[.09,.02,.03]):id.startsWith('porsche')?[.02,-.46,.49]:plus(B,[.08,.16,.025]);
+ const hrv=id==='hrv',fuse=b?plus(B,[.09,.02,.03]):id.startsWith('porsche')?[.02,-.46,.49]:hrv?[-1.16,-.56,.82]:plus(B,[.08,.16,.025]);
  const cableStart=id==='bmw325ci'?plus(B,[.100,-.046,.115]):B;
- const cableEnd=id==='bmw325ci'?m54InstalledPoint([.638,.25,-.024]):starter;
+ // The HR-V's starter is the engine's own, on the back of the bellhousing.
+ const cableEnd=id==='bmw325ci'?m54InstalledPoint([.638,.25,-.024]):hrv?[-1.21,-.45,.60]:starter;
  return [component('battery','12 V battery',p.electric,[-.16,.14,.46],r=>battery(r,B,b)),component('starter','Starter motor & solenoid','The solenoid engages the starter drive with the engine’s ring gear. Opening the motor shows the armature and pinion.',[.28,.25,-.15],r=>electricMachine(r,starter,'starter',b?.67:1)),
  component('generator',b?'Generator stator & rotor':classic?'Fan-axis alternator':'Belt-driven alternator',b?'A stator winding and rotating field generate current at the engine. The regulator controls the charging supply.':classic?'The alternator shares the engine cooling fan axis. The pulley is driven by the engine belt.':'A belt drives a rotor inside the stator. The rectifier converts its output for the vehicle’s DC circuit.',[-.30,-.32,.20],r=>electricMachine(r,gen,b?'bike-gen':'alternator',b?.72:1)),
  component('fuses',b?'Fuses & distribution':id==='bmw325ci'?'Glove-compartment fuse carrier':'Fuse carrier',id==='bmw325ci'?'The carrier is behind the glovebox panel and its two clips, as shown on page 140 of the 2003 coupé manual. Fuse colors and assignments here are illustrative.':'Individual fuse links protect branch circuits. Fuse assignments and ratings are omitted from this layout.',[.12,.47,.32],r=>{if(id==='bmw325ci')return drawBmwFuseCarrier(r);box(r,fuse,b?[.072,.049,.034]:[.148,.091,.047],rubber);for(let j=0;j<(b?3:6);j++)for(const side of [-1,1])box(r,plus(fuse,[(j-(b?1:2.5))*.018,side*(b?.009:.019),b?.020:.031]),[.013,.013,.015],['#a9785c','#9fa976','#718ba8'][j%3]);}),
- component('cables','Positive feed & ground strap','A high-current feed connects the starter to the battery. A separate bond returns current through the engine and chassis.',[0,-.34,-.22],r=>{const y=b?.105:.36;path(r,[cableStart,plus(cableStart,[.07,0,-.02]),[B[0],y,B[2]-.09],[cableEnd[0],y,b?.54:.41],cableEnd],b?.005:.009,'#956451');path(r,[cableEnd,plus(cableEnd,[.03,-.06,0]),plus(cableEnd,[.12,-.11,.018])],.010,'#717b73');})];
+ component('cables','Positive feed & ground strap','A high-current feed connects the starter to the battery. A separate bond returns current through the engine and chassis.',[0,-.34,-.22],r=>{if(hrv){path(r,[plus(B,[.094,-.043,.116]),[B[0]+.094,-.60,.83],[-1.618,-.56,.80],[-1.612,-.56,.715],[-1.45,-.47,.712],[-1.30,-.455,.70],[-1.22,-.45,.64],cableEnd],.009,'#956451');path(r,[cableEnd,[-1.15,-.44,.63],[-1.08,-.44,.68]],.010,'#717b73');return;}const y=b?.105:.36;path(r,[cableStart,plus(cableStart,[.07,0,-.02]),[B[0],y,B[2]-.09],[cableEnd[0],y,b?.54:.41],cableEnd],b?.005:.009,'#956451');path(r,[cableEnd,plus(cableEnd,[.03,-.06,0]),plus(cableEnd,[.12,-.11,.018])],.010,'#717b73');})];
 }
 function slidingRoof(p){const X0=p.roofX,H=p.roofZ;
  return [component('glass','Sliding glass lid','The moving glass sits in the opening and tilts about the front guides.',[.12,0,.39],r=>roofGlass(r,X0,H)),
@@ -146,12 +147,19 @@ export function drawRoadServiceAssembly(r,vehicle,id,engineOwnsM54Rail=false){
  // Keep a single physical starter and alternator while preserving both menus.
  const shared=new Set();
  const ownsBattery=Boolean(roadSystems[vehicle]?.sharedEngine);
- if((vehicle==='bmw325ci'||ownsBattery)&&id==='electrical'){
+ if((vehicle==='bmw325ci'||vehicle==='hrv'||ownsBattery)&&id==='electrical'){
   for(const f of r.faces){
    const owner=f.part==='powertrain.starter'?'electrical.starter':f.part==='powertrain.alternator'?'electrical.generator':ownsBattery&&f.part==='powertrain.battery'?'electrical.battery':null;
    if(!owner)continue;
    if(r.inspection?.assembly==='electrical')f.part=owner;
    shared.add(owner);
+  }
+ }
+ if(vehicle==='hrv'&&id==='fuel'){
+  for(const f of r.faces){
+   if(f.part!=='powertrain.fuel-rail'&&f.part!=='powertrain.injectors')continue;
+   if(r.inspection?.assembly==='fuel')f.part='fuel.rail';
+   shared.add('fuel.rail');
   }
  }
  for(const p of g?.parts||[]){

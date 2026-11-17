@@ -57,7 +57,7 @@ export function panelSeam(r,car,key,path,width,side,color){
     if(!side){
       // A small rolled edge gives the dark joint a visible face when the eye
       // looks along the deck. A planar decal vanishes at that grazing angle.
-      const center=spine.map(p=>{const q=project(stored.surface,p,0);q[2]+=car.modern?.0065:.0020;return q;});
+      const center=spine.map(p=>{const q=project(stored.surface,p,0);q[2]+=car.modern?.0035:.0020;return q;});
       vertices.push(...center);indices.length=0;
       for(let i=1;i<n;i++){
         const a=i-1,b=i,c=2*n-1-i,d=2*n-i,m=2*n+i-1,q=m+1;

@@ -3,7 +3,7 @@
 // sweeps, crowns and upholstery follow photographs rather than tooling drawings.
 import {fixedStopLamp,washerNozzle,classicBodyTrim,classicDeckScript,classicMirror,frontSignals993,rearOptics993,classicSignalPocket,headlamp993,headlampSeat993} from './porsche993-trim.js';
 import {faceTriangles} from './mesh-triangles.js';
-import {headlampSeat992,rocker992,stations992,sideLevels992,spoiler992,sweep992,bonnetStart,bonnetHalfWidth,bonnetPressing,door992,doorRibX,fascia992} from './porsche992-skin.js';
+import {headlampSeat992,rocker992,stations992,sideLevels992,spoiler992,sweep992,bonnetStart,bonnetHalfWidth,bonnetPressing,frontCrown992,door992,doorRibX,fascia992} from './porsche992-skin.js';
 import {classicStations,classicSpoiler,classicGrilleSpan,sweepClassicBody,classicBonnetStart,classicBonnetWidth,classicBonnetRib,classicDoor,classicDoorHem,classicDoorRib,classicSillHeight,classicLowerBands,classicBumperInset,classicBonnetValley,drawClassicCornerVents} from './porsche993-body-profile.js';
 import {draw992Headlamp,draw992RunningLamp,draw992Tail,draw992Nameplate,draw992Mirror,draw992EngineGrille} from './porsche992-exterior-trim.js';
 import {panelSeam} from './porsche-panel-seams.js';
@@ -56,7 +56,8 @@ function top(car,x,y){
   // the rear deck broadens and rounds down into the side quarters.
   const crestU=car.modern?.766:.77;
   const inner=Math.min(u/crestU,1);
-  const haunch=Math.sin(inner*Math.PI/2)**3.2;
+  const rounded=Math.sin(inner*Math.PI/2)**3.2;
+  const haunch=car.modern?frontCrown992(x,Math.min(u,crestU),crestU,rounded):rounded;
   const drop=clamp((u-crestU)/(.958-crestU));
   const crown=(z-c)*haunch+(car.modern?bonnetPressing(x,y):classicBonnetValley(x,y));
   const p=swept(car,[x,y,c+crown-.076*(car.modern?drop**2.65:1-Math.cos(drop*Math.PI/2))]);
@@ -158,8 +159,13 @@ function uBreaks(car){
   }
   const ordered=[...new Set(xs.map(x=>Math.round(x*1e7)/1e7))].sort((a,b)=>a-b);
   const result=[ordered[0]];
+  // The 992 loft is shaded per vertex. Rows no more than 55 mm apart keep
+  // its reflections continuous; the 993 keeps its original sampling.
+  const step=car.modern?.055:.18;
   for(let i=1;i<ordered.length;i++){
-    if(ordered[i]-ordered[i-1]>.18)result.push((ordered[i]+ordered[i-1])/2);
+    const gap=ordered[i]-ordered[i-1];
+    if(car.modern){const n=Math.ceil(gap/step);for(let k=1;k<n;k++)result.push(ordered[i-1]+gap*k/n);}
+    else if(gap>step)result.push((ordered[i]+ordered[i-1])/2);
     result.push(ordered[i]);
   }
   stationBreaks.set(car,result);return result;
@@ -218,7 +224,7 @@ function lidStrip(r,car,paint,phase,a,b,s,front,moves){
     const paintedPoint=(pos,t)=>open?
       spoilerPoint(false,top(car,pos,s*mix(classicGrilleSpan(pos),bladeSpan(car,pos),t)),phase):f(pos,t);
     let da=paintedPoint(a,0),db=paintedPoint(b,0);
-    const steps=car.modern&&!front?8:open?1:4;
+    const steps=car.modern?lidSteps992(front):open?1:4;
     for(let j=1;j<=steps;j++){
       const na=paintedPoint(a,j/steps),nb=paintedPoint(b,j/steps);
       painted(r,[da,db,nb,na],paint,[0,0,1]);da=na;db=nb;
@@ -234,6 +240,9 @@ function lidStrip(r,car,paint,phase,a,b,s,front,moves){
     }
   });
 }
+// Rows shared by the loft and both bumper covers. The covers reuse the very
+// vertices on the loft's last station so the two meshes close without a crack.
+const deckRows992=[.875,.75,.62,.49,.36,.22,.11,0],lidSteps992=front=>front?8:12;
 function skin(r,car,paint,phase){
   const xs=uBreaks(car),[doorA,doorB]=car.door,[cabinA,cabinB]=car.cockpit;
   const sampled=new Map();
@@ -264,7 +273,7 @@ function skin(r,car,paint,phase){
         // At the shoulder the side panel turns over toward the inside of the car.
         let ta=deck(a,1),tb=deck(b,1);
         painted(r,[fa,fb,tb,ta],paint,[0,s,.5]);
-        for(const t of [.75,.49,.22,0]){
+        for(const t of car.modern?deckRows992:[.75,.49,.22,0]){
           const na=deck(a,t),nb=deck(b,t);painted(r,[ta,tb,nb,na],paint,[0,s*.25,1]);ta=na;tb=nb;
         }
         if(cabin){
@@ -302,7 +311,7 @@ function skin(r,car,paint,phase){
         [a+.025,low],[a+.14,low],[0,low],[b-.14,low],[b-.025,low],
         [b,low+.012],[b,low+.05],[b,.54],[b,.76],[b,.9],[b,1]];
       const seam=rows.map(([x,t])=>sideRaw(car,car.modern?doorRibX(x,t):classicDoorRib(car,x,t),t,s));
-      panelSeam(r,car,'door'+s,seam,car.modern?.012:.0055,s,car.modern?'#444546':tint(paint,.48));
+      panelSeam(r,car,'door'+s,seam,car.modern?.0065:.0055,s,car.modern?'#2a2d2f':tint(paint,.48));
       const hw=car.modern?.133:.116,hz=car.modern?.750:.733,hx=b-.18;
       const handle=cheek(hx,hz);
       ellipsoid(r,handle,[hw*.63,.014,.023],car.modern?tint(paint,.67):'#343537',12,4);
@@ -326,7 +335,7 @@ function skin(r,car,paint,phase){
       r.tag(fore?'shell.luggage':'shell.deck',()=>{
         const samples=[lo,...xs.filter(x=>x>lo&&x<hi),hi];
         const edge=samples.map(x=>top(car,x,s*lidWidth(car,x,station(car,x)[0],fore)));
-        panelSeam(r,car,(fore?'bonnet':'deck')+s,edge,car.modern?.012:.0063,0,car.modern?'#4c4f50':tint(paint,.50));
+        panelSeam(r,car,(fore?'bonnet':'deck')+s,edge,car.modern?.0065:.0063,0,car.modern?'#2c2f31':tint(paint,.50));
       });
     }
   }
@@ -358,8 +367,10 @@ function fascia(r,car,front,paint){
     const side=sideLevels992.map(t=>sideRaw(car,x,t,1)[2]);
     side.unshift(sideRaw(car,x,0,1)[2]);
     const inside=lidWidth(car,x,station(car,x)[0],front);
-    const deck=front?[0,.25,.5,.75,1].map(t=>t*inside):[...Array.from({length:9},(_,i)=>i/8*bladeSpan(car,x)),inside];
-    for(const t of [.22,.49,.75,1])deck.push(mix(inside,w,t));
+    const n=lidSteps992(front);
+    const deck=front?Array.from({length:n+1},(_,i)=>i/n*inside):[...Array.from({length:n+1},(_,i)=>i/n*bladeSpan(car,x)),inside];
+    for(const t of [...deckRows992].reverse().slice(1))deck.push(mix(inside,w,t));
+    deck.push(w);
     const outer=deck.map(y=>top(car,x,y));
     return fascia992(r,front,paint,w,x,point,cap,flank,painted,side,outer);
   }
@@ -503,7 +514,7 @@ function exteriorLights(r,car,paint){
       const side=i/14-1,x=modern?bonnetStart:classicBonnetStart;
       return top(car,x,side*lidWidth(car,x,station(car,x)[0],true));
     });
-    panelSeam(r,car,'bonnet-front',gap,modern?.013:.0063,0,modern?'#44494b':tint(paint,.47));
+    panelSeam(r,car,'bonnet-front',gap,modern?.007:.0063,0,modern?'#2c2f31':tint(paint,.47));
     const badge=[[-.027,-.017],[-.027,.017],[.011,.015],[.038,0],[.011,-.015]].map(([dx,y])=>{const p=top(car,(modern?hoodX:classicBonnetStart+.085)+dx,y);p[2]+=.005;return p;});
     r.polygon(badge,'#b2945d',false);
   });
@@ -531,7 +542,50 @@ function engineGrille(r,car,paint,phase){
     }
   });
 }
-function softenPaint(faces){
+// The 992 skin is the sum of several measured corrections. Where they meet,
+// centimetre ripples remain in the surface, and a sharp studio highlight turns
+// each one into a visible blotch. Fair the shading normals inside each panel
+// with a few Laplacian passes; the geometry, seams and fittings do not move.
+function fairNormals(faces,shared,key,paint,passes=8){
+  const links=new Map();
+  const link=(a,b)=>{if(a===b)return;(links.get(a)||links.set(a,new Set()).get(a)).add(b);};
+  for(const face of faces){
+    const ids=face.points.map(p=>shared.get(face.part+key(p)));
+    for(let i=0;i<ids.length;i++){link(ids[i],ids[(i+1)%ids.length]);link(ids[(i+1)%ids.length],ids[i]);}
+  }
+  // Neighbouring panels meet on a continuous surface across a shut line.
+  // Share one normal at coincident vertices so the joint does not read as a
+  // change of curvature; the moving spoiler blade keeps its own.
+  const coincident=new Map();
+  for(const face of faces){
+    if(face.part==='shell.spoiler')continue;
+    for(const p of face.points){
+      const id=key(p);let group=coincident.get(id);
+      if(!group)coincident.set(id,group=new Set());
+      group.add(shared.get(face.part+id));
+    }
+  }
+  const tangent=group=>group.every(a=>group.every(b=>a.normal[0]*b.normal[0]+a.normal[1]*b.normal[1]+a.normal[2]*b.normal[2]>.82));
+  const joints=[...coincident.values()].filter(group=>group.size>1).map(group=>[...group]).filter(tangent);
+  const items=[...links.keys()];
+  for(let pass=0;pass<passes;pass++){
+    const next=items.map(item=>{
+      const sum=[...item.normal];
+      for(const other of links.get(item))for(let j=0;j<3;j++)sum[j]+=other.normal[j];
+      const length=Math.hypot(...sum)||1;
+      return sum.map(v=>v/length);
+    });
+    items.forEach((item,i)=>{item.normal=next[i];});
+    for(const group of joints){
+      const sum=[0,0,0];
+      for(const item of group)for(let j=0;j<3;j++)sum[j]+=item.normal[j];
+      const length=Math.hypot(...sum)||1;
+      for(const item of group)item.normal=sum.map(v=>v/length);
+    }
+  }
+  for(const item of items)item.color=coachPaintColor(paint,item.normal);
+}
+function softenPaint(faces,paint){
   // Gouraud shading across the continuous skins preserves the subtle waist of the
   // door and shoulder. Opposing bumper/lid normals stay split at the panel seam.
   const shared=new Map(),paintedFaces=faces.filter(f=>f.paintNormal);
@@ -551,6 +605,7 @@ function softenPaint(faces){
     const length=Math.hypot(...item.normal)||1;
     item.normal=item.loft||item.normal.map(value=>value/length);
   }
+  if(paint)fairNormals(paintedFaces,shared,key,paint);
   for(const face of paintedFaces){
     const vertices=face.points.map(p=>shared.get(face.part+key(p)));
     face.vertexColors=vertices.map(item=>item.color);
@@ -564,6 +619,18 @@ function packCoachworkReturns(faces,start,modern){
   const batches=new Map(),pieces=faces.splice(start);
   for(const face of pieces){
     const part=face.part;
+    if(modern&&face.vertexColors&&!face.stroke&&!face.triangles&&part?.startsWith('shell.')&&part!=='shell.spoiler'){
+      // One shared-vertex batch per painted panel. The dense loft then costs
+      // a handful of faces against the overview budget, and every panel
+      // still separates, highlights and picks as a single physical part.
+      const key=['paint',part,face.instance??'',face.rigid?.name??''].join('/');
+      let batch=batches.get(key);
+      if(!batch){batch={...face,points:[],triangles:[],vertexColors:[],clearcoatNormals:[]};batches.set(key,batch);faces.push(batch);}
+      const first=batch.points.length;
+      batch.triangles.push(...faceTriangles(face.points).map(i=>i+first));
+      batch.points.push(...face.points);batch.vertexColors.push(...face.vertexColors);batch.clearcoatNormals.push(...face.clearcoatNormals);
+      continue;
+    }
     if(face.vertexColors||face.stroke||face.triangles||!parts.has(part)){
       faces.push(face);continue;
     }
@@ -579,7 +646,7 @@ function packCoachworkReturns(faces,start,modern){
 export function drawCoachwork(r,car,paint,phase=0){
   const start=r.faces?.length||0;
   skin(r,car,paint,phase);exteriorLights(r,car,paint);engineGrille(r,car,paint,phase);drawSpoilerDrive(r,car.modern,phase);
-  if(r.faces)softenPaint(r.faces.slice(start));
+  if(r.faces)softenPaint(r.faces.slice(start),car.modern?paint:null);
   if(r.faces)packCoachworkReturns(r.faces,start,car.modern);
 }
 
@@ -594,5 +661,5 @@ export function drawPorscheSpoilerMotion(r,modern,paint,phase=0){
   }
   if(!modern)engineGrille(r,car,paint,phase);
   drawSpoilerDrive(r,modern,phase);
-  if(r.faces)softenPaint(r.faces.slice(start));
+  if(r.faces)softenPaint(r.faces.slice(start),modern?paint:null);
 }

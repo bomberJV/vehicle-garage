@@ -32,7 +32,9 @@ test('both Cabriolet spoiler paths redraw the same moving geometry as the comple
       assert.deepEqual(shape(parked,part),shape(raised,part));
     }
     assert(moving.length<parked.length*.08);
-    assert(parked.filter(f=>f.vertexColors?.length===f.points.length).length>1000);
+    // Painted panels may be packed into shared-vertex batches; count shaded vertices.
+    const shaded=parked.filter(f=>f.vertexColors?.length===f.points.length);
+    assert(shaded.reduce((sum,f)=>sum+f.points.length,0)>4000);
   }
 });
 test('spoiler carrier opens into a motor cutaway and linkage joint in the actual inspector',()=>{
@@ -99,7 +101,7 @@ test('painted Porsche door and luggage joints use continuous ribbons with a visi
         const p=face.points[i],q=face.points[2*n-1-i];
         const width=Math.hypot(p[0]-q[0],p[index]-q[index]);
         if(car.year===1998)assert(width>.0053&&width<.0065,'993 shut line remains within its fitted width');
-        else assert(width>.011,'joint keeps its width around corners');
+        else assert(width>.0058&&width<.0075,'992 shut line keeps its fitted width around corners');
         if(!door){
           const apex=face.points[2*n+i];
           assert(apex[2]-(p[2]+q[2])*.5>.001,'rolled edge remains above adjacent facets');

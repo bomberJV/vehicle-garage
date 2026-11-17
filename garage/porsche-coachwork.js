@@ -53,7 +53,29 @@ function wheelCut(car,x){
   }
   return z;
 }
+// Ahead of the cockpit the 992's plan sweep packs up to five loft units into
+// one physical unit along the outer wing. A gentle change of slope in the
+// tabulated heights then becomes a knee a couple of centimetres long, which
+// reads as a crease above the front wheel. Low-pass the height over a window
+// that widens with that compression, so it spans about the same real length
+// everywhere and vanishes where the loft is not compressed.
 function top(car,x,y){
+  if(!car.modern||x>=-1.0)return seatTop(car,x,y,deckRaw(car,x,y));
+  const p=deckRaw(car,x,y);
+  p[2]=lowPass992(x,y,v=>deckRaw(car,v,y)[2],p[2]);
+  return seatTop(car,x,y,p);
+}
+// Binomial five-tap filter of a height along the loft, with a reach set by how
+// strongly the plan sweep compresses the loft at this lateral position.
+function lowPass992(x,y,height,centre){
+  if(x>=-1.0)return centre;
+  const e=.004,squeeze=Math.max(.15,(sweep992(x+e,y)-sweep992(x-e,y))/(2*e));
+  const span=clamp(.06*(1/squeeze-1),0,.24)*clamp((-1.0-x)/.12);
+  if(span<1e-4)return centre;
+  return (height(x-span)+4*height(x-span/2)+6*centre+4*height(x+span/2)+height(x+span))/16;
+}
+function seatTop(car,x,y,p){return car.modern?headlampSeat992(p):headlampSeat993(p);}
+function deckRaw(car,x,y){
   if(!car.modern)x=classicBonnetRib(x,y);
   const [w,z,c]=station(car,x),u=Math.abs(y)/w;
   // The separate fender humps flank the shallow luggage lid. Across the tail,
@@ -76,12 +98,17 @@ function top(car,x,y){
     const blend=clamp((u-.73)/.17);
     p[2]+=(crest-z)*blend*blend*(3-2*blend);
   }
-  return car.modern?headlampSeat992(p):headlampSeat993(p);
+  return p;
 }
 // Mounting geometry for accessories shares the fitted skin's coordinate frame.
 export {top as porscheDeckPoint,sideRaw as porscheSidePoint};
+function shoulderZ(car,x){return top(car,x,station(car,x)[0]*.958)[2];}
 function sideRaw(car,x,t,s){
-  const [w,crest]=station(car,x),shoulder=top(car,x,w*.958)[2],bottom=wheelCut(car,x);
+  const [w,crest]=station(car,x),bottom=wheelCut(car,x);
+  // The flank sits further outboard than its shoulder, where the plan sweep
+  // compresses the loft harder still; filter the shoulder at that position.
+  // The wheel opening keeps its sharp edge.
+  const shoulder=car.modern?lowPass992(x,w,v=>shoulderZ(car,v),shoulderZ(car,x)):shoulderZ(car,x);
   // A wheel arch trims the *same* flank that continues over it. Compressing
   // the door cross-section into the top of the arch leaves unnatural bands.
   const h=mix(bottom,shoulder,t),v=clamp((h-.17)/Math.max(.1,shoulder-.17));

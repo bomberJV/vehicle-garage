@@ -40,19 +40,21 @@ export function draw992Headlamp(r,car,side,skin){
   }
   const contour=(scale,lift)=>outline.map(([x,y])=>surface(mix(cx,x,scale),mix(cy,y,scale),lift));
   const rings=[[1.009,.005],[1,.007],[.975,.0088],[.945,.0095],[.88,.0105],[.62,.014],[.33,.016],[0,.017]];
-  const finishes=['#343b40','#20262b','#a3b2bd','#4f606b','#303e48','#445560','#52626d'];
+  // Clear glass over a chrome housing (photographs): only the outer rim and the
+  // projector are dark; the reflector body reads bright.
+  const finishes=['#2a2f33','#1e2327','#c9d2d7','#a7b2b8','#8d9aa1','#b6c0c5','#c4cdd1'];
   for(let i=1;i<rings.length;i++)ribbon(r,contour(...rings[i-1]),contour(...rings[i]),finishes[i-1]);
   const optic=(u,v,h)=>surface(cx+.155*v+.024*u,cy+.105*u+.034*v,h);
   const reflector=ring(26,a=>optic(.55*Math.cos(a),-.51+.19*Math.sin(a),.020));
-  r.polygon(reflector.slice(0,-1),'#758691',false);
+  r.polygon(reflector.slice(0,-1),'#aab5ba',false);
   for(let i=-4;i<=4;i++){
     const u=i*.098,rad=Math.sqrt(1-(u/.55)**2)*.135;
-    r.polygon([optic(u-.009,-.51-rad,.0206),optic(u+.009,-.51-rad,.0206),optic(u+.009,-.51+rad,.0206),optic(u-.009,-.51+rad,.0206)],'#a2afb5',false);
+    r.polygon([optic(u-.009,-.51-rad,.0206),optic(u+.009,-.51-rad,.0206),optic(u+.009,-.51+rad,.0206),optic(u-.009,-.51+rad,.0206)],'#d6dcdf',false);
   }
   const bezel=(rx,ry,lift)=>ring(28,a=>optic(rx*Math.sign(Math.cos(a))*Math.abs(Math.cos(a))**.77,.22+ry*Math.sign(Math.sin(a))*Math.abs(Math.sin(a))**.85,lift));
-  ribbon(r,bezel(.465,.337,.0205),bezel(.404,.28,.022),'#7b8990');
+  ribbon(r,bezel(.465,.337,.0205),bezel(.404,.28,.022),'#2b3236');
   ribbon(r,bezel(.397,.274,.0223),bezel(.350,.235,.023),'#bac3c4');
-  r.polygon(bezel(.347,.233,.0233).slice(0,-1),'#253948',false);
+  r.polygon(bezel(.347,.233,.0233).slice(0,-1),'#1c2a33',false);
   const glint=Array.from({length:15},(_,i)=>{const a=.19+.95*Math.PI*i/14;return optic(.311*Math.cos(a),.226+.197*Math.sin(a),.0239);});
   ribbon(r,glint,glint.map(([x,y,z])=>[x-.0023,y,z]),'#607480');
   for(const u of [-.45,.45])for(const v of [-.12,.54]){

@@ -1,7 +1,7 @@
 import {vehiclePriorities,garageLink} from './priority-vehicles.js';
 
 const all=vehiclePriorities.map(v=>v.id);
-const road=['sl550','g500','f350','c63','hrv','bmw325ci','bmw328xi','porsche993cab','porsche992scab','bmws1000rr'];
+const road=['sl550','g500','f350','c63','hrv','bmw325ci','bmw328xi','porsche993cab','porsche992scab','porsche996cab','bmws1000rr'];
 const civilAircraft=['boeing747','cessna172','piperj5','gulfstreamg800'];
 const heritage=['little-willie','sherman-e8','f16','f22','f35','b52','uh60','mh6','ch47'];
 const otherCivil=all.filter(id=>!road.includes(id)&&!civilAircraft.includes(id)&&!heritage.includes(id));

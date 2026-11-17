@@ -17,6 +17,7 @@ const notes={
   bmw325ci:['body.quarter-left','Rear vent window','The US 325Ci has a dimensioned body and mirror span, five-spoke Style 43 wheels, a working rear vent window and an M54 intake-flap study. The service assemblies now include exhaust, cooling, cabin heat, seat heaters and body electronics.','Check the vent linkage travel and door-seal sections on an early US coupé. The model depicts the M54 version.'],
   porsche993cab:['engine.case','3.6-litre split crankcase','The air-cooled Carrera has separate barrels and case halves, a dry-sump circuit and heated-air ducts from the exhaust exchangers. The fuel filler now sits beneath the fender. Compare the bonnet, lamp surrounds and folded top from either side, or overlay the Porsche Classic drawing with the top raised.','Measure transverse sections through the narrow rear quarters and the folded roof stack.'],
   porsche992scab:['shell.spoiler-drive','Adaptive rear spoiler drive','Inspect the spoiler drive beneath the rear deck, the flush rear reflectors and the angled headlamp faces. Factory dimensions shows the Cabriolet drawing and five published measurements.','Match the deployed blade angle and fabric-top folds to an identified 992.1 Carrera S Cabriolet.'],
+  porsche996cab:['shell.spoiler-drive','Louvred rear spoiler drive','The first water-cooled 911 has the shared Boxster headlamp, a louvred lifting spoiler and a 3.4-litre M96/01. The body is lofted to the rescue sheet’s side and plan outlines.','Measure the front and rear bumper sections and the soft-top bows of a US 1999 Cabriolet.'],
   bmws1000rr:['drive.chain','Chain and sprockets','Inspect the RR’s ram-air duct, four throttles, ShiftCam intake shaft and combined oil and coolant pump. Factory dimensions marks seven bodywork landmarks from the Racing Red studio photograph.','Check the fairing contours and exact brake-hose routing on a bike with the same passenger and brake equipment.'],
   'little-willie':['tracks.left','Left track profile','The preserved prototype has a box-shaped hull and long exposed tracks.','Compare the visible rivet lines and outer track profile against additional museum views.'],
   'sherman-e8':['tracks.left','Left track profile','The exterior follows the M4A2E8 in the Tank Museum collection.','Record the external wheel spacing and hull stowage against more views of that particular museum vehicle.'],
@@ -52,7 +53,8 @@ const additionalEvidence={
   bmw325ci:['BMW of North America · model 0334 filing','BMW · M54 resonance intake','BMW · E46 coupé window mechanism'],
   g500:['Mercedes-Benz · VG150E center differential','Mercedes-Benz · long-wheelbase G 500 body elevations','Mercedes-Benz · front fog lamps','Mercedes-Benz · side marker lamps','Mercedes-Benz · side turn repeater'],
   porsche993cab:['Porsche Classic · 993 Cabriolet outline'],
-  porsche992scab:['Porsche · 992 Cabriolet outline']
+  porsche992scab:['Porsche · 992 Cabriolet outline'],
+  porsche996cab:['Porsche Classic · 996 Cabriolet outline']
 };
 
 export const vehiclePriorities=Object.entries(notes).map(([id,[part,study,done,next]])=>{

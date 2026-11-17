@@ -8,6 +8,7 @@ import {drawPorsche} from './fleet-porsche.js';
 import {ignitionEntries} from './fleet-ignition.js';
 import {drawBike} from './fleet-bike.js';
 import {k67ExteriorRefs} from './k67-fairings.js';
+import {refs996} from './porsche996-sources.js';
 
 const source=(label,url)=>({label,url});
 function group(id,name,description,entries,internal=false){
@@ -15,7 +16,7 @@ function group(id,name,description,entries,internal=false){
 }
 const spoilerMotion={assembly:'shell',name:'Rear spoiler',description:'Watch the spoiler rise from its recess, tilt and settle back into the rear bodywork.'};
 const motionFor=modern=>({...spoilerMotion,parts:['shell.spoiler','shell.spoiler-drive'],
-  drawMoving:(r,paint,finish,phase)=>drawPorscheSpoilerMotion(r,modern,paint||(modern?'#a84b3f':'#47778a'),phase)});
+  drawMoving:(r,paint,finish,phase)=>drawPorscheSpoilerMotion(r,modern,paint||(modern==='996'?'#c3c7c6':modern?'#a84b3f':'#47778a'),phase)});
 const porscheRunning=group('running','Wheels & brakes','A wheel set separates into its tire, wheel center, and brake hardware.',[
   ['tires','Tires','The tire bead seats on the alloy rim. The wider rear tires carry the rear-engine car’s driven axle.',[0,0,.7]],
   ['rims','Alloy wheels','The spokes connect the hub to the rim. The brake rotor and caliper sit behind the wheel face.',[0,0,.32]],
@@ -66,6 +67,41 @@ function porscheGroups(modern){return [
     ['exhaust','Exhaust headers & silencers',modern?'The illustrated Carrera S has the optional Sport Exhaust with two oval outlets. Exhaust leaves each bank through its turbocharger, then passes through the rear silencer.':'Three exhaust branches on each side feed the rear exhaust system.',[.17,0,-.32],modern?source('Porsche · 992.1 Cabriolet exhaust options, p. 16','https://newsroom.porsche.com/dam/jcr%3Acea78bb0-8770-434e-be37-ca597fda76ad/PAG_991_Cabrio_Athen_PM_EN.pdf#page=16'):source('Porsche PET · 993 exhaust, plate 202-00','https://www.9xxteile.com/media/wysiwyg/pet/E_993_KATALOG.pdf')],
     ...(modern?[['turbos','Twin turbochargers','Each exhaust turbine shares a shaft with a compressor. The mirror-image units feed the two charge-air coolers above the engine.',[.2,-.31,.12],source('Porsche · Carrera S engine and drivetrain','https://download.newsroom.porsche.com/dam/jcr%3A6b08630c-aa53-442c-911c-d4c2f384c031/Presskit_2020_Porsche_911_Carrera_S_and_Carrera_4S.pdf.PDF')]]:[])
   ],true),porscheDrive(modern?7:6),porscheRunning
+];}
+// 1999 Carrera Cabriolet (996.1): water-cooled 3.4 L M96/01, six-speed manual.
+function porsche996Groups(){return [
+  {...group('shell','Body panels','Separate the doors, luggage lid, rear lid and bumper covers.',[
+    ['fenders','Front wings & rear quarters','The front wings rise around the one-piece headlamp units. The rear quarters swell over the driven wheels and carry the tail lamps.',[0,0,0],refs996.outline],
+    ['left-door','Left door & mirror','The frameless door carries its mirror on a short stalk at the front corner.',[0,-.48,.025]],
+    ['right-door','Right door & mirror','The right door and its mirror move as one panel.',[0,.48,.025]],
+    ['luggage','Front luggage lid','The wide lid runs between the wings from the bumper to the windshield.',[-.15,0,.58]],
+    ['spoiler','Extending louvred spoiler','The louvred section of the rear lid lifts and tilts as a spoiler. Open it to follow the lift arms and the drive.',[.16,0,.32],refs996.spoiler],
+    ['spoiler-drive','Rear spoiler drive mechanism','One electric motor drives both lift arms through flexible shafts beneath the moving panel.',[0,0,.16],refs996.spoiler],
+    ['deck','Rear engine lid','The lid carries the third brake light ahead of the louvres and the 911 Carrera script.',[.20,0,.55]],
+    ['bumpers','Bumper covers & intakes','Three intakes cross the front cover. The rear cover holds the US plate recess between two rubber guards.',[0,0,-.26],refs996.photos]
+  ]),animated:true,motionDescription:spoilerMotion.description},
+  group('cabin','Cabin and convertible top','The windshield frame, seats, controls and folding roof surround the cockpit.',[
+    ['windshield','Windshield & frame','The fixed glass, header and A-pillars form the front edge of the open cabin.',[-.22,0,.32]],
+    ['seats','Front seats & rear seats','Two front seats sit ahead of two small rear seats.',[0,0,.37]],
+    ['carpet','Carpet, floor mats and heel pad','The fitted carpet follows both footwells, the center tunnel and the rear bulkhead.',[0,0,.22]],
+    ['controls','Steering wheel & manual lever','The US layout places the steering wheel on the left and the six-speed lever on the center tunnel.',[-.18,-.12,.14]],
+    ['top','Convertible top and rear window','The fabric top folds into the well behind the rear seats beneath a body-colour cover. Its rear window is flexible plastic.',[.28,0,.28],refs996.top]
+  ]),
+  group('lights','Exterior lighting','Inspect the lamps independently of the bumpers and body panels.',[
+    ['headlamps','One-piece headlamp units','Each clear lens covers the main reflector, a smaller round lamp and the amber US signal.',[-.32,0,.23],refs996.outline],
+    ['indicators','Amber side markers','A US side marker sits in each bumper return ahead of the front wheel.',[-.38,0,-.05]],
+    ['tail','Tail lamps & third brake light','Each tail lamp wraps from the rear panel onto the quarter. The third brake light sits on the rear lid ahead of the louvres.',[.36,0,.12],refs996.photos]
+  ]),
+  group('engine','3.4 L water-cooled flat-six','The M96/01 engine is naturally aspirated. Three cylinders on either side share one water-cooled head per bank.',[
+    ['case','Split crankcase and crankshaft','Open the vertical joint to see the crankshaft, bearings and the bores cast into each case half.',[0,0,-.18],refs996.crankcase],
+    ['crankshaft','Six-throw crankshaft','Use the engine cutaway to see the six offset rod journals in place. Open the shaft to inspect its bearing lands, counterweights and ends.',[0,0,.28],refs996.crankshaft],
+    ['cylinders','Cylinder banks','Three cylinders face out to each side of the crankcase.',[.01,0,.02]],
+    ['heads','Cylinder heads and covers','One water-cooled head covers three cylinders in each bank, with four valves per cylinder and VarioCam on the intake side.',[0,.42,.17],refs996.engine],
+    ...ignitionEntries('porsche996cab'),
+    ['intake','Resonance intake manifold','A central distributor with a resonance flap feeds both banks from one throttle body.',[0,0,.39],refs996.engine],
+    ['cooling','Front coolant radiators and fans','The engine pump sends coolant forward to a radiator behind each outer front intake.',[.22,0,.40],refs996.engine],
+    ['exhaust','Exhaust headers & silencers','Three branches on each side feed a catalyst and a rear silencer that ends in one oval tailpipe.',[.17,0,-.32],refs996.photos]
+  ],true),porscheDrive(6),porscheRunning
 ];}
 const bikeGroups=[
   group('body','Fairings, tank & seat','The fairings guide air around the rider and over the cooling surfaces. The winglets project from the nose.',[
@@ -127,5 +163,12 @@ export const roadModels=[
     photoReference:source('2023 S 1000 RR factory photos','https://www.press.bmwgroup.com/usa/article/detail/T0404178EN_US/the-new-bmw-s-1000-rr'),
     specs:[['Generation','K67 · 2023 update'],['Engine','999 cc liquid-cooled inline-four'],['Valve gear','DOHC · 16 valves · ShiftCam'],['Transmission','6-speed · chain final drive'],['Wheels','17 in front and rear']],
     parts:[{name:'2023 S 1000 RR parts diagrams',url:'https://shop.maxbmw.com/fiche/DiagramsMain.aspx?rnd=554960&vid=63032',seller:'MAX BMW Motorcycles',description:'US K67 parts diagrams for October 2021 through June 2024 production. Check the production date and VIN when choosing an option.'}],
-    groups:bikeGroups,draw:drawBike}
+    groups:bikeGroups,draw:drawBike},
+  {inspectionSections:{engine:engineSectionFace},id:'porsche996cab',name:'Porsche 911 Carrera Cabriolet',short:'911 Carrera Cabriolet · 996',year:1999,domain:'Land',type:'Cars',
+    detail:'US Carrera Cabriolet with the six-speed manual. The first water-cooled 911 has one-piece headlamp units and a longer, wider body than the 993.',
+    source:source('Porsche Classic · 911 Carrera (type 996)','https://www.porsche.com/central-eastern-europe/en/_bulgaria_/accessoriesandservice/classic/models/996/996/'),
+    photoReference:source('1999 Carrera Cabriolet 6-speed photo gallery','https://bringatrailer.com/listing/1999-porsche-911-carrera-71/'),
+    specs:[['Generation','996.1'],['Engine','3.4 L water-cooled flat-six'],['Induction','Naturally aspirated · M96/01'],['Transmission','6-speed manual · rear-wheel drive'],['Wheelbase','2,350 mm']],
+    parts:[{name:'996 Carrera parts diagrams',url:'https://eurospares.co.uk/Porsche/996/996_(1999)/PartDiagrams/101-005/CRANKCASE',seller:'Eurospares',description:'Choose the 1999 Carrera (996) and the Cabriolet body style. Match engine code and options before ordering.'}],
+    motion:motionFor('996'),groups:porsche996Groups(),draw:(r,paint,finish,phase)=>drawPorsche(r,'996',paint||undefined,finish||undefined,phase)}
 ];

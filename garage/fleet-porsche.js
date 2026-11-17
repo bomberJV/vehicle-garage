@@ -5,16 +5,24 @@ import {drawInstalledBoxer} from './porsche-engine-dress.js';
 import {drawEngineCore} from './porsche-crankshaft.js';
 import {drawFleetIgnition} from './fleet-ignition.js';
 import {ellipse,barrel,wheel} from './road-primitives.js';
-import {drawCoachwork,coupeShape} from './porsche-coachwork.js';
+import {drawCoachwork,porscheShape} from './porsche-coachwork.js';
 import {drawCabrioletCabin} from './porsche-cabin.js';
-import {alloy993,alloy992} from './porsche-wheels.js';
+import {alloy993,alloy992,alloy996} from './porsche-wheels.js';
 import {wheelDesign} from './wheel-designs.js';
 import {drawAlternativeAlloy} from './wheel-faces.js';
 
 const TAU=2*Math.PI;
+export const porscheVehicle=modern=>modern==='996'?'porsche996cab':modern?'porsche992scab':'porsche993cab';
+// Running gear per car: tyre section widths, tracks, brake rim and the wheel face.
+const running={
+  porsche993cab:{width:[.205,.245],track:[1.405,1.444],brake:[.2032,.2032],rim:alloy993},
+  porsche992scab:{width:[.245,.305],track:[1.59,1.556],brake:[.254,.2667],rim:alloy992},
+  // 1999 Carrera: 205/50 ZR 17 and 255/40 ZR 17 on 7J and 9J × 17 wheels.
+  porsche996cab:{width:[.205,.255],track:[1.455,1.500],brake:[.2159,.2159],rim:alloy996}
+};
 function boxer(r,car,modern){
-  const cx=car.rear+.285, z=.502;
-  drawFleetIgnition(r,modern?'porsche992scab':'porsche993cab',[cx,0,z]);
+  const cx=car.rear+.285, z=.502,type996=modern==='996';
+  drawFleetIgnition(r,porscheVehicle(modern),[cx,0,z]);
   drawEngineCore(r,cx,z,modern);
   for(const s of [-1,1]){
     for(let n=0;n<3;n++){
@@ -32,10 +40,11 @@ function boxer(r,car,modern){
     }
     r.tag('drive.axles',()=>{barrel(r,[car.rear,s*.109,.345],[car.rear,s*.663,.345],.025,'#7e8281');barrel(r,[car.rear,s*.536,.345],[car.rear,s*.62,.345],.046,'#3d4449');});
     r.tag('engine.exhaust',()=>{
-      const tip=modern?car.stations.at(-1)[0]-.100:classicTailpipeEnd(),y=s*(modern?.455:classicTailpipe.y);
+      // The 996 has one oval tailpipe below each rear corner of the bumper.
+      const tip=type996?2.092:modern?car.stations.at(-1)[0]-.100:classicTailpipeEnd(),y=s*(type996?.500:modern?.455:classicTailpipe.y);
       // The 992.1 Cabriolet is shown with the optional two-oval Sport Exhaust.
       // Its outlets sit nearly flush with the black apron, as in photographs.
-      const outletHeight=modern?.313:classicTailpipe.z;
+      const outletHeight=type996?.300:modern?.313:classicTailpipe.z;
       const outlets=[0];
       for(const delta of outlets){
         r.polygon(Array.from({length:22},(_,i)=>{const a=i*TAU/22;return [tip+.016+.004*Math.sin(a),y+delta+(modern?.069:.059)*Math.cos(a),outletHeight+(modern?.047:.038)*Math.sin(a)];}),'#202527',false);
@@ -49,29 +58,31 @@ function boxer(r,car,modern){
     for(let i=0;i<7;i++){const x=a+.03+i*.043;barrel(r,[x,0,.395],[x+.014,0,.395],.118,'#646c70',14);}
   });
   if(modern){
-    draw992DeckCooling(r);
+    if(!type996)draw992DeckCooling(r);
     r.tag('engine.cooling',()=>{
+      // The 996 radiators stand behind the outboard intakes, inside the bumper.
+      const [rx,ry,rw]=type996?[car.front-.66,.545,.095]:[car.front-.67,.61,.116];
       for(const s of [-1,1]){
-        r.box(car.front-.67,s*.61-.116,.32,car.front-.60,s*.61+.116,.512,'#646f76');
-        for(let i=0;i<8;i++){const h=.333+i*.022;r.rod([car.front-.674,s*.61-.114,h],[car.front-.674,s*.61+.114,h],.004,'#a4b0b0',6);}
+        r.box(rx,s*ry-rw,.32,rx+.07,s*ry+rw,.512,'#646f76');
+        for(let i=0;i<8;i++){const h=.333+i*.022;r.rod([rx-.004,s*ry-rw+.002,h],[rx-.004,s*ry+rw-.002,h],.004,'#a4b0b0',6);}
       }
     });
   }else draw993CoolingFan(r,[cx+.297,0,z+.170]);
   drawInstalledBoxer(r,cx,z,modern,car.stations.at(-1)[0]);
 
 }
-export function drawPorsche(r,modern,paint=modern?'#a84b3f':'#47778a',finish='#bdc6cb',phase=0){
-  const car=coupeShape[modern?1:0];
+export function drawPorsche(r,modern,paint=modern==='996'?'#c3c7c6':modern?'#a84b3f':'#47778a',finish='#bdc6cb',phase=0){
+  const car=porscheShape(modern),vehicle=porscheVehicle(modern),gear=running[vehicle];
   if(r.inspection?.assembly==='engine'&&r.isolate&&!r.inspection.detailView){boxer(r,car,modern);return;}
-  const design=wheelDesign(modern?'porsche992scab':'porsche993cab',r.build?.wheelDesign);
+  const design=wheelDesign(vehicle,r.build?.wheelDesign);
   const alternative=design.id!=='stock';
   drawCoachwork(r,car,paint,phase);drawCabrioletCabin(r,car,paint);boxer(r,car,modern);
   for(const rear of [false,true])for(const s of [-1,1]){
-    const x=rear?car.rear:car.front,radius=rear?car.rearRadius:car.frontRadius,width=modern?(rear?.305:.245):(rear?.245:.205);
-    const track=modern?(rear?1.556:1.59):(rear?1.444:1.405);
-    const brakeRim=modern?(rear?.2667:.254):.2032;
+    const x=rear?car.rear:car.front,radius=rear?car.rearRadius:car.frontRadius,width=gear.width[rear?1:0];
+    const track=gear.track[rear?1:0];
+    const brakeRim=gear.brake[rear?1:0];
     const rim=alternative?(rear?design.rearDiameter:design.frontDiameter)*.0127:brakeRim;
     wheel(r,{x,y:s*track/2,z:radius+.006,radius,width,rim,brakeRim,side:s,modern,rear,finish,
-      drawRim:alternative?(renderer,c)=>drawAlternativeAlloy(renderer,design,c):modern?alloy992:alloy993,tags:{tire:'running.tires',rim:'running.rims',brake:'running.brakes'}});
+      drawRim:alternative?(renderer,c)=>drawAlternativeAlloy(renderer,design,c):gear.rim,tags:{tire:'running.tires',rim:'running.rims',brake:'running.brakes'}});
   }
 }

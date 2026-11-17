@@ -23,6 +23,11 @@ export const dimensionStudies={
     description:'Compare the narrow-body Carrera with the top up. The wheel centers and the widest part of the rear fenders are measured directly on the model.',
     note:'The dimensions are for the US rear-wheel-drive Cabriolet. Height is measured from the tire contact patch. The Porsche rescue sheet supplies a second reference for the windshield and wheel positions.',
     sources:[source('Excellence · 1998 Carrera Cabriolet specifications','https://www.excellence-mag.com/resources/specs/319'),source('Porsche Classic · 993 Cabriolet outline','https://files.porsche.com/f/332100/e5c1d1c36c/rescue-data-sheets-classic.pdf#page=32'),source('Photographs · US 1998 Carrera Cabriolet','https://bringatrailer.com/listing/1998-porsche-911-carrera-cabriolet-48/')]},
+  porsche996cab:{name:'1999 US 911 Carrera Cabriolet · 996.1',make:'Published',short:'1999 Carrera Cabriolet',unit:'mm',
+    rows:[['length','Overall length',4430],['bodyWidth','Body width without mirrors',1765],['height','Height with roof raised',1305],['wheelbase','Wheelbase',2350]],
+    description:'Compare the first water-cooled Cabriolet with its top up. The wheel centers and the widest part of the rear fenders are measured directly on the model.',
+    note:'The dimensions are for the rear-wheel-drive Carrera Cabriolet. Height is measured from the tire contact patch with the fabric top raised. The rescue sheet’s side and plan views were registered at the wheelbase and fitted to these spans.',
+    sources:[source('Excellence · 1999 911 Carrera Cabriolet (996) specifications','https://www.excellence-mag.com/resources/specs/58'),source('Porsche Classic · 996 Cabriolet outline','https://files.porsche.com/f/332100/e5c1d1c36c/rescue-data-sheets-classic.pdf#page=36'),source('Photographs · US 1999 Carrera Cabriolet','https://bringatrailer.com/listing/1999-porsche-911-carrera-71/')]},
   porsche992scab:{name:'2023 911 Carrera S Cabriolet · 992.1',make:'Porsche',short:'2023 Carrera S Cabriolet',unit:'mm',
     rows:[['length','Overall length',4519],['bodyWidth','Body width without mirrors',1852],['width','Width across mirrors',2024],['height','Height with roof raised',1299],['wheelbase','Wheelbase',2450]],
     description:'Compare the length, both widths, closed-roof height and wheelbase with the Carrera S Cabriolet column in Porsche’s 992.1 brochure.',
@@ -63,7 +68,7 @@ function include(bounds,p){
   }
 }
 export function measureStockMesh(vehicle,faces){
-  const cabriolet=vehicle==='porsche993cab'||vehicle==='porsche992scab';
+  const cabriolet=vehicle==='porsche993cab'||vehicle==='porsche992scab'||vehicle==='porsche996cab';
   const motorcycle=vehicle==='bmws1000rr';
   const tireTag=cabriolet||motorcycle||vehicle==='sl550'?'running.tires':'wheels.tire';
   const envelope=emptyBounds(),body=emptyBounds(),bumpers=emptyBounds(),tires=new Map();

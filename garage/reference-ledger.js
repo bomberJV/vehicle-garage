@@ -87,6 +87,14 @@ const references = {
     parts('Porsche PET · 993 engine', 'https://files.porsche.com/f/332100/cfbfd366e3/kat017-e-911-98-katalog.pdf#page=77', 'Use the Carrera plates in engine group 1 for the crankcase and crankshaft. Plate 105-00 shows the belt-driven engine cooling fan.'),
     parts('Porsche PET · 993 rear spoiler', 'https://www.design911.co.uk/diagrams/d/40739/0/', 'Plate 803-15 places the spoiler drive and transmission beneath the rear lid.')
   ],
+  porsche996cab: [
+    drawing('Porsche Classic · 996 Cabriolet outline','https://files.porsche.com/f/332100/e5c1d1c36c/rescue-data-sheets-classic.pdf#page=36','The side and plan views were read as vector paths and registered at the 2,350 mm wheelbase. They set the body outline, windshield, door cut, wheel openings, headlamp and tail-lamp outlines and the rear-lid louvres.'),
+    specs('Excellence · 1999 911 Carrera Cabriolet (996) specifications','https://www.excellence-mag.com/resources/specs/58','Length 4,430 mm, width 1,765 mm, height 1,305 mm, wheelbase 2,350 mm, tracks 1,455 / 1,500 mm and the 7J and 9J × 17 wheels with 205/50 and 255/40 tires.'),
+    photo('Bring a Trailer · 1999 Carrera Cabriolet 6-speed, US car','https://bringatrailer.com/listing/1999-porsche-911-carrera-71/','Front, rear and three-quarter views show the one-piece headlamps with amber US signals, the three front intakes, the louvred rear lid with its third brake light, the US plate guards and the 17-inch Carrera wheels.'),
+    parts('Porsche PET · 996 crankcase, plate 101-005','https://eurospares.co.uk/Porsche/996/996_(1999)/PartDiagrams/101-005/CRANKCASE','The M96 crankcase is split vertically, with the cylinder bores cast into each half.'),
+    parts('Porsche PET · 996 rear spoiler, plate 803-007','https://eurospares.co.uk/Porsche/996/996_(2001)/PartDiagrams/803-007/REAR_SPOILER','The lifting rear spoiler has its own drive unit and electric motor beneath the louvred panel.'),
+    parts('TEILE.COM · 17-inch Carrera wheel set','https://teile.com/en/porsche-tequipment-shop/model-911-964/3/Wheels-Rims-and-accessories/601C-Wheel-rim-sets/218/17-inch-Carrera-wheel-set-7J-x-17-ET55-9J-x-17-ET55/39755','The 996 Carrera wheel: 7J × 17 ET55 front and 9J × 17 ET55 rear.')
+  ],
   porsche992scab: [
     drawing('Porsche · 992 Cabriolet outline','https://files.porsche.com/f/332100/cae3f3bc15/rescue-data-sheets.pdf#page=86','The side and plan views locate the headlamp rims, side markers, cowl and axle centers. The upper outline also guides the fabric roof and the rear deck. The Carrera S specification sets the model’s overall height.'),
     photo('Porsche · Carrera S Cabriolet exterior photographs','https://newsroom.porsche.com/en/2019/sport-lifestyle/porsche-911-carrera-s-cabriolet-neel-jani-formula-e-christophorus-18122.html','The headlamp close-up shows the reflector and four small optics. The front and side views show the low intake band, the turned-under nose and the pressed lower doors.'),

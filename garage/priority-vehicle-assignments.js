@@ -10,6 +10,7 @@ export const vehicleAssignments={
   bmw325ci:['P1','todo','A measured seal section and vent linkage are still needed to establish exact travel.'],
   porsche993cab:['P1','in-progress'],
   porsche992scab:['P1','in-progress'],
+  porsche996cab:['P1','in-progress','The body follows the 996 Cabriolet rescue sheet in side and plan; transverse sections still come from photographs.'],
   bmws1000rr:['P1','in-progress'],
   'little-willie':['P3','todo'],
   'sherman-e8':['P3','todo'],

@@ -3,7 +3,7 @@ import {style43Face} from './e46-wheels.js';
 import {GarageRenderer} from './render.js';
 import {utilityWheelSpokes} from './exterior-utility.js';
 import {roadWheelSpokes} from './exterior-alloys.js';
-import {alloy992,alloy993} from './porsche-wheels.js';
+import {alloy992,alloy993,alloy996} from './porsche-wheels.js';
 import {drawAlternativeAlloy,drawApex6} from './wheel-faces.js';
 import {wheel} from './road-primitives.js';
 import {wheelDesign} from './wheel-designs.js';
@@ -24,8 +24,8 @@ export function drawWheelSample(canvas,vehicle,id,finish='#b8c0bd'){
     r.ringY(0,.103,0,rim+.011,rim-.013,finish,48);
     utilityWheelSpokes(r,{...car,design:design.id,y:.077});
   }else if(design.id!=='stock')drawAlternativeAlloy(r,design,car);
-  else if(vehicle==='porsche993cab'||vehicle==='porsche992scab'){
-    (vehicle==='porsche993cab'?alloy993:alloy992)(r,car);
+  else if(vehicle==='porsche993cab'||vehicle==='porsche992scab'||vehicle==='porsche996cab'){
+    ({porsche993cab:alloy993,porsche992scab:alloy992,porsche996cab:alloy996}[vehicle])(r,car);
   }else{
     r.ringY(0,.132,0,rim,rim-.019,finish,48);
     (vehicle==='f350'?utilityWheelSpokes:roadWheelSpokes)(r,{...car,y:.098});

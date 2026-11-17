@@ -27,6 +27,7 @@ const work={
  hrv:['Match the CVT casing, intake, rear differential and underfloor routes to the decided US EX-L AWD.','Cycle the CVT study; check wheel faces, hatch glazing and the EX-L moonroof on the decided AWD configuration.'],
  porsche993cab:['Check both case halves, cylinder interfaces and cooling shrouds; refine the Cabriolet top and rocker sections.','Checked the raised and lowered roofs, the views of the mounted lamps, and the clearance between the fuel filler and front fender.'],
  porsche992scab:['Check the flat-six service connections, spoiler linkage and fabric-top frame against the 992.1 Cabriolet plates.','Checked the parked spoiler, the windshield mounting and both headlamp openings. Reviewed the bonnet and rear quarters under changing light.'],
+ porsche996cab:['Match the M96/01 resonance intake, coolant routes and the soft-top frame to the 1999 Cabriolet plates.','Checked the traced side and plan outlines, both headlamp seats and the wrapped tail lamps under the studio light.'],
  bmws1000rr:['Match the fairing returns, brake hoses and chain path to the 2023 RR’s selected passenger and brake equipment.','Inspect chain engagement, front twin discs and rear wheel alignment; compare the solo cowl and pillion configurations.'],
  'little-willie':['Trace visible rivets, outer wheel positions and track contours from the preserved museum prototype.','Compare public exterior views; check that track links and hull panels stay distinct during selection and separation.'],
  'sherman-e8':['Match the museum M4A2E8’s external suspension spacing, hull seams and visible stowage.','Check exterior silhouettes and track-to-wheel alignment in museum reference views; keep the review outside the vehicle.'],
@@ -58,12 +59,13 @@ const work={
  alvin:['Match the refurbished frame, five viewport fairings, science basket and thruster mounts to a documented dive configuration.','Inspect every viewport and thruster from outside and in section; check the pressure sphere and frame remain distinct.']
 };
 const exteriorOnly=new Set(['little-willie','sherman-e8','f16','f22','f35','b52','uh60','mh6','ch47']);
-const measured=new Set(['sl550','bmw325ci','bmws1000rr','porsche993cab','porsche992scab']);
+const measured=new Set(['sl550','bmw325ci','bmws1000rr','porsche993cab','porsche992scab','porsche996cab']);
 const reviewedInWorkbench=new Set(['sl550','porsche993cab','porsche992scab']);
 const comparisons={
  sl550:'The raised roof and bonnet follow the R231 workshop side drawing. Length, height, wheelbase and mirror span match the rounded US brochure dimensions. Transverse panel sections still need measurements.',
  porsche993cab:'The raised-roof 993 has a side-outline overlay from Porsche Classic, four published spans and the US brake-light bridge. The transverse rocker and quarter-panel sections still need measurements.',
  porsche992scab:'Compare five published dimensions and trace Porsche’s side elevation across the nose, roof and rear deck. The spoiler angle and transverse bumper sections still need independent measurements.',
+ porsche996cab:'The 996 Cabriolet loft is fitted to Porsche’s rescue sheet: the plan outline within a millimetre and the side elevation’s nose, sills, arches and tail. Front and rear sections follow photographs of a US 1999 car.',
  bmws1000rr:'The standard cast-wheel motorcycle has seven side-photo landmarks and three factory dimensions. Parts diagrams identify the fitted panels. Their transverse sections still need measurements.'
 };
 const known=new Map(vehiclePriorities.map(v=>[v.id,v]));

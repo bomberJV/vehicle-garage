@@ -208,10 +208,12 @@ export function draw992HoodSide(r,car,s,rows,roofPoint,glaze){
     let i=1;while(i<hoop.length-1&&hoop[i][0]<x)i++;
     return blend(hoop[i-1],hoop[i],(x-hoop[i-1][0])/(hoop[i][0]-hoop[i-1][0]));
   };
-  const belt=x=>[x,s*(.717-.009*Math.max(0,x)),car.belt+.024+.013*Math.max(0,x)+.066*Math.max(0,x-.91)];
+  // Body-specific glass line; the 996 passes its own through the car's kit.
+  const H=car.kit?.hood||{jamb:.598,tip:.983,y:.717,yRate:.009,lift:.024,rise:.013,kick:.066,kickAt:.91};
+  const belt=x=>[x,s*(H.y-H.yRate*Math.max(0,x)),car.belt+H.lift+H.rise*Math.max(0,x)+H.kick*Math.max(0,x-H.kickAt)];
   const glass=(points)=>{glaze(r,points,'#92a3ab',.205);r.faces.at(-1).roofServicePart='cabin.windshield';};
   const foot=[car.screen[0]+car.screenFootSweep,s*car.screen[3],car.belt-.008];
-  const jamb=.598,tip=.983;
+  const jamb=H.jamb,tip=H.tip;
   const door=[...hoop.filter(p=>p[0]<jamb),contour(jamb)];
   for(let i=1;i<door.length;i++)glass([i===1?foot:belt(door[i-1][0]),door[i-1],door[i],belt(door[i][0])]);
   const corners=[contour(jamb),contour(.688),contour(.798),contour(.895),contour(tip)];

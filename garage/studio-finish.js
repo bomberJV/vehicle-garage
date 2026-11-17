@@ -58,7 +58,8 @@ export function studioSurfaceFinish(face,base,view){
 const footprints={
   sl550:{axles:[[-1.2925,.8],[1.2925,.802]],length:2.52,width:1.09},
   porsche993cab:{axles:[[-1.16,.7025],[1.112,.722]],length:2.23,width:.95},
-  porsche992scab:{axles:[[-1.2,.795],[1.25,.778]],length:2.47,width:1.04}
+  porsche992scab:{axles:[[-1.2,.795],[1.25,.778]],length:2.47,width:1.04},
+  porsche996cab:{axles:[[-1.175,.7275],[1.175,.75]],length:2.42,width:.98}
 };
 export const hasStudioFinish=vehicle=>Object.hasOwn(footprints,vehicle);
 export function drawStudioContactShadow(ctx,project,z,vehicle){

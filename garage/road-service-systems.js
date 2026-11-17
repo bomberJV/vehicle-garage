@@ -144,8 +144,8 @@ function slidingRoof(p){const X0=p.roofX,H=p.roofZ;
  component('slides','Guide shoes & lifting links','The two sides support the moving lid. Raising its trailing edge gives the tilt position.',[.23,.32,.17],r=>{for(const s of [-1,1])for(const dx of [-.25,.22]){const c=[X0+dx,s*.472,H-.025];box(r,c,[.081,.026,.015],rubber);path(r,[c,plus(c,[.039,0,.023]),plus(c,[.073,0,.029])],.007,metal);}}),
  component('shade','Interior sliding shade','The shade travels below the glass on its own guides.',[-.26,-.29,.06],r=>{box(r,[X0,0,H-.061],[.62,.90,.013],'#787e76');box(r,[X0-.20,0,H-.069],[.035,.107,.012],iron);})];
 }
-function softTop(p){const modern=p.roofType==='modern';return [
- ...(modern?[component('compartment-lid','Convertible-top compartment lid','The curved, body-colour lid covers the rear of the folded roof. The forward fabric panel remains visible.',[.34,0,.49],r=>drawPorscheCompartmentLid(r,paintChoice(r.build?.paint).hex))]:[]),
+function softTop(p){const modern=p.roofType==='modern',lidded=modern||p.roofType==='lidded';return [
+ ...(lidded?[component('compartment-lid','Convertible-top compartment lid','The curved, body-colour lid covers the rear of the folded roof. The forward fabric panel remains visible.',[.34,0,.49],r=>drawPorscheCompartmentLid(r,paintChoice(r.build?.paint).hex,p.roofBody))]:[]),
  component('fabric','Fabric roof cover','The fabric follows the raised frame and folds when the frame retracts.',[.06,0,.60],topFabric),component('header','Front roof frame','The leading frame meets the windshield header.',[-.42,0,.22],r=>topBows(r,'header')),
  component('bows',modern?'Magnesium panel bows':'Folding transverse bows',modern?'Two panel bows support the fabric between the front frame and rear window.':'Transverse bows span the two side mechanisms and carry the fabric roof.',[.08,.39,.38],r=>topBows(r,'bows')),
  component('rear-window',modern?'Glass rear window & frame':'Flexible rear screen','The rear window occupies the sloping section behind the last roof bow.',[.35,0,.24],r=>{backlight(r);topBows(r,'rearframe');}),

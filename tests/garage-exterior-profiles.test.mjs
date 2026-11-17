@@ -20,7 +20,7 @@ test('side references align both axles and keep the skyline above them in either
 });
 
 test('raised-roof side profiles keep the measured fit to their registered factory drawings',()=>{
-  for(const [id,limit,maximum] of [['sl550',10,40],['porsche993cab',12,30],['porsche992scab',20,38]]){
+  for(const [id,limit,maximum] of [['sl550',10,40],['porsche993cab',12,30],['porsche992scab',20,38],['porsche996cab',10,30]]){
     const f=GarageRenderer.assembledFaces({vehicle:id,parts:[],roofPosition:'up',paint:'silver'});
     const {wheels}=measureStockMesh(id,f),profile=exteriorProfiles[id];
     const gap=upperOutlineGap(profile,wheels,f);

@@ -20,7 +20,8 @@ const shortcuts={
   ],
   bmw325ci:[['Left rear vent window','body','body.quarter-left'],['DISA intake flap','powertrain','powertrain.disa'],['Rear differential','drivetrain','drivetrain.rear-differential']],
   porsche993cab:[['Open crankcase','engine','engine.case',true]],
-  porsche992scab:[['Open crankcase','engine','engine.case',true]]
+  porsche992scab:[['Open crankcase','engine','engine.case',true]],
+  porsche996cab:[['Open crankcase','engine','engine.case',true]]
 };
 const g500StudyRoutes={
   'Mercedes-Benz USA · G-Class electrical training':['electrical','electrical.can-c','Inspect the drivetrain data bus'],

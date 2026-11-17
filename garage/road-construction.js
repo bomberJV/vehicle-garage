@@ -63,7 +63,7 @@ const windshield=entry('windshield-section','Laminated windshield',
   ]);
 
 export function getRoadConstruction(vehicle,id){
-  if(!['hrv','f350','c63','bmw325ci','g500','porsche993cab','porsche992scab'].includes(vehicle))return null;
+  if(!['hrv','f350','c63','bmw325ci','g500','porsche993cab','porsche992scab','porsche996cab'].includes(vehicle))return null;
   if(id==='wheels.tire'||id==='running.tires')return tire;
   if(id==='body.windshield'||id==='cabin.windshield')return windshield;
   // The generic glazing button covers multiple panes. The detail explicitly illustrates the front windshield.

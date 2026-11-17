@@ -13,6 +13,8 @@ const p992=link('Porsche 992 wheel identification plates','https://static.nhtsa.
 const p992Shop=link('Suncoast Porsche wheel sets','https://www.suncoastparts.com/category/9922020SCHASWHLS.html');
 const gTrade=link('Mercedes-Benz G500 five-spoke wheel B6 647 0598','https://parts.mercedesbenzofmiami.com/oem-parts/mercedes-benz-wheel-alloy-7-5x18-66470598');
 const fTrade=link('LMC Truck steel wheels','https://www.lmctruck.com/wheels-hubcaps/wheels/fd-1992-96-steel-wheel');
+const p996=link('Excellence · 1999 911 Carrera Cabriolet (996) wheel and tire sizes','https://www.excellence-mag.com/resources/specs/58');
+const p996Trade=link('TEILE.COM 17-inch Carrera wheel set, 7J × 17 ET55 + 9J × 17 ET55','https://teile.com/en/porsche-tequipment-shop/model-911-964/3/Wheels-Rims-and-accessories/601C-Wheel-rim-sets/218/17-inch-Carrera-wheel-set-7J-x-17-ET55-9J-x-17-ET55/39755');
 const p993Trade=link('TEILE.COM 993 wheel sets','https://www.teile.com/en/porsche-parts-shop/model-911-993/2/Wheels-brakes/601C-Wheel-rim-sets/218');
 function stock(name,diameters,description,source,buy){
   const [frontDiameter,rearDiameter=frontDiameter]=diameters;
@@ -79,6 +81,10 @@ const options={
     description:'Five smooth, gently curved cast paddles frame large open windows.',
     fitment:'Narrow-body 993 Carrera. Front 7J × 17 ET55. Rear 9J × 17 ET55.',
     source:p993,buy:link('TEILE.COM Cup II set','https://teile.com/en/porsche-tequipment-shop/model-911-993/2/wheels-rims-and-accessories/601c-wheel-rim-sets/218/17-inch-cup-ii-wheel-set-7j-x-17-et55-9j-x-17-et55/21704')
+  }],
+  porsche996cab:[{...stock('17-inch Carrera',[17],'Five twisted cast spokes run from a flat hub to the rim flange.',p996,p996Trade),
+    partNumber:'996.362.124.00 front / 996.362.128.00 rear',
+    fitment:'7J × 17 ET55 with 205/50 ZR17 tires in front. 9J × 17 ET55 with 255/40 ZR17 tires at the rear.',lugs:5,boltCircle:130
   }],
   porsche992scab:[stock('20 / 21-inch Carrera S',[20,21],'The front and rear wheels keep the staggered size of the 992.1 Carrera S.',p992,p992Shop),{
     id:'rsspyd',name:'RS Spyder Design',maker:'Porsche',partNumber:'992.601.025.BB front / 992.601.025.G rear',frontDiameter:20,rearDiameter:21,lugs:5,boltCircle:130,

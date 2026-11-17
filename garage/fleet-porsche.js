@@ -32,8 +32,9 @@ function boxer(r,car,modern){
     }
     r.tag('drive.axles',()=>{barrel(r,[car.rear,s*.109,.345],[car.rear,s*.663,.345],.025,'#7e8281');barrel(r,[car.rear,s*.536,.345],[car.rear,s*.62,.345],.046,'#3d4449');});
     r.tag('engine.exhaust',()=>{
-      const tip=modern?car.stations.at(-1)[0]-.082:classicTailpipeEnd(),y=s*(modern?.455:classicTailpipe.y);
+      const tip=modern?car.stations.at(-1)[0]-.100:classicTailpipeEnd(),y=s*(modern?.455:classicTailpipe.y);
       // The 992.1 Cabriolet is shown with the optional two-oval Sport Exhaust.
+      // Its outlets sit nearly flush with the black apron, as in photographs.
       const outletHeight=modern?.313:classicTailpipe.z;
       const outlets=[0];
       for(const delta of outlets){

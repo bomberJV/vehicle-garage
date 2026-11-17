@@ -169,7 +169,7 @@ function exhaust(r,cx,z,modern,rear){
           [[x,s*.351,z-.063],[x-.02,s*.359,z-.123],[x-.022,s*(.351-.025*n),z-.175-.011*n],[x+.08,s*(.315-.017*n),z-.201],collector];
         sweep(r,path,modern?.024:.022,modern?'#8a7565':HEAT,8);
       }
-      const end=modern?[rear-.082,s*.455,.311]:[classicTailpipeEnd(),s*classicTailpipe.y,classicTailpipe.z];
+      const end=modern?[rear-.100,s*.455,.311]:[classicTailpipeEnd(),s*classicTailpipe.y,classicTailpipe.z];
       if(modern){
         const centralX=rear-.285;
         sweep(r,[[cx+.095,s*.426,z-.134],[cx+.235,s*.45,z-.154],[centralX-.085,s*.40,.309],[centralX,s*.321,.323]],.042,'#777e7d',10);
@@ -177,7 +177,8 @@ function exhaust(r,cx,z,modern,rear){
         sweep(r,[[centralX,s*.32,.317],[centralX+.008,s*.367,.308],fork],.039,'#737b7a',10);
         sweep(r,[fork,[end[0]-.070,end[1],.299],[end[0]+.013,end[1],end[2]+.002]],.041,'#6c7675',12);
         const ring=(x,w,h)=>Array.from({length:18},(_,i)=>[x,end[1]+w*Math.cos(TAU*i/18),end[2]+h*Math.sin(TAU*i/18)]);
-        loft(r,[ring(end[0]-.045,.042,.038),ring(end[0]+.011,.069,.047)],'#858f8d');
+        // A short oval sleeve, the same section as the outlet, set into the apron.
+        loft(r,[ring(end[0]-.030,.066,.045),ring(end[0]+.011,.069,.047)],'#858f8d');
       }else{
         const inlet=[cx+.335,s*.489,.340];
         sweep(r,[collector,[cx+.255,s*.355,.309],[cx+.286,s*.451,.321],inlet],.031,'#91816c',9);

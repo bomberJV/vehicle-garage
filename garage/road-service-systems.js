@@ -32,6 +32,25 @@ export function drawRoadBrakeMaster(r,id){
  box(r,plus(m,[.024,0,.043]),[.090,.057,.056],'#b6bda6');
  cyl(r,plus(m,[.02,0,.068]),Z,0,.014,.022,rubber,12);
 }
+// HR-V: the modulator sits behind the engine on the left. The right front line
+// crosses above the exhaust at the firewall; both rear lines drop behind the
+// transaxle and run under the floor along the sills. Routes are schematic.
+function hrvBrakeLines(r,mod,axleSites){
+ const line='#897d64';
+ for(const c of axleSites(false)){
+  const s=Math.sign(c[1]);
+  const mid=[-1.18,s*.46,.44];
+  path(r,s<0?[mod,[-1.16,-.40,.66],mid]:[mod,[-1.03,-.28,.86],[-1.03,.42,.86],[-1.03,.45,.50],mid],.0045,line);
+  // The front hose passes under the spring seat to the caliper behind the axle.
+  path(r,[mid,[-1.20,s*.62,.425],plus(c,[.10,0,.054])],.007,rubber);
+ }
+ for(const c of axleSites(true)){
+  const s=Math.sign(c[1]),mid=[1.46,s*.50,.47];
+  path(r,[mod,[-1.05,-.30,.62],[-1.00,-.30,.42],[-.95,s*.64,.42],[1.10,s*.64,.42],[1.10,s*.50,.425],[1.46,s*.50,.425],mid],.0045,line);
+  // Behind the damper, the rear hose drops to the caliper.
+  path(r,[mid,[1.45,s*.70,.47],plus(c,[.10,0,.054])],.007,rubber);
+ }
+}
 // The truck's lines drop from the inner fender, pass under the bellhousing and
 // run along the right of the frame below the crossmembers. Routes are schematic.
 function fordBrakeLines(r,mod,axleSites){
@@ -73,6 +92,7 @@ function brakes(id,p){
  parts.push(component('master',p.bike?'Front brake master cylinder':'Master cylinder & reservoir',p.bike?'The right-hand lever acts on the front circuit. The rear pedal has a separate master cylinder.':'A fluid reservoir sits on the tandem cylinder at the driver’s side of the vehicle.',[-.40,0,.40],r=>drawRoadBrakeMaster(r,id)),component('abs',p.park==='drum'?'Rear anti-lock circuit':'ABS hydraulic unit',p.park==='drum'?'The rear anti-lock system acts on the rear axle brake circuit. The diagram omits option-specific valve plumbing.':'The hydraulic block modulates brake pressure. An electric pump and valve passages share the module.',[.03,.44,.36],r=>{box(r,mod,[.099,.066,.075],metal);cyl(r,plus(mod,[.065,0,0]),X,-.038,.046,.033,rubber,16);for(let j=0;j<(p.bike?3:4);j++)cyl(r,plus(mod,[-.03+j*.020,0,.034]),Z,0,.019,.006,copper,8);}),
  component('lines','Hard lines & flexible hoses','The fixed lines carry fluid along the chassis. A flexible section follows each moving wheel. Routes are schematic.',[.03,.14,-.40],r=>{
   if(id==='f350')return fordBrakeLines(r,mod,axleSites);
+  if(id==='hrv')return hrvBrakeLines(r,mod,axleSites);
   for(const rear of [false,true])for(const c of axleSites(rear)){
    const side=Math.sign(c[1]),mid=[c[0]+(rear?-.13:.13),side*(p.bike?.042:.38),c[2]+.10];
    path(r,[mod,[mod[0],side*(p.bike?.042:.38),mod[2]-.027],mid],p.bike?.003:.0045,'#897d64');path(r,[mid,[c[0]-.04,c[1]*.90,c[2]+.145],plus(c,[.10,0,.054])],p.bike?.004:.007,rubber);
@@ -85,11 +105,11 @@ function brakes(id,p){
 function fuel(id,p){
  const t=p.tank,b=p.bike,ford=p.tankShape==='midship',saddle=p.tankShape==='saddle',external=id==='porsche993cab';
  const unit=plus(t,[0,saddle?.28:p.pumpY||0,b?-.09:.065]);
- const neck=external?[-.948,-.661,.747]:b?plus(t,[-.02,0,.119]):[t[0]+(p.engine[0]>0?-.22:.43),p.neckSide*(ford?.90:.74),t[2]+.37];
+ const neck=p.neck||(external?[-.948,-.661,.747]:b?plus(t,[-.02,0,.119]):[t[0]+(p.engine[0]>0?-.22:.43),p.neckSide*(ford?.90:.74),t[2]+.37]);
  const end=id==='bmw325ci'?m54RailInlet:p.fuelEnd||plus(p.engine,[0,0,.13]);
  const parts=[component('tank',ford?'Midship tank · one configuration':saddle?'Saddle fuel tank':'Fuel tank',p.fuel,[0,0,-.38],r=>tankBody(r,t,p.tankShape,p.tunnel)),
-  component('filler',b?'Filler cap & neck':'Filler neck',b?'The cap sits in the top of the tank ahead of the rider.':'The neck leads from the body-side filler opening to the tank.',[0,p.neckSide*.44,.27],r=>{const join=plus(t,[0,p.neckSide*(ford?.12:.23),.06]);if(!b)path(r,[neck,[neck[0]-.04,neck[1]*.86,neck[2]-.13],join],.025,rubber);cyl(r,neck,b?Z:Y,-.014,.016,b?.048:.037,iron,18);}),
-  component('sender',saddle?'Right-hand delivery flange & sender':'Fuel level sender',ford?'The float tracks the fuel level. The engine specification determines the pump and sender combination.':'A float arm pivots as the liquid level changes. The electrical sender reports that position.',[-.18,.07,.52],r=>sender(r,unit,b?.64:1)),
+  component('filler',b?'Filler cap & neck':'Filler neck',b?'The cap sits in the top of the tank ahead of the rider.':'The neck leads from the body-side filler opening to the tank.',[0,p.neckSide*.44,.27],r=>{const join=plus(t,[0,p.neckSide*(ford?.12:.23),.06]);if(p.neckPath)path(r,[neck,...p.neckPath],.025,rubber);else if(!b)path(r,[neck,[neck[0]-.04,neck[1]*.86,neck[2]-.13],join],.025,rubber);cyl(r,neck,b?Z:Y,-.014,.016,b?.048:.037,iron,18);}),
+  component('sender',saddle?'Right-hand delivery flange & sender':'Fuel level sender',ford?'The float tracks the fuel level. The engine specification determines the pump and sender combination.':'A float arm pivots as the liquid level changes. The electrical sender reports that position.',[-.18,.07,.52],r=>sender(r,id==='hrv'?plus(unit,[0,0,-.03]):unit,b?.64:1)),
   component('supply','Fuel supply line',ford?'The chassis line runs inside the left frame rail and ends at the engine bay. The connection to the V8’s fuel rails and the return line are not drawn.':'The supply line runs from the tank assembly toward the engine. Its bends and clips are schematic.',[.12,-.33,-.15],r=>{const y=p.supplyY??(b?.08:.27);if(id==='hrv'){path(r,[unit,[unit[0],.31,unit[2]-.13],[-1.695,.31,.32],[-1.695,.27,.40],[-1.695,.27,.78],[-1.66,.33,.81],[-1.632,.33,.828],end],.009,'#736f5a');return;}path(r,[unit,[unit[0],y,ford?.33:unit[2]-.13],[end[0],y,b?.65:.33],end],b?.005:.009,'#736f5a');})];
  if(saddle)parts.push(component('left-sender','Left tank sender','The second float measures the level across the center tunnel.',[-.29,-.41,.27],r=>sender(r,plus(t,[-.035,-.28,.07]))));
  if(!ford){

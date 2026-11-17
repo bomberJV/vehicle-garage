@@ -560,14 +560,23 @@ export class GarageRenderer{
    return;
  }
  const disc=vehicle==='g500'?(x<0?.1575:.136):stockRadius*.81;
- this.tag('wheels.disc',()=>{const plane=y-side*.025;if(vehicle==='g500'){drawG500InstalledRotor(this,x>0,side);return;}this.ringY(x,plane,z,disc,.045,'#717b80',N);this.ringY(x,plane-side*.018,z,disc,.045,'#525b60',N);this.tubeY(x,plane-side*.018,plane,z,disc,'#899395',N);});
+ this.tag('wheels.disc',()=>{const plane=y-side*.025;if(vehicle==='g500'){drawG500InstalledRotor(this,x>0,side);return;}const bore=vehicle==='hrv'?.062:.045;this.ringY(x,plane,z,disc,bore,'#717b80',N);this.ringY(x,plane-side*.018,z,disc,bore,'#525b60',N);this.tubeY(x,plane-side*.018,plane,z,disc,'#899395',N);});
  this.tag('wheels.hub',()=>{
   if(vehicle==='g500'&&x<0){
    const profile=[[-.070,.021],[-.070,.025],[-.045,.025],[-.041,.0275],[.020,.0275],[.024,.039],[.040,.039],[.040,.0424],[.050,.0424],[.050,.021],[-.070,.021]];
    turnWheelHub(this,[x,y,z],lateralAxis,profile.map(([station,rad])=>[side*station,rad]),hubSteel,{n:36});return;
   }
-  this.tubeY(x,y-side*.065,y+side*.047,z,.048,'#777f82',24);this.ringY(x,y+side*.05,z,.048,0,'#a5adb0',24);});
- this.tag('wheels.caliper',()=>{if(vehicle==='g500'){drawG500InstalledCaliper(this,g500RotorCenter(x>0,side),x>0,side);return;}this.box(x+disc*.65,y-side*.07,z-disc*.35,x+disc*1.04,y+side*.023,z+disc*.35,'#545d62');});
+  // The HR-V hub starts at the outer face of its knuckle.
+  this.tubeY(x,y-side*(vehicle==='hrv'?.052:.065),y+side*.047,z,.048,'#777f82',24);this.ringY(x,y+side*.05,z,.048,0,'#a5adb0',24);});
+ this.tag('wheels.caliper',()=>{if(vehicle==='g500'){drawG500InstalledCaliper(this,g500RotorCenter(x>0,side),x>0,side);return;}if(vehicle==='hrv'){
+   // Piston housing and outer pad bracket either side of the friction ring, bridged beyond its edge.
+   const plane=y-side*.025,c='#545d62';
+   this.box(x+disc*.65,y-side*.07,z-disc*.35,x+disc*1.04,plane-side*.022,z+disc*.35,c);
+   this.box(x+disc*.65,plane+side*.004,z-disc*.30,x+disc*1.04,y+side*.023,z+disc*.30,c);
+   this.box(x+disc*1.01,plane-side*.022,z-disc*.30,x+disc*1.04,plane+side*.004,z+disc*.30,c);
+   return;
+  }
+  this.box(x+disc*.65,y-side*.07,z-disc*.35,x+disc*1.04,y+side*.023,z+disc*.35,'#545d62');});
  }
  mechanicalMesh(){
  if(this.build.vehicle==='bmw325ci'){drawE46Suspension(this);return;}
@@ -581,11 +590,14 @@ export class GarageRenderer{
     for(const side of [-1,1])box(rear-.29,side<0?-.50:.30,.20,rear+.17,side<0?-.30:.50,.25,dark);});
  }else{box(front-.30,-.55,.27,front+.32,.55,.35,dark);box(rear-.25,-.50,.27,rear+.25,.50,.34,dark);}});
  if(g)drawG500AxleLocation(this);
- else tag('steering.axle',()=>{for(const x of [front,rear])for(const side of [-1,1]){const low=awd&&x===rear;box(x-.075,side*(w-.14)-.04,.30,x+.075,side*(w-.14)+.04,.53,metal);rod([x-.20,side*.35,low?.235:.31],[x,side*(w-.14),low?.30:.39],.026,metal);}});
+ else tag('steering.axle',()=>{for(const x of [front,rear])for(const side of [-1,1]){const low=awd&&x===rear,k=awd?w-.175:w-.14;box(x-.075,side*k-.04,.30,x+.075,side*k+.04,.53,metal);rod([x-.20,side*(low?.53:.35),low?.225:awd?.32:.31],[x,side*k,low?.30:awd?.30:.39],.026,metal);}});
  tag('steering.linkage',()=>{if(g){drawG500SteeringLinkage(this);}else{rod([front-.09,-.66,.38],[front-.09,.66,.38],.023,metal);}});
  tag('suspension.spring',()=>{for(const x of [front,rear])for(const side of [-1,1]){const y=side*(g?.48:.57);if(truck){for(let layer=0;layer<4;layer++)this.profile([[x-.52+layer*.065,.39+layer*.013],[x,.34+layer*.013],[x+.52-layer*.065,.39+layer*.013],[x+.52-layer*.065,.402+layer*.013],[x,.352+layer*.013],[x-.52+layer*.065,.402+layer*.013]],y-.035,y+.035,'#76818a');continue;}const base=g?.47:.44,height=g?.39:.48;let prior=null;for(let i=0;i<=84;i++){const t=i/84,a=t*Math.PI*12,p=[x+Math.cos(a)*.073,y+Math.sin(a)*.073,base+t*height];if(prior)rod(prior,p,.011,'#b0b5a4',6);prior=p;}}});
  // The G500 damper tops lean 20 mm inboard of the generic line and its body is 66 mm across, clear of the tyres.
- tag('suspension.damper',()=>{for(const x of [front,rear])for(const side of [-1,1]){const lo=side*.59,hi=side*(g?.600:.62),mid=side*(g?.591:.605);rod([x-.14,lo,.43],[x+.06,hi,.90],.026,'#98a4ac');rod([x-.14,lo,.43],[x-.03,mid,.68],g?.033:.039,'#414c53');}});
+ tag('suspension.damper',()=>{for(const x of [front,rear])for(const side of [-1,1]){if(awd){
+   // HR-V: each damper runs up the axis of its coil spring.
+   const y=side*.57;rod([x,y,.43],[x,y,.93],.022,'#98a4ac');rod([x,y,.43],[x,y,.70],.036,'#414c53');continue;}
+  const lo=side*.59,hi=side*(g?.600:.62),mid=side*(g?.591:.605);rod([x-.14,lo,.43],[x+.06,hi,.90],.026,'#98a4ac');rod([x-.14,lo,.43],[x-.03,mid,.68],g?.033:.039,'#414c53');}});
 
  }
  applyInspection(){this.prepareInspection(null);}

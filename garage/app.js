@@ -760,3 +760,21 @@ if(location.hash==='#workbench')requestAnimationFrame(()=>$('workbench').scrollI
 
 const openFactoryElevations=enableFactoryElevations(()=>build.vehicle);
 if(initialRoute.get('drawing')==='dimensions')openFactoryElevations();
+// Full screen: the workbench (view and inspector) fills the screen. The Fullscreen API is used
+// where the browser has it; elsewhere (iPhone Safari) the workbench becomes a fixed overlay.
+const fullWorkbench=$('workbench'),expandView=$('expand-view');
+function setGarageExpanded(on){
+  fullWorkbench.classList.toggle('expanded',on);document.documentElement.classList.toggle('garage-expanded',on);
+  expandView.setAttribute('aria-pressed',on);expandView.textContent=on?'Exit full screen':'Full screen';
+  $('vehicle-canvas').focus({preventScroll:true});
+}
+expandView.addEventListener('click',async()=>{
+  if(!fullWorkbench.classList.contains('expanded')){
+    setGarageExpanded(true);
+    try{if(fullWorkbench.requestFullscreen&&!document.fullscreenElement)await fullWorkbench.requestFullscreen({navigationUI:'hide'});}catch{/* The overlay alone still fills the window. */}
+  }else{
+    if(document.fullscreenElement){try{await document.exitFullscreen();}catch{/* Already out. */}}
+    setGarageExpanded(false);
+  }
+});
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&fullWorkbench.classList.contains('expanded'))setGarageExpanded(false);});

@@ -292,11 +292,14 @@ const groups=[
  ],[-1.04,.59]),
  assembly('fuel','Fuel tank and delivery','Follow fuel from the filler neck to the rear tank, external pump and replaceable filter. The underbody shield and tank straps separate in the tank view.',src.fuel,[
   ['tank','Rear fuel tank and sender','The tank lies behind the rear axle. Left and right longitudinal straps support its underside; the sender enters from above.',up,src.fuel,r=>{
-   r.profile([[1.54,.501],[1.63,.418],[1.99,.418],[2.084,.477],[2.09,.615],[1.99,.658],[1.56,.627]],-.60,.60,rubber);
-   for(const yy of [-.36,.36]){r.box(1.625,yy-.018,.406,2.00,yy+.018,.419,steel);for(const xx of [1.614,1.99])r.box(xx,yy-.018,.414,xx+.012,yy+.018,.481,steel);}
-   cyl(r,[1.80,.00,.638],z,0,.025,.055,ivory,14);
+   // The tank fills the space between the frame rails, behind the rear
+   // differential and the track bar, under the cargo floor and ahead of the
+   // last crossmember.
+   r.profile([[1.61,.48],[1.655,.42],[1.915,.42],[1.945,.46],[1.945,.695],[1.61,.695]],-.445,.445,rubber);
+   for(const yy of [-.36,.36]){r.box(1.635,yy-.018,.406,1.925,yy+.018,.419,steel);for(const xx of [1.623,1.913])r.box(xx,yy-.018,.414,xx+.012,yy+.018,.481,steel);}
+   cyl(r,[1.80,.00,.695],z,0,.006,.055,ivory,14);
   }],
-  ['shield','Fuel tank skid plate','A formed guard protects the tank and external delivery hardware from below.',[0,-.23,-.50],src.fuel,r=>{r.profile([[1.51,.419],[1.63,.303],[2.00,.303],[2.11,.413],[2.095,.426],[1.997,.319],[1.642,.319],[1.525,.429]],-.60,.60,steel);}],
+  ['shield','Fuel tank skid plate','A formed guard protects the tank and external delivery hardware from below.',[0,-.23,-.50],src.fuel,r=>{r.profile([[1.60,.40],[1.66,.303],[1.95,.303],[2.00,.40],[1.988,.41],[1.94,.319],[1.672,.319],[1.612,.41]],-.445,.445,steel);}],
   ['delivery','External fuel pump and filter','The external pump and filter sit below the tank and above its shield. Each has a separate clamp on the supporting plate.',down,src.fuel,r=>{
    moved(r,p=>p.map((v,i)=>v+fuelFilterCenter[i]),q=>{for(const item of deliveryParts)item.draw(q);});
   }],
@@ -308,7 +311,7 @@ const groups=[
    line(r,[port('feed'),[1.692,-.132,.378],[1.670,-.18,.383]],.006,rubber);
    line(r,[port('tankReturn'),[1.928,-.110,.384],[1.934,-.113,.426]],.007,rubber);
   }],
-  ['filler','Fuel filler neck and cap','The right rear filler neck joins the tank. A seal sits where the neck passes through the opening.',right,src.fuel,r=>{line(r,[[1.88,.56,.591],[1.90,.69,.669],[1.82,.79,.849],[1.72,.826,.945]],.033,dark);cyl(r,[1.72,.827,.945],y,-.014,.036,.042,rubber,12);}]
+  ['filler','Fuel filler neck and cap','The right rear filler neck joins the tank. A seal sits where the neck passes through the opening.',right,src.fuel,r=>{line(r,[[1.88,.415,.66],[1.88,.415,.80],[1.80,.70,.88],[1.72,.826,.945]],.033,dark);cyl(r,[1.72,.827,.945],y,-.014,.036,.042,rubber,12);}]
  ],[-.95,.52]),
  assembly('electrical','Electrical power, controllers and networks',g500ElectronicAssemblyText,g500ElectronicSources.model,[
   ...g500ElectronicNetworkRows,

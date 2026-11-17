@@ -3,14 +3,14 @@ import {box,path,plus,iron,metal,alloy,rubber} from './road-service-geometry.js'
 import {slab} from './section-primitives.js';
 import {fluidRefs as ref} from './g500-fluid-refs.js';
 
-const can=[1.963,.710,.844],tankPort=[1.845,.381,.648],pressure=[1.805,.140,.661];
+const can=[1.963,.710,.844],tankPort=[1.930,.420,.690],pressure=[1.805,.140,.683];
 const canPorts={tank:plus(can,[.092,-.033,.036]),purge:plus(can,[.092,.029,.036]),air:plus(can,[.031,.052,.044])};
 // The purge valve sits outboard of the left exhaust manifold.
 const shut=plus(can,[.030,.053,.088]),purge=[-1.185,-.612,.940],manifold=[-.858,-.018,1.021];
 export const evapRows=[
  ['tank-vent','Tank vapor connection','Vapor leaves the high side of the tank for the charcoal canister. The underbody and wheelhouse bends show the route schematically.',[.14,.11,.23],ref.evapRoute,r=>{
   cyl(r,tankPort,z,-.009,.013,.012,iron,10);
-  path(r,[tankPort,[1.876,.527,.661],[1.898,.602,.715],[2.079,.635,.762],[2.086,.677,.879],canPorts.tank],.008,rubber);
+  path(r,[tankPort,[1.930,.420,.780],[1.960,.600,.810],[2.050,.660,.850],canPorts.tank],.008,rubber);
  }],
  ['canister','Activated-charcoal canister','Vapor collects on activated carbon in the canister by the right rear wheelhouse. The early G500 parts listing identifies A 463 470 00 59 through chassis 144225.',[.10,.33,.13],ref.evapCase,r=>{
   slab(r,can[0],can[1],can[2]-.041,.181,.106,.086,rubber,.022);

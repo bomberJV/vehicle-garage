@@ -104,11 +104,27 @@ function bodyShell(r,paint) {
     // The floor and the bulkhead open around the transmission, which sits
     // under the tunnel pressing between the footwells.
     for(const side of [-1,1]){
-      r.box(-.744,Math.min(side*.20,side*.83),.545,-.40,Math.max(side*.20,side*.83),.575,tone(paint,.53));
+      r.box(-.744,Math.min(side*.20,side*.83),.575,-.40,Math.max(side*.20,side*.83),.595,tone(paint,.53));
       r.box(-.749,Math.min(side*.20,side*.823),.58,-.723,Math.max(side*.20,side*.823),1.19,tone(paint,.58));
     }
-    r.box(-.40,-.83,.545,2.05,.83,.575,tone(paint,.53));
     r.box(-.749,-.20,.84,-.723,.20,1.19,tone(paint,.58));
+    // Behind the bulkhead the floor stays open over the transfer case and the
+    // steep ends of both propeller shafts.
+    // The floor plate lies directly under the floor pan, above the exhaust and its shields.
+    for(const side of [-1,1])r.box(-.40,Math.min(side*.31,side*.83),.575,.55,Math.max(side*.31,side*.83),.595,tone(paint,.53));
+    r.box(.55,-.83,.575,.95,.83,.595,tone(paint,.53));
+    // The floor steps up over the rear axle to the cargo floor, which sits on
+    // the frame rails. Between the arches it stays clear of the tyres, and it
+    // opens beside the spring and damper towers and behind each wheel, where
+    // the filler neck and tank vent rise from the tank top.
+    r.profile([[.95,.575],[.95,.595],[1.03,.735],[1.03,.705]],-.60,.60,tone(paint,.53));
+    const cargo=tone(paint,.53),floor=(x0,x1,y0,y1)=>r.box(x0,y0,.705,x1,y1,.735,cargo);
+    floor(1.03,1.95,-.38,.38);
+    for(const side of [-1,1]){
+      const y=a=>side*a,lo=a=>Math.min(y(a),y(.60)),hi=a=>Math.max(y(a),y(.60));
+      floor(1.03,1.25,lo(.38),hi(.38));floor(1.60,1.83,lo(.38),hi(.38));
+    }
+    floor(1.95,2.047,-.83,.83);
     drawG500Cabin(r);
     for(const side of [-1,1]) {
       const y=side*width;

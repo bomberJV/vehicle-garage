@@ -1,7 +1,7 @@
 import {garageLink} from './priority-vehicles.js';
 import {additionalRequestSections} from './priority-backlog.js';
 
-const site='https://brandon-huang-studio.brainyalbatross8.chatgpt.site';
+const site='https://brandonfhuang.com';
 const link=(label,url)=>({label,url});
 const part=(label,vehicle,assembly,open)=>link(label,garageLink(vehicle,{assembly,open}));
 const tool=(label,vehicle,tool)=>link(label,garageLink(vehicle,{tool}));
@@ -70,15 +70,13 @@ export const requestSections=[
   ]},
   {id:'notebook',name:'Research, writing and listening',items:[
     work('dark-matter','shipped','Ask what galaxy rotation curves can actually tell us','The dark matter working paper reviews recent constraints and candidate mechanisms. It fits two halo profiles to 100 SPARC galaxies and compares 600 synthetic cases. The figures, measurements and analysis code can be downloaded with the paper.',[
-      link('Read the paper',site+'/curiosities/papers/dark-matter-2026/'),link('See the synthetic experiment',site+'/curiosities/papers/dark-matter-2026/#recovery')]),
+      link('Read the paper',site+'/projects/papers/dark-matter-2026/'),link('See the synthetic experiment',site+'/projects/papers/dark-matter-2026/#recovery')]),
     work('medical','shipped','Run three medical AI experiments','The studies ask when a classifier should defer, how wide a prediction interval should be and what happens when inputs go missing. Each uses held-out predictions from a public dataset and includes the code and results.',[
-      link('Open the three experiments',site+'/curiosities/play/medical/')]),
+      link('Open the three experiments',site+'/projects/play/medical/')]),
     work('narration','shipped','Listen beside the text','Speaker controls play the site’s explanatory passages and component descriptions. The recordings use a lower American male voice. Controls in the garage also read out the current inspection.',[
-      link('Open the garage','./index.html#workbench'),link('Listen to the experiments',site+'/curiosities/play/medical/')]),
-    work('portfolio-writing','shipped','Give the introduction something concrete to say','The home page introduces Brandon once and opens with “Nothing ventured. Nothing gained.” The credit identifies it as an English proverb and links to John Heywood’s 1546 collection, which records an earlier wording.',[
-      link('Read the introduction',site+'/'),link('Heywood’s collection','https://www.otago.ac.nz/english-linguistics/tudor/heywood13291')]),
-    work('pantry','shipped','Give the pantry a broader starting point','The pantry now starts with staples such as eggs, rice and mushrooms. Its opening suggestions include scallion eggs over rice and mushroom toast.',[
-      link('Open the pantry',site+'/curiosities/play/pantry/')]),
+      link('Open the garage','./index.html#workbench'),link('Listen to the experiments',site+'/projects/play/medical/')]),
+    work('portfolio-writing','shipped','Introduce the portfolio','The homepage introduces Brandon and his approach to exploring new ideas.',[
+      link('Read the introduction',site+'/')]),
     work('project-priorities','shipped','Keep the open work visible','Change a priority or workflow status on any row. Filter by environment or vehicle type, or hide whole categories. Each vehicle links to its next check and a reference.',[
       link('See the vehicle register','#vehicles')])
   ]},

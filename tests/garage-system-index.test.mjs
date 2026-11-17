@@ -6,7 +6,7 @@ import {getDetail} from '../garage/detail-catalog.js';
 import {systemsFor} from '../garage/system-index.js';
 
 test('every directory opens assemblies on that vehicle and follows valid parents to each study',()=>{
-  assert.equal(Object.keys(VEHICLES).length,38);
+  assert.equal(Object.keys(VEHICLES).length,39);
   for(const v of Object.keys(VEHICLES)){
     const {assemblies,featured,remaining}=systemsFor(v),groups=getAssemblies(v);
     assert.deepEqual(assemblies.map(a=>a.assembly).sort(),groups.map(g=>g.id).sort());

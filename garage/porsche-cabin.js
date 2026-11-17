@@ -63,12 +63,15 @@ function glass(r,car,paint){
       const a=j/vsteps,b=(j+1)/vsteps;
       r.polygon([p(s*.954,a,.001),p(s,a,.001),p(s,b,.001),p(s*.954,b,.001)],'#303537',false);
       const inset=(v,k)=>{const q=p(s,v);return [q[0]+.012*(1-k),q[1]+s*.022*k,q[2]+.012*k];};
-      r.polygon([inset(a,0),inset(b,0),inset(b,1),inset(a,1)],tint(paint,1.11),false);
-      pipe(r,[inset(a,1),inset(b,1)],.013,paint,8);
+      // The 992 Cabriolet's A-pillar trim is black, as is its header
+      // (photographs); the 993's pillars are body colour.
+      const pillar=car.modern?'#2b2f31':paint;
+      r.polygon([inset(a,0),inset(b,0),inset(b,1),inset(a,1)],car.modern?pillar:tint(paint,1.11),false);
+      pipe(r,[inset(a,1),inset(b,1)],.013,pillar,8);
     }
   }
   for (const [a,b,c] of [[.923,1,'#303639'],[0,.048,'#303639']])strip(r,row(a).map(([x,y,z])=>[x-.002,y,z+.001]),row(b).map(([x,y,z])=>[x-.002,y,z+.001]),c);
-  for(const [v,thick,mat] of [[1,.016,modern?'#404448':paint],[0,.014,'#373c3f']]){
+  for(const [v,thick,mat] of [[1,.016,modern?'#2b2f31':paint],[0,.014,'#373c3f']]){
     const front=row(v),back=front.map(([x,y,z])=>[x+thick,y,z+thick*.55]);
     strip(r,front,back,mat);
     strip(r,back,back.map(([x,y,z])=>[x+.005,y,z-thick*1.22]),'#42464a');

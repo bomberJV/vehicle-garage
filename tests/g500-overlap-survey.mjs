@@ -63,7 +63,8 @@ export const mounts=[
   ['body.grille','lighting.housing','the headlamp housings meet the grille surround'],
   ['body.roof','roof.sunshade','the sunshade runs in the roof'],
   ['body.structure','suspension.frame','the body is bolted to the frame'],
-  ...['tcm','transfer','yaw-sensor','srs-control','esm','sam-rear','tunnel','footwell','battery','battery-box','seat-left','seat-right']
+  // The console and seat units rest on the carpet; these four sit in or under the floor.
+  ...['tunnel','footwell','battery','battery-box']
     .map(id=>['electrical.'+id,'floor','the unit is fixed to the floor under the carpet']),
   ...['steering.axle','wheels.hub','wheels.inner-bearing','suspension.radius-arms','suspension.front-track-bar']
     .map(id=>['differentials.front',id,'the front axle carries it']),
@@ -84,8 +85,14 @@ export const mounts=[
   ['steering-assist.steering-box','suspension.frame','the steering box bolts to the frame'],
   ['electrical.can-b','electrical.can-b-connectors','the bus runs through its connectors'],
   ['electrical.battery-box','electrical.primary-power','the cable starts at the prefuse inside the box'],
+  ['body.structure','electrical.primary-power','the battery cable passes the bulkhead through its grommet'],
+  ...['primary-power','main-feed','rear-heater-circuit'].map(id=>['electrical.'+id,'floor','the lead leaves the prefuse studs on the battery box through the carpet cut-out']),
+  ['electrical.chassis-control-harness','floor','the transmission and transfer-case leads drop through grommets in the tunnel'],
+  ['body.front-seats','electrical.comfort-harness','the seat branches plug into the connectors under the cushions'],
+  ['body.rear-bench','electrical.comfort-harness','the seat branches plug into the connectors under the cushion'],
+  ['body.rear-bench','electrical.rear-heater-circuit','the heater branches plug into the cushion mats'],
+  ...['door','rear-left','rear-right'].map(id=>['body.'+id,'electrical.can-b','the door branch passes through its rubber boot to the door module']),
   ['electrical.ecu','electrical.engine-harness','the harness plugs run along the control unit'],
-  ['electrical.comfort-harness','electrical.seat-right','the harness ends inside the seat module'],
   ['hvac.compressor','hvac.refrigerant-lines','the lines end at the compressor'],
   ['hvac.drier','hvac.refrigerant-lines','the lines end at the drier'],
   ['cooling.heater-pump','cooling.heater-return','the pump sits in the return hose'],

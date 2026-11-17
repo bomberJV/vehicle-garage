@@ -119,7 +119,7 @@ function heatShields(r){
    for(const [a,b] of [[-.33,-.14],[-.133,.31]])turn(r,c,x,[[a,.091],[a+.012,.099],[b-.012,.099],[b,.091]],shield,{n:9,start:Math.PI*1.12,sweep:Math.PI*.76});
  }
  // The installed prop shaft passes above the main shell. Its shield is low and broad.
- const crown=(xx,yy)=>[.846+xx,yy,mainZ+.074-.029*(xx/.133)**2];
+ const crown=(xx,yy)=>[.846+xx,yy,mainZ+.064-.024*(xx/.133)**2];
  for(const [a,b] of [[-.133,-.075],[-.075,0],[0,.075],[.075,.133]])
    r.polygon([crown(a,-.21),crown(a,.21),crown(b,.21),crown(b,-.21)],shield,false);
 }

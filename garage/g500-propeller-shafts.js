@@ -18,7 +18,7 @@ export const transferOutputX=front=>transferOrigin[0]+(front?-.21:.21);
 export const axleInputX=(front,halfWheelbase)=>front?-halfWheelbase+.270:halfWheelbase-.270;
 export const transferInput=[transferOrigin[0]-.205,transferOrigin[1]-.09,transferOrigin[2]+.105];
 export const gearboxOutput=add(transferInput,x,-shaftMeasures.length);
-export const transferMotorPlug=add(transferOrigin,[-.106,.112,.157]);
+export const transferMotorPlug=add(transferOrigin,[-.106,-.12,.157]);
 const rubber='#394248';
 const shaftDescription='Mercedes lists 463 410 07 02 between the transmission and transfer case. Welte gives this shaft a length of 325 mm. Driveshaft Parts lists a 330 mm replacement for both 07 02 and 08 02, with 108 mm ends and six 10 mm bores on each face. The model uses the 325 mm length.';
 

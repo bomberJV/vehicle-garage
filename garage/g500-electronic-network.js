@@ -29,7 +29,7 @@ function terminal(r,p,axis=z){sleeve(r,p,axis,-.003,.003,.008,.003,alloy,6);}
 // All coordinates are shared model anchors, in metres. -Y is the driver's side.
 const placed={
  prefuse:[.482,-.074,.754],jump:[-.810,-.680,.920],alternator:[-1.600,-.280,.690],starter:[-.965,.300,.713],
- ecu:[-.640,.710,1.075],tcm:[-.300,-.105,.729],esm:[-.290,0,.790],transfer:[.2425,0,.718],esp:[-.435,.485,.780],
+ ecu:[-.640,.710,1.075],tcm:[-.300,-.105,.729],esm:[-.290,0,.790],transfer:[.2425,0,.718],esp:[-.517,.485,.780],
  frontSam:[-.645,.565,1.065],rearSam:[.2425,-.005,.793],cluster:[-.480,-.415,1.291],eis:[-.465,-.202,1.158],
  column:[-.510,-.410,1.215],upper:[-.496,0,1.163],overhead:[-.361,0,1.904],comand:[-.509,0,1.054],
  locks:[-.469,0,1.263],abs:[-1.085,-.694,1.023],valves:[-.802,-.507,1.163],yaw:[-.130,-.060,.696],srs:[.0615,0,.702],
@@ -183,8 +183,10 @@ const keys={eis:'eis',cluster:'cluster','steering-column':'column','upper-panel'
 // Units on the far side are reached around the back of the console.
 function lowPath(sgn,dest){
  const near=Math.abs(dest[1])<.14||Math.sign(dest[1])===sgn;
- return near?[on(-.52,sgn*.158),on(dest[0],sgn*.158),on(dest[0],dest[1]),dest]:
-  [on(-.52,sgn*.158),on(.45,sgn*.158),on(.45,-sgn*.158),on(dest[0],-sgn*.158),on(dest[0],dest[1]),dest];
+ // Seat units are reached under the seat rails, level with the footwell carpet.
+ const foot=s=>Math.abs(dest[1])>.2?[on(dest[0],s*.20)]:[];
+ return near?[on(-.52,sgn*.158),on(dest[0],sgn*.158),...foot(sgn),on(dest[0],dest[1]),dest]:
+  [on(-.52,sgn*.158),on(.45,sgn*.158),on(.45,-sgn*.158),on(dest[0],-sgn*.158),...foot(-sgn),on(dest[0],dest[1]),dest];
 }
 // Units in the console or under the front seats are wired along the floor.
 const low=id=>['tcm','esm','transfer','sam-rear','srs-control','yaw-sensor','seat-left','seat-right'].includes(id);
@@ -264,7 +266,7 @@ function chassisControl(r){
   const tp=g500ElectronicPorts.transfer,cp=g500ElectronicPorts.tcm;
   line(r,[tp,on(tp[0],tp[1]),on(.178,.113),[.082,.211,.640],A.transferActuator],.004,black);
  line(r,[cp,[cp[0],cp[1],cp[2]+.012],[-.41,cp[1],cp[2]+.012],on(-.41,-.125),[-.470,.058,.612],A.transmissionPlug],.004,black);
- line(r,[g500ElectronicPorts.esp,[-.607,.514,.827],[-.728,.42,1.235],[-.728,-.55,1.235],[-1.02,-.756,1.139],plus(A.abs,[-.012,-.078,-.008])],.004,black);
+ const ep=g500ElectronicPorts.esp;line(r,[ep,[ep[0],ep[1]-.025,ep[2]],[-.650,ep[1]-.025,.800],[-.650,.514,.827],[-.715,.43,1.22],[-.728,.42,1.235],[-.728,-.55,1.235],[-1.02,-.756,1.139],plus(A.abs,[-.012,-.078,-.008])],.004,black);
  // The yaw-sensor lead passes under the front of the console to the sensor's plug.
  const yp=g500ElectronicPorts['yaw-sensor'];
  line(r,[g500ElectronicPorts.esp,on(-.45,.158),on(-.47,.158),on(-.47,-.13),on(yp[0],-.13),on(yp[0],yp[1]),yp],.003,black);

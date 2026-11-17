@@ -31,7 +31,9 @@ test('early coupe bumpers span the 4,488-mm shell and split rear lenses follow t
   assert.equal(new Set(faces.map(f=>f.instance)).size,2);
   assert(faces.every(f=>id==='lighting.reverse'?f.rigid?.name==='trunk-lid':f.rigid?.name!=='trunk-lid'));
  }
- assert(tagged('lighting.headlamp').every(f=>f.points.every(p=>p[0]<-2.04&&p[2]<.83)));
+ // The lamp faces lean back under the hood's leading edge as on the car, so the
+ // outer top corner sits about 17 cm behind the bumper face.
+ assert(tagged('lighting.headlamp').every(f=>f.points.every(p=>p[0]<-1.99&&p[2]<.83)));
  const assembled=GarageRenderer.assembledFaces({vehicle:'bmw325ci',paint:'silver',finish:'silver',parts:[]});
  const tips=assembled.filter(f=>f.part==='e46-exhaust.outlets'&&f.points.every(p=>p[0]>2.29));
  assert(tips.length>30);assert(tips.every(f=>f.points.every(p=>p[1]<0&&p[2]<.30)));

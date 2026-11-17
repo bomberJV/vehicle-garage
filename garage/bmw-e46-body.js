@@ -88,20 +88,6 @@ function fixedWipers(r){
  });
 }
 export function finishE46Body(r,paint){
- // A shallow return and inner stiffeners complete the two lids in exploded
- // view. They are carried by the same rigid mounts as the painted outer skins.
- panel(r,'bonnet',[0,0,.71],'body.hood',()=>{
-  for(const side of [-1,1]){
-   const rail=[[-1.985,side*.455,.837],[-1.778,side*.505,.866],[-1.395,side*.555,.878],[-1.004,side*.560,.911]];
-   for(let k=1;k<rail.length;k++)r.rod(rail[k-1],rail[k],.013,tint(paint,.67),8);
-  }
- });
- deckPanel(r,false,()=>{
-  for(const side of [-1,1]){
-   const rail=[[1.847,side*.439,1.051],[1.998,side*.512,1.025],[2.190,side*.476,.991]];
-   for(let k=1;k<rail.length;k++)r.rod(rail[k-1],rail[k],.012,tint(paint,.64),8);
-  }
- });
  r.tag('body.structure',()=>{
   for(const side of [-1,1]){
    const y=.725*side;
@@ -120,9 +106,5 @@ export function finishE46Body(r,paint){
    const field=[[1.444,.554,.472],[2.162,.514,.472],[2.162,.569,.783],[1.761,.607,.844],[1.445,.602,.725]];
    r.polygon(field.map(([x,y,z])=>[x,side*y,z]),'#4a5050',false);
   }
-  // A fuel-filler flap ahead of the right rear lamp, above the wheel arch.
-  const hatch=[[1.524,.753],[1.546,.737],[1.745,.738],[1.755,.757],[1.748,.859],[1.737,.873],[1.552,.880],[1.535,.866]];
-  function flank(x,z){const s=e46BodyProfile.stations;let k=0;while(k<s.length-2&&s[k+1][0]<x)k++;const [x0,w0,h0]=s[k],[x1,w1,h1]=s[k+1],t=(x-x0)/(x1-x0),top=h0+(h1-h0)*t;return [x,e46BodyProfile.sideSection(w0+(w1-w0)*t,(z-.204)/(top-.204))+.0025,z];}
-  for(let i=0;i<hatch.length;i++)r.rod(flank(...hatch[i]),flank(...hatch[(i+1)%hatch.length]),.0022,tint(paint,.67),7);
  });
 }

@@ -62,7 +62,9 @@ test('every catalogued oil and climate part has the same installed and isolated 
  for(const key of ['outbound','return']){
   const line=shape(whole,'993-lubrication.'+key),[nose,rear]=span(line,0);
   // The thermostat end sits ahead of the right rear wheelhouse tub (x .595).
-  assert(nose< -1.7&&rear>.58);assert(line.every(p=>p[1]>.47));
+  // At the front bulkhead they pass under the warm-air duct at y .43, still
+  // clear of the fuel tank's right side (y .40).
+  assert(nose< -1.7&&rear>.58);assert(line.every(p=>p[1]>.41));
  }
  assert(shape(whole,'993-lubrication.tank').every(p=>p[0]<1.112-.30&&p[1]>.5));
  assert(shape(whole,'993-climate.compressor').some(p=>p[1]>.3));

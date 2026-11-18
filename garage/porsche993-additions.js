@@ -8,9 +8,9 @@ import {refs} from './porsche993-sources.js';
 const steel='#8d9a9b',black='#41494a',alloy='#a7ada1',brass='#ac916c',plastic='#394043';
 // The tank, thermostat and filter sit in the body ahead of the right rear
 // wheelhouse tub, clear of the wheel-well volume.
-const oilCore=[-1.72,.57,.43],condCore=[-1.72,-.57,.43],thermo=[.60,.58,.31],oilTank=[.58,.64,.50],pump=[1.39,0,.389];
+const oilCore=[-1.72,.57,.43],condCore=[-1.72,-.57,.43],thermo=[.57,.58,.31],oilTank=[.58,.70,.50],pump=[1.39,0,.389];
 const rearBlower=[1.41,-.48,.673],compressor=[1.61,.352,.641],evap=[-.745,0,.68];
-const dryer=[-.766,-.597,.462],valve=[-.78,-.219,.741];
+const dryer=[-.88,-.50,.462],valve=[-.78,-.219,.741];
 const row=(key,name,description,offset,source,draw)=>({...part(key,name,description,offset,draw),source});
 const pair=[[-1,'left','Left'],[1,'right','Right']];
 function channel(r,points,radius,color){
@@ -34,7 +34,7 @@ function oilPipe(r,k){
  // never pass through the wheel well, then drop to the cooler ahead of it.
  // Over the wheelhouse the pair is stacked vertically to stay inboard.
  const b=k*.032;
- channel(r,[[.595,.561+b,.303],[.50,.62+b,.247],[.40,.673+b,.228],[-.66,.673+b,.228],[-.74,.492+b*.3,.27+b],[-.86,.492+b*.3,.46+b],[-1.08,.492+b*.3,.60+b],[-1.38,.492+b*.3,.62+b],[-1.56,.50+b,.585],[-1.71,.54+b,.565]],.0135,'#7f898a');
+ channel(r,[[.595,.561+b,.303],[.50,.62+b,.247],[.40,.673+b,.228],[-.66,.673+b,.228],[-.72,.673+b,.21],[-.76,.43+b*.3,.21],[-.86,.43+b*.3,.30],[-1.08,.43+b*.3,.40+b],[-1.38,.47+b*.3,.55+b],[-1.56,.50+b,.585],[-1.71,.54+b,.565]],.0135,'#7f898a');
  for(const xx of [-.53,.22])box(r,[xx,.673+b,.227],[.022,.032,.035],black);
 }
 function matrix(r,c,w,h,d){
@@ -79,10 +79,10 @@ const oilRows=[
  }),
  row('tank','External oil tank and level sender','The tank stands ahead of the right rear wheel. Its sender measures the tank level. Oil from the bottom feeds the pressure pump.',[.10,.33,.17],refs.tank,oilReservoir),
  row('connections','Tank feed, return and filler neck','Two lower connections link the tank, engine and thermostat. The filler reaches up into the engine bay.',[.16,.28,.22],refs.tank,r=>{
-  channel(r,[[.55,.615,.335],[.57,.51,.302],[.81,.46,.29],[1.12,.424,.30],[1.35,.15,.319],[1.37,.029,.374]],.021,black);
+  channel(r,[[.55,.675,.335],[.57,.56,.302],[.62,.51,.29],[.81,.46,.29],[1.12,.424,.30],[1.35,.15,.319],[1.37,.029,.374]],.021,black);
   channel(r,[[1.41,.033,.377],[1.43,.206,.334],[1.35,.416,.322],[.84,.50,.325],[.612,.561,.321]],.0165,steel);
-  channel(r,[[.62,.64,.653],[.85,.635,.693],[1.10,.60,.729],[1.38,.573,.753],[1.49,.53,.771]],.020,black);
-  cyl(r,[1.49,.53,.776],z,-.003,.012,.029,'#c69a52',12);
+  channel(r,[[.62,.70,.653],[.66,.64,.70],[.70,.56,.71],[.85,.49,.72],[1.10,.49,.725],[1.38,.52,.73],[1.49,.53,.745]],.020,black);
+  cyl(r,[1.49,.53,.75],z,-.003,.012,.029,'#c69a52',12);
  }),
  row('thermostat','External oil thermostat','The regulator diverts warm return oil to the cooler ahead of the right front wheel. Open the housing to find its regulator, springs and retaining clip.',[-.20,.31,-.18],refs.thermostat,thermostat),
  row('filter','Tank-side oil filter','This spin-on filter shares a bracket with the external thermostat.',[.22,.25,-.17],refs.thermostat,oilCan),
@@ -106,10 +106,14 @@ const heatRows=[
  ...pair.flatMap(([s,key,label])=>[
   row('exchanger-'+key,label+' exhaust heat exchanger','Three exhaust primaries pass through this bank’s air jacket. The walls of the pipes keep exhaust gas separate from the air sent to the cabin.',[.15,.31*s,-.24],refs.exchanger,r=>airJacket(r,s)),
   row('control-'+key,label+' heater control box and duct','Warm air leaves the exchanger through this control box. A longitudinal body duct carries it forward to the cabin air guides.',[-.09,s*.33,-.18],refs.heatValve,r=>{
+   // The control box sits at the rear end of the sill. From there the warm-air
+   // duct runs forward inside the sill box (under the door opening, below the
+   // oil tank and inboard of the right-hand oil pipes), then climbs the front
+   // kick panel to the heater housing (PET 813, heating ducts).
    const rear=1.155+s*.0445;
-   channel(r,[[rear,s*.335,.351],[1.04,s*.40,.39],[.91,s*.444,.42],[.77,s*.495,.399]],.036,steel);
-   cyl(r,[.75,s*.494,.39],x,-.05,.054,.047,steel,14);
-   channel(r,[[.70,s*.494,.391],[.46,s*.58,.351],[-.48,s*.58,.351],[-.59,s*.51,.54],[-.72,s*.40,.677]],.034,black);
+   channel(r,[[rear,s*.335,.351],[1.02,s*.36,.24],[.86,s*.44,.20],[.745,s*.44,.20]],.034,steel);
+   cyl(r,[.70,s*.44,.20],x,-.045,.045,.040,steel,14);
+   channel(r,[[.655,s*.44,.20],[.42,s*.44,.20],[.30,s*.62,.275],[-.70,s*.62,.275],[-.76,s*.60,.40],[-.78,s*.52,.56],[-.76,s*.40,.677]],.030,black);
   })
  ]),
  row('compressor','Belt-driven A/C compressor and clutch','The crankshaft belt turns the pulley at the right rear of the engine. The magnetic clutch couples it to the compressor.',[.20,.28,.20],refs.compressor,r=>{
@@ -130,10 +134,13 @@ const heatRows=[
  }),
  row('lines','Refrigerant pipes and hoses','Follow the discharge hose from the compressor to the front condenser and the suction hose back from the evaporator. The bends through the body are schematic.',[0,-.31,-.17],refs.rearLines,r=>{
   const compPort=delta=>[1.58+delta,.34,.695];
-  channel(r,[compPort(0),[1.34,.40,.69],[1.13,.33,.59],[.89,-.40,.47],[.55,-.59,.26],[-.76,-.64,.26],[-1.10,-.47,.58],[-1.42,-.49,.56],[-1.72,-.53,.55]],.009,steel);
-  channel(r,[[-1.72,-.61,.33],[-1.64,-.50,.34],[-1.40,-.50,.513],[-1.15,-.50,.64],[-.92,-.54,.594],add(dryer,[0,0,.083])],.008,steel);
-  channel(r,[add(dryer,[.014,0,.083]),[-.748,-.57,.592],[-.767,-.41,.666],valve],.008,steel);
-  channel(r,[valve,[-.83,-.45,.63],[-.87,-.60,.37],[-.72,-.615,.278],[.55,-.57,.278],[.90,-.37,.48],[1.15,.30,.61],compPort(.045)],.013,black);
+  // Both refrigerant runs pass under the left sill, outboard of the warm-air
+  // duct, then climb inboard of the front wheel tub to the condenser.
+  channel(r,[compPort(0),[1.34,.40,.69],[1.13,.33,.59],[.89,-.40,.47],[.55,-.62,.24],[.40,-.673,.228],[-.66,-.673,.228],[-.72,-.673,.21],[-.76,-.43,.21],[-.86,-.43,.30],[-1.08,-.43,.40],[-1.38,-.47,.55],[-1.56,-.50,.585],[-1.72,-.53,.55]],.009,steel);
+  channel(r,[[-1.72,-.61,.33],[-1.64,-.50,.34],[-1.40,-.50,.513],[-1.15,-.50,.64],[-.95,-.50,.594],add(dryer,[0,0,.083])],.008,steel);
+  // Between the brake booster and the bulkhead, up and across to the valve.
+  channel(r,[add(dryer,[.014,0,.083]),[-.83,-.50,.62],[-.822,-.47,.78],[-.80,-.219,.78],valve],.008,steel);
+  channel(r,[valve,[-.84,-.219,.72],[-.86,-.48,.62],[-.86,-.48,.24],[-.74,-.48,.21],[-.70,-.705,.21],[.40,-.705,.21],[.55,-.65,.24],[.90,-.37,.48],[1.15,.30,.61],compPort(.045)],.013,black);
  }),
  row('evaporator','Evaporator and expansion valve','The valve meters refrigerant into the evaporator. Cabin air loses heat as it passes across the cold fins.',[-.21,.09,.28],refs.cabin,r=>{
   matrix(r,evap,.428,.146,.060);box(r,valve,[.042,.043,.049],brass);

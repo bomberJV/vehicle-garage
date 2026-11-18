@@ -5,6 +5,7 @@ import {sanitizeBuild} from '../garage/model.js';
 import {getAssembly} from '../garage/assemblies.js';
 import {getDetail} from '../garage/detail-catalog.js';
 import {groups} from '../garage/porsche992-additions.js';
+import {E992} from '../garage/porsche992-layout.js';
 
 const car='porsche992scab';
 function renderer(){return Object.assign(Object.create(GarageRenderer.prototype),{build:sanitizeBuild({vehicle:car,roofPosition:'up'}),inspection:{},faces:[],schematic:true,partPositions:new Map()});}
@@ -15,7 +16,7 @@ function nearest(pts,point){return Math.min(...pts.map(p=>Math.hypot(...p.map((n
 
 test('992.1 assemblies consist of installed and individually pickable surfaces at the same coordinates as their isolated views',()=>{
  const r=renderer();r.buildMesh();const whole=r.faces;
- assert(whole.length<22000);
+ assert(whole.length<105000); // hub #261: the G500's overview budget
  assert.equal(groups.length,9);
  const ids=groups.flatMap(g=>g.parts.map(p=>p.id));assert.equal(ids.length,new Set(ids).size);assert.equal(ids.length,63);
  for(const g of groups){
@@ -33,7 +34,7 @@ test('992.1 assemblies consist of installed and individually pickable surfaces a
 test('both rear intake ducts meet real compressor inlets and the two coolant and refrigerant circuits have separate front cores',()=>{
  const r=renderer();r.buildMesh();const pts=id=>vertices(r.faces,id);
  for(const [s,side] of [[-1,'left'],[1,'right']]){
-  const inlet=[1.699,s*.426,.378];assert(nearest(pts('p992-intake.inlet-'+side),inlet)<.04);
+  const inlet=[E992.cx+.258,s*.426,E992.z-.124];assert(nearest(pts('p992-intake.inlet-'+side),inlet)<.04);
   assert(nearest(pts('engine.turbos'),inlet)<.04);
   const cond=pts('p992-hvac.condenser-'+side),radiator=pts('engine.cooling').filter(p=>Math.sign(p[1])===s);
   assert(bounds(cond,0)[1]<bounds(radiator,0)[0]);
@@ -48,7 +49,7 @@ test('both rear intake ducts meet real compressor inlets and the two coolant and
   }
  }
  assert(bounds(pts('p992-hvac.suction'),0)[1]-bounds(pts('p992-hvac.suction'),0)[0]>2.4);
- assert(nearest(pts('p992-clutch.line'),[1.068,-.132,.553])<.007);assert(nearest(pts('p992-clutch.slave'),[1.068,-.132,.553])<.024);
+ assert(nearest(pts('p992-clutch.line'),[1.272,-.188,.605])<.007);assert(nearest(pts('p992-clutch.slave'),[1.272,-.188,.605])<.024);
  const brackets=pts('p992-steering.column');assert(nearest(brackets,[-.337,-.327,.795])<.022);
 });
 test('nested studies connect through the actual registry, animate individual components and keep their fixed parts still',()=>{

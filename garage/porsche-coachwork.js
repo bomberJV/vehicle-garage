@@ -38,7 +38,7 @@ export const coupeShape=[
     screen:[-.613,-.155,1.260,.700,.577],screenFootSweep:.240,screenHeaderSweep:.065, cockpit:[-.62,.725],door:classicDoor,belt:.840,
     stations:classicStations},
   {modern:true,width:1.852,front:-1.2,rear:1.25,frontRadius:.333,rearRadius:.352,
-    screen:[-.869,-.238,1.248,.755,.647],screenFootSweep:.281,screenHeaderSweep:.113,cockpit:[-.695,.84],door:door992,belt:.866,
+    screen:[-.869,-.238,1.248,.755,.647],screenFootSweep:.281,screenHeaderSweep:.113,screenFoot:[.014,.05],cockpit:[-.695,.84],door:door992,belt:.866,
     stations:stations992,kit:kit992},
   // 1999 Carrera Cabriolet (996.1). The water-cooled loft with the 996 kit; the
   // string flag keeps every shared water-cooled branch while naming the body.
@@ -78,9 +78,34 @@ function archRadius(car,r){return r+(car.modern?car.kit.arch:.055);}
 const cutOf=(car,x)=>typeof car.kit.cut==='function'?car.kit.cut(x):car.kit.cut;
 function wheelCut(car,x){
   let z=car.modern?cutOf(car,x):.172;
+  // The 992's plan sweep compresses the loft ahead of the front axle and
+  // behind the rear one. Its arch is a circle about the axle in the swept,
+  // physical frame. Around the openings the flank keeps the sweep of its
+  // outer face at every height (archHold), so each loft row is upright in
+  // side view and the opening is cut where the row actually stands.
+  if(car.kit?.id!=='992')return archCut(car,x,z);
+  return archCut(car,car.kit.sweep(x,station(car,x)[0]),z);
+}
+// Loft position of the 992 flank row whose outer face stands at physical X,
+// near the given axle.
+function loftAt(car,X,axle){
+  const at=x=>car.kit.sweep(x,station(car,x)[0])-X;
+  let a=axle-1.2,b=axle+1.2;
+  for(let i=0;i<44;i++){const m=(a+b)/2;if(at(m)<0)a=m;else b=m;}
+  return (a+b)/2;
+}
+// How strongly a 992 flank row holds the sweep of its outer face: fully over
+// each wheel opening, fading out within 120 mm of it.
+function archHold(car,x){
+  const X=car.kit.sweep(x,station(car,x)[0]);
+  let k=0;
+  for(const [axle,r] of [[car.front,car.frontRadius],[car.rear,car.rearRadius]])k=Math.max(k,clamp(1-(Math.abs(X-axle)-archRadius(car,r))/.12));
+  return k;
+}
+function archCut(car,at,z){
   for(const [axle,r,lift] of [[car.front,car.frontRadius,car.archLift?.[0]||0],[car.rear,car.rearRadius,car.archLift?.[1]||0]]){
     // Outer wheelhouse returns vertically into the sill below the axle centre.
-    const rx=archRadius(car,r),d=(x-axle)/rx;
+    const rx=archRadius(car,r),d=(at-axle)/rx;
     if(Math.abs(d)<=1)z=Math.max(z,r+.003+(r+.046+lift)*Math.sqrt(1-d*d));
   }
   return z;
@@ -176,6 +201,9 @@ function sideRaw(car,x,t,s){
   }
   p[0]+=(fore*fore*.085-aft*aft*(car.modern?car.kit.toeAft:.137))*toe;
   p[1]-=s*(fore*fore+aft*aft)*.024*toe;
+  // Around each wheel opening the 992 flank row stands upright in side view,
+  // including the bumper corners' tuck, so the opening is cut where it stands.
+  if(car.kit?.id==='992'){const k=archHold(car,x);if(k>0)p[0]=mix(p[0],car.kit.sweep(x,w),k);}
   return p;
 }
 export {painted as paintCoach};
@@ -229,6 +257,14 @@ function uBreaks(car){
     const rad=archRadius(car,r);
     for(let j=0;j<=18;j++)xs.push(axle+rad*Math.cos(j*Math.PI/18));
     xs.push(axle-rad-.003,axle+rad+.003);
+    // The 992's plan sweep packs the loft ahead of the front axle and behind
+    // the rear one, so evenly spaced loft rows leave the swept arch with a
+    // single facet across the front of the front opening. Add rows whose swept
+    // position steps evenly around the arch, at the top and foot of the flank.
+    if(car.kit?.id==='992'){
+      for(let j=0;j<=18;j++)xs.push(loftAt(car,axle+rad*Math.cos(j*Math.PI/18),axle));
+      for(const e of [-1,1])xs.push(loftAt(car,axle+e*(rad+.003),axle));
+    }
   }
   const ordered=[...new Set(xs.map(x=>Math.round(x*1e7)/1e7))].sort((a,b)=>a-b);
   const result=[ordered[0]];
@@ -263,7 +299,8 @@ function floorAndSills(r,car,paint){
     for (const [axle,rad] of [[car.front,car.frontRadius],[car.rear,car.rearRadius]])for(const s of [-1,1]){
       const ring=[];
       for(let j=0;j<=26;j++){
-        const a=j*Math.PI/26,x=axle+archRadius(car,rad)*Math.cos(a)*(car.modern?1:.999999);
+        const a=j*Math.PI/26,X=axle+archRadius(car,rad)*Math.cos(a)*(car.modern?1:.999999);
+        const x=car.kit?.id==='992'?loftAt(car,X,axle):X;
         ring.push(sideRaw(car,x,0,s));
       }
       const lip=ring.map(([x,y,z])=>[x,y-s*.015,z-.004]);

@@ -56,14 +56,16 @@ test('the engine sits behind the rear axle and the final drive, with the flywhee
   assert(Math.max(...['engine.case','engine.cooling','engine.intake'].map(id=>range(points(id),0)[1]))<car.stations.at(-1)[0]-.35);
 });
 
-test('the gearbox and clutch share the lowered crankshaft axis; the 992 and 996 frames are unchanged',()=>{
+test('the gearbox and clutch share the lowered crankshaft axis; the 996 frame is unchanged and the 992 uses the real pitch',()=>{
   const g=range(points('drivetrain.gearbox'),2);
   assert(Math.abs((g[0]+g[1])/2-frame.z)<1e-6);
-  for(const rear of [1.25,1.175]){
-    const modern=boxerFrame({rear},true);
-    assert.deepEqual([modern.cx,modern.f,modern.z],[rear+.285,1,.502]);
-    assert(Math.abs(flangeX(modern.cx,modern.f)-(rear+.285-.0065-.607*.55625))<1e-12);
-  }
+  const m96=boxerFrame({rear:1.175},'996');
+  assert.deepEqual([m96.cx,m96.f,m96.z],[1.175+.285,1,.502]);
+  assert(Math.abs(flangeX(m96.cx,m96.f)-(1.175+.285-.0065-.607*.55625))<1e-12);
+  // The 9A2 shares the 993's 118 mm bore spacing (Christophorus 394), so the
+  // 992 is drawn with the 993's scale and setback at its own crank height.
+  const m92=boxerFrame({rear:1.25},true);
+  assert(Math.abs(m92.cx-(1.25+.378))<1e-12&&Math.abs(m92.f-118/178)<1e-12&&m92.z===.502);
 });
 
 test('the alternator is on the fan axis and the rails carry one injector per cylinder',()=>{

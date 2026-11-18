@@ -141,9 +141,12 @@ function seat(r,x,y,modern){
 function glass(r,car,paint){
   const modern=car.modern,[x0,x1,h,w0,w1]=car.screen,base=car.belt+.002;
   const n=16,vsteps=5;
+  // The 992's screen foot sits on the scuttle and rises at each corner onto
+  // the raised wing tops (screenFoot: centre and corner lift).
+  const foot=u=>car.screenFoot?car.screenFoot[0]+u*u*car.screenFoot[1]:0;
   // Centre of the bowed glazing leads the A-pillar feet by several centimetres.
   const p=(u,v,lift=0)=>[mix(x0,x1,v)+u*u*mix(car.screenFootSweep,car.screenHeaderSweep,v)-.019*Math.sin(Math.PI*v)*(1-u*u)-lift,
-    u*mix(w0,w1,v),mix(base,h,v)-u*u*mix(.012,.037,v)+(modern?0:(.083-.065*u*u)*(1-v))+lift*.5];
+    u*mix(w0,w1,v),mix(base,h,v)-u*u*mix(.012,.037,v)+(modern?0:(.083-.065*u*u)*(1-v))+foot(u)*(1-v)+lift*.5];
   const row=v=>Array.from({length:n+1},(_,i)=>p(i/n*2-1,v));
   for(let j=0;j<vsteps;j++)for(let i=0;i<n;i++){
     const u=i/n*2-1,t=(i+1)/n*2-1,v=j/vsteps,w=(j+1)/vsteps;
@@ -177,7 +180,7 @@ function glass(r,car,paint){
 }
 // The 996 cockpit opening ends further back and higher; its U follows the
 // rescue sheet's plan (roof well from the B-post line to x = 0.94 at the centre).
-const compartment={992:[.42,.41,.626,.885],996:[.535,.405,.645,.900]};
+const compartment={992:[.42,.41,.585,.885],996:[.535,.405,.645,.900]};
 function compartmentEdges(car){
   const [x0,depth,half,z0]=compartment[car?.variant==='996'?996:992];
   const apron=Array.from({length:25},(_,i)=>{
@@ -263,7 +266,8 @@ function dash(r,car){
   const panels=[];
   // The 993's dash ends meet the door seals: its doors close at |y| 0.582, so
   // the panel stops just inside them. The later cars keep their wider dash.
-  const w=modern?1:.578/.658;
+  // The 992's door cards reach |y| 0.645 at the dash ends.
+  const w=car.kit?.id==='992'?.632/.658:modern?1:.578/.658;
   for(let j=0;j<=18;j++){
     const u=j/9-1;
     panels.push([[x+.12*u*u,u*.654*w,top-.013*u*u],[x+.216-.018*u*u,u*.658*w,top+.008*(1-u*u)],[x+.271,u*.637*w,top-.028],[x+.257,u*.619*w,top-.125]]);

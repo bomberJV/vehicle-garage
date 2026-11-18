@@ -11,6 +11,11 @@
 // Radial sizes (bores, fins, pipes, the fan) are not scaled: only positions
 // and lengths along the crankshaft are.
 export const classicPitch=.118;
+// 992.1 Carrera S 9A2 evo: 2,981 cm³ from 91.0 mm bore and 76.4 mm stroke.
+// Porsche: every current boxer shares the 118 mm cylinder spacing.
+export const nineA2={bore:.091,stroke:.0764,pitch:classicPitch,bankOffset:classicPitch/2,
+  source:{label:'Porsche · The new 911 Carrera, Technology Workshop Powertrain (9A2 evo: 91.0 × 76.4 mm, 2,981 cm³)',url:'https://rennlist.com/forums/attachments/992/1317917d1604346939-savagegeese-992-review-tws_992_powertrain_en.pdf'},
+  pitchSource:{label:'Porsche Christophorus 394 · every member of the boxer family has 118 mm cylinder spacing',url:'https://newsroom.porsche.com/christophorus/en/2020/394/technology-boxer-engine-911-turbo.html'}};
 // 993 Carrera M64/05: 3,600 cm³ from 100 mm bore and 76.4 mm stroke.
 export const m64={bore:.100,stroke:.0764,pitch:classicPitch,bankOffset:classicPitch/2,
   source:{label:'kfz-tech.de · Porsche 911 engine, bore × stroke by year (1989: 100.0 × 76.4 mm, 3,600 cm³)',url:'https://kfz-tech.de/Engl/Hersteller/Porsche/Porsche911Motor.htm'},
@@ -25,9 +30,13 @@ export const CLASSIC_SCALE=classicPitch/modelPitch;
 // x 1.262, 150 mm behind the final drive at x 1.112. The crankshaft axis sits
 // 30 mm lower than the shared model height, so the fan housing clears the
 // recess under the spoiler blade in the sloping engine lid.
+// The 992 follows the same transaxle rule as the 993: the final drive sits on
+// the axle line and the flywheel 150 mm behind it, so the crank centre is
+// 378 mm behind the axle at the real pitch. The 996 keeps its model frame.
 const classicSetback=.378,modernSetback=.285;
 
 export function boxerFrame(car,modern){
+  if(modern===true)return {cx:car.rear+classicSetback,f:CLASSIC_SCALE,z:.502};
   return modern?{cx:car.rear+modernSetback,f:1,z:.502}:{cx:car.rear+classicSetback,f:CLASSIC_SCALE,z:.472};
 }
 // Centre of cylinder `n` (0 forward) on bank `side` (-1 left, 1 right).

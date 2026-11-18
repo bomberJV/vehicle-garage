@@ -110,7 +110,9 @@ function roofFrame(r,car,raised,alias){
   // These pivots remain on the body in both poses. Roof arms meet the ends of the
   // same bows used above; moving the roof never takes the drive mounting off the car.
   for(const s of [-1,1]){
-    const a=mount(car,s),head=beam(0,s*.96),first=beam(1,s*.96),second=beam(2,s*.96),rear=beam(3,s*.96);
+    // Stowed, the 992's link ends lie inboard of the rear wheel-housing tops.
+    const k=!raised&&panel?.84:.96;
+    const a=mount(car,s),head=beam(0,s*k),first=beam(1,s*k),second=beam(2,s*k),rear=beam(3,s*k);
     const elbow=raised?mix(a,rear,.50):[a[0]+.125,a[1],a[2]+.055];
     positioned(r,'links',alias,()=>{
       r.rod(a,elbow,.011,iron,8);r.rod(elbow,rear,.011,alloy,8);

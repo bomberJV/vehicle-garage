@@ -16,7 +16,8 @@ const range=(pts,k)=>[Math.min(...pts.map(p=>p[k])),Math.max(...pts.map(p=>p[k])
 test('both stock Cabriolets install every existing service group at its complete-vehicle coordinates, with one physical owner',()=>{
  for(const vehicle of cars){
   const r=model(vehicle),whole=r.faces,ids=new Set(whole.map(f=>f.part));
-  assert(whole.length<22000,vehicle+' overview budget');
+  // Hub #261 lifts the 992's overview budget to the G500's level.
+  assert(whole.length<(vehicle==='porsche992scab'?105000:22000),vehicle+' overview budget');
   const cache=r.meshCache;r.buildMesh();assert.equal(r.meshCache,cache,vehicle+' reuses its installed mesh');
   assert.deepEqual(new Set(GarageRenderer.assembledFaces(r.build).map(f=>f.part)),ids);
   for(const legacy of ['running.brakes','drive.gearbox','drive.axles'])assert(!ids.has(legacy),vehicle+' duplicate '+legacy);

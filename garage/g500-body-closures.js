@@ -162,11 +162,15 @@ export const g500GateParts={
     r.box(x,-.115,1.858,x+.012,.115,1.882,'#363e40');
     r.box(x+.012,-.106,1.861,x+.016,.106,1.878,'#943d3b');
   },
-  carrier(r){
-    r.rod([2.124,-.115,1.056],[2.194,-.115,1.056],.154,'#303638',24);
+  // `own` lets the installed car give each catalog piece its own part id;
+  // the bench study passes nothing and keeps its own tags.
+  carrier(r,own){
+    if(typeof own!=='function')own=(id,fn)=>fn();
+    own('carrier',()=>r.rod([2.124,-.115,1.056],[2.194,-.115,1.056],.154,'#303638',24));
     r.rod([2.180,-.115,1.056],[2.225,-.115,1.056],.370,'#42494a',40);
   },
-  spare(r,paint){
+  spare(r,paint,own){
+    if(typeof own!=='function')own=(id,fn)=>fn();
     const y=-.115,z=1.056;
     const hoop=(x,rad)=>Array.from({length:48},(_,i)=>[x,y+rad*Math.cos(i*Math.PI/24),z+rad*Math.sin(i*Math.PI/24)]);
     // The 2002 US cover: a painted side wall rolls over a rounded shoulder
@@ -174,7 +178,7 @@ export const g500GateParts={
     // left of a "Mercedes-Benz" wordmark across the middle (BaT lot 271820).
     const rims=[[2.196,.370],[2.206,.384],[2.230,.392],[2.380,.392],[2.405,.386],[2.420,.374],[2.428,.360],[2.431,.335]];
     const tones=['',shade(paint,.58),shade(paint,.78),shade(paint,.86),shade(paint,.82),shade(paint,.92),'#d4dadb','#eef1f1'];
-    for(let k=1;k<rims.length;k++)ring(r,hoop(...rims[k-1]),hoop(...rims[k]),tones[k]);
+    for(let k=1;k<rims.length;k++)own(k===rims.length-1?'ring':'cover',()=>ring(r,hoop(...rims[k-1]),hoop(...rims[k]),tones[k]));
     // The face is a shallow polished dome. Its shading follows height, as a
     // mirror does: bright sky above, a dark horizon just below the middle,
     // grey ground underneath.
@@ -183,14 +187,16 @@ export const g500GateParts={
     const sky=v=>{for(let i=1;i<stops.length;i++)if(v<=stops[i][0]){const [a,ca]=stops[i-1],[b,cb]=stops[i],t=(v-a)/(b-a);
       return '#'+ca.map((c,k)=>Math.round(c+(cb[k]-c)*t).toString(16).padStart(2,'0')).join('');}return '#c6ced1';};
     const radii=[.335,.29,.24,.19,.14,.09,.04,0];
-    for(let k=1;k<radii.length;k++){
+    own('cap',()=>{for(let k=1;k<radii.length;k++){
       const a=hoop(dome(radii[k-1]),radii[k-1]),b=hoop(dome(radii[k]),radii[k]);
       for(let i=0;i<48;i++){const j=(i+1)%48,mid=(a[i][2]+a[j][2]+b[i][2]+b[j][2])/4;
         r.polygon([a[i],a[j],b[j],b[i]],sky((mid-z)/.335),false);}
-    }
+    }});
     const {height:h,text,star,gap,start}=spareBadge,on=(dy,dz,lift)=>dome(Math.hypot(dy,dz))+lift;
-    starBadge(r,[on(start+star-y,0,.005),start+star,z],star,'x',1,{backing:false});
-    drawLettering(r,text,h,(u,v)=>{const yy=start+2*star+gap+u,zz=z-h*.38+v;return [on(yy-y,zz-z,.0035),yy,zz];},{color:'#2f3537',radius:h*.07});
+    own('emblem',()=>{
+      starBadge(r,[on(start+star-y,0,.005),start+star,z],star,'x',1,{backing:false});
+      drawLettering(r,text,h,(u,v)=>{const yy=start+2*star+gap+u,zz=z-h*.38+v;return [on(yy-y,zz-z,.0035),yy,zz];},{color:'#2f3537',radius:h*.07});
+    });
   }
 };
 export function cargoDoor(r,paint){
@@ -198,5 +204,6 @@ export function cargoDoor(r,paint){
   p.skin(r,paint);gateHinges(r,paint,true);p.handle(r);p.wiper(r);
   r.tag('body.glass',()=>p.glass(r));
   r.tag('body.rear-lights',()=>p.lamp(r));
-  r.tag('body.spare',()=>{p.carrier(r);p.spare(r,paint);});
+  const own=(id,fn)=>r.tag('body.spare-'+id,fn);
+  r.tag('body.spare',()=>{p.carrier(r,own);p.spare(r,paint,own);});
 }

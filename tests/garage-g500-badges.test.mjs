@@ -19,11 +19,12 @@ test('a chrome V8 script sits on each front wing, below the rub strip and ahead 
 });
 
 test('the stainless spare face carries the star left of a Mercedes-Benz wordmark',()=>{
-  const spare=exterior().filter(f=>f.part==='body.spare');
+  const spare=exterior().filter(f=>f.part==='body.spare-emblem');
   const word=spare.filter(f=>f.points.every(([x,y,z])=>x>2.44&&y>g500SpareStar.center[0]+g500SpareStar.radius&&Math.abs(z-1.056)<.03));
   assert(word.length>100,`${word.length} wordmark faces`);
   const ys=word.flatMap(f=>f.points.map(p=>p[1]));
-  assert(Math.max(...ys)-Math.min(...ys)>.30,'wordmark spans the face');
+  // The lettering alone now carries this part, so its span is the wordmark width.
+  assert(Math.abs(Math.max(...ys)-Math.min(...ys)-letteringWidth('Mercedes-Benz',.036))<.01,'wordmark spans its lettering width');
   assert(Math.max(...ys)<-.115+.335&&g500SpareStar.center[0]-g500SpareStar.radius>-.115-.335,'badge stays on the face');
 });
 

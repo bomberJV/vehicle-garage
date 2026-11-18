@@ -15,13 +15,18 @@ const sources={
   carrier:{label:'TECHART · original 992 motor, carrier and Hall sensor, figures 35–38',url:'https://www.techart.de/fileadmin/mediapoint/6b6d8f2a844669b49e8197fb041bf6f.pdf'}
 };
 const variants={
-  porsche993cab:{id:'993spoiler',modern:false,front:classicSpoiler.front,rear:classicSpoiler.rear,zc:.948,w:.54,mount:.377,base:.673,source:sources.classic},
+  // The 993's motor, gears and lift units are screwed to the underside of the
+  // engine lid, the motor on the left (owners' forum descriptions; PET 803-15).
+  // `lid` approximates that underside beside the blade recess: z = z0 - slope·(x - x0).
+  porsche993cab:{id:'993spoiler',modern:false,front:classicSpoiler.front,rear:classicSpoiler.rear,zc:.948,w:.54,mount:.47,base:.673,source:sources.classic,
+    lid:{x0:1.38,z0:.818,slope:.30,motor:[1.44,-.40]}},
   porsche992scab:{id:'992spoiler',modern:true,shape:1,front:spoiler992.front,rear:spoiler992.rear,zc:.905,w:.715,mount:.435,base:.69,source:sources.new},
   // The 996 lid lifts its louvred section on two arms, driven like the 993's by
   // one motor and flexible shafts; the blade follows the lofted 996 lid.
   porsche996cab:{id:'996spoiler',modern:false,shape:2,front:spoiler996.front,rear:spoiler996.rear,zc:.918,w:.45,mount:.300,base:.700,source:sources.type996,
     tilt:.22,advance:.020,rise:.075}
 };
+const lidUnder=(g,x)=>g.lid.z0-(x-g.lid.x0)*g.lid.slope;
 const model=modern=>modern==='996'?variants.porsche996cab:modern?variants.porsche992scab:variants.porsche993cab;
 // The lofted lid that the blade sits in; the 993 blade uses its own analytic surface.
 const skinOf=g=>g.shape===undefined?null:coupeShape[g.shape];
@@ -35,10 +40,19 @@ function mounting(g,s,phase,forward){
   // Leave the pin and its bracket beneath the skin even at the sloping rear edge.
   const skin=skinOf(g)?porscheDeckPoint(skinOf(g),x,y):[x,y,z];
   const end=spoilerPoint(g.shape===2?'996':g.modern,[skin[0],y,skin[2]-(g.modern?.031:.052)],phase);
-  const base=[skin[0]-(forward?.085:.110),y,g.base-.035];
+  const bx=skin[0]-(forward?.085:.110),base=[bx,y,g.lid?lidUnder(g,bx)-.035:g.base-.035];
   return {base,end};
 }
 function carrier(r,g){
+  if(g.lid){
+    // A pad under the lid at each pivot, rather than a carrier across the engine.
+    for(const s of [-1,1])for(const forward of [true,false]){
+      const {base}=mounting(g,s,0,forward),top=lidUnder(g,base[0]);
+      r.box(base[0]-.04,s*g.mount-.035,top-.022,base[0]+.04,s*g.mount+.035,top,'#69757b');
+      for(const d of [-.025,.025])barrel(r,[base[0]+d,s*g.mount,top-.02],[base[0]+d,s*g.mount,top+.002],.008,'#a0a9aa',8);
+    }
+    return;
+  }
   const x=g.front+(g.modern?.050:.22);
   for(const s of [-1,1]){
     r.box(x-.154,s*g.mount-.042,g.base-.032,x+.138,s*g.mount+.042,g.base,'#69757b');
@@ -55,12 +69,30 @@ function lift(r,g,phase,s){
   }
 }
 function motor(r,g){
+  if(g.lid){
+    const [x,y]=g.lid.motor,z=lidUnder(g,x)-.045;
+    barrel(r,[x,y-.106,z],[x,y+.029,z],.036,'#85959b',16);
+    r.box(x-.04,y+.023,z-.034,x+.022,y+.081,z+.034,'#5a6468');
+    return;
+  }
   const x=g.front+(g.modern?.070:.24),y=g.modern?.115:-.258,z=g.base-.033;
   barrel(r,[x-.03,y-.106,z],[x-.03,y+.029,z],.038,g.modern?'#454b4c':'#85959b',16);
   r.box(x-.063,y+.023,z-.036,x+.022,y+.081,z+.037,'#5a6468');
   r.box(x-.063,y-.088,z+.010,x-.038,y-.054,z+.051,'#3a474e');
 }
 function transmission(r,g){
+  if(g.lid){
+    // Flexible shafts from the motor gearbox to a reduction box at each lift
+    // unit. Across the car the shaft follows the crowned lid above the intake.
+    const [mx,my]=g.lid.motor,x=mx-.02,z=lidUnder(g,x),at=(y,h)=>[x,y,h];
+    pipe(r,[at(my+.07,z-.03),at(-.20,z+.007),at(0,z+.022),at(.20,z+.007),at(.40,z-.03)],.009,'#393c3d',8);
+    for(const s of [-1,1]){
+      const b=mounting(g,s,0,true).base;
+      const ys=[s*(g.mount-.075),s*(g.mount-.035)].sort((u,v)=>u-v);
+      r.box(b[0]-.03,ys[0],z-.06,b[0]+.035,ys[1],z-.012,'#77858a');
+    }
+    return;
+  }
   const x=g.front+(g.modern?.058:.228),z=g.base-.012;
   if(g.modern){
     barrel(r,[x,-g.mount,z],[x,g.mount,z],.010,'#899ba4',10);
@@ -72,6 +104,12 @@ function transmission(r,g){
   }
 }
 function feedback(r,g){
+  if(g.lid){
+    const [mx,my]=g.lid.motor,x=mx+.07,y=my+.04,z=lidUnder(g,x)-.02;
+    r.box(x-.025,y-.014,z-.013,x+.025,y+.018,z+.018,'#333c40');
+    pipe(r,[[x-.021,y,z+.016],[x-.043,y,z+.012],[x-.06,y+.03,z+.012]],.005,'#b6b6a5',5);
+    return;
+  }
   const x=g.front+(g.modern?.130:.30),y=g.modern?.257:.305,z=g.base+.001;
   r.box(x-.025,y-.014,z-.013,x+.025,y+.018,z+.018,'#333c40');
   if(!g.modern)pipe(r,[[x-.021,y,z+.016],[x-.043,y,z+.022],[x-.048,y,z+.042]],.005,'#b6b6a5',5);

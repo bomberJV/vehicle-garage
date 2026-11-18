@@ -1,4 +1,5 @@
 import {drawG500InputShaft,drawG500Gearbox,g500InputShaftStudy,g500AxleShaftStudy,shaftRefs} from './g500-propeller-shafts.js';
+import {boxerFrame,flangeX} from './porsche-boxer-layout.js';
 import {TAU,steel,metal,dark,gold,cyl,sleeve,turn,gear,bead,part,study,x,y,z,origin} from './mechanism-shapes.js';
 import {vehicleServiceDetail} from './vehicle-service.js';
 import {e46Drivetrain,getE46RunningDetail} from './e46-running-gear.js';
@@ -149,12 +150,12 @@ function carrera(id){
  const spec=layouts[id],rear=spec.rear,modern=id==='porsche992scab';
  // The crankshaft flange is the forward end of the installed flat-six. The
  // gearbox input shares its axis; the differential outputs sit at hub height.
- const flange=rear+.285-.0065-.607*.55625,clutchDepth=.068,caseDepth=.48;
+ const frame=boxerFrame({rear},id==='porsche993cab'?false:true),flange=flangeX(frame.cx,frame.f),clutchDepth=.068,caseDepth=.48;
  const back=flange-clutchDepth,axleZ={porsche992scab:.358,porsche996cab:.324}[id]??.320,hubY={porsche992scab:.778,porsche996cab:.75}[id]??.722;
  return register(id,[
-  inputComponent(id,spec,r=>gearbox(r,[back-caseDepth/2,0,.502],[-1,0,0],.145,caseDepth)),
+  inputComponent(id,spec,r=>gearbox(r,[back-caseDepth/2,0,frame.z],[-1,0,0],.145,caseDepth)),
   ['clutch','Clutch and flywheel','The flywheel and clutch meet at the interface between the rear-mounted flat-six and the gearbox.',[.33,0,.36],r=>{
-    const c=[flange,0,.502];
+    const c=[flange,0,frame.z];
     cyl(r,c,x,-.016,0,.150,steel,20);
     cyl(r,c,x,-.028,-.016,.139,dark,20);
     turn(r,c,x,[[-clutchDepth,.050],[-.047,.109],[-.037,.145],[-.028,.145]],metal,{n:20});

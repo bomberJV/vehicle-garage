@@ -129,8 +129,10 @@ export function get993Fan(partId){
   return null;
 }
 
-export function draw993CoolingFan(r,center){
-  const [x,y,z]=center,crank=[x,y,z-.202],radius=.137;
+// `drop` is the height of the fan axis above the crankshaft, so the belt
+// pulleys are drawn on the crank axis.
+export function draw993CoolingFan(r,center,drop=.202){
+  const [x,y,z]=center,crank=[x,y,z-drop],radius=.137;
   r.tag('engine.cooling',()=>{
     r.discX(x-.015,y,z,radius,'#424a4c',28);
     const aperture=[],lip=[];

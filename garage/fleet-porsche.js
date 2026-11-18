@@ -4,6 +4,7 @@ import {draw993CoolingFan} from './porsche-fan.js';
 import {drawInstalledBoxer} from './porsche-engine-dress.js';
 import {drawEngineCore} from './porsche-crankshaft.js';
 import {drawFleetIgnition} from './fleet-ignition.js';
+import {boxerFrame,cylinderX,m64} from './porsche-boxer-layout.js';
 import {ellipse,barrel,wheel} from './road-primitives.js';
 import {drawCoachwork,porscheShape} from './porsche-coachwork.js';
 import {drawCabrioletCabin} from './porsche-cabin.js';
@@ -21,17 +22,20 @@ const running={
   porsche996cab:{width:[.205,.255],track:[1.455,1.500],brake:[.2159,.2159],rim:alloy996}
 };
 function boxer(r,car,modern){
-  const cx=car.rear+.285, z=.502,type996=modern==='996';
-  drawFleetIgnition(r,porscheVehicle(modern),[cx,0,z]);
-  drawEngineCore(r,cx,z,modern);
+  const {cx,f,z}=boxerFrame(car,modern),type996=modern==='996';
+  drawFleetIgnition(r,porscheVehicle(modern),[cx,0,z],f);
+  drawEngineCore(r,cx,z,modern,f,modern?null:m64.stroke);
+  // The 993's 100 mm bores sit 118 mm apart, so its finned barrels are
+  // smaller than the 992/996 water jackets drawn at the wider model pitch.
+  const [barrelR,finR]=modern?[.077,.086]:[.054,.0575];
   for(const s of [-1,1]){
     for(let n=0;n<3;n++){
-      const x=cx-.1845+n*.178+s*.0445;
+      const x=cylinderX(cx,f,n,s);
       r.tag('engine.cylinders',()=>{
-        barrel(r,[x,s*.12,z],[x,s*.37,z],.077,'#939a9e',14);
-        if(!modern)for(let f=0;f<7;f++){
-          const y=s*(.17+f*.027);
-          const rim=Array.from({length:10},(_,i)=>[x+.086*Math.cos(i*TAU/10),y,z+.086*Math.sin(i*TAU/10)]);
+        barrel(r,[x,s*.12,z],[x,s*.37,z],barrelR,'#939a9e',14);
+        if(!modern)for(let k=0;k<7;k++){
+          const y=s*(.17+k*.027);
+          const rim=Array.from({length:10},(_,i)=>[x+finR*Math.cos(i*TAU/10),y,z+finR*Math.sin(i*TAU/10)]);
           // Thin cooling fins remain distinct in the vehicle overview. The
           // cylinder intersects each centre, leaving the annular rim exposed.
           r.polygon(rim,'#696e72',false);
@@ -53,7 +57,7 @@ function boxer(r,car,modern){
     });
   }
   r.tag('drive.gearbox',()=>{
-    const a=car.rear-.49,b=cx-.28;
+    const a=car.rear-.49,b=cx-.28*f;
     barrel(r,[a,0,.395],[b-.085,0,.395],.112,'#858d91',16);barrel(r,[b-.085,0,.40],[b,0,.403],.164,'#89918f',16);
     for(let i=0;i<7;i++){const x=a+.03+i*.043;barrel(r,[x,0,.395],[x+.014,0,.395],.118,'#646c70',14);}
   });
@@ -67,8 +71,8 @@ function boxer(r,car,modern){
         for(let i=0;i<8;i++){const h=.333+i*.022;r.rod([rx-.004,s*ry-rw+.002,h],[rx-.004,s*ry+rw-.002,h],.004,'#a4b0b0',6);}
       }
     });
-  }else draw993CoolingFan(r,[cx+.297,0,z+.170]);
-  drawInstalledBoxer(r,cx,z,modern,car.stations.at(-1)[0]);
+  }else draw993CoolingFan(r,[cx+.297*f,0,z+.160],.160);
+  drawInstalledBoxer(r,cx,z,modern,car.stations.at(-1)[0],f);
 
 }
 export function drawPorsche(r,modern,paint=modern==='996'?'#c3c7c6':modern?'#a84b3f':'#47778a',finish='#bdc6cb',phase=0){

@@ -38,9 +38,10 @@ export function ignitionEntries(id){
 export function isFleetPlug(id,part){
   return !!locations[id]?.some(p=>part==='engine.'+p.key);
 }
-export function drawFleetIgnition(r,id,center=[0,0,0]){
+export function drawFleetIgnition(r,id,center=[0,0,0],f=1){
+  // f scales the plug stations along the crankshaft (porsche-boxer-layout.js).
   for(const p of locations[id]){
-    const seat=add(center,p.origin),point=t=>add(seat,p.axis,p.length*t),diameter=p.length*.11;
+    const seat=add(center,[p.origin[0]*f,p.origin[1],p.origin[2]]),point=t=>add(seat,p.axis,p.length*t),diameter=p.length*.11;
     r.tag('engine.'+p.key,()=>{
       barrel(r,point(0),point(.32),diameter*.76,'#92999b',7);
       barrel(r,point(.32),point(.46),diameter*1.03,'#c0c8c5',6);

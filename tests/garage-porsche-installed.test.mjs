@@ -1,4 +1,5 @@
 import {test} from 'node:test';
+import {boxerFrame,flangeX} from '../garage/porsche-boxer-layout.js';
 import assert from 'node:assert/strict';
 import {GarageRenderer} from '../garage/render.js';
 import {sanitizeBuild} from '../garage/model.js';
@@ -42,7 +43,7 @@ test('the seat tracks reach the seat bases, and the clutch mates with the actual
   const seatLow=range(seat,2)[0],railTop=range(rail,2)[1];assert(Math.abs(railTop-seatLow)<.007);
   assert(rail.every(p=>Math.abs(p[1])>(modern?.19:.17)&&Math.abs(p[1])<(modern?.52:.50)));
   assert(Math.min(...carpet.map(p=>p[2]))<railTop);
-  const flange=rear+.285-.0065-.607*.55625;
+  const frame=boxerFrame({rear},modern?true:false),flange=flangeX(frame.cx,frame.f);
   const clutch=pts('drivetrain.clutch'),gearbox=pts('drivetrain.gearbox');
   assert(Math.abs(range(clutch,0)[1]-flange)<1e-8);
   assert(Math.abs(range(gearbox,0)[1]-range(clutch,0)[0])<1e-8);

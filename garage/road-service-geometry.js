@@ -72,7 +72,8 @@ export function electricMachine(r,c,kind,size=1){
   if(kind==='bike-gen'){sleeve(r,c,y,-.028*S,.028*S,.083*S,.039*S,metal,26);for(let i=0;i<12;i++){const a=i*TAU/12,center=plus(c,[Math.cos(a)*.060*S,0,Math.sin(a)*.060*S]);cyl(r,center,y,-.031*S,.031*S,.012*S,copper,8);}return;}
   turn(r,c,x,[[-.100,.034],[-.084,r0],[-.067,r0*1.04],[.059,r0*1.04],[.080,r0],[.095,r0*.46],[.102,0]].map(([d,b])=>[d*S,b*S]),kind==='starter'?iron:metal,{n:20});
   if(kind==='starter'){cyl(r,plus(c,[0,0,.061*S]),x,-.057*S,.035*S,.029*S,rubber,16);cyl(r,c,x,.087*S,.122*S,.024*S,iron,14);}
-  else {for(let j=0;j<3;j++)sleeve(r,c,x,(-.135+j*.01)*S,(-.131+j*.01)*S,.053*S,.023*S,iron,22);for(let j=0;j<12;j++){const a=j*TAU/12,at=d=>plus(c,[d*S,.085*S*Math.cos(a),.085*S*Math.sin(a)]);r.rod(at(-.04),at(.034),.005*S,'#555f5e',6);}}
+  // A fan-axis alternator is driven through the fan hub, so its own pulley is not drawn.
+  else {if(kind!=='fan-alternator')for(let j=0;j<3;j++)sleeve(r,c,x,(-.135+j*.01)*S,(-.131+j*.01)*S,.053*S,.023*S,iron,22);for(let j=0;j<12;j++){const a=j*TAU/12,at=d=>plus(c,[d*S,.085*S*Math.cos(a),.085*S*Math.sin(a)]);r.rod(at(-.04),at(.034),.005*S,'#555f5e',6);}}
 }
 export function battery(r,c,bike=false){const d=bike?[.125,.087,.104]:[.26,.165,.175];box(r,c,d,'#3e4948');box(r,plus(c,[0,0,d[2]*.49]),[d[0]*1.02,d[1]*1.03,d[2]*.10],'#455452');for(const s of [-1,1]){const p=plus(c,[s*d[0]*.36,-d[1]*.26,d[2]*.58]);cyl(r,p,z,0,.014,.011,metal,10);if(s===1)box(r,plus(p,[.006,-.003,.012]),[.038,.026,.019],'#a34d3c');}}
 export function roofGlass(r,X,H){const length=.64,width=.95;let old;

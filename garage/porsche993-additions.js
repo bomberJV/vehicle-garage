@@ -7,6 +7,7 @@ import {get993Study} from './porsche993-system-studies.js';
 import {refs} from './porsche993-sources.js';
 import {boxerFrame,cylinderX} from './porsche-boxer-layout.js';
 import {chassisGroups} from './porsche993-chassis.js';
+import {electricsGroups} from './porsche993-electrics.js';
 // Engine-mounted parts follow the installed flat-six frame (118 mm pitch,
 // crank centre behind the rear axle).
 const E=boxerFrame({rear:1.112},false),along=dx=>E.cx+E.f*dx;
@@ -190,6 +191,7 @@ function assembly(id,name,description,source,rows){
 export const groups=[
  assembly('993-lubrication','Dry-sump lubrication','Trace oil from the separate tank into the engine and back through the thermostat. The two long sill pipes connect the hot return circuit to the right-front cooler.',refs.oilCooler,oilRows),
  ...chassisGroups,
+ ...electricsGroups,
  assembly('993-climate','Cabin heat and air conditioning','The 993 heats the cabin with air from jackets around its exhaust pipes. A separate refrigerant loop cools the incoming air at the front of the car. Pipe bends and installed dimensions are approximate.',refs.cabin,heatRows)
 ];
 export function drawGroup(r,id){

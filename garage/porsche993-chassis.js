@@ -23,9 +23,9 @@ const row=(key,name,description,offset,source,draw)=>({...part(key,name,descript
 const sides=[[-1,'left','Left'],[1,'right','Right']];
 const M=([px,py,pz],s)=>[px,py*s,pz];
 const rod=(r,a,b,rad,color,n=6)=>r.rod(a,b,rad,color,Math.min(n,8));
-function eye(r,c,axis,rad,color){cyl(r,c,axis,-rad*.9,rad*.9,rad,color,8);}
+function eye(r,c,axis,rad,color){cyl(r,c,axis,-rad*.9,rad*.9,rad,color,6);}
 function link(r,a,b,rad,color){rod(r,a,b,rad,color,8);eye(r,a,y,rad*1.35,rubber);eye(r,b,y,rad*1.25,iron);}
-function ball(r,c,rad,color){turn(r,c,z,[[-rad,0],[-rad*.7,rad*.72],[0,rad],[rad*.7,rad*.72],[rad,0]],color,{n:8});}
+function ball(r,c,rad,color){turn(r,c,z,[[-rad,0],[-rad*.7,rad*.72],[0,rad],[rad*.7,rad*.72],[rad,0]],color,{n:6});}
 function strut(r,base,top,{tube=.024,rodR=.010,coil=.046,seat=.064,coilFrom=.52,turns=4}={}){
  // Damper tube, piston rod, a pitched coil between two seats and the top mount.
  const d=top.map((v,i)=>v-base[i]),len=Math.hypot(...d),u=d.map(v=>v/len);

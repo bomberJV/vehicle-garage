@@ -117,10 +117,12 @@ function syncView(view){
 }
 const customizer=createCustomizer({
   current:()=>build,palette:()=>palette,savePalette:next=>{palette=next;persist();},
-  style(key,value){
+  style(key,value,{save=true}={}){
     const modeChanged=key==='lift'&&build.lift?.mode!==value.mode;
     build=key==='wheelDesign'?selectWheelDesign(build,value):key==='lift'?sanitizeBuild({...build,lift:value}):{...build,[key]:value};
-    persist();renderer.setBuild(build);
+    // An unsaved paint change is a picker preview: the renderer recolours instead of rebuilding.
+    renderer.paintPreview=!save&&key==='paint';
+    if(save)persist();renderer.setBuild(build);
     if(key==='wheelDesign'||modeChanged){renderSheet();renderCatalog();}
   },
   accessory(id){

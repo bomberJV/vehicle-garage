@@ -45,6 +45,7 @@ import {buildEngineBay,enginePartOffset} from './engine-geometry.js';
 import {drawF350Frame,drawTwinIBeams,drawTwinIBeamLinkage,drawTwinIBeamSpringSeats,drawF350RearLeafSprings} from './f350-powertrain.js';
 import {getEngineDefinition} from './engine-data.js';
 import {baseVehicle} from './vehicle-variants.js';
+import {PROBES,paintModel} from './paint-preview.js';
 const shade=(hex,f)=>{const h=hex.replace('#','');return '#'+[0,2,4].map(i=>Math.min(255,Math.max(0,Math.round(parseInt(h.slice(i,i+2),16)*f))).toString(16).padStart(2,'0')).join('');};
 function physicalInstance(face){
   if(face.instance)return face.instance;
@@ -744,7 +745,9 @@ export class GarageRenderer{
  const bikeLegacyGroup=b.vehicle==='bmws1000rr'&&['engine','drive'].includes(assembly)?assembly:null;
  const isolatedPorscheEngine=Boolean(exhibit?.inspectionSections?.engine && assembly==='engine' && this.isolate && !focusView);
  const bodyModules=assembly==='body'&&['bmw325ci','bmw328xi','c63','hrv','hrvlx'].includes(b.vehicle);
- const sourceKey=JSON.stringify([isolatedPorscheEngine,bikeLegacyGroup,bodyModules,b.vehicle,b.paint,b.finish,b.wheelDesign,b.roofPosition,b.slGlass,b.slWindstop,b.slComfort,this.inspection?.studySeat,this.slRoofFraction,b.bmwVentPosition,Boolean(this.inspection?.engineCutaway),b.parts,this.lights,!exhibit,engineOwnsM54Rail,ownGearbox,porscheLegacy,showDrive,showFloor,activeService?.id,focusView?.id,movingAssembly,phase]);
+ const sourceParts=[isolatedPorscheEngine,bikeLegacyGroup,bodyModules,b.vehicle,b.paint,b.finish,b.wheelDesign,b.roofPosition,b.slGlass,b.slWindstop,b.slComfort,this.inspection?.studySeat,this.slRoofFraction,b.bmwVentPosition,Boolean(this.inspection?.engineCutaway),b.parts,this.lights,!exhibit,engineOwnsM54Rail,ownGearbox,porscheLegacy,showDrive,showFloor,activeService?.id,focusView?.id,movingAssembly,phase],sourceKey=JSON.stringify(sourceParts);
+ // Everything that shapes the mesh except the paint (sourceParts[4]).
+ const paintFree=JSON.stringify(sourceParts.map((v,i)=>i===4?null:v))+(b.lift?.mm&&!focusView?JSON.stringify(b.lift):'');
  const lift=!focusView&&b.lift?.mm?b.lift:null;
  const key=lift?sourceKey+JSON.stringify(lift):sourceKey;
  if(this.assembledMesh?.key===key)this.meshCache=this.assembledMesh;
@@ -753,7 +756,24 @@ export class GarageRenderer{
    const base=this.suspensionBase;
    this.meshCache={key,groundZ:base.groundZ,faces:lift?applySuspensionLift(base.faces,b):base.faces};
  }
- if(this.meshCache?.key!==key){
+ // While the paint picker is dragged, recolour builds made at two probe paints (paint-preview.js)
+ // instead of drawing the whole vehicle again. The exact build follows when the picker settles.
+ let previewed=false;
+ if(this.meshCache?.key!==key&&this.paintPreview&&!this.probingPaint){
+   if(this.paintModel?.key!==paintFree){
+     const probe=hex=>{
+       const build=this.build,inspection=this.inspection;this.build={...build,paint:hex};this.probingPaint=true;
+       try{this.buildMesh();return this.meshCache;}finally{this.build=build;this.inspection=inspection;this.probingPaint=false;}
+     };
+     const low=probe(PROBES[0]),high=probe(PROBES[1]);
+     this.paintModel={key:paintFree,recolour:paintModel(low?.faces,high?.faces),groundZ:low?.groundZ};
+   }
+   if(this.paintModel.recolour){
+     this.meshCache={key:key+'#preview',faces:this.paintModel.recolour(paintChoice(b.paint).hex),groundZ:this.paintModel.groundZ};
+     previewed=true;
+   }
+ }
+ if(!previewed&&this.meshCache?.key!==key){
    this.faces=[];
    const paint=paintChoice(b.paint).hex;
    const finish=FINISHES.find(p=>p.id===b.finish)?.hex || FINISHES[0].hex;
@@ -862,7 +882,7 @@ export class GarageRenderer{
  if(this.cacheDraws){
    const sceneKey=JSON.stringify([this.build,i.vehicle,i.assembly,i.part,i.instance,i.studySeat,i.system,i.detailView?.id,i.detailPart,i.expanded,i.separation,i.previewGroup,
      i.onlyPart,i.frameEngine,i.engineCutaway,this.progress,this.isolate,this.schematic,
-     this.sectionPlane,this.seeThroughBody,this.lights,this.mechanismPhase,this.slRoofFraction,this.dragContext?.part,this.partPositions?.size?[...this.partPositions]:null,studioTheme().key]);
+     this.sectionPlane,this.seeThroughBody,this.lights,this.mechanismPhase,this.slRoofFraction,this.dragContext?.part,this.partPositions?.size?[...this.partPositions]:null,studioTheme().key,Boolean(this.paintPreview)]);
    geometryKey=sceneKey+JSON.stringify([this.hoverHit?.part,this.hoverHit?.instance]);
    const baseFrame=JSON.stringify([sceneKey,w,h,dpr,this.angle,this.elevation,this.zoom,this.blueprint,this.keepAssemblyFrame,
      this.selectionFocus?.id,this.selectionFocus?.instance,this.drag?.move,this.drag?.moved,this.focusPan?.start]);

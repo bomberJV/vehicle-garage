@@ -7,6 +7,7 @@ import {sleeve} from './mechanism-shapes.js';
 import {reflectorBowl} from './road-lamp-optics.js';
 import {glazingFace} from './surface-materials.js';
 import {sideSheet,formedRoof,drawBodyMirror,wheelhouse,cargoDoor,rearJamb,g500BodyReferences} from './g500-body-closures.js';
+import {drawFrontBumperBrackets,drawRearBumperBrackets,g500BumperParts,bumperRefs} from './g500-bumpers.js';
 import {roofFrontLip} from './g500-roof-datums.js';
 import {drawG500Bonnet,drawG500FrontDeck,drawG500Scuttle} from './g500-bonnet.js';
 import {drawG500Cabin,drawG500DoorTrim,g500CabinSource} from './g500-cabin.js';
@@ -132,11 +133,10 @@ function bodyShell(r,paint) {
     for(const side of [-1,1]) {
       const y=side*width;
       // The wing side runs up to the fender-top deck, so no slit opens into the bay.
-      lowerPanel(r,front,-.755,side,1.239,paint);
+      r.tag('body.fender-'+(side<0?'left':'right'),()=>{lowerPanel(r,front,-.755,side,1.239,paint);drawG500FrontDeck(r,paint,side);});
       lowerPanel(r,1.130,2.083,side,1.223,paint);
       // Quarter sheet under the diagonal hem meets the arch at the sill.
       sideSheet(r,[[.835,.538],[.958,.538],[1.025,.682],[1.130,.804],[1.130,.974]],side*width,side*(width-.044),paint);
-      drawG500FrontDeck(r,paint,side);
       // The pillars and sills stay in place when the closures pull away.
       r.box(-.748,y-.025,.505,.977,y+.025,.530,tone(paint,.79));
       r.rod([.234,side*.844,.54],[.225,side*.833,1.906],.019,tone(paint,.70),8);
@@ -149,25 +149,32 @@ function bodyShell(r,paint) {
 
       r.tag('body.quarter-glass',()=>fittedWindow(r,aperture.map(([x,y,z])=>[x,y-side*.009,z]),{privacy:true,radius:.039}));
       // Non-moving front wing and rear quarter own their rub strips.
-      for (const [x1,x2] of [[front+.025,-.757],[1.132,2.06]]) {
+      const hand=side<0?'left':'right';
+      r.tag('body.rub-strips',()=>r.instance(hand,()=>{for (const [x1,x2] of [[front+.025,-.757],[1.132,2.06]]) {
         r.box(x1,side*(width+.013)-.009,.975,x2,side*(width+.013)+.009,1.025,dark);
         r.box(x1+.008,side*(width+.013)-.006,1.026,x2-.008,side*(width+.013)+.006,1.032,bright);
+      }}));
+      for(const axle of axles){
+        const at=(axle<0?'front-':'rear-')+hand;
+        r.tag(axle<0?'body.fender-liner-'+hand:'body.wheelhouses',()=>r.instance(at,()=>wheelhouse(r,axle,side)));
+        r.tag('body.wheel-flares',()=>r.instance(at,()=>wingFlare(r,axle,side,width,paint)));
       }
-      for(const axle of axles){wheelhouse(r,axle,side);wingFlare(r,axle,side,width,paint);}
-      wingIntake(r,side,width);
+      r.tag('body.wing-intakes',()=>r.instance(hand,()=>wingIntake(r,side,width)));
       // Chrome "V8" script on each front wing, below the rub strip and just
       // ahead of the door, as on the photographed 2002 US trucks.
-      {const h=.030,span=letteringWidth('V8',h),x0=-.80-span/2;
-       drawLettering(r,'V8',h,(u,v)=>[side<0?x0+u:x0+span-u,side*(width+.004),.885+v],{color:'#dfe4e3'});}
+      r.tag('body.v8-badges',()=>r.instance(hand,()=>{const h=.030,span=letteringWidth('V8',h),x0=-.80-span/2;
+       drawLettering(r,'V8',h,(u,v)=>[side<0?x0+u:x0+span-u,side*(width+.004),.885+v],{color:'#dfe4e3'});}));
       // Running board: a stainless pressing with a ribbed outboard face, black
       // rubber treads between its raised ribs and black end caps, as on the
       // photographed 2002 US trucks. Rib count and pitch are read from photos.
       const yy=(a,b)=>[Math.min(side*a,side*b),Math.max(side*a,side*b)];
       const board=(x0,x1,a,b,z0,z1,color)=>{const [y0,y1]=yy(a,b);r.box(x0,y0,z0,x1,y1,z1,color);};
+      r.tag('body.running-boards',()=>r.instance(hand,()=>{
       board(-.930,.925,.861,.963,.452,.507,'#aab3b5');
       for(let j=-1;j<=1;j++)board(-.917,.912,.912+j*.033-.012,.912+j*.033+.012,.507,.513,'#272d2e');
       for(const z of [.462,.475,.488,.500])board(-.928,.923,.963,.967,z-.0035,z+.0035,'#d6dcdd');
       for(const [x0,x1] of [[-.943,-.930],[.925,.938]])board(x0,x1,.861,.963,.450,.509,'#2b3132');
+      }));
       if(side===1) {
         r.box(1.777,.889,1.055,1.96,.897,1.204,tone(paint,.56));
         r.box(1.785,.899,1.062,1.952,.904,1.197,paint);
@@ -177,24 +184,29 @@ function bodyShell(r,paint) {
     }
     rearJamb(r,paint);
     // The cowl supports the wipers independently of the movable bonnet and glass.
-    drawG500Scuttle(r,paint);
+    r.tag('body.cowl',()=>drawG500Scuttle(r,paint));
     outlineRing(r,windscreenFrame,windscreenAperture,paint);
     const recess=windscreenAperture.map(([x,y,z])=>[x+.018,y,z-.004]);
     outlineRing(r,windscreenAperture,recess,tone(paint,.68));
     // The steel header turns back beneath the removable front roof lip.
     r.polygon([windscreenFrame[1],windscreenFrame[2],roofFrontLip,[roofFrontLip[0],-roofFrontLip[1],roofFrontLip[2]]],paint,false);
-    for(const y of [-.395,.374]) {
+    r.tag('body.wipers',()=>{for(const y of [-.395,.374]) r.instance(y<0?'left':'right',()=>{
       r.rod([-.768,y-.118,1.358],[-.742,y+.157,1.417],.009,dark,8);
       r.rod([-.749,y+.002,1.401],[-.734,y+.278,1.434],.011,dark,8);
-    }
-    bumperSkin(r,{face:front-.116,back:front+.037,width:.923,low:.480,high:.685,span:.229,center:.598,lightZ:.553,lightHeight:.092,paint:tone(paint,.8)});
-    drawFrontBumperFittings(r);
-    bumperSkin(r,{face:2.225,back:2.039,width:.926,low:.483,high:.680,span:.147,center:.641,lightZ:.552,lightHeight:.077,paint:tone(paint,.82)});
-    for(const y of [-.662,.662]){
-      r.box(2.057,y-.17,.681,2.211,y+.17,.693,dark);
-      rearBumperLight(r,Math.sign(y));
-    }
-    drawRearPlatePanel(r);
+    });});
+    r.tag('body.front-bumper',()=>{
+      bumperSkin(r,{face:front-.116,back:front+.037,width:.923,low:.480,high:.685,span:.229,center:.598,lightZ:.553,lightHeight:.092,paint:tone(paint,.8),ends:['body.front-bumper-cap-left','body.front-bumper-cap-right']});
+      drawFrontBumperFittings(r);
+    });
+    r.tag('body.front-bumper-brackets',()=>drawFrontBumperBrackets(r,front+.037));
+    r.tag('body.rear-bumper',()=>{
+      bumperSkin(r,{face:2.225,back:2.039,width:.926,low:.483,high:.680,span:.147,center:.641,lightZ:.552,lightHeight:.077,paint:tone(paint,.82),
+        ends:['body.rear-bumper-end-left','body.rear-bumper-end-right'],caps:['body.rear-bumper-cap-left','body.rear-bumper-cap-right']});
+      r.tag('body.rear-step-pad',()=>{for(const y of [-.662,.662])r.instance(y<0?'left':'right',()=>r.box(2.057,y-.17,.681,2.211,y+.17,.693,dark));});
+      for(const y of [-.662,.662])rearBumperLight(r,Math.sign(y));
+    });
+    drawRearBumperBrackets(r,2.039);
+    r.tag('body.rear-plate-panel',()=>drawRearPlatePanel(r));
 
   }));
 }
@@ -271,6 +283,23 @@ export function buildG500Exterior(r,paint,selected=[]) {
   }
 }
 
+const exteriorPlate=(label,slug)=>({label:'Mercedes-Benz Classic USA · 2002 G500 '+label,url:'https://classicparts.mbusa.com/v-2002-mercedes-benz-g500--base--5-0l-v8-gas/'+slug});
+const giantRef=(label,slug)=>({label:'MB Parts Giant · 2002 G500 '+label+' diagram',url:'https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/body-hardware/'+slug});
+const exteriorPlates={
+  ...Object.fromEntries(g500BumperParts.map(([key,,,end])=>[key,bumperRefs[end]])),
+  'licence-lamps':exteriorPlate('licence lamps','electrical--license-lamps'),
+  'rear-plate-panel':exteriorPlate('exterior trim · rear body','body--exterior-trim-rear-body'),
+  'running-boards':exteriorPlate('rocker panel','body--rocker-panel'),
+  'wheel-flares':exteriorPlate('exterior trim · fender','body--exterior-trim-fender'),
+  'wheelhouses':exteriorPlate('splash shields','body--splash-shields'),
+  'rub-strips':exteriorPlate('exterior trim · quarter panel','body--exterior-trim-quarter-panel'),
+  'wing-intakes':exteriorPlate('fender and components','body--fender-and-components'),
+  'v8-badges':exteriorPlate('decals and emblems','accessories--decals-and-emblems'),
+  cowl:exteriorPlate('cowl','body--cowl'),
+  wipers:exteriorPlate('wiper arm, blade and related components','wiper-and-washer--wiper-arm-blade-and-related-components'),
+  ...Object.fromEntries(['mirror-left','mirror-right','mirror-glass-left','mirror-glass-right','mirror-gaskets'].map(k=>[k,giantRef('front door outside mirrors','outside-mirrors')])),
+  ...Object.fromEntries(['fender-left','fender-right','fender-liner-left','fender-liner-right'].map(k=>[k,giantRef('fender and components','fender-components')]))
+};
 export const G500_BODY_PARTS = [
   ['structure','Body shell & cabin','The pillars, sills and fixed rear corner panels surround five door openings. Exterior proportions follow the W463 factory drawing and the 2002 US dimensions.'],
   ['front-seats','Front seats and head restraints','Each front seat has a separate cushion, bolstered back and adjustable head restraint. This black-leather interior follows an original first-year US G500.'],
@@ -290,5 +319,25 @@ export const G500_BODY_PARTS = [
   ['spare','Spare-wheel cover & carrier','A painted cover with a polished stainless face, star and Mercedes-Benz wordmark encloses the spare wheel on the cargo door.'],
   ['grille','Radiator grille','Seven vanes, painted like the surround, sit inside the grille opening. The star stands ahead of the vanes, and the lower valance meets the bumper.'],
   ['rear-lights','Rear combination lamps','The two rectangular lamp clusters are mounted at the fixed rear corners above the bumper.'],
-  ['fog-lamps','Front fog lamp trim','The black rectangular surrounds frame the two clear lenses low in the front bumper. Open a lamp to see the reflector, bulb and spring clip.']
-].map(([key,name,description])=>({id:'body.'+key,name,description,source:['front-seats','rear-bench','dashboard','rearview-mirror'].includes(key)?g500CabinSource:g500BodyReferences[key]||g500BodyReferences.structure,...(key==='fog-lamps'?{source:lampRefs.fog}:key==='rear-lights'?{source:lampRefs.manual}:key==='grille'?{source:{label:'Mercedes-Benz Classic · 2002 G500 grille plate',url:'https://classicparts.mbusa.com/v-2002-mercedes-benz-g500--base--5-0l-v8-gas/body--grille-and-components'}}:{})}));
+  ['fog-lamps','Front fog lamp trim','The black rectangular surrounds frame the two clear lenses low in the front bumper. Open a lamp to see the reflector, bulb and spring clip.'],
+  ['rear-plate-panel','Rear licence-plate recess','A recessed surround in the rear body holds the US-size plate and its two lamps.'],
+  ['running-boards','Running boards','Each side has a stainless pressing with a ribbed outer face, rubber treads between raised ribs and black end caps.'],
+  ['wheel-flares','Wheel-arch flares','Four flares run around the wheel openings and stand out from the wing and quarter panels.'],
+  ['wheelhouses','Rear wheel-arch liners','A dark liner closes each rear wheel arch between the flare and the inner body.'],
+  ['fender-liner-left','Front fender liner, left · 463-884-17-22','The liner closes the left front wheel arch between the flare and the inner wing.'],
+  ['fender-liner-right','Front fender liner, right · 463-884-13-22','The liner closes the right front wheel arch between the flare and the inner wing.'],
+  ['fender-left','Front fender, left · 463-880-59-06','The flat-sided front wing runs from the headlamp to the door and is bolted to the body. Its top deck meets the hood.'],
+  ['fender-right','Front fender, right · 463-880-64-06','The flat-sided front wing runs from the headlamp to the door and is bolted to the body. Its top deck meets the hood.'],
+  ['rub-strips','Wing and quarter rub strips','Black protective strips with a bright insert run along the fixed front wings and rear quarters. Each door carries its own matching section.'],
+  ['wing-intakes','Front-wing louvers','A trapezoidal louver sits on each front wing between the door hinge and the wheel arch.'],
+  ['v8-badges','V8 wing scripts','A chrome V8 script sits on each front wing, below the rub strip and just ahead of the door.'],
+  ['cowl','Cowl panel','The cowl panel spans the base of the windshield and carries the wipers, independent of the hood.'],
+  ['wipers','Windshield wiper arms and blades','Two wiper arms park at the base of the windshield, each carrying a blade.'],
+  ['mirror-left','Exterior mirror assembly, left · 463-810-39-16','The housing and arm stand on the front corner of the left door window frame.'],
+  ['mirror-right','Exterior mirror assembly, right · 463-810-40-16','The housing and arm stand on the front corner of the right door window frame.'],
+  ['mirror-glass-left','Mirror glass, left · 463-810-83-16','The flat glass sits in a black frame inside the housing.'],
+  ['mirror-glass-right','Mirror glass, right · 463-810-82-16','The glass sits in a black frame inside the housing.'],
+  ['mirror-gaskets','Mirror base gaskets · 463-811-00-96','A rubber gasket seals each mirror foot against the door skin.'],
+  ['licence-lamps','Licence-plate lamps','Two small lamps in the top edge of the plate recess light the plate.'],
+  ...g500BumperParts.map(([key,name,description])=>[key,name,description])
+].map(([key,name,description])=>({id:'body.'+key,name,description,source:['front-seats','rear-bench','dashboard','rearview-mirror'].includes(key)?g500CabinSource:g500BodyReferences[key]||g500BodyReferences.structure,...(exteriorPlates[key]?{source:exteriorPlates[key]}:{}),...(key==='fog-lamps'?{source:lampRefs.fog}:key==='rear-lights'?{source:lampRefs.manual}:key==='grille'?{source:{label:'Mercedes-Benz Classic · 2002 G500 grille plate',url:'https://classicparts.mbusa.com/v-2002-mercedes-benz-g500--base--5-0l-v8-gas/body--grille-and-components'}}:{})}));

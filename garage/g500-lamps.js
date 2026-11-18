@@ -98,7 +98,7 @@ export function sideLighting(r,side){
 }
 // Leave apertures through the outer bumper skin. The recessed returns become
 // visible when the two optical units move away from their mounting positions.
-export function bumperSkin(r,{face,back,width,low,high,span,center,lightZ,lightHeight,paint}){
+export function bumperSkin(r,{face,back,width,low,high,span,center,lightZ,lightHeight,paint,ends=null,caps=ends}){
   // The early W463 bumper rolls inward at the top and lower lip, and wraps back
   // toward each wheel. Keep the two lamp openings on the flat central face.
   const sign=Math.sign(back-face),height=high-low;
@@ -118,14 +118,17 @@ export function bumperSkin(r,{face,back,width,low,high,span,center,lightZ,lightH
   const tone=(col,f)=>'#'+[1,3,5].map(i=>Math.min(255,Math.round(parseInt(col.slice(i,i+2),16)*f)).toString(16).padStart(2,'0')).join('');
   const plate=(surface,a,b,c,d,col)=>r.polygon([at(surface,a,c),at(surface,b,c),at(surface,b,d),at(surface,a,d)],col,false);
   const sideReturn=(a,b,col)=>r.polygon([at(face,...a),at(back,...a),at(back,...b),at(face,...b)],col,false);
+  // Optional part ids for the wrapped corners and the closing end faces.
+  const own=(id,y,fn)=>id?r.tag(id[y<0?0:1],fn):fn();
+  const corner=y=>Math.abs(y)>hinge?ends:null;
   for(let i=1;i<ys.length;i++)for(let j=1;j<zs.length;j++){
     const a=ys[i-1],b=ys[i],c=zs[j-1],d=zs[j];
     if(c===za&&d===zb&&Math.abs(Math.abs((a+b)/2)-center)<span/2)continue;
     const shade=j===1?.78:j===zs.length-1?1.12:1-.115*wrap((a+b)/2);
-    plate(face,a,b,c,d,tone(paint,shade));plate(back,a,b,c,d,tone(paint,.70));
+    own(corner((a+b)/2),(a+b)/2,()=>{plate(face,a,b,c,d,tone(paint,shade));plate(back,a,b,c,d,tone(paint,.70));});
   }
-  for(const y of [-width,width])for(let j=1;j<zs.length;j++)sideReturn([y,zs[j-1]],[y,zs[j]],tone(paint,.79));
-  for(const z of [low,high])for(let i=1;i<ys.length;i++)sideReturn([ys[i-1],z],[ys[i],z],tone(paint,z===high?1.15:.61));
+  for(const y of [-width,width])own(caps,y,()=>{for(let j=1;j<zs.length;j++)sideReturn([y,zs[j-1]],[y,zs[j]],tone(paint,.79));});
+  for(const z of [low,high])for(let i=1;i<ys.length;i++)own(corner((ys[i-1]+ys[i])/2),(ys[i-1]+ys[i])/2,()=>sideReturn([ys[i-1],z],[ys[i],z],tone(paint,z===high?1.15:.61)));
   for(const y of [-center,center]){
     const a=y-span/2,b=y+span/2;
     sideReturn([a,za],[a,zb],tone(paint,.56));sideReturn([b,za],[b,zb],tone(paint,.56));

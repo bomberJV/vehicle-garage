@@ -61,14 +61,16 @@ export function drawRearPlatePanel(r){
   // Recessed surround, radiused face, and a smaller US 12-by-6 silhouette.
   insetPanel(r,map,outer,inner,.015,.004,'#444d4b','#363d3d');
   const plate=lampOutline(.309,.150,.010);
-  r.polygon(plate.map(([u,v])=>map(u,v,.007)),'#a5ada7',false);
-  for(const u of [-.089,.089])r.discX(rear+.008,u,.603,.004,'#626967',10);
+  r.tag('body.rear-licence-bracket',()=>{
+    r.polygon(plate.map(([u,v])=>map(u,v,.007)),'#a5ada7',false);
+    for(const u of [-.089,.089])r.discX(rear+.008,u,.603,.004,'#626967',10);
+  });
   // The two small housings above the plate illuminate it from the top edge.
-  for(const sign of [-1,1]){
+  for(const sign of [-1,1])r.tag('body.licence-lamps',()=>r.instance(sign<0?'left':'right',()=>{
     const p=(u,v,d)=>map(sign*.106+u,.085+v,d);
     const body=lampOutline(.073,.027,.004),face=lampOutline(.067,.020,.003);
     lampWall(r,p,body,.001,face,.026,'#445050');
     r.polygon(face.map(([u,v])=>p(u,v,.026)),'#535b58',false);
     r.polygon([p(-.025,-.010,.008),p(.025,-.010,.008),p(.025,-.010,.023),p(-.025,-.010,.023)],'#adc2b5',false);
-  }
+  }));
 }

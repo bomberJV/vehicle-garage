@@ -10,7 +10,7 @@ const exterior=()=>{const r=Object.assign(Object.create(GarageRenderer.prototype
 test('a chrome V8 script sits on each front wing, below the rub strip and ahead of the door',()=>{
   const faces=exterior();
   for(const side of [-1,1]){
-    const v8=faces.filter(f=>f.part==='body.structure'&&f.points.every(([x,y,z])=>x>-.85&&x<-.75&&z>.88&&z<.92&&side*y>.889&&side*y<.897));
+    const v8=faces.filter(f=>f.part==='body.v8-badges'&&f.points.every(([x,y,z])=>x>-.85&&x<-.75&&z>.88&&z<.92&&side*y>.889&&side*y<.897));
     assert(v8.length>40,`side ${side}: ${v8.length} lettering faces`);
     const pts=v8.flatMap(f=>f.points);
     assert(Math.max(...pts.map(p=>p[2]))<.975,'below the rub strip');

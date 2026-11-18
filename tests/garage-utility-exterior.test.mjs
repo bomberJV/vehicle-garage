@@ -120,7 +120,7 @@ test('early W463 grille has seven horizontal vanes, cleared headlamp wells and w
  assert.equal(level.size,7);
  const ray=([x,y,z])=>({x:y,y:z,depth:-x});r.project=ray;r.canvas={getBoundingClientRect:()=>({left:0,top:0})};
  assert.equal(r.hitTest(.674,1.001)?.part,'lighting.headlamp');
- const bumper=r.faces.filter(f=>f.part==='body.structure').flatMap(f=>f.points).filter(p=>p[0]<-2.114 && p[2]>.45&&p[2]<.70);
+ const bumper=r.faces.filter(f=>f.part.startsWith('body.front-bumper')).flatMap(f=>f.points).filter(p=>p[0]<-2.114 && p[2]>.45&&p[2]<.70);
  const frontAt=y=>Math.min(...bumper.filter(p=>Math.abs(Math.abs(p[1])-y)<.004).map(p=>p[0]));
  assert.ok(frontAt(.923)-frontAt(.75)>.048,'bumper corner should sweep rearward');
  const arch=r.faces.filter(f=>f.rigid?.name==='body-shell').flatMap(f=>f.points).filter(p=>p[1]>.95&&Math.abs(p[0]+1.425)<.22);

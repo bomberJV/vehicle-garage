@@ -621,12 +621,13 @@ export class GarageRenderer{
  if(g)drawG500AxleLocation(this);
  else tag('steering.axle',()=>{for(const x of [front,rear])for(const side of [-1,1]){const low=awd&&x===rear,k=awd?w-.175:w-.14;box(x-.075,side*k-.04,.30,x+.075,side*k+.04,.53,metal);rod([x-.20,side*(low?.53:.35),low?.225:awd?.32:.31],[x,side*k,low?.30:awd?.30:.39],.026,metal);}});
  tag('steering.linkage',()=>{if(g){drawG500SteeringLinkage(this);}else{rod([front-.09,-.66,.38],[front-.09,.66,.38],.023,metal);}});
- tag('suspension.spring',()=>{for(const x of [front,rear])for(const side of [-1,1]){const y=side*(g?.48:.57);if(truck){for(let layer=0;layer<4;layer++)this.profile([[x-.52+layer*.065,.39+layer*.013],[x,.34+layer*.013],[x+.52-layer*.065,.39+layer*.013],[x+.52-layer*.065,.402+layer*.013],[x,.352+layer*.013],[x-.52+layer*.065,.402+layer*.013]],y-.035,y+.035,'#76818a');continue;}const base=g?.47:.44,height=g?.39:.48;let prior=null;for(let i=0;i<=84;i++){const t=i/84,a=t*Math.PI*12,p=[x+Math.cos(a)*.073,y+Math.sin(a)*.073,base+t*height];if(prior)rod(prior,p,.011,'#b0b5a4',6);prior=p;}}});
+ tag('suspension.spring',()=>{for(const x of [front,rear])for(const side of [-1,1]){const y=side*(g?.48:.57);if(truck){for(let layer=0;layer<4;layer++)this.profile([[x-.52+layer*.065,.39+layer*.013],[x,.34+layer*.013],[x+.52-layer*.065,.39+layer*.013],[x+.52-layer*.065,.402+layer*.013],[x,.352+layer*.013],[x-.52+layer*.065,.402+layer*.013]],y-.035,y+.035,'#76818a');continue;}// The W204's front struts are shorter, under its low AMG bonnet.
+ const base=g?.47:.44,height=g?.39:this.build.vehicle==='c63'&&x===front?.43:.48;let prior=null;for(let i=0;i<=84;i++){const t=i/84,a=t*Math.PI*12,p=[x+Math.cos(a)*.073,y+Math.sin(a)*.073,base+t*height];if(prior)rod(prior,p,.011,'#b0b5a4',6);prior=p;}}});
  // The G500 damper tops lean 20 mm inboard of the generic line and its body is 66 mm across, clear of the tyres.
  tag('suspension.damper',()=>{for(const x of [front,rear])for(const side of [-1,1]){if(awd){
    // HR-V: each damper runs up the axis of its coil spring.
    const y=side*.57;rod([x,y,.43],[x,y,.93],.022,'#98a4ac');rod([x,y,.43],[x,y,.70],.036,'#414c53');continue;}
-  const lo=side*.59,hi=side*(g?.600:.62),mid=side*(g?.591:.605);rod([x-.14,lo,.43],[x+.06,hi,.90],.026,'#98a4ac');rod([x-.14,lo,.43],[x-.03,mid,.68],g?.033:.039,'#414c53');}});
+  const lo=side*.59,hi=side*(g?.600:.62),mid=side*(g?.591:.605),top=this.build.vehicle==='c63'&&x===front?.855:.90;rod([x-.14,lo,.43],[x+.06,hi,top],.026,'#98a4ac');rod([x-.14,lo,.43],[x-.03,mid,.68],g?.033:.039,'#414c53');}});
 
  }
  applyInspection(){this.prepareInspection(null);}

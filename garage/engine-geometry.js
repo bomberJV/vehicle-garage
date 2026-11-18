@@ -62,7 +62,7 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  // The M156 section drawing exaggerates the air boxes and stacked valve gear.
  // Fit its upper half beneath the W204 bonnet, keeping the crank/sump datum.
  // The E90 bonnet is lower still over the N52; its upper half is fitted the same way.
- const fitHeight=z=>(id==='c63'||id==='bmw328xi')&&z>base?base+(z-base)*(id==='c63'?.74:.70):z;
+ const fitHeight=z=>(id==='c63'||id==='bmw328xi')&&z>base?base+(z-base)*(id==='c63'?.54:.70):z;
  // Honda turns its transverse engine the other way: the transaxle sits on the
  // driver's (left) side, the intake manifold faces the radiator and the
  // exhaust faces the firewall. The K20 section is also compacted to its real
@@ -203,7 +203,7 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  // whether the engine itself runs along or across the car.
  const bayTag=(name,fn)=>tag(name,()=>fn(bay));
  // The HR-V's radiator and fan sit lower, under its lower bonnet line.
- const radX=front-.62,radY=0,radZ=base+(baseVehicle(id)==='hrv'?.16:.20),radTop=baseVehicle(id)==='hrv'?.40:id==='bmw328xi'?.44:.55,fanR=baseVehicle(id)==='hrv'?.20:.245;
+ const radX=front-.62,radY=0,radZ=base+(baseVehicle(id)==='hrv'?.16:.20),radTop=baseVehicle(id)==='hrv'?.40:id==='bmw328xi'?.44:id==='c63'?.38:.55,fanR=baseVehicle(id)==='hrv'?.20:.245;
  if(id==='g500'){
   if(!g500ServiceOwnsFlow)drawG500CoolingCircuit(r,'powertrain');
  }else{
@@ -244,9 +244,14 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  if(id==='g500'){if(!g500ServiceOwnsFlow)drawG500InductionCircuit(r,'powertrain');}
  else if(ford){}
  else if(cfg.banks===2){
-  tag('airbox',()=>{for(const side of [-1,1]){const y=side*.34,z=headZ+.25;box(-L/2+.03,y-.135,z,L/2+.01,y+.135,z+.12,BLACK);for(let x=-L/2+.06;x<L/2;x+=.065)box(x,y-.11,z+.12,x+.012,y+.11,z+.127,DARK);}});
+  // The W204's filter boxes sit flatter on the cam covers, under its lower bonnet.
+  const boxZ=id==='c63'?.215:.25,boxH=id==='c63'?.07:.12;
+  tag('airbox',()=>{for(const side of [-1,1]){const y=side*.34,z=headZ+boxZ;box(-L/2+.03,y-.135,z,L/2+.01,y+.135,z+boxH,BLACK);for(let x=-L/2+.06;x<L/2;x+=.065)box(x,y-.11,z+boxH,x+.012,y+.11,z+boxH+.007,DARK);}});
   tag('maf',()=>{const xx=-L/2-.16;tube([xx-.045,0,intakeZ],[xx+.045,0,intakeZ],.052,.040,DARK,12);box(xx-.025,-.025,intakeZ+.049,xx+.025,.025,intakeZ+.074,BLACK);});
-  tag('intake-duct',()=>{for(const side of [-1,1]){const y=side*.34,z=headZ+.30;route([[-L/2-.37,side*.56,z-.14],[-L/2-.15,side*.48,z-.08],[-L/2+.04,y,z]],.061,RUBBER,10);for(let n=0;n<5;n++){const xx=-L/2-.24+n*.025;tube([xx,side*.50,z-.10],[xx+.008,side*.50,z-.10],.065,.058,DARK,10);}const outlet=-L/2-.12;route([[outlet,y,z],[outlet,side*.13,z-.04],[outlet,0,intakeZ],[throttleX+.02,0,intakeZ]],.042,RUBBER,10);}});
+  tag('intake-duct',()=>{for(const side of [-1,1]){const y=side*.34;
+   // The W204 snorkels run level and slimmer, between the cam drives and the bonnet.
+   if(id==='c63'){const z=headZ+.200,rad=.030;route([[-L/2-.28,side*.47,z-.07],[-L/2-.15,side*.44,z],[-L/2-.02,side*.38,z+.045],[-L/2+.06,y,z+.06]],rad,RUBBER,10);for(let n=0;n<4;n++){const xx=-L/2-.25+n*.025;tube([xx,side*.465,z-.06],[xx+.008,side*.465,z-.06],.036,.031,DARK,10);}const outlet=-L/2-.12;route([[outlet,y,z+.012],[outlet,side*.13,z-.008],[outlet,0,intakeZ],[throttleX+.02,0,intakeZ]],.032,RUBBER,10);continue;}
+   const z=headZ+.30;route([[-L/2-.37,side*.56,z-.14],[-L/2-.15,side*.48,z-.08],[-L/2+.04,y,z]],.061,RUBBER,10);for(let n=0;n<5;n++){const xx=-L/2-.24+n*.025;tube([xx,side*.50,z-.10],[xx+.008,side*.50,z-.10],.065,.058,DARK,10);}const outlet=-L/2-.12;route([[outlet,y,z],[outlet,side*.13,z-.04],[outlet,0,intakeZ],[throttleX+.02,0,intakeZ]],.042,RUBBER,10);}});
  }else if(honda){
   // Airbox over the CVT, inboard of the left strut, behind the battery. The
   // duct turns into the throttle body at the transmission end of the plenum.

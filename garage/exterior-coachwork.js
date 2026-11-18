@@ -275,7 +275,7 @@ function cabin(r,cfg,paint){
 
  const back=()=>draw(r,'body.glass',()=>transverseGlass(...rear,true));
  if(cfg.hatch)deckPanel(r,true,back);else panel(r,'backlight',[0,0,.25],'body.glass',back);
- const lidX={bmw325ci:.14,c63:.06,hrv:.08}[r.build?.vehicle];
+ const lidX={bmw325ci:.14,c63:.36,hrv:.08}[r.build?.vehicle];
  if(lidX!=null){
   const left=lidX-.32,right=lidX+.32,half=.475;
   const stops=[...new Set([...roof.map(p=>p[0]),left,right])].sort((a,b)=>a-b);

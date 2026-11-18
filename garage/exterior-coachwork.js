@@ -71,7 +71,7 @@ function skin(r,cfg,paint){
     for(let j=1;j<levels.length;j++){
      const p=(x,h,t,low)=>creasePoint(cfg,side,x,Math.max(mix(cfg.base,h,t),low));
      if(mix(cfg.base,z,levels[j])<=bottom&&mix(cfg.base,zz,levels[j])<=bottomB)continue;
-     const color=cfg.cladding&&j===1?TRIM:tint(paint,(cfg.sideTints??[.68,.85,.91,1.00,1.07])[j-1]*(side<0?.95:1));
+     const color=cfg.bandColor?.(mid,j)??(cfg.cladding&&j===1?(cfg.claddingColor??TRIM):tint(paint,(cfg.sideTints??[.68,.85,.91,1.00,1.07])[j-1]*(side<0?.95:1)));
      face(r,[p(a,z,levels[j-1],bottom),p(b,zz,levels[j-1],bottomB),p(b,zz,levels[j],bottomB),p(a,z,levels[j],bottom)],color);
     }
     if(mid>=cfg.hoodEnd&&mid<cfg.deckStart){
@@ -147,13 +147,13 @@ function skin(r,cfg,paint){
     const p=ring(a,cfg.arch),q=ring(b,cfg.arch);
     face(r,[p,q,[q[0],q[1]-side*.067,q[2]],[p[0],p[1]-side*.067,p[2]]],SEAL);
     const lip=cfg.cladding?(cfg.claddingLip??.028):.009;
-    face(r,[p,q,ring(b,cfg.arch+lip),ring(a,cfg.arch+lip)],cfg.cladding?TRIM:tint(paint,.93));
+    face(r,[p,q,ring(b,cfg.arch+lip),ring(a,cfg.arch+lip)],cfg.cladding?(cfg.claddingColor??TRIM):tint(paint,.93));
    });
   }
  }
 }
 function mirror(r,cfg,side,x,z,paint){
- const width=section(cfg.stations,x)[0],yc=side*(width+.064);
+ const width=section(cfg.stations,x)[0],yc=side*(width+(cfg.mirrorOut??.064));
  r.rod([x+.03,side*(width-.056),z-.045],[x,yc,z],.024,SEAL,10);
  const points=[[-.116,0],[-.086,.053],[.015,.074],[.116,.051],[.129,-.011],[.073,-.038],[-.073,-.035]];
  const ring=(y,k)=>points.map(([xx,zz])=>[x+xx*k,y,z+zz*k]);
@@ -186,6 +186,7 @@ function cabin(r,cfg,paint){
     if(piece==='quarter'&&cfg.drawQuarter)cfg.drawQuarter(r,side,outline);
     else draw(r,'body.glass',()=>fittedWindow(r,outline,{
      privacy:!!cfg.cladding&&piece!=='front-door',radius:cfg.coupe?.028:.046,seal:cfg.coupe?.006:.011,
+     tone:cfg.windowGlass?.[piece==='front-door'?'front':'privacy'],
      sideCrown:side*(piece==='quarter'?.004:.010),frameless:cfg.coupe&&piece==='front-door'
     }));
     const color=cfg.cladding?SEAL:'#a7b0b1';
@@ -195,7 +196,7 @@ function cabin(r,cfg,paint){
     if(!cfg.coupe)line(win[1],win[2],side,.008,SEAL);
     if(piece==='front-door'){
      if(cfg.drawMirror)cfg.drawMirror(r,side,paint);
-     else mirror(r,cfg,side,door[0]+.18,cfg.belt+.041,paint);
+     else mirror(r,cfg,side,cfg.mirrorX??door[0]+.18,cfg.belt+(cfg.mirrorLift??.041),paint);
     }
     if(movable&&cfg.doorHandle){cfg.doorHandle(r,side,paint);}
     else if(movable){
@@ -208,10 +209,16 @@ function cabin(r,cfg,paint){
   }
   if(cfg.windowSurround){cfg.windowSurround(r,side,(xz)=>pair(xz,side),paint);continue;}
   const surround=(quad,color)=>draw(r,'body.structure',()=>face(r,quad.map(p=>pair(p,side)),color));
-  surround([wind[0],wind[1],frontWindow[1],frontWindow[0]],tint(paint,1.1));
+  // cfg.blackouts: (x,z) outlines of black pillar appliques, laid just proud of the cabin side.
+  for(const outline of cfg.blackouts||[])draw(r,'body.structure',()=>face(r,outline.map(p=>{const q=pair(p,side);q[1]+=side*.004;return q;}),TRIM));
+  surround([wind[0],wind[1],frontWindow[1],frontWindow[0]],cfg.aPillarColor??tint(paint,1.1));
   const last=quarter||rearWindow,topEnd=last[2];
   for(let i=1;i<roof.length;i++){
-   const inset=p=>{const t=(p[0]-roof[0][0])/(roof.at(-1)[0]-roof[0][0]);return [mix(frontWindow[1][0],topEnd[0],t),mix(frontWindow[1][1],topEnd[1],t)];};
+   // cfg.windowTopLine: (x,z) points along the window frames, so the roof rail
+   // stops at the real daylight opening instead of a straight chord.
+   const inset=p=>{const t=(p[0]-roof[0][0])/(roof.at(-1)[0]-roof[0][0]),x=mix(frontWindow[1][0],topEnd[0],t);
+    const line=cfg.windowTopLine;if(!line)return [x,mix(frontWindow[1][1],topEnd[1],t)];
+    let k=1;while(k<line.length-1&&x>line[k][0])k++;const [a,h]=line[k-1],[b,g]=line[k];return [x,mix(h,g,Math.max(0,Math.min(1,(x-a)/(b-a))))];};
    surround([roof[i-1],roof[i],inset(roof[i]),inset(roof[i-1])],tint(paint,1.02));
   }
   surround([roof.at(-1),rear[1],last[3],topEnd],tint(paint,.94));
@@ -238,7 +245,7 @@ function cabin(r,cfg,paint){
    const a=us[i-1],b=us[i],c=vs[j-1],d=vs[j],edge=i===1||i===us.length-1||j===1||j===vs.length-1;
    const points=[point(a,c),point(b,c),point(b,d),point(a,d)];
    if(edge)face(r,points,SEAL);
-   else glazingFace(r,points,tint(back&&cfg.backGlassColor?cfg.backGlassColor:'#91aab4',.91+.1*c+.035*(1-Math.abs(a))),back&&cfg.cladding?(cfg.backGlassOpacity??.51):.28+.07*d);
+   else glazingFace(r,points,tint(back&&cfg.backGlassColor?cfg.backGlassColor:!back&&cfg.windshieldGlass?cfg.windshieldGlass[0]:'#91aab4',.91+.1*c+.035*(1-Math.abs(a))),back&&cfg.cladding?(cfg.backGlassOpacity??.51):(!back&&cfg.windshieldGlass?cfg.windshieldGlass[1]:.28)+.07*d);
   }
   if(!back&&!cfg.fixedWipers){
    const lower=us.map(u=>point(u,0));
@@ -287,13 +294,13 @@ function cabin(r,cfg,paint){
     if(a>=left-1e-9&&b<=right+1e-9&&j>1&&j<rows.length-1)continue;
     const p=(x,k)=>k===1||k===rows.length-2?[x,k===1?-half:half,height(x,half)]:strip(x,rows[k]);
     const ring=[p(a,j-1),p(b,j-1),p(b,j),p(a,j)];
-    draw(r,'body.structure',()=>{face(r,ring,tint(paint,1.10));face(r,ring.map(([x,y,z])=>[x,y,z-.009]),'#5c6162');});
+    draw(r,'body.structure',()=>{face(r,ring,cfg.moonroofFrame?(j>1&&j<rows.length-1&&b>left&&a<right?cfg.moonroofFrame:tint(paint,1.10)):tint(paint,1.10));face(r,ring.map(([x,y,z])=>[x,y,z-.009]),'#5c6162');});
    }
   }
   panel(r,'sliding-roof',[0,0,.55],'roof.glass',()=>{
    for(let i=0;i<8;i++)for(let j=0;j<8;j++){
     const point=(ix,iy)=>{const x=left+.64*ix/8,y=(iy/4-1)*half;return [x,y,height(x,y)];};
-    glazingFace(r,[point(i,j),point(i+1,j),point(i+1,j+1),point(i,j+1)],'#768d91',.54);
+    glazingFace(r,[point(i,j),point(i+1,j),point(i+1,j+1),point(i,j+1)],cfg.moonroofGlass?.[0]??'#768d91',cfg.moonroofGlass?.[1]??.54);
    }
   });
  }

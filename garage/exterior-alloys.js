@@ -9,12 +9,12 @@ export function roadWheelSpokes(r,{vehicle,x,y,z,side,rim,finish}){
  const honda=baseVehicle(vehicle)==='hrv',lx=vehicle==='hrvlx',amg=vehicle==='c63',e90=vehicle==='bmw328xi';
  const skin=honda?tint(finish,.96):finish;
  const vertex=(angle,radius,depth)=>[x+Math.cos(angle)*radius,y+side*depth,z+Math.sin(angle)*radius];
- function blade(angle,stations){
+ function blade(angle,stations,flank=.94){
   for(let i=1;i<stations.length;i++){
    const [lo,hi]=stations.slice(i-1,i+1);
    const p=(section,edge,back=false)=>vertex(angle+section[1]+edge*section[2],section[0]*rim,section[3]-(back?.020:0));
    r.polygon([p(lo,-1),p(hi,-1),p(hi,0),p(lo,0)],tint(skin,1.05),false);
-   r.polygon([p(lo,0),p(hi,0),p(hi,1),p(lo,1)],tint(skin,.94),false);
+   r.polygon([p(lo,0),p(hi,0),p(hi,1),p(lo,1)],tint(skin,flank),false);
    for(const edge of [-1,1])r.polygon([p(lo,edge),p(hi,edge),p(hi,edge,true),p(lo,edge,true)],tint(skin,.59),false);
    r.polygon([p(lo,-1,true),p(lo,1,true),p(hi,1,true),p(hi,-1,true)],tint(skin,.61),false);
   }
@@ -34,11 +34,10 @@ export function roadWheelSpokes(r,{vehicle,x,y,z,side,rim,finish}){
    blade(a,[[.24,0,.30,-.004],[.36,0,.24,.004],[.50,0,.19,.010]]);
    for(const b of [-1,1])blade(a,[[.48,b*.075,.080,.010],[.70,b*.150,.100,.013],[.93,b*.200,.118,.015]]);
   }else{
-   // EX-L 18-inch wheels: five machined spokes leave a broad hub, twist slightly,
-   // and split into two arms before the rim, with dark painted pockets between.
-   blade(a,[[.24,0,.20,-.004],[.42,.02,.15,.004],[.58,.045,.11,.010]]);
-   blade(a,[[.58,.000,.045,.010],[.76,-.015,.040,.013],[.93,-.030,.045,.015]]);
-   blade(a,[[.58,.095,.045,.010],[.76,.12,.040,.013],[.93,.145,.045,.015]]);
+   // EX-L 18-inch wheels: five broad spokes that twist as they run out to the
+   // rim. The leading half of each is machined bright, the trailing half is the
+   // dark painted flank, which is what gives the face its two-tone look.
+   blade(a,[[.24,0,.42,-.004],[.45,.035,.29,.006],[.70,.075,.225,.012],[.93,.115,.195,.015]],.72);
 
   }
  }

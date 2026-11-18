@@ -44,7 +44,7 @@ function creasePoint(cfg,side,x,z){
  const [w,top]=section(cfg.stations,x);
  const level=Math.max(0,Math.min(1,(z-cfg.base)/(top-cfg.base)));
  // Convex door face above a lower rocker tuck, with a softer waist on the Honda.
- const y=cfg.sideSection?cfg.sideSection(w,level):w-.032*(1-level)**2+.009*Math.sin(level*Math.PI)-.034*Math.max(0,(level-.86)/.14);
+ const y=cfg.sideSection?cfg.sideSection(w,level,x):w-.032*(1-level)**2+.009*Math.sin(level*Math.PI)-.034*Math.max(0,(level-.86)/.14);
  return [cfg.sideStation?cfg.sideStation(x,z):x,side*y,z];
 }
 function trimmedX(cfg,x,towards){
@@ -108,7 +108,7 @@ function skin(r,cfg,paint){
    // Fixed narrow fender returns meet the bonnet or deck lid while leaving
    // the engine bay and passenger compartment genuinely open.
    if(mid<cfg.hoodEnd||mid>=cfg.deckStart){
-    const cap=(x,sw,h)=>[x,side*(sw-.034),h];
+    const cap=(x,sw,h)=>[x,cfg.capFollowsSide?creasePoint(cfg,side,x,h)[1]:side*(sw-.034),h];
     const inset=(x,sw,h)=>[x,side*(sw*(mid<cfg.hoodEnd?cfg.hoodFrac:.78)),h+.016];
     draw(r,'body.structure',()=>face(r,[cap(a,w,z),cap(b,ww,zz),inset(b,ww,zz),inset(a,w,z)],tint(paint,1.05)));
    }
@@ -120,7 +120,7 @@ function skin(r,cfg,paint){
     for(let k=1;k<lanes.length;k++){
      const lo=lanes[k-1],hi=lanes[k];
      const p=(x,sw,h,t)=>[x,s*(sw*frac-.008)*t,h+.016+(isHood&&cfg.hoodCrown!=null?cfg.hoodCrown:.036)*(1-t*t)+(isHood&&cfg.hoodPress?cfg.hoodPress(t):0)];
-     face(r,[p(x0,...section(cfg.stations,x0),lo),p(x1,...section(cfg.stations,x1),lo),p(x1,...section(cfg.stations,x1),hi),p(x0,...section(cfg.stations,x0),hi)],tint(paint,(s<0?1.11:1.17)-.035*lo+(isHood&&cfg.hoodPress&&lo===.68?.045:0)));
+     face(r,[p(x0,...section(cfg.stations,x0),lo),p(x1,...section(cfg.stations,x1),lo),p(x1,...section(cfg.stations,x1),hi),p(x0,...section(cfg.stations,x0),hi)],tint(paint,(s<0?1.11:1.17)-.035*lo+(isHood&&cfg.hoodPress&&lo===.68?.045:0)+(isHood?cfg.hoodLaneTint?.(lo)??0:0)));
     }
    }};
    if(isHood)panel(r,'bonnet',[0,0,.71],'body.hood',top);else deckPanel(r,cfg.hatch,top);

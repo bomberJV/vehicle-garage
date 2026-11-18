@@ -44,7 +44,7 @@ const options={
     source:link('American Racing Baja wheel specifications','https://www.americanracing.com/american-racing-baja'),
     buy:link('Summit Racing AR1726882 wheel','https://www.summitracing.com/parts/are-ar1726882')
   }],
-  c63:[stock('18-inch AMG twin-spoke',[18],'Five close pairs of straight spokes on the W204 sedan.',cBook,cParts),{
+  c63:[stock('18-inch AMG 5-spoke',[18],'Five straight spokes that flare toward the rim, with machined faces and a titanium-grey channel down each spoke.',cBook,cParts),{
     id:'edition507',name:'AMG Edition 507',maker:'Mercedes-AMG',partNumber:'A 204 401 25 00 front / A 204 401 26 00 rear',frontDiameter:19,rearDiameter:19,lugs:5,boltCircle:112,
     description:'Ten slim forged arms form five pairs, set wider apart at the rim.',
     fitment:'W204 C63 AMG. Front 8J × 19 ET45. Rear 9J × 19 ET54.',

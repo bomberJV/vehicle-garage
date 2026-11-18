@@ -25,8 +25,16 @@ export function roadWheelSpokes(r,{vehicle,x,y,z,side,rim,finish}){
    // Star Spoke 156: five V-shaped pairs that meet at the hub and spread to the rim.
    for(const branch of [-1,1])blade(a,[[.26,branch*.040,.055,-.008],[.52,branch*.105,.048,.004],[.93,branch*.175,.040,.014]]);
   }else if(amg){
-   // The W204 factory 18-inch face has five pairs with narrow parallel arms.
-   for(const branch of [-1,1])blade(a,[[.245,branch*.125,.087,-.008],[.48,branch*.140,.062,.003],[.92,branch*.122,.043,.013]]);
+   // The W204 C63's factory 18-inch AMG 5-spoke (A 204 401 39 02 front): five
+   // solid straight spokes that flare toward the rim. Each has a machined face
+   // and a titanium-grey channel down its middle, so it reads as a pair.
+   const spoke=[[.245,0,.30,-.008],[.48,0,.20,.004],[.70,0,.18,.010],[.93,0,.18,.014]];
+   blade(a,spoke,1.0);
+   const channel=spoke.map(([rr,o,w,d])=>[rr,o,w*.52,d+.0015]);
+   for(let k=1;k<channel.length;k++){
+    const [lo,hi]=channel.slice(k-1,k+1),p=(c,e)=>vertex(a+c[1]+e*c[2],c[0]*rim,c[3]);
+    r.polygon([p(lo,-1),p(hi,-1),p(hi,1),p(lo,1)],'#4c5358',false);
+   }
   }else if(lx){
    // LX 17-inch pewter gray: a broad stem leaves the hub and forks at about
    // half the radius; the two arms flare apart and land on the rim, leaving a
@@ -42,11 +50,11 @@ export function roadWheelSpokes(r,{vehicle,x,y,z,side,rim,finish}){
   }
  }
  const capR=rim*(amg?.259:.304),pad=y+side*.000;
- r.ringY(x,pad,z,capR,0,tint(skin,.91),32);
+ r.ringY(x,pad,z,capR,0,amg?'#646b70':tint(skin,.91),32);
  for(let i=0;i<5;i++){
   const a=(i+.5)/5*Math.PI*2+Math.PI/2,xx=x+Math.cos(a)*capR*.748,zz=z+Math.sin(a)*capR*.748;
-  r.ringY(xx,pad+side*.004,zz,.0086,0,'#323b3f',12);
-  r.ringY(xx,pad+side*.007,zz,.0058,0,'#9ca6a7',6);
+  r.ringY(xx,pad+side*.004,zz,amg?.0115:.0086,0,'#323b3f',12);
+  r.ringY(xx,pad+side*.007,zz,amg?.0075:.0058,0,'#9ca6a7',6);
  }
  r.ringY(x,pad+side*.009,z,capR*.402,0,amg?'#a4aeb3':'#41494a',24);
 }

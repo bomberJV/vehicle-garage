@@ -1,5 +1,6 @@
 import {roadSystems} from './road-service-data.js';
 import {drawStudioContactShadow,hasStudioFinish} from './studio-finish.js';
+import {studioTheme,onStudioTheme} from './studio-theme.js';
 import {drawG500SteeringLinkage} from './g500-steering-gear.js';
 import {shellFragmentShader} from './shell-depth.js';
 import {isWorkbenchPorsche,drawPorscheInstalledServices} from './porsche-installed-services.js';
@@ -94,7 +95,7 @@ export class GarageRenderer{
    model.buildMesh();
    return model.faces;
  }
- constructor(canvas,onHotspot){this.canvas=canvas;this.ctx=canvas.getContext('2d');this.initDepthRenderer();this.onHotspot=onHotspot;this.angle=-.58;this.elevation=.24;this.zoom=1;this.blueprint=false;this.spin=false;this.lights=true;this.hotspots=true;this.dirty=true;this.points=[];this.faces=[];this.build=null;this.last=0;this.drag=null;this.inspection={assembly:null,part:null,expanded:false};this.schematic=true;this.isolate=false;this.currentPart=null;this.resize=new ResizeObserver(()=>this.draw());this.resize.observe(canvas);this.partPositions=new Map();this.mechanismPhase=0;
+ constructor(canvas,onHotspot){onStudioTheme(()=>this.draw());this.canvas=canvas;this.ctx=canvas.getContext('2d');this.initDepthRenderer();this.onHotspot=onHotspot;this.angle=-.58;this.elevation=.24;this.zoom=1;this.blueprint=false;this.spin=false;this.lights=true;this.hotspots=true;this.dirty=true;this.points=[];this.faces=[];this.build=null;this.last=0;this.drag=null;this.inspection={assembly:null,part:null,expanded:false};this.schematic=true;this.isolate=false;this.currentPart=null;this.resize=new ResizeObserver(()=>this.draw());this.resize.observe(canvas);this.partPositions=new Map();this.mechanismPhase=0;
  this.reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
  this.cacheDraws=true;bindViewerInput(this);requestAnimationFrame(t=>this.frame(t));}
  initDepthRenderer(){
@@ -160,7 +161,8 @@ export class GarageRenderer{
    const dy=p.screenY*(1-scale)+(p.from.cy-camera.cy)*camera.ratio;
    const ctx=this.ctx;
    ctx.save();ctx.setTransform(this.canvas.width/w,0,0,this.canvas.height/h,0,0);
-   ctx.fillStyle=this.blueprint?'#142629':'#171b1e';ctx.fillRect(0,0,w,h);
+   const ground=studioTheme()[this.blueprint?'blueprint':'ground'];
+   ctx.fillStyle=ground[1];ctx.fillRect(0,0,w,h);
    ctx.drawImage(p.image,dx,dy,w*scale,h*scale);ctx.restore();
    this.panPick={dx,dy,scale};this.lastCamera=camera;
  }
@@ -186,7 +188,8 @@ export class GarageRenderer{
      ctx.clearRect(0,0,w,h);ctx.drawImage(state.destination,0,0,w,h);this.focusTransition=null;
    }else{
      const bg=ctx.createRadialGradient(w*.52,h*.47,10,w*.52,h*.47,w*.6);
-     bg.addColorStop(0,this.blueprint?'#1d383a':'#34383b');bg.addColorStop(1,this.blueprint?'#142629':'#171b1e');
+     const ground=studioTheme()[this.blueprint?'blueprint':'ground'];
+     bg.addColorStop(0,ground[0]);bg.addColorStop(1,ground[1]);
      ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
      const layer=focusFrameLayer(f);
      const {scale,dx,dy}=layer.transform;
@@ -718,7 +721,7 @@ export class GarageRenderer{
      const pickPart=pickId(face);
      const hi=focus ? pickPart===focus && (!highlightedInstance || instance===highlightedInstance)
        : i.previewGroup && isMember(face);
-     const color=hi?shade('#b8cc68',.65+.4*parseInt(face.color.slice(1,3),16)/255):
+     const color=hi?shade(studioTheme().pick,.65+.4*parseInt(face.color.slice(1,3),16)/255):
        links.has(face.part)?shade('#75a7b2',.65+.38*parseInt(face.color.slice(1,3),16)/255):face.color;
      return {...face,points,color,highlighted:hi||links.has(face.part),instance,pickPart,motionKey:group.draggable ? group.key:null};
    });
@@ -859,7 +862,7 @@ export class GarageRenderer{
  if(this.cacheDraws){
    const sceneKey=JSON.stringify([this.build,i.vehicle,i.assembly,i.part,i.instance,i.studySeat,i.system,i.detailView?.id,i.detailPart,i.expanded,i.separation,i.previewGroup,
      i.onlyPart,i.frameEngine,i.engineCutaway,this.progress,this.isolate,this.schematic,
-     this.sectionPlane,this.seeThroughBody,this.lights,this.mechanismPhase,this.slRoofFraction,this.dragContext?.part,this.partPositions?.size?[...this.partPositions]:null]);
+     this.sectionPlane,this.seeThroughBody,this.lights,this.mechanismPhase,this.slRoofFraction,this.dragContext?.part,this.partPositions?.size?[...this.partPositions]:null,studioTheme().key]);
    geometryKey=sceneKey+JSON.stringify([this.hoverHit?.part,this.hoverHit?.instance]);
    const baseFrame=JSON.stringify([sceneKey,w,h,dpr,this.angle,this.elevation,this.zoom,this.blueprint,this.keepAssemblyFrame,
      this.selectionFocus?.id,this.selectionFocus?.instance,this.drag?.move,this.drag?.moved,this.focusPan?.start]);
@@ -881,7 +884,8 @@ export class GarageRenderer{
    depth:near[0]*x+near[1]*y+near[2]*z
  });this.project=project;
  const bg=ctx.createRadialGradient(w*.52,h*.47,10,w*.52,h*.47,w*.6);
- bg.addColorStop(0,this.blueprint?'#1d383a':'#34383b');bg.addColorStop(1,this.blueprint?'#142629':'#171b1e');
+ const ground=studioTheme()[this.blueprint?'blueprint':'ground'];
+ bg.addColorStop(0,ground[0]);bg.addColorStop(1,ground[1]);
  ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
  if(!geometryKey||this.drawGeometryKey!==geometryKey||this.drawnFaces!==this.faces){this.buildMesh();this.drawGeometryKey=geometryKey;this.drawnFaces=this.faces;}
  this.partFrames=new Map();
@@ -969,7 +973,7 @@ export class GarageRenderer{
  }
  const focused=Boolean(this.inspection?.detailView||this.inspection?.onlyPart||(this.isolate&&this.inspection?.assembly));
  if(!focused){
-   ctx.strokeStyle=this.blueprint?'#5d97933b':'#7b858d20';ctx.lineWidth=1;
+   ctx.strokeStyle=studioTheme()[this.blueprint?'blueprintGrid':'grid'];ctx.lineWidth=1;
    const floor=this.meshCache?.groundZ||0;
    for(let n=-8;n<=8;n++){
      for(const line of [[[n,-8,floor],[n,8,floor]],[[-8,n,floor],[8,n,floor]]]){
@@ -1001,7 +1005,7 @@ export class GarageRenderer{
  }
  }
  frameLabels(w,h){
-   const ctx=this.ctx;ctx.fillStyle='#91a58a';ctx.textAlign='left';ctx.font='9px monospace';
+   const ctx=this.ctx;ctx.fillStyle=studioTheme().label;ctx.textAlign='left';ctx.font='9px monospace';
    ctx.fillText(this.inspection?.detailView?'COMPONENT STUDY':this.inspection?.assembly?'ASSEMBLY SCHEMATIC':'VEHICLE OVERVIEW',18,h-20);
    ctx.textAlign='right';ctx.fillText('REFERENCE GEOMETRY · NOT SERVICE CAD',w-18,h-20);
  }

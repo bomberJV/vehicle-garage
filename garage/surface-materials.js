@@ -1,6 +1,7 @@
 import {faceTriangles} from './mesh-triangles.js';
 import {hasStudioFinish,studioPaintReflection,studioSurfaceFinish} from './studio-finish.js';
 import {glassOrder} from './glass-order.js';
+import {blueprintInk} from './studio-theme.js';
 import {shellTarget,bindShellTextures} from './shell-depth.js';
 
 // Mark a pane independently of its parent assembly. Trim and rubber remain opaque.
@@ -51,8 +52,7 @@ function splitSurfaces(renderer,project,width,height) {
     const color=rgbOf(face.color);
     if(face.highlighted)return color;
     if(!renderer.blueprint)return studio&&!face.ghostShell?studioSurfaceFinish(face,color,view):color;
-    const value=(.21*color[0]+.72*color[1]+.07*color[2])/255;
-    return [21+63*value,44+104*value,48+104*value].map(Math.round);
+    return blueprintInk((.21*color[0]+.72*color[1]+.07*color[2])/255);
   };
   for(const face of faces){
     const opacity=face.opacity??1;

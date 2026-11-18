@@ -160,42 +160,44 @@ function frontEnd(r,paint){
  };
  const lamp={tag:'lighting.headlamp'};
 
- // Grille: a matte surround standing proud of a black opening filled with thick
- // slats that make long hexagonal cells.
+ // Grille, measured on a 5x grid of the straight-on photo: a thin matte grey
+ // surround around a near-black opening. Thin bars make the long cells: on each
+ // side four level bars run from |y| 0.31 to 0.19; at the inner end each forks
+ // up and down to the centre bars, and at the outer end it climbs to the frame.
+ // The forks cross between the columns, which is what makes the diamonds there.
  const sym=h=>[...h.map(([y,z])=>[-y,z]).reverse(),...h];
- const gTop=sym([[.33,.867],[.40,.850],[.437,.81],[.45,.752]]),gLow=sym([[.33,.652],[.40,.667],[.437,.70],[.45,.752]]);
- const oTop=sym([[.33,.855],[.385,.83],[.405,.79],[.41,.752]]),oLow=sym([[.33,.663],[.385,.69],[.405,.72],[.41,.752]]);
- const SURROUND='#30363a',FRAME=.024;
- band(gLow,gTop,'#08090a',.008,{mirror:false});
- band(oTop,gTop,SURROUND,FRAME,{mirror:false,from:-.41,to:.41});
- band(gLow,oLow,SURROUND,FRAME,{mirror:false,from:-.41,to:.41});
- band(gLow,gTop,SURROUND,FRAME,{from:.41,to:.45,step:.01});
+ const gTop=sym([[.30,.866],[.355,.860],[.425,.810],[.445,.760]]),gLow=sym([[.30,.646],[.39,.652],[.425,.668],[.442,.700],[.445,.760]]);
+ const oTop=sym([[.30,.857],[.35,.851],[.405,.805],[.415,.760]]),oLow=sym([[.30,.654],[.355,.657],[.395,.668],[.413,.700],[.415,.760]]);
+ const SURROUND='#3b4043',FRAME=.016;
+ band(gLow,gTop,'#0c0e0f',.008,{mirror:false,step:.02});
+ band(oTop,gTop,SURROUND,FRAME,{mirror:false,from:-.415,to:.415,step:.02});
+ band(gLow,oLow,SURROUND,FRAME,{mirror:false,from:-.415,to:.415,step:.02});
+ band(gLow,gTop,SURROUND,FRAME,{from:.413,to:.445,step:.008});
+ // The radar unit behind the centre cell.
+ feature(r,'body.structure',s,[[-.042,.722],[.042,.722],[.042,.752],[-.042,.752]],'#1c2023',.010);
  r.tag('body.structure',()=>{
-  const inside=(y,z)=>Math.abs(y)<.409&&z<edge(oTop,y)-.002&&z>edge(oLow,y)+.002;
-  const slat=(pts,thick=.009,front='#2d3438')=>{
+  const inside=(y,z)=>Math.abs(y)<.413&&z<edge(oTop,y)-.002&&z>edge(oLow,y)+.001;
+  const slat=(pts,thick=.0032)=>{
    for(let i=1;i<pts.length;i++){
-    const [y0,z0]=pts[i-1],[y1,z1]=pts[i],n=Math.max(1,Math.ceil(Math.abs(y1-y0)/.05));
+    const [y0,z0]=pts[i-1],[y1,z1]=pts[i],n=Math.max(1,Math.ceil(Math.abs(y1-y0)/.04));
     for(let k=0;k<n;k++){
      const ya=mix(y0,y1,k/n),za=mix(z0,z1,k/n),yb=mix(y0,y1,(k+1)/n),zb=mix(z0,z1,(k+1)/n);
      if(!inside(ya,za)||!inside(yb,zb))continue;
-     // Front edge, a bright line along its top, and the slat's upper surface going back.
-     r.polygon([s.on(ya,za-thick,FRAME),s.on(yb,zb-thick,FRAME),s.on(yb,zb+thick,FRAME),s.on(ya,za+thick,FRAME)],front,false);
-     r.polygon([s.on(ya,za+thick-.003,FRAME+.0005),s.on(yb,zb+thick-.003,FRAME+.0005),s.on(yb,zb+thick,FRAME+.0005),s.on(ya,za+thick,FRAME+.0005)],'#6a757c',false);
-     r.polygon([s.on(ya,za+thick,FRAME),s.on(yb,zb+thick,FRAME),s.on(yb,zb+thick,.009),s.on(ya,za+thick,.009)],'#1a1f22',false);
+     // Front edge catching the light, and the bar's upper surface running back.
+     r.polygon([s.on(ya,za-thick,FRAME),s.on(yb,zb-thick,FRAME),s.on(yb,zb+thick,FRAME),s.on(ya,za+thick,FRAME)],'#5a6267',false);
+     r.polygon([s.on(ya,za+thick,FRAME),s.on(yb,zb+thick,FRAME),s.on(yb,zb+thick,.010),s.on(ya,za+thick,.010)],'#202528',false);
     }
    }
   };
-  // A honeycomb of long cells: slats at one set of heights across each side,
-  // at heights half a row lower across the centre, and every side slat forks
-  // to the centre slats above and below it. The outer ends fork the same way.
-  const sideZ=[.844,.784,.724,.664],centreZ=[.874,.814,.754,.694];
-  for(const sg of [-1,1])sideZ.forEach((z,k)=>{
-   if(k<3)slat([[sg*.19,z],[sg*.34,z]].sort((a,b)=>a[0]-b[0]));
-   for(const c of [centreZ[k],centreZ[k+1]])if(c)slat([[sg*.19,z],[sg*.10,c]],.006);
-   for(const dz of [-.030,.030])slat([[sg*.34,z],[sg*.385,z+dz]],.005);
-  });
-  for(const c of centreZ)slat([[-.10,c],[.10,c]]);
-  for(const y of [-.045,.045])r.polygon([s.on(y-.006,.703,FRAME-.004),s.on(y+.006,.703,FRAME-.004),s.on(y+.006,.745,FRAME-.004),s.on(y-.006,.745,FRAME-.004)],'#20262a',false);
+  for(const sg of [-1,1])for(const z of [.837,.776,.715,.658]){
+   slat([[sg*.31,z],[sg*.189,z]].sort((a,b)=>a[0]-b[0]));
+   slat([[sg*.189,z],[sg*.092,z+.047]]);
+   slat([[sg*.189,z],[sg*.076,z-.056]]);
+   slat([[sg*.31,z],[sg*.40,z+.063]]);
+  }
+  for(const z of [.837,.776,.715,.658]){slat([[-.092,z+.047],[.092,z+.047]]);slat([[-.076,z-.056],[.076,z-.056]]);}
+  slat([[-.075,.845],[.075,.845]]);
+  for(const sg of [-1,1])slat([[sg*.075,.845],[sg*.10,.857]].sort((a,b)=>a[0]-b[0]));
  });
  // Honda emblem: a chrome H in a rounded chrome frame, above the grille.
  r.tag('body.structure',()=>{
@@ -215,25 +217,26 @@ function frontEnd(r,paint){
  // into a tall recess at the corner, which runs down into the black lower bumper.
  const browTop=[[.555,.700],[.60,.712],[.76,.716]],browLow=[[.555,.694],[.60,.686],[.665,.672]];
  const trayCorner=[[.54,.545],[.58,.552],[.61,.568],[.635,.595],[.652,.630],[.665,.672]];
- band(browLow,browTop,CLAD,.008,{step:.01});
+ band(browLow,browTop,'#272c2f',.0105,{step:.01});
  band([[.54,.52],[.665,.52]],trayCorner,CLAD,.008,{step:.008});
  band([[.665,.52],[.76,.52]],browTop,CLAD,.008,{step:.02});
- band([[.685,.60],[.76,.57]],[[.685,.672],[.76,.695]],'#07090a',.010,{step:.012});
- // Silver sweep under each pocket.
- const SILVER='#b3b9bb';
- band([[.63,.418],[.76,.437]],[[.63,.422],[.66,.443],[.76,.477]],SILVER,.012,{step:.015});
+ // The recess itself is darker than the black trim around it.
+ band([[.645,.48],[.79,.475]],[[.645,.585],[.655,.625],[.665,.668],[.70,.677],[.79,.688]],'#0b0d0e',.0095,{step:.008});
+ // Under each pocket the painted bumper sweeps down to a point.
+ const SWEEP=tone(paint,.97);
+ band([[.63,.418],[.76,.437]],[[.63,.422],[.66,.443],[.76,.477]],SWEEP,.012,{step:.015});
 
  // Lower intake: a six-sided opening with a diamond mesh, and the lip under it.
  const iTop=sym([[.42,.535],[.53,.470]]),iLow=sym([[.47,.410],[.53,.470]]);
  band(iLow,iTop,'#0a0c0d',.008,{mirror:false});
  r.tag('body.structure',()=>{
   const inside=(y,z)=>z<edge(iTop,y)-.006&&z>edge(iLow,y)+.006&&Math.abs(y)<.52;
-  for(const dir of [-1,1])for(let k=-16;k<=16;k++){
-   // One mesh wire: it climbs 0.115 m while crossing 0.19 m.
+  for(const dir of [-1,1])for(let k=-22;k<=22;k++){
+     // One mesh wire; wires 36 mm apart.
    const n=6;for(let i=0;i<n;i++){
-    const za=mix(.412,.533,i/n),zb=mix(.412,.533,(i+1)/n),ya=k*.05+dir*(za-.4725)*1.65,yb=k*.05+dir*(zb-.4725)*1.65;
+    const za=mix(.412,.533,i/n),zb=mix(.412,.533,(i+1)/n),ya=k*.036+dir*(za-.4725)*1.2,yb=k*.036+dir*(zb-.4725)*1.2;
     if(!inside(ya,za)||!inside(yb,zb))continue;
-    r.polygon([s.on(ya-.0025,za,.011),s.on(ya+.0025,za,.011),s.on(yb+.0025,zb,.011),s.on(yb-.0025,zb,.011)],'#2f373b',false);
+    r.polygon([s.on(ya-.003,za,.011),s.on(ya+.003,za,.011),s.on(yb+.003,zb,.011),s.on(yb-.003,zb,.011)],'#2a3134',false);
    }
   }
  });
@@ -241,21 +244,25 @@ function frontEnd(r,paint){
  // License plate below the grille.
  feature(r,'body.structure',s,[[-.153,.492],[.153,.492],[.153,.645],[-.153,.645]],'#20272a',.018);
 
- // Headlamps: a slim black housing, pointed at the grille end with a chin under
- // it, then nearly level out to the corner. Inside: a row of LED reflectors and a
- // light strip along the bottom that turns up at the outer end, on the fender.
+ // Headlamps (5x grid of the photo): a black housing, pointed at the grille end
+ // with a chin under it. Inside, a smoked chrome band carries three LED modules
+ // in its upper half; a white light strip runs along the bottom over a thin
+ // chrome lip and turns straight up near the outer end, at |y| 0.745.
  const DRL=r.lights?'#f8fbf8':'#e3eaeb';
  band(lampLow,lampTop,'#14181b',.008,{...lamp,to:.68});
- for(const [a,b,c] of [[.447,.500,'#a3aeb5'],[.515,.578,'#b4bec4'],[.593,.655,'#a3aeb5']]){
-  band(shift(lampLow,.032),shift(lampTop,-.012),c,.010,{...lamp,from:a,to:b});
-  band(shift(lampLow,.040),shift(lampTop,-.020),'#3b464d',.011,{...lamp,from:a+.016,to:b-.016});
+ band(shift(lampLow,.024),shift(lampTop,-.008),'#262c30',.010,{...lamp,from:.43,to:.68});
+ for(const [a,b] of [[.515,.560],[.572,.617],[.629,.674]]){
+  band(shift(lampTop,-.044),shift(lampTop,-.011),'#4f595f',.011,{...lamp,from:a,to:b,step:.015});
+  band(shift(lampTop,-.038),shift(lampTop,-.017),'#2c3439',.012,{...lamp,from:a+.006,to:b-.006,step:.015});
+  band(shift(lampTop,-.030),shift(lampTop,-.025),'#8b969c',.013,{...lamp,from:a+.012,to:b-.012,step:.015});
  }
- band(shift(lampLow,.008),shift(lampLow,.021),DRL,.012,{...lamp,from:.465,to:.68});
+ band(lampLow,shift(lampLow,.006),'#636b6f',.012,{...lamp,from:.44,to:.68});
+ band(shift(lampLow,.008),shift(lampLow,.020),DRL,.012,{...lamp,from:.452,to:.68});
  band(lampLow,lampTop,null,.016,{...lamp,glass:true,to:.68});
  // On each fender the lamp carries on to the upturned light strip, the amber
  // marker behind it and a rounded tail.
  const along=(pts,x)=>{let i=1;while(i<pts.length-1&&x>pts[i][0])i++;const [xa,za]=pts[i-1],[xb,zb]=pts[i];return mix(za,zb,clamp((x-xa)/(xb-xa)));};
- const lo=[[s.x0,edge(lampLow,.675)],[-1.98,.900],[-1.86,.922],[-1.80,.940],[-1.775,.958]],hi=[[s.x0,edge(lampTop,.64)],[-1.95,1.000],[-1.85,.993],[-1.80,.980],[-1.775,.962]];
+ const lo=[[s.x0,edge(lampLow,.68)],[-2.02,.893],[-1.95,.894],[-1.915,.899],[-1.895,.912],[-1.885,.935]],hi=[[s.x0,edge(lampTop,.68)],[-2.04,1.003],[-1.95,1.009],[-1.915,1.0],[-1.895,.975],[-1.885,.935]];
  for(const side of [-1,1]){
   const p=(x,z,dy)=>[x,side*(sideY(x,z)+dy),z];
   const strip=(xa,xb,za,zb,dy,color,tag='lighting.headlamp')=>{
@@ -268,19 +275,21 @@ function frontEnd(r,paint){
    }
   };
   const low=x=>along(lo,x),top=x=>along(hi,x);
-  strip(s.x0,-1.775,low,top,.010,'#14181b');
-  strip(s.x0+.012,-2.005,x=>low(x)+.032,x=>top(x)-.012,.012,'#b4bec4');
-  strip(s.x0+.026,-2.020,x=>low(x)+.040,x=>top(x)-.020,.013,'#3b464d');
-  strip(s.x0,-1.985,x=>low(x)+.008,x=>low(x)+.021,.013,DRL);
-  // The strip turns up, leaning back.
-  r.tag('lighting.headlamp',()=>{const q=[p(-1.995,low(-1.995)+.008,.013),p(-1.972,low(-1.972)+.008,.013),p(-1.928,top(-1.928)-.009,.013),p(-1.951,top(-1.951)-.009,.013)];r.polygon(side<0?q:q.reverse(),DRL,false);});
-  strip(-1.962,-1.918,x=>low(x)+.011,x=>mix(low(x)+.012,top(x)-.010,(x+1.962)/.044),.013,'#c9853a','lighting.indicator');
-  strip(-1.918,-1.825,x=>low(x)+.011,x=>top(x)-.010,.013,'#c9853a','lighting.indicator');
-  strip(s.x0,-1.775,low,top,.017,null);
+  strip(s.x0,-1.885,low,top,.010,'#14181b');
+  strip(s.x0,-2.03,x=>low(x)+.024,x=>top(x)-.008,.012,'#1e2326');
+  strip(s.x0,-2.025,low,x=>low(x)+.006,.013,'#636b6f');
+  strip(s.x0,-2.025,x=>low(x)+.008,x=>low(x)+.020,.013,DRL);
+  // The strip turns straight up (in the head-on view) just behind the corner.
+  r.tag('lighting.headlamp',()=>{const q=[p(-2.027,low(-2.027)+.008,.013),p(-2.013,low(-2.013)+.008,.013),p(-1.978,top(-1.978)-.010,.013),p(-1.992,top(-1.992)-.010,.013)];r.polygon(side<0?q:q.reverse(),DRL,false);});
+  // Outboard of it: a chrome reflector with the amber marker in its upper part.
+  strip(-1.975,-1.90,x=>low(x)+.008,x=>top(x)-.008,.012,'#7f898e');
+  strip(-1.962,-1.91,x=>mix(low(x),top(x),.45),x=>top(x)-.011,.013,'#a8743f','lighting.indicator');
+  strip(s.x0,-1.885,low,top,.017,null);
   // The pocket and the silver sweep wrap a short way onto the side of the bumper.
   const pTop=[[s.x0,.716],[-2.03,.714],[-2.01,.70],[-1.995,.67]],pLow=[[s.x0,.477],[-2.03,.50],[-2.01,.56],[-1.995,.62]];
   strip(s.x0,-1.995,x=>along(pLow,x),x=>along(pTop,x),.008,CLAD,'body.structure');
-  strip(s.x0,-2.02,x=>mix(.437,.469,(x-s.x0)/.06),()=>.477,.010,SILVER,'body.structure');
+  strip(s.x0,-2.01,x=>along(pLow,x)+.006,x=>along(pTop,x)-.026,.0095,'#0b0d0e','body.structure');
+  strip(s.x0,-2.02,x=>mix(.437,.469,(x-s.x0)/.06),()=>.477,.010,SWEEP,'body.structure');
  }
 }
 

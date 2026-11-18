@@ -18,7 +18,7 @@ test('every exterior part split from the body shell is drawn and sourced',()=>{
 
 test('catalog-numbered exterior parts carry their Mercedes part number and diagram',()=>{
   const numbered=G500_BODY_PARTS.filter(p=>/ · \d{3}-\d{3}-\d{2}-\d{2}/.test(p.name));
-  assert.ok(numbered.length>=39,`${numbered.length} numbered parts`);
+  assert.ok(numbered.length>=47,`${numbered.length} numbered parts`);
   const numbers=new Set();
   for(const p of numbered){
     assert.ok(drawn.has(p.id),p.id);
@@ -35,4 +35,16 @@ test('left and right catalog parts sit on their own side of the car',()=>{
     // The fender halves meet the nose panel on the centerline, so test the bulk of each part.
     assert.ok(ys.length&&ys.filter(y=>sign*y>0).length/ys.length>.9&&ys.every(y=>sign*y>=-1e-9),p.id);
   }
+});
+
+test('cabin parts split from the dashboard stay visible through the see-through body',async()=>{
+  const {bodyVisibility}=await import('../garage/body-visibility.js');
+  const cabin=['instrument-panel','cluster-trim','grab-handle','steering-wheel','center-console','console-trim-plate','shift-panel','selector-lever','shift-knob','console-lid'].map(k=>'body.'+k);
+  for(const id of cabin){
+    assert.ok(drawn.has(id),id);
+    assert.ok(G500_BODY_PARTS.find(p=>p.id===id)?.source?.url,id);
+  }
+  const shown=bodyVisibility(faces.filter(f=>cabin.includes(f.part)),null);
+  assert.ok(shown.length);
+  for(const v of shown)assert.ok(!v.ghostShell,v.part+' is not treated as body skin');
 });

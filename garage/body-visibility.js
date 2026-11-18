@@ -1,7 +1,8 @@
 export const seeThroughCars=new Set(['g500','bmw325ci','bmw328xi','sl550','hrv','hrvlx','c63','f350','porsche993cab','porsche992scab','porsche996cab']);
 
 const cabinParts=new Set(['body.front-seats','body.rear-seats','body.rear-bench','body.dashboard','body.console',
-  'body.cabin-trim','body.rearview-mirror']);
+  'body.cabin-trim','body.rearview-mirror','body.instrument-panel','body.cluster-trim','body.grab-handle','body.steering-wheel',
+  'body.center-console','body.selector-lever','body.console-lid','body.console-trim-plate','body.shift-panel','body.shift-knob']);
 const slRoofSkin=new Set(['roof.windshield','roof.sky-glass','roof.rear-glass','roof.pillars','roof.door-glass','roof.quarter-glass']);
 export function bodyVisibility(faces,selection){
   return faces.map(face=>{

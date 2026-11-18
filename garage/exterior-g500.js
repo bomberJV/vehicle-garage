@@ -90,16 +90,13 @@ function roadDoor(r,side,isFront,paint) {
     const handle=b-.134;
     // The pushbutton and black bow interrupt the longitudinal rub strip.
     r.box(handle-.081,y-.015,.972,handle+.092,y+.015,1.027,dark);
-    r.tag('body.door-handles',()=>r.instance(name,()=>{
-      r.rod([handle-.060,y+side*.023,1.017],[handle+.042,y+side*.023,1.017],.012,'#4a5051',8);
-      r.rod([handle+.072,y+side*.014,.999],[handle+.072,y+side*.024,.999],.012,bright,10);
-    }));
+    // Handle and hinges stay with the door: the door exhibit already
+    // registers them as its own parts.
+    r.rod([handle-.060,y+side*.023,1.017],[handle+.042,y+side*.023,1.017],.012,'#4a5051',8);
+    r.rod([handle+.072,y+side*.014,.999],[handle+.072,y+side*.024,.999],.012,bright,10);
     for(const z of [.726,1.103]) {
-      const hinge=()=>{
-        r.box(a-.006,y-.013,z-.023,a+.044,y+.013,z+.023,tone(paint,.9));
-        r.rod([a+.009,y+side*.014,z-.027],[a+.009,y+side*.014,z+.028],.009,tone(paint,1.15),8);
-      };
-      if(isFront)r.tag('body.front-hinge-'+(z>1?'upper':'lower')+'-'+(left?'left':'right'),hinge);else hinge();
+      r.box(a-.006,y-.013,z-.023,a+.044,y+.013,z+.023,tone(paint,.9));
+      r.rod([a+.009,y+side*.014,z-.027],[a+.009,y+side*.014,z+.028],.009,tone(paint,1.15),8);
     }
     drawG500DoorTrim(r,side,a,b,isFront);
     if(isFront)drawBodyMirror(r,side,paint);
@@ -299,11 +296,10 @@ const exteriorPlates={
   ...Object.fromEntries(g500BumperParts.map(([key,,,end])=>[key,bumperRefs[end]])),
   'licence-lamps':exteriorPlate('licence lamps','electrical--license-lamps'),
   'grille-star':giantRef('grille and components','grille-components'),
-  ...Object.fromEntries(['door-handles','front-hinge-upper-left','front-hinge-upper-right','front-hinge-lower-left','front-hinge-lower-right'].map(k=>[k,giantRef('front door lock and hardware','front-door')])),
   ...Object.fromEntries(['pillar-molding-left','pillar-molding-right'].map(k=>[k,giantRef('windshield reveal moldings','reveal-moldings')])),
   ...Object.fromEntries(['lower-quarter-left','lower-quarter-right','upper-quarter-left','upper-quarter-right','fuel-door','fuel-door-pocket'].map(k=>[k,giantRef('quarter panel and fuel door','fuel-door')])),
   ...Object.fromEntries(['roof-rail-left','roof-rail-right'].map(k=>[k,giantRef('roof and components','roof-components')])),
-  ...Object.fromEntries(['spare-carrier','spare-cover','spare-cap','spare-ring','spare-emblem'].map(k=>[k,giantRef('spare tire carrier and components','carrier-components-spare-tire')])),
+  ...Object.fromEntries(['spare-cover','spare-cap','spare-ring','spare-emblem'].map(k=>[k,giantRef('spare tire carrier and components','carrier-components-spare-tire')])),
   'rear-plate-panel':exteriorPlate('exterior trim · rear body','body--exterior-trim-rear-body'),
   'running-boards':exteriorPlate('rocker panel','body--rocker-panel'),
   'wheel-flares':exteriorPlate('exterior trim · fender','body--exterior-trim-fender'),
@@ -354,7 +350,6 @@ export const G500_BODY_PARTS = [
   ['mirror-glass-left','Mirror glass, left · 463-810-83-16','The flat glass sits in a black frame inside the housing.'],
   ['mirror-glass-right','Mirror glass, right · 463-810-82-16','The glass sits in a black frame inside the housing.'],
   ['mirror-gaskets','Mirror base gaskets · 463-811-00-96','A rubber gasket seals each mirror foot against the door skin.'],
-  ['spare-carrier','Spare-wheel carrier · 463-890-13-44','The carrier hub on the cargo door holds the spare wheel on its studs.'],
   ['spare-cover','Spare-wheel cover · 463-890-73-08','The painted side wall rolls over a rounded shoulder around the spare tyre.'],
   ['spare-cap','Spare-cover face cap · 463-890-54-08','A shallow polished stainless dome closes the face of the cover.'],
   ['spare-ring','Spare-cover edge ring · 001-987-76-25','A bright ring trims the edge of the stainless face.'],
@@ -367,11 +362,6 @@ export const G500_BODY_PARTS = [
   ['roof-rail-right','Roof rail, right · 463-630-28-35','The side roof rail runs from the windshield pillar to the rear corner above the doors.'],
   ['fuel-door','Fuel door · 463-750-01-03','The painted flap on the right rear quarter covers the filler.'],
   ['fuel-door-pocket','Fuel-filler pocket · 463-630-00-67','The recessed pocket behind the flap surrounds the filler neck.'],
-  ['door-handles','Exterior door handles · 000-760-12-59','Each door has the same pull handle with a chrome pushbutton, set into a black bezel that interrupts the rub strip.'],
-  ['front-hinge-upper-left','Front door upper hinge, left · 463-720-00-37','The exposed upper hinge carries the left front door on the windshield pillar.'],
-  ['front-hinge-upper-right','Front door upper hinge, right · 463-720-01-37','The exposed upper hinge carries the right front door on the windshield pillar.'],
-  ['front-hinge-lower-left','Front door lower hinge, left · 463-720-02-37','The exposed lower hinge carries the left front door on the windshield pillar.'],
-  ['front-hinge-lower-right','Front door lower hinge, right · 463-720-03-37','The exposed lower hinge carries the right front door on the windshield pillar.'],
   ['pillar-molding-left','Windshield pillar molding, left · 463-698-01-30','A black molding runs along the inner edge of the left windshield pillar.'],
   ['pillar-molding-right','Windshield pillar molding, right · 463-698-02-30','A black molding runs along the inner edge of the right windshield pillar.'],
   ['grille-star','Grille star emblem · 601-817-01-16','The large three-pointed star stands ahead of the grille vanes on its backing plate.'],

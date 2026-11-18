@@ -166,7 +166,8 @@ export const g500GateParts={
   // the bench study passes nothing and keeps its own tags.
   carrier(r,own){
     if(typeof own!=='function')own=(id,fn)=>fn();
-    own('carrier',()=>r.rod([2.124,-.115,1.056],[2.194,-.115,1.056],.154,'#303638',24));
+    // The carrier hub is the cargo-door exhibit's spare-wheel carrier.
+    r.rod([2.124,-.115,1.056],[2.194,-.115,1.056],.154,'#303638',24);
     r.rod([2.180,-.115,1.056],[2.225,-.115,1.056],.370,'#42494a',40);
   },
   spare(r,paint,own){

@@ -8,6 +8,7 @@ import {path,box,plus,wheelSites,disc,caliper,drum,tankBody,sender,electricMachi
 import {cyl,sleeve,turn} from './mechanism-shapes.js';
 import {getServiceStudy} from './road-service-studies.js';
 import {refineBmwFuelParts,drawBmwFuseCarrier} from './bmw-fuel-system.js';
+import {baseVehicle} from './vehicle-variants.js';
 const X=[1,0,0],Y=[0,1,0],Z=[0,0,1];
 function component(id,name,description,offset,draw){return {id,name,description,offset,draw};}
 function brakeMasterSite(p){return p.master||(p.bike?[-.49,.26,.90]:[p.engine[0]>0?-1.06:p.axles[0]+.62,-.36,.65]);}
@@ -92,7 +93,7 @@ function brakes(id,p){
  parts.push(component('master',p.bike?'Front brake master cylinder':'Master cylinder & reservoir',p.bike?'The right-hand lever acts on the front circuit. The rear pedal has a separate master cylinder.':'A fluid reservoir sits on the tandem cylinder at the driver’s side of the vehicle.',[-.40,0,.40],r=>drawRoadBrakeMaster(r,id)),component('abs',p.park==='drum'?'Rear anti-lock circuit':'ABS hydraulic unit',p.park==='drum'?'The rear anti-lock system acts on the rear axle brake circuit. The diagram omits option-specific valve plumbing.':'The hydraulic block modulates brake pressure. An electric pump and valve passages share the module.',[.03,.44,.36],r=>{box(r,mod,[.099,.066,.075],metal);cyl(r,plus(mod,[.065,0,0]),X,-.038,.046,.033,rubber,16);for(let j=0;j<(p.bike?3:4);j++)cyl(r,plus(mod,[-.03+j*.020,0,.034]),Z,0,.019,.006,copper,8);}),
  component('lines','Hard lines & flexible hoses','The fixed lines carry fluid along the chassis. A flexible section follows each moving wheel. Routes are schematic.',[.03,.14,-.40],r=>{
   if(id==='f350')return fordBrakeLines(r,mod,axleSites);
-  if(id==='hrv')return hrvBrakeLines(r,mod,axleSites);
+  if(baseVehicle(id)==='hrv')return hrvBrakeLines(r,mod,axleSites);
   for(const rear of [false,true])for(const c of axleSites(rear)){
    const side=Math.sign(c[1]),mid=[c[0]+(rear?-.13:.13),side*(p.bike?.042:.38),c[2]+.10];
    path(r,[mod,[mod[0],side*(p.bike?.042:.38),mod[2]-.027],mid],p.bike?.003:.0045,'#897d64');path(r,[mid,[c[0]-.04,c[1]*.90,c[2]+.145],plus(c,[.10,0,.054])],p.bike?.004:.007,rubber);
@@ -109,16 +110,16 @@ function fuel(id,p){
  const end=id==='bmw325ci'?m54RailInlet:p.fuelEnd||plus(p.engine,[0,0,.13]);
  const parts=[component('tank',ford?'Midship tank · one configuration':saddle?'Saddle fuel tank':'Fuel tank',p.fuel,[0,0,-.38],r=>tankBody(r,t,p.tankShape,p.tunnel)),
   component('filler',b?'Filler cap & neck':'Filler neck',b?'The cap sits in the top of the tank ahead of the rider.':'The neck leads from the body-side filler opening to the tank.',[0,p.neckSide*.44,.27],r=>{const join=plus(t,[0,p.neckSide*(ford?.12:.23),.06]);if(p.neckPath)path(r,[neck,...p.neckPath],.025,rubber);else if(!b)path(r,[neck,[neck[0]-.04,neck[1]*.86,neck[2]-.13],join],.025,rubber);cyl(r,neck,b?Z:Y,-.014,.016,b?.048:.037,iron,18);}),
-  component('sender',saddle?'Right-hand delivery flange & sender':'Fuel level sender',ford?'The float tracks the fuel level. The engine specification determines the pump and sender combination.':'A float arm pivots as the liquid level changes. The electrical sender reports that position.',[-.18,.07,.52],r=>sender(r,id==='hrv'?plus(unit,[0,0,-.03]):unit,b?.64:1)),
-  component('supply','Fuel supply line',ford?'The chassis line runs inside the left frame rail and ends at the engine bay. The connection to the V8’s fuel rails and the return line are not drawn.':'The supply line runs from the tank assembly toward the engine. Its bends and clips are schematic.',[.12,-.33,-.15],r=>{const y=p.supplyY??(b?.08:.27);if(id==='hrv'){path(r,[unit,[unit[0],.31,unit[2]-.13],[-1.695,.31,.32],[-1.695,.27,.40],[-1.695,.27,.78],[-1.66,.33,.81],[-1.632,.33,.828],end],.009,'#736f5a');return;}path(r,[unit,[unit[0],y,ford?.33:unit[2]-.13],[end[0],y,b?.65:.33],end],b?.005:.009,'#736f5a');})];
+  component('sender',saddle?'Right-hand delivery flange & sender':'Fuel level sender',ford?'The float tracks the fuel level. The engine specification determines the pump and sender combination.':'A float arm pivots as the liquid level changes. The electrical sender reports that position.',[-.18,.07,.52],r=>sender(r,baseVehicle(id)==='hrv'?plus(unit,[0,0,-.03]):unit,b?.64:1)),
+  component('supply','Fuel supply line',ford?'The chassis line runs inside the left frame rail and ends at the engine bay. The connection to the V8’s fuel rails and the return line are not drawn.':'The supply line runs from the tank assembly toward the engine. Its bends and clips are schematic.',[.12,-.33,-.15],r=>{const y=p.supplyY??(b?.08:.27);if(baseVehicle(id)==='hrv'){path(r,[unit,[unit[0],.31,unit[2]-.13],[-1.695,.31,.32],[-1.695,.27,.40],[-1.695,.27,.78],[-1.66,.33,.81],[-1.632,.33,.828],end],.009,'#736f5a');return;}path(r,[unit,[unit[0],y,ford?.33:unit[2]-.13],[end[0],y,b?.65:.33],end],b?.005:.009,'#736f5a');})];
  if(saddle)parts.push(component('left-sender','Left tank sender','The second float measures the level across the center tunnel.',[-.29,-.41,.27],r=>sender(r,plus(t,[-.035,-.28,.07]))));
  if(!ford){
   const q=external?plus(t,[.25,-.12,-.14]):plus(unit,[.004,0,-.096]);
   parts.push(component('pump',external?'External delivery pump':'Tank delivery pump',external?'The 993 uses an electric delivery pump mounted separately from the tank.':'The electrically driven pump supplies fuel from the tank. The sender reports level independently of the pump motor.',[-.31,.32,.18],r=>{cyl(r,q,external?X:Z,-.071,.064,b?.030:.040,metal,17);sleeve(r,q,external?X:Z,-.034,-.016,b?.033:.044,.028,rubber,18);}));
-  const count=b||id==='hrv'?4:id==='c63'?8:6,banked=id==='c63'||id.startsWith('porsche');
+  const count=b||baseVehicle(id)==='hrv'?4:id==='c63'?8:6,banked=id==='c63'||id.startsWith('porsche');
   parts.push(component('rail',id==='porsche992scab'?'High-pressure rails & direct injectors':b?'Lower rail & port injectors':'Fuel rail & injectors',id==='porsche992scab'?'The rails deliver high-pressure fuel to injectors that open into the combustion chambers.':b?'This section follows the lower row of injectors at the four throttle ports.':'The rail supplies an injector for each cylinder. Each injector meters fuel at the inlet port.',[-.20,-.15,.36],r=>{if(id==='bmw325ci'){drawM54FuelRail(r);drawM54Injectors(r);return;}
    for(const bank of banked?[-1,1]:[0]){
-    const center=plus(end,[0,bank*.17,0]),n=banked?count/2:count,alongY=id==='hrv'||b;
+    const center=plus(end,[0,bank*.17,0]),n=banked?count/2:count,alongY=baseVehicle(id)==='hrv'||b;
     const railPoint=t=>plus(center,alongY?[0,t,0]:[t,0,0]);r.rod(railPoint(-.19),railPoint(.19),.012,alloy,10);
     for(let j=0;j<n;j++){const u=railPoint((j/(n-1)-.5)*.34),v=plus(u,[0,bank*.032,-.068]);r.rod(u,v,.011,iron,10);box(r,plus(u,[.014,0,-.025]),[.022,.019,.030],rubber);}
    }
@@ -128,7 +129,7 @@ function fuel(id,p){
 }
 function electrical(id,p){
  const e=p.engine,b=p.bike,B=p.battery,classic=id==='porsche993cab',starter=p.starter||plus(e,[.16,b?.02:.11,-.09]),gen=classic?plus(e,[.22,0,.18]):plus(e,[-.13,b?-.10:-.20,.04]);
- const hrv=id==='hrv',fuse=b?plus(B,[.09,.02,.03]):id.startsWith('porsche')?[.02,-.46,.49]:hrv?[-1.16,-.56,.82]:plus(B,[.08,.16,.025]);
+ const hrv=baseVehicle(id)==='hrv',fuse=b?plus(B,[.09,.02,.03]):id.startsWith('porsche')?[.02,-.46,.49]:hrv?[-1.16,-.56,.82]:plus(B,[.08,.16,.025]);
  const cableStart=id==='bmw325ci'?plus(B,[.100,-.046,.115]):B;
  // The HR-V's starter is the engine's own, on the back of the bellhousing.
  const cableEnd=id==='bmw325ci'?m54InstalledPoint([.638,.25,-.024]):hrv?[-1.21,-.45,.60]:starter;
@@ -156,7 +157,7 @@ export function getRoadServiceAssemblies(vehicle){
  if(!Object.hasOwn(roadSystems,vehicle))return [];
  if(!cache.has(vehicle)){
   const p=roadSystems[vehicle],groups=[['brakes','Brakes',p.brake,brakes(vehicle,p)],['fuel','Fuel system',p.fuel,fuel(vehicle,p)],['electrical','Starting & charging',p.electric,electrical(vehicle,p)]];
-  if(p.roofType)groups.push(['roof',p.roofType==='slide'?(vehicle==='hrv'?'Moonroof · EX-L':'Sliding roof'):'Cabriolet folding roof',p.roof,p.roofType==='slide'?slidingRoof(p):softTop(p)]);
+  if(p.roofType)groups.push(['roof',p.roofType==='slide'?(baseVehicle(vehicle)==='hrv'?'Moonroof · EX-L':'Sliding roof'):'Cabriolet folding roof',p.roof,p.roofType==='slide'?slidingRoof(p):softTop(p)]);
   cache.set(vehicle,groups.map(([id,name,description,parts])=>({id,name,description,source:p.refs[id],parts:parts.map(c=>({...c,id:id+'.'+c.id,source:p.refs[id]})),view:'hero',category:'service',internal:true})));
  }
  return cache.get(vehicle);
@@ -167,7 +168,7 @@ export function drawRoadServiceAssembly(r,vehicle,id,engineOwnsM54Rail=false){
  // Keep a single physical starter and alternator while preserving both menus.
  const shared=new Set();
  const ownsBattery=Boolean(roadSystems[vehicle]?.sharedEngine);
- if((vehicle==='bmw325ci'||vehicle==='hrv'||ownsBattery)&&id==='electrical'){
+ if((vehicle==='bmw325ci'||baseVehicle(vehicle)==='hrv'||ownsBattery)&&id==='electrical'){
   for(const f of r.faces){
    const owner=f.part==='powertrain.starter'?'electrical.starter':f.part==='powertrain.alternator'?'electrical.generator':ownsBattery&&f.part==='powertrain.battery'?'electrical.battery':null;
    if(!owner)continue;
@@ -175,7 +176,7 @@ export function drawRoadServiceAssembly(r,vehicle,id,engineOwnsM54Rail=false){
    shared.add(owner);
   }
  }
- if(vehicle==='hrv'&&id==='fuel'){
+ if(baseVehicle(vehicle)==='hrv'&&id==='fuel'){
   for(const f of r.faces){
    if(f.part!=='powertrain.fuel-rail'&&f.part!=='powertrain.injectors')continue;
    if(r.inspection?.assembly==='fuel')f.part='fuel.rail';

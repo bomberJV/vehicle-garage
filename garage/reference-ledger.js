@@ -58,6 +58,10 @@ const references = {
   hrv: [
     parts('Honda · front door panel and hinges', 'https://www.hondapartsnow.com/parts-list/2026-honda-hr_v--5_door_ex_l_awd-cvt/body_air_conditioning/front_door_panels.html', 'US 2026 EX-L AWD catalog plate showing the bare front door, upper and lower hinges, door check and attachments.')
   ],
+  hrvlx: [
+    parts('Honda · 2026 HR-V LX AWD front door panels', 'https://www.hondapartsnow.com/parts-list/2026-honda-hr_v--5_door_lx_awd-cvt/body_air_conditioning/front_door_panels.html', 'US 2026 LX AWD catalog plate for the bare front door, hinges and check. The panel part numbers match the EX-L body.'),
+    parts('Honda · 2026 HR-V LX AWD parts categories', 'https://www.hondapartsnow.com/2026-honda-hr_v--5_door_lx_awd-cvt-parts.html', 'The LX AWD catalog lists a roof lining but no roof slide components, and includes the propeller shaft and rear differential.')
+  ],
   bmw328xi: [
     specs('Edmunds · 2008 328xi sedan specifications',e90Specs,'Length, width, height, wheelbase, both tracks and the 16 × 7 in wheels with 205/55R16 tires for the US 328xi sedan.'),
     photo('NHTSA · 2006 US 325i sedan, front three-quarter','https://commons.wikimedia.org/wiki/File:2006_BMW_325i_--_NHTSA.jpg','The pre-facelift US sedan body, headlamps, kidneys, front bumper and wheels; the 328xi shares this body and its lamps.'),

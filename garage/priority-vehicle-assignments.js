@@ -6,6 +6,7 @@ export const vehicleAssignments={
   f350:['P2','todo','The 1993 truck’s engine and axle are decided. Build the 7.5-litre V8, E4OD automatic, Twin I-Beam front and Sterling 10.25 rear in place of the placeholders.'],
   c63:['P2','todo'],
   hrv:['P2','todo'],
+  hrvlx:['P2','todo'],
   bmw328xi:['P1','in-progress','Check the front driveline placement against a 328xi underbody photograph and measure the sedan’s glass and lamp outlines.'],
   bmw325ci:['P1','todo','A measured seal section and vent linkage are still needed to establish exact travel.'],
   porsche993cab:['P1','in-progress'],

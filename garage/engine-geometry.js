@@ -17,6 +17,7 @@ import {drawG500AcCompressor} from './g500-comfort-parts.js';
 import {g500Ignition,g500FluidAccess} from './g500-engine-bay.js';
 import {F350_ENGINE,drawE4OD} from './f350-powertrain.js';
 import {drawF350EngineParts,f350Cams} from './f350-engine-bay.js';
+import {baseVehicle,withVariants} from './vehicle-variants.js';
 /* Component geometry for the engine-bay explorer. This is a source-informed
    layout model, not a scanned engine, assembly tolerance or service drawing.
    Coordinate units are metres; small features are enlarged for legibility. */
@@ -32,6 +33,7 @@ export const ENGINE_LAYOUTS={
  // 45° cylinder axes give the 90° V. Height and fore-aft station are estimated.
  f350:{layout:'v8',count:8,banks:2,cams:1,valves:2,plugs:1,length:F350_ENGINE.length,orientation:'longitudinal',wheelbase:3.3782,base:F350_ENGINE.base,center:F350_ENGINE.center,bore:.0554,wall:.006,slope:1,pushrod:true},
 };
+withVariants(ENGINE_LAYOUTS);
 // Every component translates rigidly; left/right instances remain an assembly.
 const OFFSETS={
  'dipstick-guide':[.06,-.42,.31],'air-filters':[.04,.40,.42],'oil-fill':[.03,-.30,.63],'oil-dipstick':[-.24,.40,.51],
@@ -49,7 +51,7 @@ const OFFSETS={
 const VEHICLE_OFFSETS={f350:{camshafts:[-.62,0,.12],'timing-drive':[-.40,0,.30]}};
 export function enginePartOffset(id,vehicle='g500'){
  const key=id.replace(/^powertrain\./,''),p=VEHICLE_OFFSETS[vehicle]?.[key]||OFFSETS[key]||[0,0,.35];
- return vehicle==='hrv'?[p[1],-p[0],p[2]]:ENGINE_LAYOUTS[vehicle]?.orientation==='transverse'?[ -p[1],p[0],p[2] ]:[...p];
+ return baseVehicle(vehicle)==='hrv'?[p[1],-p[0],p[2]]:ENGINE_LAYOUTS[vehicle]?.orientation==='transverse'?[ -p[1],p[0],p[2] ]:[...p];
 }
 export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail=false,g500ServiceOwnsFlow=false}={}){
  if(!detail)return; // Hidden under the closed hood; avoid a proxy piercing the exterior.
@@ -67,7 +69,7 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  // ~0.7 m height about the crank line.
  // Its crank line sits 40 mm above the bay datum so the block and sump clear
  // the half-shafts; the radiator and bay fittings keep the datum.
- const honda=id==='hrv',engineZ=z=>honda?base+.04+z*.80:fitHeight(base+z);
+ const honda=baseVehicle(id)==='hrv',engineZ=z=>honda?base+.04+z*.80:fitHeight(base+z);
  const world=m54?m54InstalledPoint:([x,y,z])=>[cx+(trans?(honda?y:-y):x),trans?(honda?-x:x):y,engineZ(z)],t=tools(r,world);
  const crankRise=id==='g500'?m113CrankZ-base:0;
  const rotating=id==='g500'?tools(r,([x,y,z])=>world([x,y,z+crankRise])):t;
@@ -127,10 +129,10 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
   const side=d=>corners.map(([xx,yyy,zz])=>[x+xx,yyy+d,zz]);
   const a=side(-.006),b=side(.006);poly(a,METAL);poly(b,METAL);for(let j=0;j<a.length;j++){const k=(j+1)%a.length;poly([a[j],a[k],b[k],b[j]],METAL);}
  }});
- if(id==='hrv')tag('vtec-rockers',()=>{for(const x of xs)for(const yy of [-.065,.065]){box(x-.025,yy-.017,headZ+.125,x+.025,yy+.017,headZ+.155,METAL);cyl([x-.030,yy,headZ+.14],[x+.030,yy,headZ+.14],.005,GOLD,6);}});
+ if(baseVehicle(id)==='hrv')tag('vtec-rockers',()=>{for(const x of xs)for(const yy of [-.065,.065]){box(x-.025,yy-.017,headZ+.125,x+.025,yy+.017,headZ+.155,METAL);cyl([x-.030,yy,headZ+.14],[x+.030,yy,headZ+.14],.005,GOLD,6);}});
  // The G500's covers are low magnesium shells over the camshafts, so the air
  // cleaner pods above them stay clear.
- if(!m54)tag('valve-cover',()=>{const top=id==='g500'?.162:id==='hrv'?.17:.19,rib=id==='g500'?.003:.006,bolt=id==='g500'?.005:.012;for(const s of banks){const y=bankY(s),half=headWidth/2+.025;box(-L/2-.025,y-half,headZ+.15,L/2+.025,y+half,headZ+top,BLACK);for(let x=-L/2+.025;x<L/2;x+=.15)for(const sy of [-1,1])cyl([x,y+sy*(half-.012),headZ+top],[x,y+sy*(half-.012),headZ+top+bolt],.008,METAL,6);for(const yy of [y-.06,y-.035,y+.035,y+.06])box(-L/2+.04,yy-.003,headZ+top,L/2-.04,yy+.003,headZ+top+rib,tone(METAL,.8));}});
+ if(!m54)tag('valve-cover',()=>{const top=id==='g500'?.162:baseVehicle(id)==='hrv'?.17:.19,rib=id==='g500'?.003:.006,bolt=id==='g500'?.005:.012;for(const s of banks){const y=bankY(s),half=headWidth/2+.025;box(-L/2-.025,y-half,headZ+.15,L/2+.025,y+half,headZ+top,BLACK);for(let x=-L/2+.025;x<L/2;x+=.15)for(const sy of [-1,1])cyl([x,y+sy*(half-.012),headZ+top],[x,y+sy*(half-.012),headZ+top+bolt],.008,METAL,6);for(const yy of [y-.06,y-.035,y+.035,y+.06])box(-L/2+.04,yy-.003,headZ+top,L/2-.04,yy+.003,headZ+top+rib,tone(METAL,.8));}});
  tag('timing-drive',()=>{
   const xx=-L/2-.037,crank=[xx,0,crankRise],cams=cfg.pushrod?f350Cams(xx):banks.flatMap(s=>Array.from({length:cfg.cams/cfg.banks},(_,i)=>[xx,bankY(s)+(cfg.cams/cfg.banks===1?0:(i? .065:-.065)),headZ+.115]));
   for(const p of [crank,...cams]){tube([xx-.01,p[1],p[2]],[xx+.01,p[1],p[2]],p===crank?.057:.048,p===crank?.025:.014,GOLD,14);}
@@ -138,7 +140,7 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  });
  const camAdjust=(name)=>tag(name,()=>{for(const s of banks)for(let cam=0;cam<cfg.cams/cfg.banks;cam++){const yy=bankY(s)+(cfg.cams/cfg.banks===1?0:(cam?.065:-.065));cyl([-L/2-.11,yy,headZ+.115],[-L/2-.05,yy,headZ+.115],.052,CAST,14);tube([-L/2-.116,yy,headZ+.115],[-L/2-.108,yy,headZ+.115],.043,.015,GOLD,12);}});
  if(id==='bmw328i'||id==='bmw328xi')camAdjust('vanos');
- if(id==='bmw328xi')tag('valvetronic',()=>{box(-L/2+.02,-.05,headZ+.135,L/2-.06,.05,headZ+.175,CAST);cyl([-L/2-.02,.07,headZ+.155],[-L/2+.10,.07,headZ+.155],.032,BLACK,12);});if(id==='c63')camAdjust('cam-adjusters');if(id==='hrv')camAdjust('vtc-actuators');
+ if(id==='bmw328xi')tag('valvetronic',()=>{box(-L/2+.02,-.05,headZ+.135,L/2-.06,.05,headZ+.175,CAST);cyl([-L/2-.02,.07,headZ+.155],[-L/2+.10,.07,headZ+.155],.032,BLACK,12);});if(id==='c63')camAdjust('cam-adjusters');if(baseVehicle(id)==='hrv')camAdjust('vtc-actuators');
  if(id==='g500'){
   const oilOwner=r.inspection?.assembly==='engine-oil';
   if(!oilOwner)for(const key of sharedOilKeys)tag(key,()=>drawG500EngineOilPart(r,key));
@@ -170,7 +172,7 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  }
  if(id==='g500')g500Ignition(r,tag,t,cells);
  else if(!ford){
- tag('coils',()=>{for(const {x,side,index}of cells)r.instance(side+'-'+index,()=>{const yy=cfg.banks===2?side*.43:0,zz=headZ+(id==='hrv'?.16:.23);box(x-.030,yy-.030,zz-.045,x+.030,yy+.030,zz+.025,BLACK);if(cfg.plugs===2){for(const shift of [-.035,.035])route([[x,yy,zz-.02],[x+shift,yy+side*.06,headZ-.015]],.004,RUBBER,6);}else cyl([x,yy,headZ+.03],[x,yy,zz-.045],.008,DARK,6);});});
+ tag('coils',()=>{for(const {x,side,index}of cells)r.instance(side+'-'+index,()=>{const yy=cfg.banks===2?side*.43:0,zz=headZ+(baseVehicle(id)==='hrv'?.16:.23);box(x-.030,yy-.030,zz-.045,x+.030,yy+.030,zz+.025,BLACK);if(cfg.plugs===2){for(const shift of [-.035,.035])route([[x,yy,zz-.02],[x+shift,yy+side*.06,headZ-.015]],.004,RUBBER,6);}else cyl([x,yy,headZ+.03],[x,yy,zz-.045],.008,DARK,6);});});
  tag('spark-plugs',()=>{for(const {x,side,index}of cells)for(let p=0;p<cfg.plugs;p++)r.instance(side+'-'+index+'-'+p,()=>{const yy=cfg.banks===2?side*.41:0,dx=cfg.plugs===2?(p? .027:-.027):0;cyl([x+dx,yy,headZ-.04],[x+dx,yy,headZ+.012],.007,'#d5d8cb',8);cyl([x+dx,yy,headZ-.058],[x+dx,yy,headZ-.04],.005,GOLD,6);});});
  }
  if(id==='g500'&&!g500ServiceOwnsFlow)tag('exhaust-manifold',()=>drawG500ExhaustManifold(r));
@@ -201,7 +203,7 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  // whether the engine itself runs along or across the car.
  const bayTag=(name,fn)=>tag(name,()=>fn(bay));
  // The HR-V's radiator and fan sit lower, under its lower bonnet line.
- const radX=front-.62,radY=0,radZ=base+(id==='hrv'?.16:.20),radTop=id==='hrv'?.40:id==='bmw328xi'?.44:.55,fanR=id==='hrv'?.20:.245;
+ const radX=front-.62,radY=0,radZ=base+(baseVehicle(id)==='hrv'?.16:.20),radTop=baseVehicle(id)==='hrv'?.40:id==='bmw328xi'?.44:.55,fanR=baseVehicle(id)==='hrv'?.20:.245;
  if(id==='g500'){
   if(!g500ServiceOwnsFlow)drawG500CoolingCircuit(r,'powertrain');
  }else{
@@ -262,7 +264,7 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  if(honda)tag('battery',()=>serviceBattery(r,roadSystems.hrv.battery));
  else if(!ford)bayTag('battery',({box,cyl,route})=>{const g=id==='g500',x=front+.64-(g?.025:0),y=g?-.68:.64,z=base+.18+(g?.050:0);if(id==='g500'||id.startsWith('bmw')){box(x-.045,y-.045,z,x+.045,y+.045,z+.07,BLACK);box(x-.050,y-.050,z+.07,x+.050,y+.050,z+.095,'#a45045');cyl([x,y,z+.095],[x,y,z+.12],.014,GOLD,10);if(id!=='g500')route([[x,y,z+.02],[x+.12,y,z-.10],[x+.12,y*.70,z-.15]],.009,'#7a534a',8);}else{box(x-.14,y-.10,z,x+.14,y+.10,z+.19,BLACK);box(x-.15,y-.105,z+.19,x+.15,y+.105,z+.22,DARK);for(const [yy,c]of [[y-.06,'#b55c52'],[y+.06,METAL]])cyl([x+.09,yy,z+.22],[x+.09,yy,z+.245],.012,c,8);route([[x+.09,y-.06,z+.24],[x+.25,y-.06,z+.24],[x+.25,.32,z+.09]],.007,'#a05d4f',6);}});
  if(id==='g500'){if(!g500ServiceOwnsFlow)tag('brake-reservoir',()=>drawG500BrakeHydraulics(r));}
- else if(['bmw325ci','c63','hrv','f350'].includes(id))tag('brake-reservoir',()=>drawRoadBrakeMaster(r,id));
+ else if(['bmw325ci','c63','hrv','hrvlx','f350'].includes(id))tag('brake-reservoir',()=>drawRoadBrakeMaster(r,id));
  else bayTag('brake-reservoir',({cyl,box})=>{const x=front+.78,y=-.62,z=base+.43;cyl([x-.045,y,z-.04],[x+.04,y,z-.04],.097,BLACK,16);box(x-.05,y-.055,z,x+.09,y+.055,z+.11,'#c0c9b9');cyl([x+.04,y,z+.11],[x+.04,y,z+.13],.027,BLACK,10);});
  if(id==='g500'&&!g500ServiceOwnsFlow)tag('ecu',()=>drawG500ElectronicShared(r,'ecu'));
  if(id!=='g500'&&!ford)bayTag('ecu',({box,route})=>{const x=honda?-1.10:front+.77,y=m54?-.47:honda?.56:.39,z=honda?.80:base+.45;box(x-.11,y-.075,z,x+.11,y+.075,z+.07,BLACK);for(let yy=y-.055;yy<y+.07;yy+=.021)box(x-.10,yy,z+.07,x+.10,yy+.007,z+.08,DARK);route(honda?[[x-.1,y,z+.025],[-1.20,.46,.90],[-1.285,.30,.95]]:[[x-.1,y,z+.025],[x-.18,y,z-.04],[front+.13,m54?-.20:.20,base+.43]],.012,RUBBER,6);});

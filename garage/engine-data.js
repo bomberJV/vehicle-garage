@@ -1,6 +1,7 @@
 import {g500FilterSources} from './g500-filter-geometry.js';
 import {fluidRefs} from './g500-fluid-refs.js';
 import {m54References} from './bmw-m54-bay.js';
+import {baseVehicle,withVariants} from './vehicle-variants.js';
 /* Engine architecture and a component relationship graph. Manufacturer documents
    establish the architecture; original geometry and hose paths remain schematic. */
 export const ENGINE_SCOPE = 'An interactive assembly study: components, their jobs and their connections. Shapes, routing, fasteners and separation distances are explanatory, not measured service CAD.';
@@ -94,6 +95,7 @@ const CONFIG = {
  ['distributor','ignition','Distributor','Front of the engine, behind the water pump','A gear on the camshaft turns the distributor shaft. The rotor sends the coil’s output to each cylinder’s lead in the firing order 1-5-4-2-6-3-7-8. Cap shape and position are estimated.',['camshafts','coils','spark-plugs','ecu']]]},
  hrv:{id:'honda-2l',name:'2.0L DOHC i-VTEC inline-four',layout:'inline4',orientation:'transverse',cylinders:4,camCount:2,valvesPerCylinder:4,plugsPerCylinder:1,source:ENGINE_SOURCES.honda,partsSource:ENGINE_SOURCES.hondaParts,summary:'The US 2026 HR-V has a transverse, port-injected inline-four and a CVT beside it. Two cams serve four cylinders; the accessory and cooling package wraps around that sideways layout.',extras:[['vtc-actuators','head-system','Dual VTC cam phasers','At the camshaft timing ends','VTC changes the phase of both camshafts. This differs from the intake-side VTEC switching mechanism.',['camshafts','timing-drive','ecu']],['vtec-rockers','head-system','Intake VTEC rocker mechanism','Within the cylinder head','The intake-side valve mechanism changes operating mode; the cam phasers separately vary timing.',['camshafts','valves','ecu']]]},
 };
+withVariants(CONFIG);
 const overrides = {
  g500:{
  sump:{name:'Upper and lower oil pan',location:'Under the crankcase, above the rigid front axle',description:'The detachable lower bowl sits at the pulley end. The shallow rear casting leaves room for the front differential and propeller shaft.',source:fluidRefs.pan},
@@ -156,6 +158,7 @@ const overrides = {
   transmission:{name:'E4OD bellhousing interface',location:'Behind the engine, under the cab floor',description:'The torque converter inside the bellhousing couples the crankshaft to the E4OD four-speed automatic. Open Transmission & final drive for the gearbox, propeller shaft and rear axle.'}},
  hrv:{'fuel-rail':{description:'The rail supplies the multi-point port injectors. This 2026 US model is not represented as a direct-injection system.'},injectors:{description:'Four port injectors meter fuel near the intake valves. Honda specifies multi-point fuel injection.'},camshafts:{description:'Two overhead cams serve sixteen valves. Dual VTC and intake-side VTEC have different functions.',connectsTo:['timing-drive','vtc-actuators','vtec-rockers','head']},transmission:{name:'CVT / transverse transaxle',description:'The CVT sits beside the sideways engine and transfers torque to the final-drive assembly. The internal belt/pulley mechanism is not exploded.'}},
 };
+withVariants(overrides);
 const OFFSET={shortblock:[0,0,.30],'head-system':[0,0,.72],'air-fuel':[0,-.45,.95],ignition:[0,.52,.72],lubrication:[0,-.38,-.22],cooling:[-.62,0,.12],accessories:[-.30,.48,.18],electrical:[.24,.60,.36],exhaust:[.12,.64,.18]};
 const sid=id=>`powertrain.${id}`;
 const SYSTEM_NOTES={f350:{'head-system':'One camshaft in the block opens the valves through lifters, pushrods and rocker arms. The timing chain keeps it synchronized with the crankshaft.',ignition:'The coil’s high voltage reaches each plug through the distributor and its lead. The engine controller commands when the spark occurs.'}};
@@ -164,7 +167,7 @@ export function getEngineDefinition(vehicleId) {
  const rows=[...COMMON,...c.extras];
  const components=rows.map(([id,system,name,location,description,links])=>{
   const o=overrides[vehicleId]?.[id]||{},connectsTo=(o.connectsTo||links).map(sid);
-  const component={id:sid(id),name,description,location,parentId:sid(system),system,connectsTo,connections:connectsTo.map(target=>({id:target,kind:connectionKind(id,target.slice(11)),description:'Functional or mounting relationship; see the component descriptions.'})),category:'service',source:c.extras.some(x=>x[0]===id)&&(system==='head-system'||vehicleId==='f350')?(vehicleId==='hrv'?ENGINE_SOURCES.hondaVtc:c.source):c.partsSource,explode:[...OFFSET[system]],...o};
+  const component={id:sid(id),name,description,location,parentId:sid(system),system,connectsTo,connections:connectsTo.map(target=>({id:target,kind:connectionKind(id,target.slice(11)),description:'Functional or mounting relationship; see the component descriptions.'})),category:'service',source:c.extras.some(x=>x[0]===id)&&(system==='head-system'||vehicleId==='f350')?(baseVehicle(vehicleId)==='hrv'?ENGINE_SOURCES.hondaVtc:c.source):c.partsSource,explode:[...OFFSET[system]],...o};
   component.connectsTo=connectsTo;component.connections=connectsTo.map(target=>({id:target,kind:connectionKind(id,target.slice(11))}));
   if(o.name)component.name=o.name;
   component.quantity=quantity(id,c);

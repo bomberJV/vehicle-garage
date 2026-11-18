@@ -21,13 +21,13 @@ const porsche={
   'drive.gearbox':'drivetrain.gearbox','drive.axles':'drivetrain.halfshafts',
   'running.brakes':'brakes.front-disc','cabin.carpet':'floor.carpet','cabin.top':'roof.fabric'
 };
-const gearboxes=new Set(['g500','bmw325ci','c63','hrv']);
+const gearboxes=new Set(['g500','bmw325ci','c63','hrv','hrvlx']);
 export function installedPartId(vehicle,id){
   if(gearboxes.has(vehicle)&&id==='powertrain.transmission')return 'drivetrain.gearbox';
   if(vehicle==='g500')return g500[id]||id;
   if(vehicle==='bmws1000rr')return s1000rr[id]||id;
   if(vehicle==='porsche993cab'||vehicle==='porsche992scab'||vehicle==='porsche996cab')return porsche[id]||id;
-  if(['bmw325ci','c63','hrv'].includes(vehicle)&&id==='powertrain.brake-reservoir')return 'brakes.master';
+  if(['bmw325ci','c63','hrv','hrvlx'].includes(vehicle)&&id==='powertrain.brake-reservoir')return 'brakes.master';
   if(vehicle==='bmw325ci'&&['powertrain.fuel-rail','powertrain.injectors'].includes(id))return 'fuel.rail';
   if(vehicle==='bmw325ci')return installedAlias(id)||id;
   return id;

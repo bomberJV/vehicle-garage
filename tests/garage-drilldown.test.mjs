@@ -19,7 +19,8 @@ test('All is independent of the selected model, domain and type',()=>{
 test('model families keep individual saved-build IDs under one year and trim selector',()=>{
   const ids=Object.keys(VEHICLES),groups=vehicleFamilies(ids);
   assert.deepEqual(groups.flatMap(g=>g.variants.map(v=>v.id)).sort(),[...ids].sort());
-  assert.deepEqual(groups.filter(g=>g.variants.length>1).map(g=>g.name),['Porsche 911']);
+  assert.deepEqual(groups.filter(g=>g.variants.length>1).map(g=>g.name),['Honda HR-V','Porsche 911']);
+  assert.deepEqual(groups.find(g=>g.id==='honda-hrv').variants.map(v=>v.id),['hrv','hrvlx']);
   assert.deepEqual(groups.find(g=>g.id==='porsche-911').variants.map(v=>v.id),['porsche993cab','porsche996cab','porsche992scab']);
   assert.equal(vehicleFamilies(modelFilters(ids,'Sea').models).some(g=>g.id==='porsche-911'),false);
 });

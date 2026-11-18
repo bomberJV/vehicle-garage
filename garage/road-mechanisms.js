@@ -13,6 +13,7 @@ import {diff,transaxleDiff} from './mechanism-differential.js';
 import {manual,clutch,cvJoint,multiClutch,finalChain} from './mechanism-shaft.js';
 import {hrvAwdRows,getHrvAwdDetail} from './hrv-awd.js';
 import {drawE4OD,drawE4ODConverter,drawF350Propshaft,drawSterlingCarrier,drawSterlingHousing,drawSterlingShafts,drawFullFloatingHubs} from './f350-powertrain.js';
+import {baseVehicle,withVariants} from './vehicle-variants.js';
 
 const references={
  hrv:{label:'Honda · 2026 HR-V transmission and drivetrain specifications',url:'https://hondanews.com/en-US/releases/release-6f8b202ddb1c7f26ecd92774bb014b0c-2026-honda-hr-v-specifications-and-features'},
@@ -24,6 +25,7 @@ const references={
  bmws1000rr:{label:'BMW Motorrad · S 1000 RR technical data',url:'https://www.bmw-motorrad.co.uk/en/models/sport/s1000rr-2023/technicaldata.html'},
  f350:{label:'Ford · 1993 commercial pickups and chassis',url:'https://xr793.com/wp-content/uploads/2022/11/1993-Ford-Commercial-Trucks-Pickups-Chassis.pdf'},
 };
+withVariants(references);
 const sterlingSource={label:'Diesel Hub · Sterling 10.25 applications',url:'https://dieselhub.com/maintenance/sterling-axle-fluid.html'};
 
 const converter=study('converter','Torque converter section','The engine-driven impeller accelerates oil into the turbine. The turbine turns the transmission input shaft. The stator redirects the returning flow when the converter is multiplying torque.',{label:'Schaeffler · hydrodynamic torque converters',url:'https://www.schaeffler.com/remotemedien/media/_shared_media/08_media_library/01_publications/schaeffler_2/symposia_1/downloads_11/Schaeffler_Kolloquium_2014_20_en.pdf'},[
@@ -95,22 +97,23 @@ const layouts={
  f350:{box:'E4OD four-speed automatic',desc:'The E4OD four-speed automatic with overdrive sits behind the 7.5-litre V8. A propeller shaft drives the second-generation Sterling 10.25 full-floating rear axle on this two-wheel-drive truck. Lengths, diameters and offsets are estimated.'},
  bmws1000rr:{box:'Six-speed motorcycle gearbox',desc:'A wet multi-plate clutch feeds the six-speed gearbox. A chain connects its small output sprocket to the larger sprocket fixed to the rear wheel.'},
 };
+withVariants(layouts);
 function register(id,rows){
  const spec=layouts[id],parts=rows.map(([key,name,description,offset,draw,source])=>({id:'drivetrain.'+key,name,description,offset,category:'service',draw,...(source?{source}:{})}));
  return {id:'drivetrain',name:'Transmission & final drive',description:spec.desc,source:references[id],parts,view:'hero',internal:true,category:'service'};
 }
 function inputComponent(id,spec,draw){
- return ['gearbox',spec.box,id==='hrv'?'Open the variator to see both pulley pairs, their shafts and the steel pushbelt.':id==='c63'?'The MCT uses a wet launch clutch ahead of the automatic gearsets.':'This housing transmits drive from the engine toward the final drive.',[-.18,0,.51],draw];
+ return ['gearbox',spec.box,baseVehicle(id)==='hrv'?'Open the variator to see both pulley pairs, their shafts and the steel pushbelt.':id==='c63'?'The MCT uses a wet launch clutch ahead of the automatic gearsets.':'This housing transmits drive from the engine toward the final drive.',[-.18,0,.51],draw];
 }
 function sedan(id){
  const spec=layouts[id],ax=spec.wheelbase/2,front=-ax,z0=.39;
- const transverse=id==='hrv',g=id==='g500',c=transverse?[front+.16,.39,.50]:[front+.82,0,.49];
+ const transverse=baseVehicle(id)==='hrv',g=id==='g500',c=transverse?[front+.16,.39,.50]:[front+.82,0,.49];
  const arr=[inputComponent(id,spec,g?drawG500Gearbox:transverse?hrvCvtCase:r=>gearbox(r,c,x,.174,.58))];
  if(transverse){
   arr.push(['torque-converter','Torque converter','Engine torque enters the transaxle through the fluid coupling.',[-.17,-.33,.32],hrvConverter],
   ['front-differential','Front differential','The final reduction turns the differential carrier. The side gears drive the front wheels.',[-.25,.40,-.13],hrvFinalDrive],
   ['halfshafts','Front half-shafts','An inboard and outboard joint on each side allow steering and suspension motion.',[0,.24,-.31],hrvShafts]);
-  if(id==='hrv')arr.push(...hrvAwdRows);
+  if(baseVehicle(id)==='hrv')arr.push(...hrvAwdRows);
  }else {
   const tail=c[0]+.29,center=.02;
   if(g){
@@ -222,7 +225,7 @@ export function getRoadDetail(vehicleId,partId){
  if(isFleetPlug(vehicleId,partId))return fleetSpark;
  if(partId==='powertrain.spark-plugs')return spark;
  if(partId==='spark.center')return electrode;
- if(vehicleId==='hrv'){
+ if(baseVehicle(vehicleId)==='hrv'){
    if(['powertrain.transmission','drivetrain.gearbox'].includes(partId))return cvt;
    if(partId==='cvt.belt')return pushbelt;
    if(partId==='drivetrain.front-differential')return transaxleDiff;
@@ -232,7 +235,7 @@ export function getRoadDetail(vehicleId,partId){
  if(['g500','c63','f350'].includes(vehicleId)&&['powertrain.transmission','drivetrain.gearbox'].includes(partId))return planetary;
  if(vehicleId==='c63'&&partId==='drivetrain.launch-clutch')return launchClutch;
  if(partId==='drivetrain.torque-converter')return converter;
- if(partId==='drivetrain.halfshafts'||partId==='drive.axles'||vehicleId==='hrv'&&partId==='drivetrain.rear-halfshafts')return vehicleId==='g500'?null:axleStudy;
+ if(partId==='drivetrain.halfshafts'||partId==='drive.axles'||baseVehicle(vehicleId)==='hrv'&&partId==='drivetrain.rear-halfshafts')return vehicleId==='g500'?null:axleStudy;
  if(partId==='shaft.outer')return cvJoint;
  if(['drivetrain.rear-differential','drivetrain.front-differential'].includes(partId))return diff;
  if(vehicleId.startsWith('porsche')){

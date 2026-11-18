@@ -3,6 +3,7 @@ import {pipe} from './road-primitives.js';
 import {glazingFace} from './surface-materials.js';
 import {references} from './door-profiles.js';
 import {g500CargoStudy} from './g500-cargo-study.js';
+import {baseVehicle,withVariants} from './vehicle-variants.js';
 
 const closures={
   f350:{name:'F-Series drop tailgate',width:1.64,height:.50,source:references.fordGate,truck:true,
@@ -16,6 +17,7 @@ const closures={
   bmw325ci:{name:'E46 coupe trunk lid',width:1.27,height:.57,source:references.bmwLid,
     text:'The luggage lid curves over the rear panel. Its liner covers the lower face, with the central latch standing proud of the lining.'}
 };
+withVariants(closures);
 function shellPoint(p,u,h,dy=0){
   const z=h*p.height;
   const x=u*p.width*.5*(1-(p.truck?0:.07)*h);
@@ -74,7 +76,7 @@ export function cargoSection(vehicle){
       for(let i=1;i<=8;i++)path(r,p,[[-.87,.47+i*.05],[0,.47+i*.05],[.87,.47+i*.05]],-.016,.0018,'#87745f');
     }));
   }
-  if(p.truck||vehicle==='hrv'){
+  if(p.truck||baseVehicle(vehicle)==='hrv'){
     parts.push(part('supports',p.truck?'Tailgate support cables':'Liftgate stays',p.truck?'The two flexible cables go taut when the bed face reaches its open position. They sit outside the latch linkage.':'A stay on each side supports the weight of the raised hatch.',[0,.05,-.38],r=>{
       for(const s of [-1,1]){
         const a=shellPoint(p,.91*s,p.truck?.75:.56,-.085);

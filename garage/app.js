@@ -102,7 +102,7 @@ function renderVehicles(){
     const b=button('',()=>chooseVehicle(id),'vehicle-choice');
     b.dataset.family=family.id;b.dataset.vehicle=id;b.setAttribute('aria-pressed',String(family===current));
     const title=family.name||FLEET[id]?.short||v.name;
-    if(members.length>1)b.append(el('span','',members.map(item=>VEHICLES[item.id].year).join(' · ')));
+    if(members.length>1)b.append(el('span','',[...new Set(members.map(item=>VEHICLES[item.id].year))].join(' · ')));
     else if(!title.startsWith(String(v.year)))b.append(el('span','',String(v.year)));
     b.append(el('strong','',title));choices.append(b);
   }

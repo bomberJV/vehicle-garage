@@ -30,6 +30,7 @@ const checks = {
   c63:['body.deck',['pressing','hinge','latch']],
   bmw328xi:['body.deck',['pressing','hinge','latch']],
   hrv:['body.door',['hinge','check','frame']],
+  hrvlx:['body.door',['hinge','check','frame']],
   bmw325ci:['door-bmw325ci-front-left.regulator',['track','carriage','cable','motor']],
   porsche993cab:['engine.case',['left','right','crankshaft','bearings','nose']],
   porsche992scab:['engine.case',['left','right','crankshaft','bearings']],

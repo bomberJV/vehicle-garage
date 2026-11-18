@@ -1,6 +1,7 @@
 import {getAssemblies} from './assemblies.js';
 import {getDetail} from './detail-catalog.js';
 import {vehicleDomain,vehicleType} from './fleet.js';
+import {withVariants} from './vehicle-variants.js';
 
 // The directory resolves each study through its real parents. A link cannot
 // point at a component on another variant or at a detached example.
@@ -35,6 +36,7 @@ const highlights={
  viking90:['marine-room-viking90','viking-electrical','marine-mtu2000','viking-flybridge'],
  alvin:['alvin-electric','marine-battery','marine-room-alvin','alvin-sphere']
 };
+withVariants(highlights);
 const directory=new Map();
 const serviceOrder=['exhaust','intake','cooling','electrical','hvac','seat-heating','column-adjustment','roof','brakes','fuel','differentials','drivetrain'];
 export function systemsFor(vehicle){

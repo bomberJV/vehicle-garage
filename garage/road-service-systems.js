@@ -129,10 +129,13 @@ function fuel(id,p){
   const count=b||baseVehicle(id)==='hrv'?4:id==='c63'?8:6,banked=id==='c63'||id.startsWith('porsche');
   // Some engines carry their own rails and injectors (the SL550's M278); the supply line ends at them.
   if(!p.engineOwnsRail)parts.push(component('rail',id==='porsche992scab'?'High-pressure rails & direct injectors':b?'Lower rail & port injectors':'Fuel rail & injectors',id==='porsche992scab'?'The rails deliver high-pressure fuel to injectors that open into the combustion chambers.':b?'This section follows the lower row of injectors at the four throttle ports.':'The rail supplies an injector for each cylinder. Each injector meters fuel at the inlet port.',[-.20,-.15,.36],r=>{if(id==='bmw325ci'){drawM54FuelRail(r);drawM54Injectors(r);return;}
+   // Optional per-bank rail centres and injector spacing follow the real
+   // cylinder pitch (993); otherwise the rails are spaced generically.
+   const span=p.injectorSpan??.34;
    for(const bank of banked?[-1,1]:[0]){
-    const center=plus(end,[0,bank*.17,0]),n=banked?count/2:count,alongY=baseVehicle(id)==='hrv'||b;
-    const railPoint=t=>plus(center,alongY?[0,t,0]:[t,0,0]);r.rod(railPoint(-.19),railPoint(.19),.012,alloy,10);
-    for(let j=0;j<n;j++){const u=railPoint((j/(n-1)-.5)*.34),v=plus(u,[0,bank*.032,-.068]);r.rod(u,v,.011,iron,10);box(r,plus(u,[.014,0,-.025]),[.022,.019,.030],rubber);}
+    const center=p.railCenters?p.railCenters[bank<0?0:1]:plus(end,[0,bank*.17,0]),n=banked?count/2:count,alongY=baseVehicle(id)==='hrv'||b;
+    const railPoint=t=>plus(center,alongY?[0,t,0]:[t,0,0]);r.rod(railPoint(-span/2-.02),railPoint(span/2+.02),.012,alloy,10);
+    for(let j=0;j<n;j++){const u=railPoint((j/(n-1)-.5)*span),v=plus(u,[0,bank*.032,-.068]);r.rod(u,v,.011,iron,10);box(r,plus(u,[.014,0,-.025]),[.022,.019,.030],rubber);}
    }
   }));
  }
@@ -145,7 +148,7 @@ function electrical(id,p){
  // The HR-V's starter is the engine's own, on the back of the bellhousing.
  const cableEnd=id==='bmw325ci'?m54InstalledPoint([.638,.25,-.024]):hrv?[-1.21,-.45,.60]:starter;
  return [component('battery','12 V battery',p.electric,[-.16,.14,.46],r=>battery(r,B,b)),component('starter','Starter motor & solenoid','The solenoid engages the starter drive with the engine’s ring gear. Opening the motor shows the armature and pinion.',[.28,.25,-.15],r=>electricMachine(r,starter,'starter',b?.67:1)),
- component('generator',b?'Generator stator & rotor':classic?'Fan-axis alternator':'Belt-driven alternator',b?'A stator winding and rotating field generate current at the engine. The regulator controls the charging supply.':classic?'The alternator shares the engine cooling fan axis. The pulley is driven by the engine belt.':'A belt drives a rotor inside the stator. The rectifier converts its output for the vehicle’s DC circuit.',[-.30,-.32,.20],r=>electricMachine(r,gen,b?'bike-gen':'alternator',b?.72:p.generatorSize||1)),
+ component('generator',b?'Generator stator & rotor':classic?'Fan-axis alternator':'Belt-driven alternator',b?'A stator winding and rotating field generate current at the engine. The regulator controls the charging supply.':classic?'The alternator shares the engine cooling fan axis. The pulley is driven by the engine belt.':'A belt drives a rotor inside the stator. The rectifier converts its output for the vehicle’s DC circuit.',[-.30,-.32,.20],r=>electricMachine(r,gen,b?'bike-gen':p.generatorKind||'alternator',b?.72:p.generatorSize||1)),
  component('fuses',b?'Fuses & distribution':id==='bmw325ci'?'Glove-compartment fuse carrier':'Fuse carrier',id==='bmw325ci'?'The carrier is behind the glovebox panel and its two clips, as shown on page 140 of the 2003 coupé manual. Fuse colors and assignments here are illustrative.':'Individual fuse links protect branch circuits. Fuse assignments and ratings are omitted from this layout.',[.12,.47,.32],r=>{if(id==='bmw325ci')return drawBmwFuseCarrier(r);box(r,fuse,b?[.072,.049,.034]:[.148,.091,.047],rubber);for(let j=0;j<(b?3:6);j++)for(const side of [-1,1])box(r,plus(fuse,[(j-(b?1:2.5))*.018,side*(b?.009:.019),b?.020:.031]),[.013,.013,.015],['#a9785c','#9fa976','#718ba8'][j%3]);}),
  component('cables','Positive feed & ground strap','A high-current feed connects the starter to the battery. A separate bond returns current through the engine and chassis.',[0,-.34,-.22],r=>{if(hrv){path(r,[plus(B,[.094,-.043,.116]),[B[0]+.094,-.60,.83],[-1.618,-.56,.80],[-1.612,-.56,.715],[-1.45,-.47,.712],[-1.30,-.455,.70],[-1.22,-.45,.64],cableEnd],.009,'#956451');path(r,[cableEnd,[-1.15,-.44,.63],[-1.08,-.44,.68]],.010,'#717b73');return;}if(p.cablePath){path(r,[cableStart,...p.cablePath,cableEnd],.009,'#956451');path(r,[cableEnd,plus(cableEnd,[.03,-.06,0]),plus(cableEnd,[.12,-.11,.018])],.010,'#717b73');return;}const y=b?.105:.36;path(r,[cableStart,plus(cableStart,[.07,0,-.02]),[B[0],y,B[2]-.09],[cableEnd[0],y,b?.54:.41],cableEnd],b?.005:.009,'#956451');path(r,[cableEnd,plus(cableEnd,[.03,-.06,0]),plus(cableEnd,[.12,-.11,.018])],.010,'#717b73');})];
 }

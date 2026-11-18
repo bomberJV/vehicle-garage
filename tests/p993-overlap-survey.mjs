@@ -44,6 +44,10 @@ export const mounts=[
   ['brakes.lines','shell.fenders','each hard line ends at a bracket on the inner wing, where its hose passes through to the caliper'],
   ['cabin.controls','floor','the centre console is screwed to the tunnel through the carpet'],
   ['fuel.filler','shell.fenders','the filler neck passes through its sealed opening in the left front inner wing'],
+  ['993-climate.exchanger-left','engine.exhaust','the three primaries of each bank run through its heat-exchanger jacket'],
+  ['993-climate.exchanger-right','engine.exhaust','the three primaries of each bank run through its heat-exchanger jacket'],
+  ['drivetrain.halfshafts','shell.fenders','each half-shaft passes through the opening in the inner wheel housing to its hub; the housing wall is drawn closed'],
+  ['engine.exhaust','shell.bumpers','each tailpipe leaves through its opening in the rear apron; the apron is drawn without the cut-out'],
   ['roof','shell.deck','the folded top lies in its compartment behind the seats; the deck surface is drawn closed across the compartment opening'],
 ];
 // Reviewed pairs that the rules would pass but are wrong.

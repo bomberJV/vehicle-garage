@@ -95,8 +95,10 @@ export function drawCrank(r,phase,modern){for(const g of groups)crankFeature(r,g
 
 // The overview uses the same pin and main axes with smaller polygon rings. All
 // journal lengths meet their cheeks. Cup-shaped bearings remain in the casting.
-export function drawEngineCore(r,cx,z,modern){
-  const s=.54, map=([x,y,h])=>[cx-.0065+x*.55625,y*s,z+h*s];
+export function drawEngineCore(r,cx,z,modern,f=1,stroke=null){
+  // f scales positions along the crankshaft (see porsche-boxer-layout.js).
+  // `stroke` (m) sets the installed crank throw; otherwise the study's throw is used.
+  const s=.54,throwScale=stroke?stroke/2/(.096*s):1, map=([x,y,h])=>[cx+f*(-.0065+x*.55625),y*s,z+h*s];
   const face=(pts,col)=>r.polygon(pts.map(map),col,false);
   const rings=(center,a,b,rad,segments=6)=>{
     const ring=dx=>Array.from({length:segments},(_,j)=>[center[0]+dx,center[1]+rad*cos(j*TAU/segments),center[2]+rad*sin(j*TAU/segments)]);
@@ -106,7 +108,7 @@ export function drawEngineCore(r,cx,z,modern){
   r.tag('engine.crankshaft',()=>{
     for(const m of mainStations){const [a,b]=rings([m,0,0],-.022,.022,.059);strip(a,b,silver);}
     for(let i=0;i<6;i++){
-      const p=rodPin(i),a=angles[i]+.29,c=cos(a),v=sin(a);
+      const pin=rodPin(i),p=[pin[0],pin[1]*throwScale,pin[2]*throwScale],a=angles[i]+.29,c=cos(a),v=sin(a);
       const [q,t]=rings(p,-.031,.031,.046);strip(q,t,silver);
       for(const hand of [-1,1]){
         const pos=p[0]+hand*.047;

@@ -6,6 +6,7 @@ import {drawSLCabin,slCabinGroups} from './sl550-cabin.js';
 import {drawSLPower,slPowerGroups} from './sl550-power.js';
 import {slAssistGroup,drawSLAssist,drawSLRearCamera} from './sl550-assist.js';
 import {slSpecifications} from './sl550-sources.js';
+import {drawSLChassis,slChassisGroups} from './sl550-chassis.js';
 
 const brochure='https://ragtop.org/mbbrochures/2014/usa/2014-SL-Class.pdf';
 const partsBase='https://classicparts.mbusa.com/v-2014-mercedes-benz-sl550--base--4-7l-v8-gas/';
@@ -22,10 +23,10 @@ export const sl550={
     {name:'SL550 passenger seat components',seller:'Mercedes-Benz Classic Parts',url:'https://classicparts.mbusa.com/v-2014-mercedes-benz-sl550--base--4-6l-v8-gas/body--passenger-seat-components',description:'Compare the backrest, head restraint and cushion diagrams for the equipped seat.'},
     {name:'2014 SL550 parts catalog',seller:'Mercedes-Benz Classic Parts',url:partsBase,description:'Look up the roof, climate and powertrain components by VIN and equipment code.'}
   ],
-  groups:[...slExteriorGroup,slSeatGroup,slRoofGroup,...slCabinGroups,...slPowerGroups,slAssistGroup],
+  groups:[...slExteriorGroup,slSeatGroup,slRoofGroup,...slCabinGroups,...slPowerGroups,...slChassisGroups,slAssistGroup],
   draw(r,paint,finish){
     const t=roofPosition(r);
-    drawSLExterior(r,paint,finish,t);drawSLPower(r);drawSLCabin(r,t);drawSLSeats(r);drawSLAssist(r,paint,t);drawSLRoof(r,paint,t);
+    drawSLExterior(r,paint,finish,t);drawSLPower(r);drawSLChassis(r);drawSLCabin(r,t);drawSLSeats(r);drawSLAssist(r,paint,t);drawSLRoof(r,paint,t);
   },
   movingRoofParts:new Set(['access.trunk','access.handle','sl-assist.rearview','shell.trunklid','lights.high-stop',...slRoofGroup.parts.map(p=>p.id)]),
   drawMovingRoof(r,paint){const t=roofPosition(r);drawSLDeck(r,paint,t);drawSLMovingAccess(r,t);drawSLRearCamera(r,t);drawSLRoof(r,paint,t);}

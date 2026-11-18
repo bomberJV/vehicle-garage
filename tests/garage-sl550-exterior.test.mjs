@@ -12,8 +12,8 @@ function render(draw) {
 const paint='#a6a8a9';
 const mesh=render(r=>drawSLExterior(r,paint));
 const extent=(faces,axis)=>{
-  const values=faces.flatMap(f=>f.points.map(p=>p[axis]));
-  const low=Math.min(...values),high=Math.max(...values);
+  let low=Infinity,high=-Infinity;
+  for(const f of faces)for(const p of f.points){low=Math.min(low,p[axis]);high=Math.max(high,p[axis]);}
   return {low,high,span:high-low,center:(low+high)/2};
 };
 function close(actual,expected,tolerance=.00001) {

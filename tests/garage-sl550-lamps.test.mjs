@@ -8,14 +8,14 @@ import {getDetail} from '../garage/detail-catalog.js';
 test('the SL550 rear light bands stay visible around the whole corner',()=>{
   const r=Object.assign(Object.create(GarageRenderer.prototype),{faces:[]});
   drawSLExterior(r,'#999999');
-  // Cast toward the installed car from rearward through side-on, including the
-  // former boundary between the two rear-lamp patches. Compare actual meshes.
+  // Cast toward the installed car from rearward to the lens's forward tip, which
+  // ends about 0.39 m ahead of the tail on the photographed US car.
   const triangles=r.faces.filter(f=>f.points.some(([x])=>x>1.65)).flatMap(f=>{
     const indices=faceTriangles(f.points),ts=[];
     for(let i=0;i<indices.length;i+=3)ts.push({part:f.part,vertices:indices.slice(i,i+3).map(j=>f.points[j])});
     return ts;
   });
-  for(const side of [-1,1])for(const [angle,z] of [[39,.677],[47,.703],[54,.739],[61,.757],[66,.775],[72,.807],[76,.838]]){
+  for(const side of [-1,1])for(const [angle,z] of [[39,.677],[47,.703],[54,.739],[61,.757],[64,.766],[65.5,.772]]){
     const theta=angle*Math.PI/180,dx=Math.cos(theta),dy=side*Math.sin(theta);
     let part=null,nearest=0;
     for(const tri of triangles){

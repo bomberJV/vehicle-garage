@@ -72,7 +72,8 @@ function brakes(id,p){
  const m=brakeMasterSite(p);
  const mod=p.absSite||(p.bike?[.14,0,.55]:[m[0]-.10,m[1]+.12,m[2]-.09]);
  const parts=[];
- for(const rear of [false,true]){
+ // Vehicles that draw their own discs and calipers with the wheels list only the hydraulics here.
+ for(const rear of p.wheelBrakes===false?[]:[false,true]){
   const key=rear?'rear':'front',label=rear?'Rear':'Front',idx=rear?1:0,sites=axleSites(rear),R=p.radii[idx],n=p.calipers[idx];
   if(rear&&p.park==='drum'){
    parts.push(component('rear-drum','Rear brake drums','Each rear drum turns around a stationary backing plate. Open the drum to see its shoes, cylinder, adjuster and springs.',[.43,-.53,.18],r=>sites.forEach(c=>drum(r,c,R,Math.sign(c[1])||1))));continue;
@@ -95,6 +96,14 @@ function brakes(id,p){
   if(id==='f350')return fordBrakeLines(r,mod,axleSites);
   if(baseVehicle(id)==='hrv')return hrvBrakeLines(r,mod,axleSites);
   if(p.brakeRoute){for(const rear of [false,true])for(const c of axleSites(rear)){const side=Math.sign(c[1]),run=p.brakeRoute(rear,side,mod,c);path(r,run.hard,.0045,'#897d64');path(r,run.hose,.007,rubber);}return;}
+  if(p.lineVia){
+   // Explicit routes for a crowded bay: hard line to the last point, then a hose to the caliper.
+   for(const rear of [false,true])for(const c of axleSites(rear)){
+    const side=Math.sign(c[1]),pts=p.lineVia[rear?'rear':'front'].map(([x,y,z])=>[x,typeof y==='number'?side*y:y[side<0?0:1],z]);
+    path(r,[mod,...pts],.0045,'#897d64');path(r,[pts.at(-1),plus(c,[.10,0,.054])],.007,rubber);
+   }
+   return;
+  }
   for(const rear of [false,true])for(const c of axleSites(rear)){
    const side=Math.sign(c[1]),mid=[c[0]+(rear?-.13:.13),side*(p.bike?.042:.38),c[2]+.10];
    path(r,[mod,[mod[0],side*(p.bike?.042:.38),mod[2]-.027],mid],p.bike?.003:.0045,'#897d64');path(r,[mid,[c[0]-.04,c[1]*.90,c[2]+.145],plus(c,[.10,0,.054])],p.bike?.004:.007,rubber);
@@ -118,7 +127,8 @@ function fuel(id,p){
   const q=p.pumpSite||(external?plus(t,[.25,-.12,-.14]):plus(unit,[.004,0,-.096]));
   parts.push(component('pump',external?'External delivery pump':'Tank delivery pump',external?'The 993 uses an electric delivery pump mounted separately from the tank.':'The electrically driven pump supplies fuel from the tank. The sender reports level independently of the pump motor.',[-.31,.32,.18],r=>{cyl(r,q,external?X:Z,-.071,.064,b?.030:.040,metal,17);sleeve(r,q,external?X:Z,-.034,-.016,b?.033:.044,.028,rubber,18);}));
   const count=b||baseVehicle(id)==='hrv'?4:id==='c63'?8:6,banked=id==='c63'||id.startsWith('porsche');
-  parts.push(component('rail',id==='porsche992scab'?'High-pressure rails & direct injectors':b?'Lower rail & port injectors':'Fuel rail & injectors',id==='porsche992scab'?'The rails deliver high-pressure fuel to injectors that open into the combustion chambers.':b?'This section follows the lower row of injectors at the four throttle ports.':'The rail supplies an injector for each cylinder. Each injector meters fuel at the inlet port.',[-.20,-.15,.36],r=>{if(id==='bmw325ci'){drawM54FuelRail(r);drawM54Injectors(r);return;}
+  // Some engines carry their own rails and injectors (the SL550's M278); the supply line ends at them.
+  if(!p.engineOwnsRail)parts.push(component('rail',id==='porsche992scab'?'High-pressure rails & direct injectors':b?'Lower rail & port injectors':'Fuel rail & injectors',id==='porsche992scab'?'The rails deliver high-pressure fuel to injectors that open into the combustion chambers.':b?'This section follows the lower row of injectors at the four throttle ports.':'The rail supplies an injector for each cylinder. Each injector meters fuel at the inlet port.',[-.20,-.15,.36],r=>{if(id==='bmw325ci'){drawM54FuelRail(r);drawM54Injectors(r);return;}
    for(const bank of banked?[-1,1]:[0]){
     const center=plus(end,[0,bank*.17,0]),n=banked?count/2:count,alongY=baseVehicle(id)==='hrv'||b;
     const railPoint=t=>plus(center,alongY?[0,t,0]:[t,0,0]);r.rod(railPoint(-.19),railPoint(.19),.012,alloy,10);
@@ -129,13 +139,13 @@ function fuel(id,p){
  return id==='bmw325ci'?refineBmwFuelParts(parts,p):parts;
 }
 function electrical(id,p){
- const e=p.engine,b=p.bike,B=p.battery,classic=id==='porsche993cab',starter=p.starter||plus(e,[.16,b?.02:.11,-.09]),gen=classic?plus(e,[.22,0,.18]):plus(e,[-.13,b?-.10:-.20,.04]);
+ const e=p.engine,b=p.bike,B=p.battery,classic=id==='porsche993cab',starter=p.starter||plus(e,[.16,b?.02:.11,-.09]),gen=p.generator||(classic?plus(e,[.22,0,.18]):plus(e,[-.13,b?-.10:-.20,.04]));
  const hrv=baseVehicle(id)==='hrv',fuse=p.fuseSite?p.fuseSite:b?plus(B,[.09,.02,.03]):id.startsWith('porsche')?[.02,-.46,.49]:hrv?[-1.16,-.56,.82]:plus(B,[.08,.16,.025]);
  const cableStart=id==='bmw325ci'?plus(B,[.100,-.046,.115]):B;
  // The HR-V's starter is the engine's own, on the back of the bellhousing.
  const cableEnd=id==='bmw325ci'?m54InstalledPoint([.638,.25,-.024]):hrv?[-1.21,-.45,.60]:starter;
  return [component('battery','12 V battery',p.electric,[-.16,.14,.46],r=>battery(r,B,b)),component('starter','Starter motor & solenoid','The solenoid engages the starter drive with the engine’s ring gear. Opening the motor shows the armature and pinion.',[.28,.25,-.15],r=>electricMachine(r,starter,'starter',b?.67:1)),
- component('generator',b?'Generator stator & rotor':classic?'Fan-axis alternator':'Belt-driven alternator',b?'A stator winding and rotating field generate current at the engine. The regulator controls the charging supply.':classic?'The alternator shares the engine cooling fan axis. The pulley is driven by the engine belt.':'A belt drives a rotor inside the stator. The rectifier converts its output for the vehicle’s DC circuit.',[-.30,-.32,.20],r=>electricMachine(r,gen,b?'bike-gen':'alternator',b?.72:1)),
+ component('generator',b?'Generator stator & rotor':classic?'Fan-axis alternator':'Belt-driven alternator',b?'A stator winding and rotating field generate current at the engine. The regulator controls the charging supply.':classic?'The alternator shares the engine cooling fan axis. The pulley is driven by the engine belt.':'A belt drives a rotor inside the stator. The rectifier converts its output for the vehicle’s DC circuit.',[-.30,-.32,.20],r=>electricMachine(r,gen,b?'bike-gen':'alternator',b?.72:p.generatorSize||1)),
  component('fuses',b?'Fuses & distribution':id==='bmw325ci'?'Glove-compartment fuse carrier':'Fuse carrier',id==='bmw325ci'?'The carrier is behind the glovebox panel and its two clips, as shown on page 140 of the 2003 coupé manual. Fuse colors and assignments here are illustrative.':'Individual fuse links protect branch circuits. Fuse assignments and ratings are omitted from this layout.',[.12,.47,.32],r=>{if(id==='bmw325ci')return drawBmwFuseCarrier(r);box(r,fuse,b?[.072,.049,.034]:[.148,.091,.047],rubber);for(let j=0;j<(b?3:6);j++)for(const side of [-1,1])box(r,plus(fuse,[(j-(b?1:2.5))*.018,side*(b?.009:.019),b?.020:.031]),[.013,.013,.015],['#a9785c','#9fa976','#718ba8'][j%3]);}),
  component('cables','Positive feed & ground strap','A high-current feed connects the starter to the battery. A separate bond returns current through the engine and chassis.',[0,-.34,-.22],r=>{if(hrv){path(r,[plus(B,[.094,-.043,.116]),[B[0]+.094,-.60,.83],[-1.618,-.56,.80],[-1.612,-.56,.715],[-1.45,-.47,.712],[-1.30,-.455,.70],[-1.22,-.45,.64],cableEnd],.009,'#956451');path(r,[cableEnd,[-1.15,-.44,.63],[-1.08,-.44,.68]],.010,'#717b73');return;}if(p.cablePath){path(r,[cableStart,...p.cablePath,cableEnd],.009,'#956451');path(r,[cableEnd,plus(cableEnd,[.03,-.06,0]),plus(cableEnd,[.12,-.11,.018])],.010,'#717b73');return;}const y=b?.105:.36;path(r,[cableStart,plus(cableStart,[.07,0,-.02]),[B[0],y,B[2]-.09],[cableEnd[0],y,b?.54:.41],cableEnd],b?.005:.009,'#956451');path(r,[cableEnd,plus(cableEnd,[.03,-.06,0]),plus(cableEnd,[.12,-.11,.018])],.010,'#717b73');})];
 }

@@ -31,7 +31,7 @@ const lines=new Set(['electrical.can-b','electrical.can-c','electrical.chassis-c
   'electrical.lighting-harness','electrical.lock-circuit','electrical.main-feed','electrical.primary-power','electrical.rear-heater-circuit',
   'electrical.roof-circuit','electrical.engine-ground','cooling.heater-feed','cooling.heater-return','cooling.lower-hose','cooling.upper-hose',
   'cooling.bypass','hvac.refrigerant-lines','evap.purge-line','evap.tank-vent','evap.manifold-line','fuel.lines','transmission-fluid.left-line',
-  'transmission-fluid.right-line','steering-assist.pressure-line','steering-assist.return-lines','brakes.hydraulics','roof.cable','roof.drainage']);
+  'transmission-fluid.right-line','steering-assist.pressure-line','steering-assist.return-lines','brakes.hydraulics','roof.cable','roof.drainage','chassis.abs-leads','chassis.parking-cables']);
 // Systems a line cannot end in: trim, structure and running gear.
 const noPorts=new Set(['floor','body','suspension','wheels','steering']);
 // Pairs of systems that are one unit.
@@ -42,6 +42,21 @@ const unit=(a,b)=>units.some(([u,v])=>(within(u,a)&&within(v,b))||(within(u,b)&&
 // Reviewed pairs where one part is carried by, seated in or bolted to the other.
 // Each entry is [part or system, part or system, reason].
 export const mounts=[
+  // Chassis and wheel-end hardware.
+  ['chassis.body-mounts','suspension.frame','each body mount bolt passes through the frame rail'],
+  ['chassis.bump-stops','suspension.frame','the jounce buffer is bolted under the frame spring cup'],
+  ['chassis.abs-rings','differentials.front','the front pulse ring is pressed on the outer joint of the axle shaft'],
+  ['chassis.abs-rings','steering.axle','the front ring turns inside the knuckle bore, inboard of the inner bearing'],
+  ['chassis.abs-rings','suspension.rear-axle','the rear pulse ring turns on the shaft inside the axle tube end'],
+  ['chassis.abs-sensors','steering.axle','the front sensor sits in a bore in the steering knuckle'],
+  ['chassis.front-swivels','steering.axle','the kingpin caps and stop screw bolt to the knuckle and the seal ring closes the swivel joint'],
+  ['chassis.front-hub-ends','steering.axle','the hub seal is pressed into the knuckle bore'],
+  ['chassis.front-hub-ends','wheels.hub','the tab washer, slotted nut and grease cap sit on the hub'],
+  ['chassis.rear-bearings','differentials.rear','the bearing cartridge is carried on the flanged axle shaft'],
+  ['chassis.steering-damper','differentials.front','the damper bracket is bolted to the axle tube'],
+  ['chassis.steering-damper','steering.linkage','the damper rod is clamped to the tie rod'],
+  ['chassis.parking-cables','floor.pan','the lever cable passes through a grommet in the floor'],
+  ['chassis.parking-cables','suspension.trailing-arms','clips hold each rear cable on its trailing arm'],
   ...['electrical.cluster','electrical.diff-lock-control','electrical.eis','electrical.upper-panel','electrical.steering-column',
     'seat-heating.front-switches'].map(id=>['body.dashboard',id,'instruments and switch panels are set into the dashboard']),
   ['body.dashboard','column-adjustment','the steering column passes through the dashboard'],

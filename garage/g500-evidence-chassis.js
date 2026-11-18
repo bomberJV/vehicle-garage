@@ -3,6 +3,7 @@ import {brakeRefs} from './g500-rotors.js';
 import {g500AxleSources} from './g500-underbody.js';
 import {fluidRefs} from './g500-fluid-refs.js';
 import {G500_WHEEL_MANUAL} from './g500-wheel-specs.js';
+import {chassisRefs} from './g500-chassis-hardware.js';
 
 const classic='https://classicparts.mbusa.com/v-2002-mercedes-benz-g500--base--5-0l-v8-gas/';
 const manual={label:'Mercedes-Benz · 2002 G500 wheel and tire specifications, printed pp. 359–360',url:G500_WHEEL_MANUAL};
@@ -33,17 +34,21 @@ export default [
  claim(['suspension.trailing-arms','suspension.rear-track-bar'],'diagram','The rear suspension drawing identifies the longitudinal arms, Panhard rod and frame connections.','Measure link center distances, rod bends, rubber sleeves and bracket offsets.',g500AxleSources.rearLinks),
  claim(['suspension.rear-axle'],'diagram','The rear casing supports flanged axle shafts on both sides.','Measure housing ends, axle tube sections, bearing seats and seal lands for the actual rear axle.',g500AxleSources.rear),
  claim(['steering.linkage','steering-assist.steering-box','steering-assist.shaft','steering-assist.pitman'],'diagram','The G500 steering plate locates the steering box, pitman arm and mechanical linkage.','Obtain the fitted steering-box section, pitman spline and drag-link joint centers.',fluidRefs.gear),
+ claim(['chassis.body-mounts'],'diagram','The frame plate lists rubber body mounts between the ladder frame and the body. The model places stacks of rubber, steel cup and through bolt where the floor sill clears the rail top.','Obtain the long-wheelbase body mounting drawing with each station, rubber height and bolt length.',chassisRefs.frame),
+ claim(['chassis.bump-stops'],'diagram','The spring plate groups a rubber buffer with each coil spring. Each buffer hangs from the frame spring cup inside the coil.','Measure the buffer free height, convolutions and the gap to the axle seat at ride height.',chassisRefs.springs),
+ claim(['chassis.abs-rings','chassis.abs-sensors','chassis.abs-leads'],'diagram','The sensor and ABS plates give one wheel-speed sensor and toothed ring per wheel. Front sensors sit in the knuckles and rear sensors in the axle tube ends. Leads run to the frame.','Count the ring teeth, measure the sensor air gaps and trace each lead clip on a US 2002 chassis.',chassisRefs.sensors),
+ claim(['chassis.steering-damper'],'diagram','The 2002 US window sticker lists a hydraulic steering damper. The steering linkage plate places it between the axle and the tie rod.','Measure the damper length, stroke, rod and body diameters and both bracket offsets.',chassisRefs.sticker),
+ claim(['chassis.front-swivels'],'diagram','The front axle and carrier plate gives upper and lower kingpin bearings with caps, the swivel seal ring and the steering stop screws.','Measure cap diameters, bolt pattern, seal section and the stop screw setting at full lock.',chassisRefs.carrier),
+ claim(['chassis.front-hub-ends'],'diagram','The wheel-bearing plate gives the hub seal, tab washer, slotted nut and grease cap that complete each front hub.','Measure the seal section, nut across-flats and grease-cap depth on the fitted hub.',chassisRefs.bearings),
+ claim(['chassis.rear-bearings'],'diagram','The rear axle plate gives a bearing cartridge and shaft seal at each tube end.','Check the rear axle serial, then measure the cartridge width, bore and outside diameter and the seal position.',chassisRefs.rearAxle),
+ claim(['chassis.parking-cables'],'diagram','The parking-brake plate gives the lever cable, an equalizer and two rear cables to the backing plates.','Trace the cable clips, equalizer bracket and grommet positions on the chassis.',chassisRefs.parking),
  claim(['steering-assist.pump','steering-assist.reservoir'],'diagram','The 463.249 workshop drawing places the reservoir on the belt-driven power-steering pump.','Identify the pump code and measure the pulley, mounting bosses and reservoir interfaces.',fluidRefs.steeringInstall),
  claim(['steering-assist.cooler','steering-assist.pressure-line','steering-assist.return-lines'],'diagram','The parts diagram identifies the pressure hose and the two return connections via the cooler.','Trace the pipes, end fittings and mounting clips for this chassis break.',fluidRefs.steering)
 ];
 export const gaps=[
- {title:'Front wheel-end seals, slotted nuts, tab washer and kingpin bearings',need:'Match the front axle code and obtain seated section drawings, seal profiles and bearing spacing.'},
- {title:'Rear wheel-bearing cartridge and axle seal',need:'Check the rear axle serial and capture the flanged axle, bearing, spacer and seal stack.'},
- {title:'Parking-shoe anchor, return springs, retainers and cable equalizer',need:'Check the rear axle plate, spring attachment points, cable travel and mid-chassis equalizer.'},
+ {title:'Parking-shoe anchor, return springs and retainers',need:'Check the rear axle plate, spring attachment points and anchor on the backing plate.'},
  {title:'Front and rear service-caliper pistons, seals, guides and hardware',need:'Match castings and axle serial, then obtain piston sections, pad profiles, bridge bolts and hydraulic-port locations.'},
- {title:'ABS wheel-speed sensors, pulse rings and wheel-end routes',need:'Locate each ring and sensor on the model-year axles and trace each lead and clip to the body.'},
  {title:'ABS hydraulic modulator, tandem circuits and hard-line clips',need:'Match the hydraulic unit number and map each master-cylinder and wheel-end pipe on the US vehicle.'},
- {title:'Frame mounting datums, outriggers, bump stops and body mount stacks',need:'Obtain the long-wheelbase frame alignment drawing and sections for rubber mounts and their hardware.'},
- {title:'Springs by paint code and damper internals',need:'Verify front and rear codes and obtain free lengths, wire sections, piston and valve sections and usable stroke.'},
- {title:'Steering damper, swivel seals and steering stops',need:'Identify the early axle variant; measure ends, bushes, seal stack and full-lock clearances.'}
+ {title:'Frame mounting datums and outriggers',need:'Obtain the long-wheelbase frame alignment drawing with datum holes and outrigger sections.'},
+ {title:'Springs by paint code and damper internals',need:'Verify front and rear codes and obtain free lengths, wire sections, piston and valve sections and usable stroke.'}
 ];

@@ -1,5 +1,6 @@
 import {transferOutputX,axleInputX} from './g500-propeller-shafts.js';
 import {g500HalfWheelbase} from './g500-underbody.js';
+import {chassisLiftWeight} from './g500-chassis-hardware.js';
 import {liftChoice,normalizedLift,liftOptions} from './lift-options.js';
 
 const clamp=n=>Math.max(0,Math.min(1,n));
@@ -13,6 +14,7 @@ function movementWeight(vehicle,id,p,instance){
   // stud and the tie rod follow the rigid front axle at wheel height.
   if(id==='steering.linkage'&&instance==='drag-link')return clamp((.622-yy)/(.622+.530));
   if(fixedG.has(id))return 0;
+  if(id.startsWith('chassis.'))return chassisLiftWeight(id.slice(8),p);
   if(id==='suspension.radius-arms'||id==='suspension.trailing-arms')return clamp((1.425-Math.abs(xx)-.13)/(.83-.13));
   if(id==='suspension.front-track-bar'||id==='suspension.rear-track-bar')return clamp((zz-(.4276+.060))/(.609-(.4276+.060)));
   if(id==='suspension.spring')return clamp((zz-.47)/.39);

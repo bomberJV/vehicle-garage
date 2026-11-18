@@ -246,7 +246,9 @@ function applySection(){
   const percent=Number($('section-depth').value);
   $('section-percent').textContent=percent+'%';
   renderer.sectionPlane=allowSection()&&percent<100?{axis:Number($('section-axis').value),percent,reverse:$('section-reverse').getAttribute('aria-pressed')==='true'}:null;
-  renderer.draw();
+  // Sliding the plane draws on the renderer's fast path, once per display frame; the full frame
+  // follows when the slider settles.
+  renderer.beginInteraction();renderer.requestDraw();renderer.endInteraction(220);
 }
 function clearSection(close=false){
   $('section-depth').value='100';$('section-percent').textContent='100%';
@@ -254,6 +256,7 @@ function clearSection(close=false){
   if(close)$('section-tools').open=false;
 }
 $('section-depth').addEventListener('input',applySection);
+$('section-depth').addEventListener('change',()=>renderer.settleInteraction());
 $('section-axis').addEventListener('change',applySection);
 $('section-reverse').addEventListener('click',()=>{
   const b=$('section-reverse');b.setAttribute('aria-pressed',String(b.getAttribute('aria-pressed')!=='true'));applySection();

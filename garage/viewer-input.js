@@ -13,7 +13,9 @@ export function refreshPointerHover(r){
 
 export function bindViewerInput(r) {
   const canvas=r.canvas;
-  function endDrag(e) { if(r.drag?.id===e.pointerId)r.drag=null; }
+  // An orbit draws on the renderer's fast path until the pointer lets go.
+  const orbiting=()=>typeof r.beginInteraction==='function';
+  function endDrag(e) { if(r.drag?.id===e.pointerId){r.drag=null;if(orbiting())r.endInteraction();} }
   canvas.addEventListener('pointerdown',e=>{
     if(r.drag || e.button>1 || e.isPrimary===false)return;
     canvas.focus({preventScroll:true});
@@ -52,7 +54,7 @@ export function bindViewerInput(r) {
       r.angle+=(e.clientX-d.x)*.009;
       r.elevation=Math.max(-.92,Math.min(1.48,r.elevation-(e.clientY-d.y)*.004));
       r.focusPan=null;
-      r.draw();
+      if(orbiting()){r.beginInteraction();r.requestDraw();}else r.draw();
     }
     d.x=e.clientX;d.y=e.clientY;
   });
@@ -60,6 +62,7 @@ export function bindViewerInput(r) {
     const d=r.drag;
     if(!d || d.id!==e.pointerId)return;
     r.drag=null;
+    if(d.moved && !d.move && orbiting())r.endInteraction();
     if(d.moved || e.button!==0)return;
     // Selection can change the camera. Resolve a second tap from the first hit
     // even when the object has since moved out from under that screen position.
@@ -79,7 +82,8 @@ export function bindViewerInput(r) {
   canvas.addEventListener('wheel',e=>{
     if(document.activeElement!==canvas)return;e.preventDefault();
     r.focusPan=null;
-    r.zoom=Math.max(.6,Math.min(2.2,r.zoom-e.deltaY*.001));r.draw();
+    r.zoom=Math.max(.6,Math.min(2.2,r.zoom-e.deltaY*.001));
+    if(orbiting()){r.beginInteraction();r.requestDraw();r.endInteraction(180);}else r.draw();
   },{passive:false});
   canvas.addEventListener('keydown',e=>{
     const arrows={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};

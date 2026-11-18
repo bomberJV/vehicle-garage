@@ -2,7 +2,7 @@
 // feed both drawing and picking. The plane stays put while the camera orbits.
 import {faceTriangles} from './mesh-triangles.js';
 
-const clippedGeometry=new WeakMap();
+const clippedGeometry=new WeakMap(),extents=new WeakMap();
 
 const unpack=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
 const pack=rgb=>'#'+rgb.map(n=>Math.round(n).toString(16).padStart(2,'0')).join('');
@@ -26,8 +26,15 @@ function clipRing(points,axis,limit,sign){
 export function sectionFaces(faces,plane){
  if(!faces.length||plane.percent>=100)return faces;
  const axis=plane.axis,sign=plane.reverse?-1:1;
- let min=Infinity,max=-Infinity;
- for(const face of faces)for(const p of face.points){min=Math.min(min,p[axis]);max=Math.max(max,p[axis]);}
+ // The model's extent along the axis changes only with the face list, not as the plane slides.
+ let extent=extents.get(faces)?.[axis];
+ if(!extent){
+   let low=Infinity,high=-Infinity;
+   for(const face of faces)for(const p of face.points){const v=p[axis];if(v<low)low=v;if(v>high)high=v;}
+   extent=[low,high];
+   const all=extents.get(faces)||[];all[axis]=extent;extents.set(faces,all);
+ }
+ const [min,max]=extent;
  if(max<=min||!Number.isFinite(min))return faces;
  const k=Math.max(0,Math.min(1,plane.percent/100)),limit=plane.reverse?max-(max-min)*k:min+(max-min)*k;
  const out=[];

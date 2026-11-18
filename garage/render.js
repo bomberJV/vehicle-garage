@@ -1,3 +1,4 @@
+import {roadSystems} from './road-service-data.js';
 import {drawStudioContactShadow,hasStudioFinish} from './studio-finish.js';
 import {drawG500SteeringLinkage} from './g500-steering-gear.js';
 import {shellFragmentShader} from './shell-depth.js';
@@ -794,7 +795,7 @@ export class GarageRenderer{
    if(!focusView&&services.length){
      const passenger=!exhibit&&seeThroughCars.has(b.vehicle);
      if(passenger&&!ownGearbox)this.faces=this.faces.filter(f=>f.part!=='powertrain.brake-reservoir');
-     if(!porsche&&activeService?.id==='brakes'){
+     if(!porsche&&activeService?.id==='brakes'&&roadSystems[b.vehicle]?.wheelBrakes!==false){
        const originalBrakeParts=new Set(['wheels.disc','wheels.caliper','running.brakes','running.discs','powertrain.brake-reservoir']);
        this.faces=this.faces.filter(f=>!originalBrakeParts.has(f.part));
      }
@@ -802,7 +803,7 @@ export class GarageRenderer{
        if(porsche&&(g.id==='brakes'||g.id==='roof'))continue;
        // The imported road shells already carry their brake geometry and roof surfaces.
        if(g.id==='brakes'&&activeService!==g){
-         if(passenger||b.vehicle==='bmws1000rr')for(const part of g.parts){
+         if(passenger||b.vehicle==='bmws1000rr'||b.vehicle==='sl550')for(const part of g.parts){
            const master=part.id==='brakes.hydraulics'||part.id==='brakes.master';
            if((master&&!ownGearbox)||['brakes.abs','brakes.lines','brakes.parking'].includes(part.id)){
              this.tag(part.id,()=>part.draw(this));

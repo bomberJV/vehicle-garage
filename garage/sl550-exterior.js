@@ -7,6 +7,7 @@ import {drawLampOptics} from './sl550-lamp-optics.js';
 import {wheel,pipe,ellipse,tint} from './road-primitives.js';
 import {faceTriangles} from './mesh-triangles.js';
 import {slDeckPoint} from './sl550-roof.js';
+import {drawLettering,letteringWidth} from './badge-lettering.js';
 
 const brochure={label:'MBUSA · 2014 SL-Class brochure, pp. 3, 24–27',url:'https://ragtop.org/mbbrochures/2014/usa/2014-SL-Class.pdf#page=3'};
 const drawing={label:'Mercedes-Benz · R231 body dimensions, P00.10-5105-00',url:'https://www.manualslib.de/manual/89970/Mercedes-Benz-Typenreihe-231.html?page=21'};
@@ -62,7 +63,32 @@ function warp(x,y){
   return x+clamp(1-(x-nose)/.72)**2*(.150*u*u+.235*u**4)
     -clamp(1-(tail-x)/.65)**2*(.10*u*u+.24*u**4);
 }
-function shoulder(x){return sample(stations,x);}
+// Monotone cubic (Fritsch–Carlson) through the digitised stations. Linear
+// interpolation put a crease in the skin at every station; this keeps the
+// measured values and their extremes without overshoot.
+function monotone(rows){
+  const n=rows.length,cols=rows[0].length-1,xs=rows.map(r=>r[0]);
+  const slopes=[];
+  for(let c=0;c<cols;c++){
+    const ys=rows.map(r=>r[c+1]),d=[],m=new Array(n).fill(0);
+    for(let i=0;i<n-1;i++)d.push((ys[i+1]-ys[i])/(xs[i+1]-xs[i]));
+    m[0]=d[0];m[n-1]=d[n-2];
+    for(let i=1;i<n-1;i++){
+      if(d[i-1]*d[i]<=0){m[i]=0;continue;}
+      const w1=2*(xs[i+1]-xs[i])+(xs[i]-xs[i-1]),w2=(xs[i+1]-xs[i])+2*(xs[i]-xs[i-1]);
+      m[i]=(w1+w2)/(w1/d[i-1]+w2/d[i]);
+    }
+    slopes.push(m);
+  }
+  return x=>{
+    let j=1;while(j<n-1&&xs[j]<x)j++;
+    const h=xs[j]-xs[j-1],t=clamp((x-xs[j-1])/h),t2=t*t,t3=t2*t;
+    const h00=2*t3-3*t2+1,h10=t3-2*t2+t,h01=-2*t3+3*t2,h11=t3-t2;
+    return rows[0].slice(1).map((_,c)=>h00*rows[j-1][c+1]+h10*h*slopes[c][j-1]+h01*rows[j][c+1]+h11*h*slopes[c][j]);
+  };
+}
+const smoothStations=monotone(stations);
+function shoulder(x){return smoothStations(x);}
 // The R231 plan shows the bonnet narrowing around the inboard edge of
 // each lamp, with a separately rising wing over each front wheel.
 function lidWidth(x){
@@ -102,11 +128,13 @@ function flankWidth(x,z){
   const between=fade(front-.18,front+.38,x)*(1-fade(rear-.32,rear+.12,x));
   const character=.704+.087*clamp((x+.90)/1.55);
   const swage=.382+.084*clamp((x+.88)/1.86);
-  const crown=.012*bell(z-character,.026)+.012*bell(z-character,.081);
-  const hollow=.037*bell(z-(character-.101),.100)+.024*bell(z-(swage+.108),.089);
-  const lowerRidge=.013*bell(z-swage,.028);
+  // Two crisp lines with a shallow hollow between them, as in the side
+  // photographs: the deeper, narrower forms printed as ripples in the paint.
+  const crown=.011*bell(z-character,.034)+.012*bell(z-character,.085);
+  const hollow=.030*bell(z-(character-.101),.105)+.019*bell(z-(swage+.108),.092);
+  const lowerRidge=.011*bell(z-swage,.034);
   const wheelDistance=Math.min(Math.hypot(x-front,z-.33055),Math.hypot(x-rear,z-.3268));
-  const arch=.009*bell(wheelDistance-.388,.020)-.006*bell(wheelDistance-.424,.025);
+  const arch=.0045*bell(wheelDistance-.40,.05);
   return w-.062*(1-f)**2-.024*f**3+between*(crown+lowerRidge-hollow)+arch;
 }
 function sidePoint(x,s,t){
@@ -116,32 +144,85 @@ function sidePoint(x,s,t){
   const aft=.104*fade(.60,.91,z)*fade(1.75,tail,x);
   return [warp(x,s*y)+fore-aft,s*y,z];
 }
+// Rows of the side skin run parallel to the two pressed lines. Fractions of
+// the opening-to-crest height crossed each line at a slant, and the shading
+// interpolated across those rows printed a saw-tooth along every crease.
+const rowAnchors=[0,.20,.38,.55,.75,1];
+function rowFraction(x,u){
+  // Row anchors follow a softened opening line: the true arch meets the sill
+  // with a vertical tangent, and rows that copied it printed a pinch above it.
+  const [,,crest]=shoulder(x),lower=openingBottom(x),span=crest-lower;
+  let soft=0;for(let k=-3;k<=3;k++)soft+=openingBottom(x+k*.025)/7;
+  const character=.704+.087*clamp((x+.90)/1.55),swage=.382+.084*clamp((x+.88)/1.86);
+  const features=[lower,swage,swage+.108,character-.101,character,crest];
+  const z=[lower],softSpan=crest-Math.max(lower,soft);
+  for(let k=1;k<features.length;k++){
+    const floor=Math.max(lower,soft)+softSpan*rowAnchors[k]*.55,ceiling=crest-softSpan*(1-rowAnchors[k])*.25;
+    z.push(Math.max(z[k-1]+.004*span,clamp(features[k],floor,Math.max(floor,ceiling))));
+  }
+  z[z.length-1]=crest;
+  for(let k=z.length-2;k>0;k--)z[k]=Math.min(z[k],z[k+1]-.004*span);
+  let k=1;while(k<rowAnchors.length-1&&rowAnchors[k]<u)k++;
+  const t=(u-rowAnchors[k-1])/(rowAnchors[k]-rowAnchors[k-1]);
+  return clamp((mix(z[k-1],z[k],t)-lower)/span);
+}
 // Curve the door cut through the actual panel grid from shoulder to sill.
 // The station immediately on either side of the joint follows the same curve.
+// A smooth bump (C1 at both ends) instead of a tent, which creased the skin
+// where the tent met the surrounding stations.
+const bump=(d,width)=>{const q=clamp(1-(d/width)**2);return q*q;};
 function doorStation(x,f){
   const low=1-f,frontEdge=-.022*bell(f-.5,.25)+.012*low;
-  const rearEdge=-.25*low**1.9+.012*bell(f-.71,.15);
-  return x+frontEdge*Math.max(0,1-Math.abs(x+.54)/.23)+rearEdge*Math.max(0,1-Math.abs(x-.79)/.39);
+  const rearEdge=-.13*low**1.9+.012*bell(f-.71,.15);
+  return x+frontEdge*bump(x+.54,.30)+rearEdge*bump(x-.79,.70);
 }
 function adjustedStation(x,y){
   // Bow the hood's rear cut to meet the foot of the windshield.
   const u=Math.min(1,Math.abs(y)/.762);
-  if(x>=-1.02&&x<=-.16)return x+.142*u*u*Math.max(0,1-Math.abs(x+.685)/.33);
+  if(x>=-1.02&&x<=-.16)return x+.142*u*u*bump(x+.685,.33);
   // The forward edge of the deck wraps around the back of both seats.
-  if(x>=.61&&x<=1.45)return x-.116*u**3*Math.max(0,1-Math.abs(x-1.01)/.4);
+  if(x>=.61&&x<=1.45)return x-.116*u**3*bump(x-1.01,.4);
   return x;
 }
 const atRoof=(x,y)=>top(adjustedStation(x,y),y);
 export const slDeckCrown=(x,k)=>atRoof(x,lidWidth(x)*k);
-function meshPaint(r,points,paint){
+const paintTone=(paint,n)=>{
+  const sky=clamp((n[2]+.30)/1.25),soft=Math.exp(-(((n[2]-.29)/.25)**2));
+  return tint(paint,.74+.37*sky+.13*soft);
+};
+function outward(n,center){
+  return n[1]*center[1]+Math.max(0,center[2]-.42)*n[2]<0?n.map(q=>-q):n;
+}
+function meshPaint(r,points,paint,normals=null){
   const [a,b,c]=points,u=b.map((v,i)=>v-a[i]),v=c.map((n,i)=>n-a[i]);
   let n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
   const len=Math.hypot(...n)||1; n=n.map(q=>q/len);
   const center=points.reduce((o,p)=>o.map((q,k)=>q+p[k]/points.length),[0,0,0]);
-  if(n[1]*center[1]+Math.max(0,center[2]-.42)*n[2]<0)n=n.map(q=>-q);
-  const sky=clamp((n[2]+.30)/1.25),soft=Math.exp(-(((n[2]-.29)/.25)**2));
-  const color=tint(paint,.74+.37*sky+.13*soft);
-  r.polygon(points,color,false);const f=r.faces?.at(-1);if(f)f.slNormal=n;
+  n=outward(n,center);
+  r.polygon(points,paintTone(paint,n),false);const f=r.faces?.at(-1);
+  if(f){f.slNormal=n;if(normals){f.slVertexNormals=normals.map(q=>outward(q,center));f.slPaint=paint;}}
+}
+// Smooth shading from the analytic surface. A parametric patch fn(x,u) is
+// differentiated at each vertex, so the facets of the coarse grid no longer
+// print as streaks in the reflection.
+// One-sided differences, taking the smoother side: a column that sits on the
+// vertical lip of a wheel opening must not difference across that step.
+function tangent(a,c,b){
+  const fwd=b.map((q,i)=>q-c[i]),back=c.map((q,i)=>q-a[i]);
+  const nf=Math.hypot(...fwd),nb=Math.hypot(...back);
+  if(!nb)return fwd;if(!nf)return back;
+  return nf<nb*1.5&&nb<nf*1.5?b.map((q,i)=>q-a[i]):nf<nb?fwd:back;
+}
+function surfaceNormal(fn,x,u,h=.0015){
+  const c=fn(x,u);
+  const dx=tangent(fn(x-h,u),c,fn(x+h,u));
+  const du=tangent(fn(x,Math.max(0,u-h)),c,fn(x,Math.min(1,u+h)));
+  const n=[dx[1]*du[2]-dx[2]*du[1],dx[2]*du[0]-dx[0]*du[2],dx[0]*du[1]-dx[1]*du[0]];
+  const len=Math.hypot(...n)||1;return n.map(q=>q/len);
+}
+function patch(r,fn,a,b,u0,u1,paint){
+  const corners=[[a,u0],[b,u0],[b,u1],[a,u1]];
+  meshPaint(r,corners.map(([x,u])=>fn(x,u)),paint,corners.map(([x,u])=>surfaceNormal(fn,x,u)));
 }
 function finishPaint(faces){
   // Share normals only inside a physical panel. The hood gap and pressed
@@ -150,18 +231,27 @@ function finishPaint(faces){
   for(const f of faces){
     if(!f.slNormal)continue;
     const rgb=[1,3,5].map(i=>parseInt(f.color.slice(i,i+2),16));
-    for(const p of f.points){
+    f.points.forEach((p,i)=>{
       const k=keys(f,p);let v=vertices.get(k);
-      if(!v){v={c:[0,0,0],n:[0,0,0],count:0};vertices.set(k,v);}
+      if(!v){v={c:[0,0,0],n:[0,0,0],count:0,exact:null};vertices.set(k,v);}
+      const n=f.slVertexNormals?.[i];
+      if(n){
+        if(!v.exact)v.exact={n:[0,0,0],count:0,paint:f.slPaint};
+        for(let j=0;j<3;j++)v.exact.n[j]+=n[j];v.exact.count++;
+      }
       for(let j=0;j<3;j++){v.c[j]+=rgb[j];v.n[j]+=f.slNormal[j];}v.count++;
-    }
+    });
   }
   for(const v of vertices.values()){
+    if(v.exact){
+      const length=Math.hypot(...v.exact.n)||1;v.n=v.exact.n.map(q=>q/length);
+      v.c=paintTone(v.exact.paint,v.n);continue;
+    }
     const length=Math.hypot(...v.n)||1;v.n=v.n.map(q=>q/length);
     v.c='#'+v.c.map(q=>Math.round(q/v.count).toString(16).padStart(2,'0')).join('');
   }
   for(const f of faces)if(f.slNormal){const verts=f.points.map(p=>vertices.get(keys(f,p)));
-    f.vertexColors=verts.map(v=>v.c);f.clearcoatNormals=verts.map(v=>v.n);delete f.slNormal;}
+    f.vertexColors=verts.map(v=>v.c);f.clearcoatNormals=verts.map(v=>v.n);delete f.slNormal;delete f.slVertexNormals;delete f.slPaint;}
 }
 const xGrid=(()=>{
   const base=[...stations.map(row=>row[0]),-2.205,-.685,-.54,.79,1.01];
@@ -170,9 +260,49 @@ const xGrid=(()=>{
     base.push(x-rad-.002,x+rad+.002);
   }
   const uniq=[...new Set(base.map(v=>+v.toFixed(6)))].sort((a,b)=>a-b);
-  return uniq.flatMap((x,j)=>j&&x-uniq[j-1]>.095?[(2*uniq[j-1]+x)/3,(uniq[j-1]+2*x)/3,x]:[x]);
+  // At most 4 cm between columns: long sheared triangles smeared the
+  // interpolated reflection into diagonal streaks.
+  return uniq.flatMap((x,j)=>{
+    if(!j)return [x];
+    const gap=x-uniq[j-1],n=Math.ceil(gap/.04-1e-9);
+    return Array.from({length:n},(_,k)=>uniq[j-1]+gap*(k+1)/n);
+  });
 })();
 const dirt='#2c2d31',chrome='#cbd1d2';
+// Door cuts as functions of the row parameter: the front cut leans back at
+// mid-height, the rear cut sweeps forward toward the sill.
+const frontCut=u=>doorStation(-.54,rowFraction(-.54,u));
+const rearCut=u=>doorStation(.79,rowFraction(.79,u));
+function clipParam(poly,f){
+  // Keep the part of a parameter-space polygon where f(x,u)<=0.
+  const out=[];
+  for(let i=0;i<poly.length;i++){
+    const p=poly[i],q=poly[(i+1)%poly.length],fp=f(...p),fq=f(...q);
+    if(fp<=0)out.push(p);
+    if((fp<0&&fq>0)||(fp>0&&fq<0)){
+      let lo=0,hi=1;
+      for(let k=0;k<30;k++){const m=(lo+hi)/2,pt=[mix(p[0],q[0],m),mix(p[1],q[1],m)];if((f(...pt)<=0)===(fp<=0))lo=m;else hi=m;}
+      out.push([mix(p[0],q[0],lo),mix(p[1],q[1],lo)]);
+    }
+  }
+  return out.length>=3?out:null;
+}
+function doorPieces(quad,doorID){
+  const xs=quad.map(p=>p[0]),lo=Math.min(...xs),hi=Math.max(...xs);
+  if(hi<-.90||lo>1.0)return [['shell.fenders',quad]];
+  const pieces=[];
+  const front=clipParam(quad,(x,u)=>x-frontCut(u));
+  const rearPart=clipParam(quad,(x,u)=>rearCut(u)-x);
+  const middle=clipParam(quad,(x,u)=>frontCut(u)-x);
+  const door=middle&&clipParam(middle,(x,u)=>x-rearCut(u));
+  if(front)pieces.push(['shell.fenders',front]);
+  if(door)pieces.push([doorID,door]);
+  if(rearPart)pieces.push(['shell.fenders',rearPart]);
+  return pieces;
+}
+function paramPolygon(r,fn,poly,paint){
+  meshPaint(r,poly.map(([x,u])=>fn(x,u)),paint,poly.map(([x,u])=>surfaceNormal(fn,x,u)));
+}
 function skins(r,paint,deck=false,t=0){
   for(let i=1;i<xGrid.length;i++){
     const a=xGrid[i-1],b=xGrid[i],m=(a+b)/2,hood=m>=-2.205&&m<-.685,lid=m>1.01;
@@ -185,15 +315,24 @@ function skins(r,paint,deck=false,t=0){
       };
       if(!deck){
         r.tag(sideID,()=>{
-          for(const [u,v] of [[0,.30],[.30,.68],[.68,1]])meshPaint(r,[outer(a,u),outer(b,u),outer(b,v),outer(a,v)],paint);
-          const levels=[0,.025,.061,.10,.14,.16,.215,.27,.31,.355,.395,.43,.47,.515,.565,.62,.685,.735,.785,.825,.865,.905,.951,1];
+          const bands=[0,.10,.20,.30,.40,.50,.60,.68,.76,.84,.92,1];
+          for(let k=1;k<bands.length;k++)patch(r,outer,a,b,bands[k-1],bands[k],paint);
+          // Rows every 2% through the pressed band, so the two creases are
+          // sampled at the same phase all along the car instead of aliasing.
+          const levels=[0,.025,.061,.10,.14,...Array.from({length:40},(_,k)=>+(.16+.02*k).toFixed(3)),.951,.975,1];
+          // Straight columns; the curved door cuts are clipped through the
+          // panel grid instead of bending it, which sheared the quarter skin.
+          const fraction=(x,u)=>u<=0||u>=1?u:rowFraction(x,u);
+          const vertex=(x,u)=>sidePoint(mix(x,adjustedStation(x,s*.90),fade(.82,1,fraction(x,u))),s,fraction(x,u));
+          const doorID='shell.'+(s<0?'left':'right')+'-door';
           for(let j=1;j<levels.length;j++){
-            const vertex=(x,u)=>sidePoint(doorStation(mix(x,adjustedStation(x,s*.90),fade(.82,1,u)),u),s,u);
-            const panel=[vertex(a,levels[j-1]),vertex(b,levels[j-1]),vertex(b,levels[j]),vertex(a,levels[j])];
-            if(sideID.endsWith('-door') && levels[j]<=.14)r.tag('shell.sills',()=>meshPaint(r,panel,paint));
-            else meshPaint(r,panel,paint);
+            const u0=levels[j-1],u1=levels[j],quad=[[a,u0],[b,u0],[b,u1],[a,u1]];
+            for(const [id,piece] of doorPieces(quad,doorID)){
+              const draw=()=>r.tag(id,()=>paramPolygon(r,vertex,piece,paint));
+              if(id===doorID&&u1<=.14)r.tag('shell.sills',draw);else draw();
+            }
           }
-          const sa=sidePoint(doorStation(a,0),s,0),sb=sidePoint(doorStation(b,0),s,0);
+          const sa=sidePoint(a,s,0),sb=sidePoint(b,s,0);
           r.polygon([sa,sb,[sb[0],sb[1]-s*.032,sb[2]],[sa[0],sa[1]-s*.032,sa[2]]],dirt,false);
         });
       }
@@ -208,7 +347,7 @@ function skins(r,paint,deck=false,t=0){
         const rows=hood||lid?[0,.14,.225,.275,.32,.37,.42,.47,.53,.62,.72,.83,.91,.984,1]:[0,.23,.39,.48,.67,.84,1];
         for(let k=1;k<rows.length;k++){
           const hem=(hood||lid)&&k===rows.length-1;
-          meshPaint(r,[edge(a,rows[k-1]),edge(b,rows[k-1]),edge(b,rows[k]),edge(a,rows[k])],hem?tint(paint,.90):paint);
+          patch(r,edge,a,b,rows[k-1],rows[k],hem?tint(paint,.90):paint);
         }
       });
     }
@@ -260,6 +399,23 @@ function grilleStar(r,x,y,z,R){
     r.polygon([left,p,point(0,0,-.008)],'#edf1f0',false);r.polygon([p,right,point(0,0,-.008)],'#91999c',false);
   }
 }
+function diamondMesh(r,side,y0,y1,low,high,depth,pitch,color){
+  const steps=8;
+  for(const dir of [-1,1]){
+    for(let start=y0-.12;start<y1+.12;start+=pitch){
+      let run=[];
+      const flush=()=>{for(let k=1;k<run.length;k++)r.rod(run[k-1],run[k],.0016,color,4);run=[];};
+      for(let k=0;k<=steps;k++){
+        const v=k/steps,y=start+dir*v*.10;
+        if(y<y0||y>y1){flush();continue;}
+        const yy=side*y,z=mix(low(yy),high(yy),v);
+        if(high(yy)-low(yy)<.006){flush();continue;}
+        run.push(frontAt(yy,z,depth));
+      }
+      flush();
+    }
+  }
+}
 function frontFascia(r,paint){
   const contour=y=>sample(frontContour,Math.abs(y)),edge=(y,k)=>contour(y)[k];
   const frontLow=y=>.158+.037*(Math.abs(y)/.813)**2;
@@ -301,8 +457,10 @@ function frontFascia(r,paint){
         }
         if(m>.59){
           const mid=y=>mix(edge(y,0),edge(y,1),.55);
-          frontBand(r,a,b,y=>mid(y)-.011,y=>mid(y)+.011,'#373d40',-.003,false);
-          r.tag('lights.running',()=>frontBand(r,a,b,y=>mid(y)-.003,y=>mid(y)+.003,'#e2ebef',-.009,false));
+          // Chrome blade across the corner opening; the LED strip runs in its lower edge.
+          frontBand(r,a,b,y=>mid(y)-.010,y=>mid(y)+.009,'#cfd6d9',-.004,false);
+          frontBand(r,a,b,y=>mid(y)+.002,y=>mid(y)+.009,'#eef2f3',-.0045,false);
+          r.tag('lights.running',()=>frontBand(r,a,b,y=>mid(y)-.010,y=>mid(y)-.005,'#f4f8fa',-.005,false));
         }
       });
       if(m<.59)r.tag('shell.grille',()=>{
@@ -316,17 +474,12 @@ function frontFascia(r,paint){
       const edgePoints=ys.filter(y=>y<=.59).map(y=>frontAt(side*y,edge(y,2),-.002));
       pipe(r,edgePoints,.0045,'#c3ccce',6);
       const lowerTop=y=>edge(y,1)-.088*clamp((Math.abs(y)-.365)/.17)**1.4;
-      for(let j=1;j<29;j++){
-        const a=side*j*.0182,b=side*Math.max(0,j*.0182-.105),c=side*Math.min(.531,j*.0182+.082);
-        r.rod(frontAt(a,edge(a,0)+.018,.009),frontAt(b,lowerTop(b)-.005,.009),.00235,'#5a6369',4);
-        r.rod(frontAt(a,edge(a,0)+.018,.010),frontAt(c,lowerTop(c)-.005,.010),.0016,'#424a4f',4);
-      }
-      // Fine diagonal grille bars lie inside the bezel and beneath its bright crossbar.
-      for(let j=1;j<19;j++){
-        const a=side*j*.030,b=side*(j*.030-.026);
-        r.rod(frontAt(a,edge(a,2)+.009,.012),frontAt(b,edge(b,3)-.008,.012),.0017,'#343b3e',4);
-      }
+      // Diamond mesh, as on the US car: two crossing families of bars set
+      // back inside each opening. Bars stop at the opening's outer edge.
+      diamondMesh(r,side,0,.531,y=>edge(y,0)+.012,y=>lowerTop(y)-.004,.011,.034,'#3b4246');
+      diamondMesh(r,side,0,.585,y=>edge(y,2)+.006,y=>edge(y,3)-.006,.013,.030,'#30373a');
     });
+    r.tag('shell.fascia',()=>diamondMesh(r,side,.60,.785,y=>edge(y,0)+.008,y=>edge(y,1)-.008,.034,.030,'#2f3639'));
   }
   r.tag('shell.grille',()=>grilleStar(r,frontAt(0,.548,-.018)[0],0,.548,.111));
   r.tag('shell.fascia',()=>{
@@ -472,6 +625,16 @@ function sideDetails(r,paint){
         }
       }
     });
+    if(s>0)r.tag('shell.fenders',()=>{
+      // Fuel filler flap high on the passenger-side quarter, as photographed.
+      const c=[1.265,.872],R=.056;
+      const ringAt=(k,f,proud)=>side(c[0]+R*f*Math.cos(k*TAU/28),c[1]+R*f*Math.sin(k*TAU/28),proud);
+      for(let k=0;k<28;k++){
+        r.polygon([ringAt(k,1,.0016),ringAt(k+1,1,.0016),ringAt(k+1,.955,.0016),ringAt(k,.955,.0016)],tint(paint,.52),false);
+      }
+      const disc=Array.from({length:28},(_,k)=>ringAt(k,.955,.0012));
+      r.polygon(disc,tint(paint,1.02),false);
+    });
     r.tag('shell.sills',()=>{
       const ends=[front+.375,-.78,-.56,-.25,.12,.44,.65,.78,rear-.373];
       for(let j=1;j<ends.length;j++){
@@ -573,11 +736,26 @@ function rearFascia(r,paint){
       const hh=[.27,.31,.36,.42,.50,.56,.605,.625];
       for(let k=1;k<ys.length;k++)for(let j=1;j<hh.length;j++){
         const pt=(u,z)=>rearAt(side*u,z===.625?sill(u):z-.024*(u/.85)**2);
-        meshPaint(r,[pt(ys[k-1],hh[j-1]),pt(ys[k],hh[j-1]),pt(ys[k],hh[j]),pt(ys[k-1],hh[j])],j<=2?'#383d40':paint);
+        const quad=[pt(ys[k-1],hh[j-1]),pt(ys[k],hh[j-1]),pt(ys[k],hh[j]),pt(ys[k-1],hh[j])];
+        // The diffuser is unpainted black plastic; keep it out of the paint's shared shading.
+        if(j<=3)r.polygon(quad,j===3?'#2a2f32':'#1c2023',false);else meshPaint(r,quad,paint);
       }
+      // Black diffuser insert: a fine grid texture, a bright strip along its
+      // lower edge between the outlets and a reflector panel at the centre.
+      const lip=(u,z,d)=>rearAt(side*u,z-.024*(u/.85)**2,d);
+      for(let k=0;k<=13;k++){const u=k*.04;r.polygon([lip(u,.372,.004),lip(u+.03,.372,.004),lip(u+.03,.392,.004),lip(u,.392,.004)],'#2c3134',false);}
+      r.polygon([lip(0,.300,.005),lip(.505,.300,.005),lip(.505,.309,.005),lip(0,.309,.005)],'#d0d6d8',false);
+      r.polygon([lip(0,.352,.005),lip(.12,.352,.005),lip(.12,.366,.005),lip(0,.366,.005)],'#8a8f8f',false);
+      for(let k=0;k<3;k++)ellipse(r,lip(.025+.04*k,.359,.006),[0,.006,0],[0,0,.006],1,0,'#b8baa9',10);
       const pts=[[-.104,-.028],[-.086,-.043],[.086,-.043],[.117,.028],[.089,.047],[-.089,.043]];
-      const ring=f=>pts.map(([y,z])=>rearAt(side*(.628+y*f),.335+z*f,.013));
-      const a=ring(1),b=ring(.84);r.polygon(b,'#222629',false);for(let j=0;j<a.length;j++){const n=(j+1)%a.length;r.polygon([a[j],a[n],b[n],b[j]],chrome,false);}
+      const ring=(f,d=.013)=>pts.map(([y,z])=>rearAt(side*(.628+y*f),.335+z*f,d));
+      // Chrome trim with a rolled lip, a dark throat and the round pipe end inside it.
+      const a=ring(1),b=ring(.84),c=ring(.84,-.012);
+      for(let j=0;j<a.length;j++){const n=(j+1)%a.length;r.polygon([a[j],a[n],b[n],b[j]],chrome,false);r.polygon([b[j],b[n],c[n],c[j]],'#6f7577',false);}
+      r.polygon(c,'#111416',false);
+      const pipeEnd=rearAt(side*.628,.333,-.004);
+      ellipse(r,pipeEnd,[0,.034,0],[0,0,.026],1,.72,'#7d7a73',20);
+      ellipse(r,[pipeEnd[0]+.002,pipeEnd[1],pipeEnd[2]],[0,.025,0],[0,0,.019],1,0,'#0c0e0f',20);
       const q=rearAt(side*.796,.502,.004);ellipse(r,q,[0,.065,0],[0,0,.008],1,0,'#9d343b',16);
     });
     r.tag('lights.tail',()=>{
@@ -590,7 +768,9 @@ function rearFascia(r,paint){
       const colors=['#5b1920','#9e2732','#db4343','#8e232b','#b72b32','#e84c47','#ab3037','#701f29','#d4cbc2','#a94850','#71202c'];
       let last=null;
       for(let station=0;station<=40;station++){
-        const angle=mix(31.5,79,station/40);
+        // The lens ends about 0.39 m ahead of the tail in the side photograph
+        // of the US car (BaT lot 148,073), not 0.6 m as previously drawn.
+        const angle=mix(31.5,66,station/40);
         const [d,lo,hi]=sample(stations,angle);
         const next=rows.map(v=>mount(side,angle,mix(lo,hi,v),d));
         if(last)for(let k=1;k<rows.length;k++)
@@ -608,13 +788,13 @@ function deckFace(y,z){
   // Trapezoidal pressed recess with a formed sill at its lower edge and a
   // handle above the US plate. Brochure p. 9 gives its relation to the lamps.
   const socket=.255+.071*v;
-  const pocket=(1-fade(socket,socket+.055,u))*fade(.605,.654,z)*(1-fade(.813,.862,z));
-  q[0]-=.062*pocket;
+  const pocket=(1-fade(socket,socket+.03,u))*fade(.615,.645,z)*(1-fade(.823,.852,z));
+  q[0]-=.040*pocket;
   return q;
 }
 export const slDeckCameraMount=(y=0,z=.831)=>deckFace(y,z);
 function rearDeck(r,paint,t,drawFixed=false){
-  const pose=p=>slDeckPoint(p,t),ys=[0,.14,.20,.255,.285,.32,.355,.39,.46,.48,.52,.554,.597,.67,.68,.74,.81,.853];
+  const pose=p=>slDeckPoint(p,t),ys=[0,.07,.14,.20,.24,.26,.28,.30,.32,.34,.355,.37,.39,.42,.46,.48,.52,.554,.597,.67,.68,.74,.81,.853];
   for(const s of [-1,1])for(let i=1;i<ys.length;i++){
     const a=ys[i-1],b=ys[i],isDeck=b<=.597;
     if(isDeck===drawFixed)continue;
@@ -623,8 +803,8 @@ function rearDeck(r,paint,t,drawFixed=false){
       return isDeck?pose(q):q;
     };
     r.tag(isDeck?'shell.trunklid':'shell.fenders',()=>{
-      const levels=[0,.04,.095,.155,.32,.49,.56,.63,.7,.77,.87,1];
-      for(let j=1;j<levels.length;j++)meshPaint(r,[p(a,levels[j-1]),p(b,levels[j-1]),p(b,levels[j]),p(a,levels[j])],paint);
+      const levels=[0,.04,.095,.155,.24,.32,.40,.49,.56,.63,.7,.77,.82,.87,.93,1];
+      for(let j=1;j<levels.length;j++)patch(r,p,a,b,levels[j-1],levels[j],paint);
     });
   }
   if(drawFixed)return;
@@ -639,6 +819,11 @@ function rearDeck(r,paint,t,drawFixed=false){
     for(let j=0;j<3;j++){const a=j*TAU/3+Math.PI/2;
       r.polygon([ring(.16,a+Math.PI/2),ring(.98,a),ring(.16,a-Math.PI/2)],'#e7e9e8',false);
     }
+  });
+  r.tag('shell.trunklid',()=>{
+    // Chrome "SL 550" script on the driver's side of the lid, above the lamp.
+    const h=.030,w=letteringWidth('SL 550',h),start=-.505;
+    drawLettering(r,'SL 550',h,(u,v)=>{const p=deckFace(start+u*(1)+0,.858+v);p[0]+=.0035;return pose(p);},{radius:.0024,color:'#d9dedf'});
   });
   r.tag('lights.high-stop',()=>{
     const band=(y,z)=>{const p=deckFace(y,z);p[0]+=.0025;return pose(p);};

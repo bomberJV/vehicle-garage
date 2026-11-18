@@ -106,6 +106,10 @@ test('reusing the stationary mesh during roof travel matches a fresh draw at bot
     fresh.slRoofFraction=fraction;
     sl550.draw(fresh,'#a8aaa5','#bfc4c2');
     const direct=grouped(fresh.faces);
+    // The shared brake, fuel and electrical systems are drawn by the renderer
+    // around the exhibit's own mesh; compare the exhibit's parts.
+    const own=new Set(sl550.groups.flatMap(g=>g.parts.map(p=>p.id)));
+    for(const id of [...cached.keys()])if(!own.has(id))cached.delete(id);
     assert.deepEqual(new Set(cached.keys()),new Set(direct.keys()));
     for(const [id,faces] of direct){
       const actual=cached.get(id);

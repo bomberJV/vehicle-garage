@@ -22,7 +22,7 @@ export const errorClasses=['through','overlap'];
 const system=id=>id.split('.')[0];
 
 // Wires, hoses, pipes and ducts.
-export const lines=new Set(['993-steering.lines','993-climate.lines','993-climate.supply','993-lubrication.outbound','993-lubrication.return',
+export const lines=new Set(['993-steering.lines','993-evap.vent','993-evap.purge','993-electrics.engine-harness','993-electrics.abs-lead-front-left','993-electrics.abs-lead-front-right','993-electrics.abs-lead-rear-left','993-electrics.abs-lead-rear-right','993-climate.lines','993-climate.supply','993-lubrication.outbound','993-lubrication.return',
   '993-lubrication.connections','brakes.lines','electrical.cables','fuel.supply']);
 // Systems a line cannot end in: trim, structure and running gear.
 const noPorts=new Set(['floor','shell','running','cabin','roof']);
@@ -61,6 +61,11 @@ export const mounts=[
     ['993-suspension.rear-carrier-'+hand,'drivetrain.halfshafts','the drive shaft passes through the wheel carrier into the hub bearing'],
     ['993-steering.tie-rod-'+hand,'993-suspension.front-carrier-'+hand,'the tie-rod ball joint is bolted into the carrier\'s steering arm']
   ]),
+  ...['abs-lead-front-left','abs-lead-front-right','abs-lead-rear-left','abs-lead-rear-right'].map(id=>['993-electrics.'+id,'shell.fenders','the sensor lead leaves the wheel through the open wheel housing; the housing wall is drawn as a closed disc']),
+  ['993-evap.purge','shell.fenders','the purge line passes through its grommet in the inner wheel-housing panel, as the oil filler hose does on the right'],
+  ['993-electrics.engine-harness','floor.pan','the harness passes through its grommet in the floor behind the seat'],
+  ['993-electrics.engine-harness','floor.carpet','the harness passes through its grommet in the floor behind the seat'],
+  ['993-electrics.engine-harness','floor.underlay','the harness passes through its grommet in the floor behind the seat'],
   ['993-steering.column','cabin.controls','the column passes through the facia below the instruments to the wheel'],
   ['993-steering.column','floor.pan','the intermediate shaft passes through its grommet in the toe board'],
   ['993-steering.column','floor.carpet','the intermediate shaft passes through its grommet in the toe board'],

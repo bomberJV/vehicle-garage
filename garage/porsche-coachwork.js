@@ -32,6 +32,9 @@ const kit996={id:'996',sweep:sweep996,headlampSeat:headlampSeat996,rocker:rocker
   deckHalf:deckHalf996,deckStart:1.52};
 export const coupeShape=[
   {modern:false,width:1.735,front:-1.16,rear:1.112,frontRadius:.316,rearRadius:.314,
+  // Two US Cabriolets photographed side-on show about 85 mm of fender above
+  // the front tyre and 55 mm above the rear (tests/garage-p993-photo-audit).
+  archLift:[.046,.016],
     screen:[-.613,-.155,1.260,.700,.577],screenFootSweep:.240,screenHeaderSweep:.065, cockpit:[-.62,.725],door:classicDoor,belt:.840,
     stations:classicStations},
   {modern:true,width:1.852,front:-1.2,rear:1.25,frontRadius:.333,rearRadius:.352,
@@ -64,15 +67,17 @@ function station(car,x){
 function swept(car,[x,y,z]){
   return [car.modern?car.kit.sweep(x,y):sweepClassicBody(car,x,y,z),y,z];
 }
+// 993 door pull: centre measured back from the door's rear shut line.
+export const classicHandle={back:.145,z:.733,w:.116};
 function archRadius(car,r){return r+(car.modern?car.kit.arch:.055);}
 
 const cutOf=(car,x)=>typeof car.kit.cut==='function'?car.kit.cut(x):car.kit.cut;
 function wheelCut(car,x){
   let z=car.modern?cutOf(car,x):.172;
-  for(const [axle,r] of [[car.front,car.frontRadius],[car.rear,car.rearRadius]]){
+  for(const [axle,r,lift] of [[car.front,car.frontRadius,car.archLift?.[0]||0],[car.rear,car.rearRadius,car.archLift?.[1]||0]]){
     // Outer wheelhouse returns vertically into the sill below the axle centre.
     const rx=archRadius(car,r),d=(x-axle)/rx;
-    if(Math.abs(d)<=1)z=Math.max(z,r+.003+(r+.046)*Math.sqrt(1-d*d));
+    if(Math.abs(d)<=1)z=Math.max(z,r+.003+(r+.046+lift)*Math.sqrt(1-d*d));
   }
   return z;
 }
@@ -146,7 +151,7 @@ function sideRaw(car,x,t,s){
   // fades into the rear quarter and meets the existing crown at the shoulder.
   if(!car.modern){
     const arch=Math.max(0,1-((x-car.rear)/.40)**2);
-    p[1]+=s*.0139566*arch*Math.sin(Math.PI*v);
+    p[1]+=s*.01632*arch*Math.sin(Math.PI*v);
     // The door turns in beneath its belt before the lower sill flares out.
     const doorTaper=clamp((x+.79)/.23)*clamp((.82-x)/.28);
     p[1]-=s*doorTaper*(.028*(1-v)**2+.009*Math.exp(-(((v-.41)/.18)**2)));
@@ -408,7 +413,9 @@ function skin(r,car,paint,phase){
         }
         r.tag('shell.fenders',()=>panelSeam(r,car,'bumper-wing'+s,joint,.0055,s,tint(paint,.5)));
       }
-      const hw=car.modern?car.kit.handle.w:.116,hz=car.modern?car.kit.handle.z:.733,hx=b-(car.modern?car.kit.handle.x:.18);
+      const hw=car.modern?car.kit.handle.w:classicHandle.w,hz=car.modern?car.kit.handle.z:classicHandle.z,hx=b-(car.modern?car.kit.handle.x:classicHandle.back);
+      // The 993 handle centre is 0.68 of the wheelbase behind the front axle in
+      // the rescue-sheet side view and in both side-on photographs.
       const handle=cheek(hx,hz);
       // The 993 pull handle is a body-colour moulding over a shallow dark recess.
       ellipsoid(r,handle,[hw*.63,.014,.023],car.modern?tint(paint,.67):'#4a4d4f',12,4);

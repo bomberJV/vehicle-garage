@@ -1,4 +1,4 @@
-export const seeThroughCars=new Set(['g500','bmw325ci','bmw328xi','sl550','hrv','c63','f350','porsche993cab','porsche992scab']);
+export const seeThroughCars=new Set(['g500','bmw325ci','bmw328xi','sl550','hrv','c63','f350','porsche993cab','porsche992scab','porsche996cab']);
 
 const cabinParts=new Set(['body.front-seats','body.rear-seats','body.rear-bench','body.dashboard','body.console',
   'body.cabin-trim','body.rearview-mirror']);

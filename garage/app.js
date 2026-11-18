@@ -42,7 +42,7 @@ function el(tag,className,text){const e=document.createElement(tag);if(className
 function button(text,handler,className){const b=el('button',className,text);b.type='button';b.addEventListener('click',handler);return b;}
 function external(text,url){const a=el('a','',text);a.href=url;a.target='_blank';a.rel='noopener noreferrer';return a;}
 function defaultForVehicle(vehicle){
-  const paint={sl550:'silver',porsche993cab:'silver',porsche992scab:'burgundy',bmws1000rr:'#c5222c'}[vehicle]||DEFAULT_BUILD.paint;
+  const paint={sl550:'silver',porsche993cab:'silver',porsche996cab:'silver',porsche992scab:'burgundy',bmws1000rr:'#c5222c'}[vehicle]||DEFAULT_BUILD.paint;
   return {...DEFAULT_BUILD,vehicle,paint,finish:vehicle==='bmws1000rr'?'black':DEFAULT_BUILD.finish};
 }
 function initialBuild(vehicle){

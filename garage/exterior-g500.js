@@ -90,6 +90,8 @@ function roadDoor(r,side,isFront,paint) {
     const handle=b-.134;
     // The pushbutton and black bow interrupt the longitudinal rub strip.
     r.box(handle-.081,y-.015,.972,handle+.092,y+.015,1.027,dark);
+    // Handle and hinges stay with the door: the door exhibit already
+    // registers them as its own parts.
     r.rod([handle-.060,y+side*.023,1.017],[handle+.042,y+side*.023,1.017],.012,'#4a5051',8);
     r.rod([handle+.072,y+side*.014,.999],[handle+.072,y+side*.024,.999],.012,bright,10);
     for(const z of [.726,1.103]) {
@@ -134,18 +136,23 @@ function bodyShell(r,paint) {
       const y=side*width;
       // The wing side runs up to the fender-top deck, so no slit opens into the bay.
       r.tag('body.fender-'+(side<0?'left':'right'),()=>{lowerPanel(r,front,-.755,side,1.239,paint);drawG500FrontDeck(r,paint,side);});
-      lowerPanel(r,1.130,2.083,side,1.223,paint);
-      // Quarter sheet under the diagonal hem meets the arch at the sill.
-      sideSheet(r,[[.835,.538],[.958,.538],[1.025,.682],[1.130,.804],[1.130,.974]],side*width,side*(width-.044),paint);
+      const hand0=side<0?'left':'right';
+      r.tag('body.lower-quarter-'+hand0,()=>{
+        lowerPanel(r,1.130,2.083,side,1.223,paint);
+        // Quarter sheet under the diagonal hem meets the arch at the sill.
+        sideSheet(r,[[.835,.538],[.958,.538],[1.025,.682],[1.130,.804],[1.130,.974]],side*width,side*(width-.044),paint);
+      });
       // The pillars and sills stay in place when the closures pull away.
       r.box(-.748,y-.025,.505,.977,y+.025,.530,tone(paint,.79));
       r.rod([.234,side*.844,.54],[.225,side*.833,1.906],.019,tone(paint,.70),8);
       r.rod([1.125,side*.85,.969],[1.080,side*.834,1.905],.018,tone(paint,.76),8);
       r.rod([-.754,side*.865,1.205],[-.439,side*.831,1.918],.027,paint,9);
-      r.rod([-.439,side*.831,1.913],[1.978,side*.831,1.913],.029,paint,9);
+      // Black molding along the inner edge of each windshield pillar.
+      r.tag('body.pillar-molding-'+(side<0?'left':'right'),()=>r.rod([-.776,side*.842,1.208],[-.461,side*.808,1.915],.0065,dark,6));
+      r.tag('body.roof-rail-'+(side<0?'left':'right'),()=>r.rod([-.439,side*.831,1.913],[1.978,side*.831,1.913],.029,paint,9));
       const quarter=[[1.130,y,1.223],[1.088,side*.838,1.911],[1.957,side*.838,1.911],[1.998,side*.848,1.815],[2.084,y,1.223]];
       const aperture=[[1.194,side*.881,1.249],[1.137,side*.844,1.841],[1.905,side*.844,1.841],[1.930,side*.851,1.805],[2.008,side*.881,1.249]];
-      outlineRing(r,quarter,aperture,paint);
+      r.tag('body.upper-quarter-'+(side<0?'left':'right'),()=>outlineRing(r,quarter,aperture,paint));
 
       r.tag('body.quarter-glass',()=>fittedWindow(r,aperture.map(([x,y,z])=>[x,y-side*.009,z]),{privacy:true,radius:.039}));
       // Non-moving front wing and rear quarter own their rub strips.
@@ -176,8 +183,8 @@ function bodyShell(r,paint) {
       for(const [x0,x1] of [[-.943,-.930],[.925,.938]])board(x0,x1,.861,.963,.450,.509,'#2b3132');
       }));
       if(side===1) {
-        r.box(1.777,.889,1.055,1.96,.897,1.204,tone(paint,.56));
-        r.box(1.785,.899,1.062,1.952,.904,1.197,paint);
+        r.tag('body.fuel-door-pocket',()=>r.box(1.777,.889,1.055,1.96,.897,1.204,tone(paint,.56)));
+        r.tag('body.fuel-door',()=>r.box(1.785,.899,1.062,1.952,.904,1.197,paint));
       }
       sideLighting(r,side);
       rearCornerLamp(r,side);
@@ -237,7 +244,7 @@ function nose(r,paint) {
   r.rigid('nose-carrier',[0,0,0],()=>{
     r.tag('body.grille',()=>{
       radiatorGrille(r,front,paint);
-      starBadge(r,[front-.057,0,1.007],.132,'x',-1);
+      r.tag('body.grille-star',()=>starBadge(r,[front-.057,0,1.007],.132,'x',-1));
     });
     for(const side of [-1,1]) {
       const y=side*.674;
@@ -288,6 +295,11 @@ const giantRef=(label,slug)=>({label:'MB Parts Giant · 2002 G500 '+label+' diag
 const exteriorPlates={
   ...Object.fromEntries(g500BumperParts.map(([key,,,end])=>[key,bumperRefs[end]])),
   'licence-lamps':exteriorPlate('licence lamps','electrical--license-lamps'),
+  'grille-star':giantRef('grille and components','grille-components'),
+  ...Object.fromEntries(['pillar-molding-left','pillar-molding-right'].map(k=>[k,giantRef('windshield reveal moldings','reveal-moldings')])),
+  ...Object.fromEntries(['lower-quarter-left','lower-quarter-right','upper-quarter-left','upper-quarter-right','fuel-door','fuel-door-pocket'].map(k=>[k,giantRef('quarter panel and fuel door','fuel-door')])),
+  ...Object.fromEntries(['roof-rail-left','roof-rail-right'].map(k=>[k,giantRef('roof and components','roof-components')])),
+  ...Object.fromEntries(['spare-cover','spare-cap','spare-ring','spare-emblem'].map(k=>[k,giantRef('spare tire carrier and components','carrier-components-spare-tire')])),
   'rear-plate-panel':exteriorPlate('exterior trim · rear body','body--exterior-trim-rear-body'),
   'running-boards':exteriorPlate('rocker panel','body--rocker-panel'),
   'wheel-flares':exteriorPlate('exterior trim · fender','body--exterior-trim-fender'),
@@ -316,8 +328,8 @@ export const G500_BODY_PARTS = [
   ['quarter-glass','Rear quarter windows','The cargo-area side windows sit in fixed apertures behind the rear passenger doors.'],
   ['roof','Roof & rain gutters','The pressed roof skin, six rear reinforcing ribs and gutters lift above the door frames.'],
   ['tailgate','Side-hinged cargo door','Two hinges on the left carry the narrow door. Its pushbutton handle is on the right. The glass, overhead wiper and spare move with the door.'],
-  ['spare','Spare-wheel cover & carrier','A painted cover with a polished stainless face, star and Mercedes-Benz wordmark encloses the spare wheel on the cargo door.'],
-  ['grille','Radiator grille','Seven vanes, painted like the surround, sit inside the grille opening. The star stands ahead of the vanes, and the lower valance meets the bumper.'],
+  ['spare','Spare wheel and tyre','The full-size spare wheel and tyre ride on the carrier hub behind the cover on the cargo door.'],
+  ['grille','Radiator grille · 463-888-00-15','Seven vanes, painted like the surround, sit inside the grille opening. The star emblem stands ahead of the vanes, and the lower valance meets the bumper.'],
   ['rear-lights','Rear combination lamps','The two rectangular lamp clusters are mounted at the fixed rear corners above the bumper.'],
   ['fog-lamps','Front fog lamp trim','The black rectangular surrounds frame the two clear lenses low in the front bumper. Open a lamp to see the reflector, bulb and spring clip.'],
   ['rear-plate-panel','Rear licence-plate recess','A recessed surround in the rear body holds the US-size plate and its two lamps.'],
@@ -338,6 +350,21 @@ export const G500_BODY_PARTS = [
   ['mirror-glass-left','Mirror glass, left · 463-810-83-16','The flat glass sits in a black frame inside the housing.'],
   ['mirror-glass-right','Mirror glass, right · 463-810-82-16','The glass sits in a black frame inside the housing.'],
   ['mirror-gaskets','Mirror base gaskets · 463-811-00-96','A rubber gasket seals each mirror foot against the door skin.'],
+  ['spare-cover','Spare-wheel cover · 463-890-73-08','The painted side wall rolls over a rounded shoulder around the spare tyre.'],
+  ['spare-cap','Spare-cover face cap · 463-890-54-08','A shallow polished stainless dome closes the face of the cover.'],
+  ['spare-ring','Spare-cover edge ring · 001-987-76-25','A bright ring trims the edge of the stainless face.'],
+  ['spare-emblem','Spare-cover Mercedes-Benz emblem · 463-898-05-11','The star sits left of the Mercedes-Benz wordmark across the middle of the face.'],
+  ['lower-quarter-left','Lower quarter panel, left · 463-637-23-09','The lower rear quarter runs from the diagonal door hem back over the rear wheel to the corner.'],
+  ['lower-quarter-right','Lower quarter panel, right · 463-637-24-09','The lower rear quarter runs from the diagonal door hem back over the rear wheel to the corner.'],
+  ['upper-quarter-left','Upper quarter panel, left · 463-637-06-03','The upper quarter frames the fixed rear side window up to the roof rail.'],
+  ['upper-quarter-right','Upper quarter panel, right · 463-637-07-03','The upper quarter frames the fixed rear side window up to the roof rail.'],
+  ['roof-rail-left','Roof rail, left · 463-630-27-35','The side roof rail runs from the windshield pillar to the rear corner above the doors.'],
+  ['roof-rail-right','Roof rail, right · 463-630-28-35','The side roof rail runs from the windshield pillar to the rear corner above the doors.'],
+  ['fuel-door','Fuel door · 463-750-01-03','The painted flap on the right rear quarter covers the filler.'],
+  ['fuel-door-pocket','Fuel-filler pocket · 463-630-00-67','The recessed pocket behind the flap surrounds the filler neck.'],
+  ['pillar-molding-left','Windshield pillar molding, left · 463-698-01-30','A black molding runs along the inner edge of the left windshield pillar.'],
+  ['pillar-molding-right','Windshield pillar molding, right · 463-698-02-30','A black molding runs along the inner edge of the right windshield pillar.'],
+  ['grille-star','Grille star emblem · 601-817-01-16','The large three-pointed star stands ahead of the grille vanes on its backing plate.'],
   ['licence-lamps','Licence-plate lamps','Two small lamps in the top edge of the plate recess light the plate.'],
   ...g500BumperParts.map(([key,name,description])=>[key,name,description])
-].map(([key,name,description])=>({id:'body.'+key,name,description,source:['front-seats','rear-bench','dashboard','rearview-mirror'].includes(key)?g500CabinSource:g500BodyReferences[key]||g500BodyReferences.structure,...(exteriorPlates[key]?{source:exteriorPlates[key]}:{}),...(key==='fog-lamps'?{source:lampRefs.fog}:key==='rear-lights'?{source:lampRefs.manual}:key==='grille'?{source:{label:'Mercedes-Benz Classic · 2002 G500 grille plate',url:'https://classicparts.mbusa.com/v-2002-mercedes-benz-g500--base--5-0l-v8-gas/body--grille-and-components'}}:{})}));
+].map(([key,name,description])=>({id:'body.'+key,name,description,source:['front-seats','rear-bench','dashboard','rearview-mirror'].includes(key)?g500CabinSource:g500BodyReferences[key]||g500BodyReferences.structure,...(exteriorPlates[key]?{source:exteriorPlates[key]}:{}),...(key==='fog-lamps'?{source:lampRefs.fog}:key==='rear-lights'?{source:lampRefs.manual}:key==='grille'?{source:giantRef('grille and components','grille-components')}:{})}));

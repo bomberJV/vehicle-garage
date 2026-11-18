@@ -19,8 +19,8 @@ test('W463 rear cargo opening has fixed wings, near-side picks and distinct hing
   for(const x of [-.63,.63])assert.equal(r.hitTest(x,1.45)?.part,'body.structure');
   assert.equal(r.hitTest(.29,1.51)?.part,'body.glass');
   assert.equal(r.hitTest(.34,1.0)?.part,'body.tailgate');
-  assert.equal(r.hitTest(-.115,1.03)?.part,'body.spare');
-  const carrier=faces.filter(f=>f.part==='body.spare');
+  assert.match(r.hitTest(-.115,1.03)?.part,/^body\.spare-(cap|emblem)$/);
+  const carrier=faces.filter(f=>f.part.startsWith('body.spare'));
   assert(carrier.every(f=>f.rigid.name==='cargo-door'));
   const [left,right]=bounds(carrier)[1];
   assert.equal(Math.round(1000*(left+right)/2),-115);

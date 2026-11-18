@@ -9,7 +9,7 @@ test('stock G500 rendered extrema reproduce the six measurements on p.360 of the
   const {mm,min,max}=measureStockMesh('g500',faces);
   assert.deepEqual(mm,{length:4715,width:2007,height:1977,wheelbase:2850,frontTrack:1515,rearTrack:1515});
   function reaches(part,axis,value){
-    const parts=part==='body.door'?[part,'body.mirror-left']:part==='body.front-right'?[part,'body.mirror-right']:[part];
+    const parts=part==='body.door'?[part,'body.mirror-left']:part==='body.front-right'?[part,'body.mirror-right']:part==='body.spare'?['body.spare','body.spare-cap','body.spare-emblem','body.spare-ring']:[part];
     return faces.some(f=>parts.includes(f.part) && f.points.some(p=>Math.abs(p[axis]-value)<1e-9));
   }
   assert(reaches('body.spare',0,max[0]));

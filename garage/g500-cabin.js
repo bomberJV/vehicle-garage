@@ -1,6 +1,7 @@
 // Black-leather cabin of US G 500 WDCYR49E72X131705, RM Arizona 2023.
 // The gallery establishes shapes and layout. Seat positions and upholstery dimensions are schematic.
 import {tint} from './road-primitives.js';
+import {drawG500DashFittings} from './g500-dash-fittings.js';
 import {drawHeaterMat,frontHeaterCenter} from './g500-seat-heaters.js';
 import {drawG500WindowLift} from './g500-window-lifter.js';
 import {part,study} from './mechanism-shapes.js';
@@ -177,7 +178,7 @@ function rearviewMirror(r){
   r.polygon([[-.397,-.093,1.780],[-.397,.093,1.780],[-.401,.096,1.815],[-.401,-.096,1.815]],'#707b7c',false);
  });
 }
-export function drawG500Cabin(r){frontSeats(r);rearBench(r);dashboard(r);rearviewMirror(r);}
+export function drawG500Cabin(r){frontSeats(r);rearBench(r);dashboard(r);drawG500DashFittings(r);rearviewMirror(r);}
 export function drawG500DoorTrim(r,side,a,b,front){
  const y=v=>side*v,low=front?.73:.92;
  drawG500WindowLift(r,(u,z,depth=0)=>[a+(b-a)*u,side*(.857+depth*.47),.545+.89*z],!front);

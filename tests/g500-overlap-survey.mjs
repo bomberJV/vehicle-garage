@@ -64,6 +64,7 @@ export const mounts=[
   ['body.instrument-panel','column-adjustment','the steering column passes through the instrument panel'],
   ['body.instrument-panel','hvac','the demister ducts sit under the instrument-panel pad'],
   ['body.cluster-trim','electrical.cluster','the cluster trim hoods the instrument cluster'],
+  ['body.lower-cover-left','electrical.diagnostic','the diagnostic socket is set into the driver-side lower cover'],
   ['body.cluster-trim','hvac','the face ducts sit beneath the cluster trim'],
   ['body.steering-wheel','column-adjustment','the steering wheel is splined to the column shaft'],
   ['body.door','column-adjustment.door-switch','the switch is set into the door trim'],

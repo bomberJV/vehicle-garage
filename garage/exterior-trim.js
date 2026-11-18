@@ -15,13 +15,14 @@ function cornerFillets(corners,radius) {
   return edge;
 }
 
-export function fittedWindow(r,corners,{privacy=false,radius=.036,seal=.010,sideCrown=0,frameless=false}={}){
+export function fittedWindow(r,corners,{privacy=false,radius=.036,seal=.010,sideCrown=0,frameless=false,tone=null}={}){
   const middle=corners[0].map((_,j)=>corners.reduce((sum,p)=>sum+p[j],0)/corners.length);
   const edge=cornerFillets(corners,radius);
   const sill=Math.min(...corners.map(p=>p[2]));
   const height=Math.max(...corners.map(p=>p[2]))-sill;
   const clear=edge.map(p=>lerp(p,middle,Math.min(.15,seal*2/Math.max(.1,height))));
-  const pane=(points)=>glazingFace(r,points,privacy?'#557079':'#8daab1',privacy?.53:.29);
+  // tone: optional [color, opacity] for a vehicle's own tint level.
+  const pane=(points)=>glazingFace(r,points,tone?.[0]??(privacy?'#557079':'#8daab1'),tone?.[1]??(privacy?.53:.29));
   const crown=p=>[p[0],p[1]+sideCrown,p[2]];
   const center=crown(middle);
   const inside=clear.map(p=>{

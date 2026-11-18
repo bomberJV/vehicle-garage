@@ -14,7 +14,11 @@ export const classicPitch=.118;
 // 993 Carrera M64/05: 3,600 cm³ from 100 mm bore and 76.4 mm stroke.
 export const m64={bore:.100,stroke:.0764,pitch:classicPitch,bankOffset:classicPitch/2,
   source:{label:'kfz-tech.de · Porsche 911 engine, bore × stroke by year (1989: 100.0 × 76.4 mm, 3,600 cm³)',url:'https://kfz-tech.de/Engl/Hersteller/Porsche/Porsche911Motor.htm'},
-  pitchSource:{label:'Hagerty · Mezger spaced the bores 118 mm apart',url:'https://hagerty.com/media/?p=6803'}};
+  pitchSource:{label:'Hagerty · Mezger spaced the bores 118 mm apart',url:'https://hagerty.com/media/?p=6803'},
+  // The 993 crank keeps the 964's 60 mm main journals and narrows the 55 mm
+  // big-end journals from 22 to 19 mm.
+  journals:{main:.060,rod:.055,rodWidth:.019},
+  journalSource:{label:'Rennlist 993 forum · 964, 993 and GT3 cranks share 76.4 mm stroke and 60 mm mains; the 993 big end is 55 mm, narrowed from 22 to 19 mm wide',url:'https://rennlist.com/forums/993-forum/253360-993-crank-vs-964-vs-turbo.html'}};
 const modelPitch=.178;
 export const CLASSIC_SCALE=classicPitch/modelPitch;
 // 993: crank centre 378 mm behind the axle line puts the flywheel face at

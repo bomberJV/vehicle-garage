@@ -67,6 +67,10 @@ function station(car,x){
 function swept(car,[x,y,z]){
   return [car.modern?car.kit.sweep(x,y):sweepClassicBody(car,x,y,z),y,z];
 }
+// Opening in the 993 inner wheel-housing wall, behind the tire: [dx from the
+// axle, z]. It stays inside the tire's side silhouette, so only the
+// suspension behind the wheel can be seen through it.
+export const classicWheelOpening=[[.21,.12],[.25,.25],[.25,.42],[.20,.52],[-.20,.52],[-.25,.42],[-.25,.25],[-.21,.12]];
 // 993 door pull: centre measured back from the door's rear shut line.
 export const classicHandle={back:.145,z:.733,w:.116};
 function archRadius(car,r){return r+(car.modern?car.kit.arch:.055);}
@@ -276,14 +280,29 @@ function floorAndSills(r,car,paint){
         strip(r,ring,hem,tint(paint,.84));strip(r,hem,lip,tint(paint,.62));
       }
       strip(r,lip,inner,'#33363b');
-      for(let j=0;j<26;j++)r.polygon([[axle,s*.535,.17],inner[j],inner[j+1]],'#292d31',false);
-      if(!car.modern){
-        // The 993 wheelhouse is a closed tub: carry the inner wall down to the
-        // floor line at both ends so the cabin floor and oil lines behind it
-        // cannot be seen past the tire.
+      if(car.modern)for(let j=0;j<26;j++)r.polygon([[axle,s*.535,.17],inner[j],inner[j+1]],'#292d31',false);
+      else{
+        // The 993 wheelhouse is a tub: its inner wall runs down to the floor
+        // line ahead of and behind the tire, so the cabin floor and oil lines
+        // cannot be seen past it. Behind the tire the wall stops above the
+        // suspension (classicWheelOpening), where the struts, links and drive
+        // shafts pass under the dome.
+        const edge=classicWheelOpening.map(([dx,z])=>[axle+dx,s*.535,z]);
+        const c=[axle,s*.535,.32],toEdge=([x,,z])=>{
+          const dx=x-c[0],dz=z-c[2];let best=null;
+          for(let i=0;i<edge.length-1;i++){
+            const a=edge[i],b=edge[i+1],ex=b[0]-a[0],ez=b[2]-a[2],den=dx*ez-dz*ex;
+            if(Math.abs(den)<1e-12)continue;
+            const t=((a[0]-c[0])*ez-(a[2]-c[2])*ex)/den,u=((a[0]-c[0])*dz-(a[2]-c[2])*dx)/den;
+            if(t>0&&u>=-1e-9&&u<=1+1e-9&&(!best||t<best[0]))best=[t,[c[0]+dx*t,c[1],c[2]+dz*t]];
+          }
+          return best[1];
+        };
+        const rim=inner.map(toEdge);
+        strip(r,inner,rim,'#292d31');
         for(const j of [0,26]){
-          const end=inner[j],x=end[0];
-          r.polygon([[axle,s*.535,.17],end,[x,s*.535,.12],[axle,s*.535,.12]],'#292d31',false);
+          const end=inner[j],x=end[0],[low,mid]=j===0?[edge[0],edge[1]]:[edge.at(-1),edge.at(-2)];
+          r.polygon([rim[j],end,[x,s*.535,.12],low,mid],'#292d31',false);
         }
       }
       if(!car.modern){
@@ -293,7 +312,7 @@ function floorAndSills(r,car,paint){
           const sign=j===0?1:-1;
           const upper=[lip[j],inner[j]],lower=upper.map(([x,y])=>[x+sign*.006,y-s*.018,.174]);
           strip(r,upper,lower,'#383b3c');
-          r.polygon([inner[j],[axle,s*.535,.17],lower[1]],'#303235',false);
+          r.polygon([inner[j],[axle+(j===0?1:-1)*.23,s*.535,.17],lower[1]],'#303235',false);
         }
       }
     }

@@ -15,10 +15,11 @@ export const chassisRefs={
  upperLink:{label:'Design911 · 993 rear upper control arm, joins wheel carrier and side section',url:'https://www.design911.co.uk/parts/99333106502/'},
  steering:{label:'Porsche 993 parts catalogue · 403-000 steering gear, power steering, tie rods',url:'https://www.eurospares.co.uk/Porsche/993/1998_(993)/PartDiagrams/403-000/STEERING_GEAR_-_STEERING_PARTS'},
  steeringFluid:{label:'Porsche 993 parts catalogue · 403-001 power steering oil container and lines',url:'https://new-store.9xx-parts.com/t/parts/911/porsche-911-carrera-1994-2021/1994-1998/4-front-axle-steering/03-steering-gear/403-001-power-steering'},
+ springPaint:{label:'Rennlist 993 forum · springs are black with paint marks; a black front spring with three blue dots is the standard (not M030) spring',url:'https://rennlist.com/forums/993-forum/16622-shock-part-number.html'},
  steeringPump:{label:'Porsche 993 parts catalogue · 403-004 power steering pump, container',url:'https://www.eurospares.co.uk/Porsche/993/1998_(993)/PartDiagrams/403-004/POWER_STEERING_-_POWER-STEERING_PUMP_-_CONTAINER'}
 };
 
-const iron='#5d6566',steel='#8f9a9b',alloy='#a9afa6',black='#30363a',rubber='#24282a',spring='#3d4c52',zinc='#b8bcb0';
+const iron='#5d6566',steel='#8f9a9b',alloy='#a9afa6',black='#30363a',rubber='#24282a',spring='#1e2123',springSheen='#2b2f32',springMark='#2f5fb0',zinc='#b8bcb0';
 const row=(key,name,description,offset,source,draw)=>({...part(key,name,description,offset,draw),source});
 const sides=[[-1,'left','Left'],[1,'right','Right']];
 const M=([px,py,pz],s)=>[px,py*s,pz];
@@ -26,7 +27,9 @@ const rod=(r,a,b,rad,color,n=6)=>r.rod(a,b,rad,color,Math.min(n,8));
 function eye(r,c,axis,rad,color){cyl(r,c,axis,-rad*.9,rad*.9,rad,color,6);}
 function link(r,a,b,rad,color){rod(r,a,b,rad,color,8);eye(r,a,y,rad*1.35,rubber);eye(r,b,y,rad*1.25,iron);}
 function ball(r,c,rad,color){turn(r,c,z,[[-rad,0],[-rad*.7,rad*.72],[0,rad],[rad*.7,rad*.72],[rad,0]],color,{n:6});}
-function strut(r,base,top,{tube=.024,rodR=.010,coil=.046,seat=.064,coilFrom=.52,turns=4}={}){
+// Springs are black with paint marks (chassisRefs.springPaint); the standard
+// front spring carries three blue dots in a row.
+function strut(r,base,top,{tube=.024,rodR=.010,coil=.046,seat=.064,coilFrom=.52,turns=4,marks=0}={}){
  // Damper tube, piston rod, a pitched coil between two seats and the top mount.
  const d=top.map((v,i)=>v-base[i]),len=Math.hypot(...d),u=d.map(v=>v/len);
  const at=t=>add(base,u,len*t);
@@ -35,7 +38,7 @@ function strut(r,base,top,{tube=.024,rodR=.010,coil=.046,seat=.064,coilFrom=.52,
  const lo=coilFrom,hi=.95,n=turns*9;
  // The coil is a continuous pitched strip (as in the 992 strut), one face per step.
  const p=(i,edge)=>{const t=lo+(hi-lo)*i/n+edge*.006/len,ang=TAU*turns*i/n;return add(add(at(t),v1,coil*Math.cos(ang)),v2,coil*Math.sin(ang));};
- for(let i=0;i<n;i++)r.polygon([p(i,-1),p(i,1),p(i+1,1),p(i+1,-1)],i%3?spring:'#56666b',false);
+ for(let i=0;i<n;i++)r.polygon([p(i,-1),p(i,1),p(i+1,1),p(i+1,-1)],marks&&i<2*marks&&i%2?springMark:i%3?spring:springSheen,false);
  for(const t of [lo-.02,hi+.01])cyl(r,at(t),u,-.004,.004,seat,black,12);
  cyl(r,top,u,-.012,.016,seat*.82,rubber,12);
  eye(r,base,y,tube*1.15,iron);
@@ -190,7 +193,7 @@ const perSide=(key,name,description,offset,source,draw)=>sides.map(([s,hand,labe
 
 const suspensionRows=[
  row('front-cross-member','Front axle cross member','The cross member spans the front compartment floor. It carries both track control arms and the steering gear.',[0,0,-.20],chassisRefs.frontAxle,crossMember),
- ...perSide('front-strut','front spring strut','The coil spring sits on the damper. The strut clamps to the wheel carrier and its top mount sits in the body tower.',[0,.25,.20],chassisRefs.strut,(r,s)=>strut(r,M(front.strutBase,s),M(front.strutTop,s))),
+ ...perSide('front-strut','front spring strut','The coil spring sits on the damper. The strut clamps to the wheel carrier and its top mount sits in the body tower.',[0,.25,.20],chassisRefs.strut,(r,s)=>strut(r,M(front.strutBase,s),M(front.strutTop,s),{marks:3})),
  ...perSide('front-arm','front track control arm','Two rubber-bushed pivots on the cross member locate the ball joint at the foot of the wheel carrier.',[0,.18,-.12],chassisRefs.frontAxle,frontArm),
  ...perSide('front-carrier','front wheel carrier','The carrier holds the hub bearing. The strut sets its top, the track control arm its foot and the tie rod its steering angle.',[0,.30,0],chassisRefs.frontCarrier,frontCarrier),
  ...perSide('front-hub','front wheel hub and bearing','The double-row bearing in the carrier supports the hub flange, which carries the brake disc and wheel.',[0,.40,0],chassisRefs.frontCarrier,frontHub),

@@ -8,6 +8,7 @@ import {reflectorBowl} from './road-lamp-optics.js';
 import {glazingFace} from './surface-materials.js';
 import {sideSheet,formedRoof,drawBodyMirror,wheelhouse,cargoDoor,rearJamb,g500BodyReferences} from './g500-body-closures.js';
 import {drawFrontBumperBrackets,drawRearBumperBrackets,g500BumperParts,bumperRefs} from './g500-bumpers.js';
+import {g500DashFittingParts,dashFittingsRef} from './g500-dash-fittings.js';
 import {roofFrontLip} from './g500-roof-datums.js';
 import {drawG500Bonnet,drawG500FrontDeck,drawG500Scuttle} from './g500-bonnet.js';
 import {drawG500Cabin,drawG500DoorTrim,g500CabinSource} from './g500-cabin.js';
@@ -296,6 +297,7 @@ const exteriorPlates={
   ...Object.fromEntries(g500BumperParts.map(([key,,,end])=>[key,bumperRefs[end]])),
   'licence-lamps':exteriorPlate('licence lamps','electrical--license-lamps'),
   'grille-star':giantRef('grille and components','grille-components'),
+  ...Object.fromEntries(g500DashFittingParts.map(([key])=>[key,dashFittingsRef])),
   ...Object.fromEntries(['instrument-panel','cluster-trim','grab-handle'].map(k=>[k,giantRef('instrument panel','instrument-panel')])),
   ...Object.fromEntries(['center-console','console-trim-plate','shift-panel','shift-knob','console-lid'].map(k=>[k,giantRef('center console','center-console')])),
   'steering-wheel':exteriorPlate('steering wheel','steering--steering-wheel'),
@@ -380,5 +382,6 @@ export const G500_BODY_PARTS = [
   ['pillar-molding-right','Windshield pillar molding, right · 463-698-02-30','A black molding runs along the inner edge of the right windshield pillar.'],
   ['grille-star','Grille star emblem · 601-817-01-16','The large three-pointed star stands ahead of the grille vanes on its backing plate.'],
   ['licence-lamps','Licence-plate lamps','Two small lamps in the top edge of the plate recess light the plate.'],
-  ...g500BumperParts.map(([key,name,description])=>[key,name,description])
+  ...g500BumperParts.map(([key,name,description])=>[key,name,description]),
+  ...g500DashFittingParts
 ].map(([key,name,description])=>({id:'body.'+key,name,description,source:['front-seats','rear-bench','dashboard','rearview-mirror'].includes(key)?g500CabinSource:g500BodyReferences[key]||g500BodyReferences.structure,...(exteriorPlates[key]?{source:exteriorPlates[key]}:{}),...(key==='fog-lamps'?{source:lampRefs.fog}:key==='rear-lights'?{source:lampRefs.manual}:key==='grille'?{source:giantRef('grille and components','grille-components')}:{})}));

@@ -35,7 +35,7 @@ function swatches(target,options,selected,onChoice){
 
 export function createCustomizer({current,palette,savePalette,style,accessory}){
   const feedback=message=>{$('color-feedback').textContent=message;};
-  function paint(value){style('paint',value);syncPaint();}
+  function paint(value,options){style('paint',value,options);syncPaint();}
   function syncPaint(){
     const chosen=paintChoice(current().paint);
     $('custom-color').value=chosen.hex;$('hex-color').value=chosen.hex.toUpperCase();
@@ -51,7 +51,19 @@ export function createCustomizer({current,palette,savePalette,style,accessory}){
   }
   $('apply-hex').addEventListener('click',applyHex);
   $('hex-color').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();applyHex();}});
-  $('custom-color').addEventListener('input',event=>{paint(event.target.value);feedback('');});
+  // Dragging across the picker sends an input event for every pointer move, and each repaint
+  // rebuilds the vehicle. Only the latest colour is drawn, once per frame, so a slow rebuild
+  // drops the colours passed over instead of queueing them; the build is saved when the
+  // picker settles.
+  let pickedColor=null,pickFrame=0,pickSave=0;
+  const commitPick=()=>{clearTimeout(pickSave);pickSave=0;if(pickFrame){cancelAnimationFrame(pickFrame);pickFrame=0;}
+    const value=pickedColor;pickedColor=null;paint(value??$('custom-color').value);};
+  $('custom-color').addEventListener('input',event=>{
+    pickedColor=event.target.value;feedback('');
+    if(!pickFrame)pickFrame=requestAnimationFrame(()=>{pickFrame=0;if(pickedColor!==null){const value=pickedColor;pickedColor=null;paint(value,{save:false});}});
+    clearTimeout(pickSave);pickSave=setTimeout(()=>{pickSave=0;if(!pickFrame)paint($('custom-color').value);},600);
+  });
+  $('custom-color').addEventListener('change',commitPick);
   function store(){
     if(!applyHex())return;
     const chosen=paintChoice(current().paint),name=$('color-name').value.trim()||chosen.hex.toUpperCase();

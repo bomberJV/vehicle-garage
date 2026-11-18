@@ -1,5 +1,6 @@
 import {roadSystems} from './road-service-data.js';
 import {drawStudioContactShadow,hasStudioFinish} from './studio-finish.js';
+import {studioTheme,onStudioTheme} from './studio-theme.js';
 import {drawG500SteeringLinkage} from './g500-steering-gear.js';
 import {shellFragmentShader} from './shell-depth.js';
 import {isWorkbenchPorsche,drawPorscheInstalledServices} from './porsche-installed-services.js';
@@ -24,7 +25,7 @@ import {motionEnvelope} from './motion-envelope.js';
 import {sectionFaces} from './section-plane.js';
 import {faceTriangles} from './mesh-triangles.js';
 import {getCabinFloor,drawCabinFloor} from './floor-trim.js';
-import {softwareDepthRender,gpuDepthRender,recolorHover} from './surface-materials.js';
+import {softwareDepthRender,gpuDepthRender,gpuWorldRender,recolorHover} from './surface-materials.js';
 import {origin, planSeparation, displaced, intersects, allowedTravel, sampleMotion} from './exploded-layout.js';
 import {planTravel,offsetAt} from './explosion-travel.js';
 import {bindViewerInput,refreshPointerHover} from './viewer-input.js';
@@ -44,6 +45,8 @@ import {buildEngineBay,enginePartOffset} from './engine-geometry.js';
 import {drawF350Frame,drawTwinIBeams,drawTwinIBeamLinkage,drawTwinIBeamSpringSeats,drawF350RearLeafSprings} from './f350-powertrain.js';
 import {getEngineDefinition} from './engine-data.js';
 import {baseVehicle} from './vehicle-variants.js';
+import {PROBES,paintModel} from './paint-preview.js';
+import {canOrbitFast,orbitFrame} from './orbit-frame.js';
 const shade=(hex,f)=>{const h=hex.replace('#','');return '#'+[0,2,4].map(i=>Math.min(255,Math.max(0,Math.round(parseInt(h.slice(i,i+2),16)*f))).toString(16).padStart(2,'0')).join('');};
 function physicalInstance(face){
   if(face.instance)return face.instance;
@@ -78,7 +81,7 @@ function boundedShift(delta,near,far,start,end){
 // driver's seat. Mirror the lateral axis in the camera basis, including depth,
 // so a front-facing observer sees the driver on their right. Nested part
 // studies have their own authored workbench axes, independent of the chassis.
-function cameraBasis(vehicle,detail,azimuth,elevation){
+export function cameraBasis(vehicle,detail,azimuth,elevation){
   const lateral=(vehicle==='g500'||vehicle==='bmw325ci'||vehicle==='sl550')&&!detail?-1:1;
   const ca=Math.cos(azimuth),sa=Math.sin(azimuth),ce=Math.cos(elevation),se=Math.sin(elevation);
   return {
@@ -94,16 +97,35 @@ export class GarageRenderer{
    model.buildMesh();
    return model.faces;
  }
- constructor(canvas,onHotspot){this.canvas=canvas;this.ctx=canvas.getContext('2d');this.initDepthRenderer();this.onHotspot=onHotspot;this.angle=-.58;this.elevation=.24;this.zoom=1;this.blueprint=false;this.spin=false;this.lights=true;this.hotspots=true;this.dirty=true;this.points=[];this.faces=[];this.build=null;this.last=0;this.drag=null;this.inspection={assembly:null,part:null,expanded:false};this.schematic=true;this.isolate=false;this.currentPart=null;this.resize=new ResizeObserver(()=>this.draw());this.resize.observe(canvas);this.partPositions=new Map();this.mechanismPhase=0;
+ constructor(canvas,onHotspot){onStudioTheme(()=>this.draw());this.canvas=canvas;this.ctx=canvas.getContext('2d');this.initDepthRenderer();this.onHotspot=onHotspot;this.angle=-.58;this.elevation=.24;this.zoom=1;this.blueprint=false;this.spin=false;this.lights=true;this.hotspots=true;this.dirty=true;this.points=[];this.faces=[];this.build=null;this.last=0;this.drag=null;this.inspection={assembly:null,part:null,expanded:false};this.schematic=true;this.isolate=false;this.currentPart=null;this.resize=new ResizeObserver(()=>this.draw());this.resize.observe(canvas);this.partPositions=new Map();this.mechanismPhase=0;
  this.reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
  this.cacheDraws=true;bindViewerInput(this);requestAnimationFrame(t=>this.frame(t));}
  initDepthRenderer(){
  this.surface=document.createElement('canvas');const gl=this.surface.getContext('webgl',{alpha:true,depth:true,antialias:true,premultipliedAlpha:true});this.gl=gl;if(!gl)return;
  const shader=(type,source)=>{const sh=gl.createShader(type);gl.shaderSource(sh,source);gl.compileShader(sh);return sh;};
- const program=gl.createProgram();gl.attachShader(program,shader(gl.VERTEX_SHADER,'attribute vec3 position;attribute vec4 color;varying mediump vec4 tint;void main(){gl_Position=vec4(position,1.0);tint=color;}'));gl.attachShader(program,shader(gl.FRAGMENT_SHADER,shellFragmentShader));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS)){this.gl=null;return;}this.program=program;this.buffer=gl.createBuffer();
+ const program=gl.createProgram();gl.attachShader(program,shader(gl.VERTEX_SHADER,'uniform mat4 view;attribute vec3 position;attribute vec4 color;varying mediump vec4 tint;void main(){gl_Position=view*vec4(position,1.0);tint=color;}'));gl.attachShader(program,shader(gl.FRAGMENT_SHADER,shellFragmentShader));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS)){this.gl=null;return;}this.program=program;this.buffer=gl.createBuffer();
+ gl.useProgram(program);this.viewUniform=gl.getUniformLocation(program,'view');gl.uniformMatrix4fv(this.viewUniform,false,new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]));
  }
  softwareRender(w,h,project){return softwareDepthRender(this,w,h,project);}
- depthRender(w,h,dpr,project){return gpuDepthRender(this,w,h,dpr,project);}
+ depthRender(w,h,dpr,project){return this.orbitTransform?gpuWorldRender(this,w,h,dpr,project,this.orbitTransform):gpuDepthRender(this,w,h,dpr,project);}
+ // Orbiting, zooming and sliding the section plane draw on the orbit path (orbit-frame.js), at
+ // most once per display frame. The full frame follows when the interaction ends.
+ requestDraw(){
+   if(typeof requestAnimationFrame==='undefined'){this.draw();return;}
+   if(this.drawRequest)return;
+   this.drawRequest=requestAnimationFrame(()=>{this.drawRequest=0;this.draw();});
+ }
+ beginInteraction(){this.interacting=true;clearTimeout(this.interactionEnd);this.interactionEnd=0;}
+ endInteraction(delay=0){
+   clearTimeout(this.interactionEnd);
+   this.interactionEnd=setTimeout(()=>{this.interactionEnd=0;this.settleInteraction();},delay);
+ }
+ settleInteraction(){
+   clearTimeout(this.interactionEnd);this.interactionEnd=0;
+   const stale=this.interacting||this.hitFacesStale;this.interacting=false;
+   if(this.drawRequest){cancelAnimationFrame(this.drawRequest);this.drawRequest=0;}
+   if(stale){this.completedFrame=null;this.draw();}
+ }
  frame(t){
    const dt=Math.max(0,Math.min(60,t-this.last));this.last=t;
    let redraw=false;
@@ -160,7 +182,8 @@ export class GarageRenderer{
    const dy=p.screenY*(1-scale)+(p.from.cy-camera.cy)*camera.ratio;
    const ctx=this.ctx;
    ctx.save();ctx.setTransform(this.canvas.width/w,0,0,this.canvas.height/h,0,0);
-   ctx.fillStyle=this.blueprint?'#142629':'#171b1e';ctx.fillRect(0,0,w,h);
+   const ground=studioTheme()[this.blueprint?'blueprint':'ground'];
+   ctx.fillStyle=ground[1];ctx.fillRect(0,0,w,h);
    ctx.drawImage(p.image,dx,dy,w*scale,h*scale);ctx.restore();
    this.panPick={dx,dy,scale};this.lastCamera=camera;
  }
@@ -186,7 +209,8 @@ export class GarageRenderer{
      ctx.clearRect(0,0,w,h);ctx.drawImage(state.destination,0,0,w,h);this.focusTransition=null;
    }else{
      const bg=ctx.createRadialGradient(w*.52,h*.47,10,w*.52,h*.47,w*.6);
-     bg.addColorStop(0,this.blueprint?'#1d383a':'#34383b');bg.addColorStop(1,this.blueprint?'#142629':'#171b1e');
+     const ground=studioTheme()[this.blueprint?'blueprint':'ground'];
+     bg.addColorStop(0,ground[0]);bg.addColorStop(1,ground[1]);
      ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
      const layer=focusFrameLayer(f);
      const {scale,dx,dy}=layer.transform;
@@ -452,6 +476,7 @@ export class GarageRenderer{
    return true;
  }
  hitTest(clientX,clientY){
+   if(this.hitFacesStale)this.settleInteraction();
    if(this.focusTransition?.acceptsDestinationPick===false)return null;
    const rect=this.canvas.getBoundingClientRect(),tr=this.focusTransition?.hitTransform||this.panPick;
    const localX=(clientX-rect.left-(tr?.dx||0))/(tr?.scale||1),localY=(clientY-rect.top-(tr?.dy||0))/(tr?.scale||1);
@@ -718,7 +743,7 @@ export class GarageRenderer{
      const pickPart=pickId(face);
      const hi=focus ? pickPart===focus && (!highlightedInstance || instance===highlightedInstance)
        : i.previewGroup && isMember(face);
-     const color=hi?shade('#b8cc68',.65+.4*parseInt(face.color.slice(1,3),16)/255):
+     const color=hi?shade(studioTheme().pick,.65+.4*parseInt(face.color.slice(1,3),16)/255):
        links.has(face.part)?shade('#75a7b2',.65+.38*parseInt(face.color.slice(1,3),16)/255):face.color;
      return {...face,points,color,highlighted:hi||links.has(face.part),instance,pickPart,motionKey:group.draggable ? group.key:null};
    });
@@ -741,7 +766,9 @@ export class GarageRenderer{
  const bikeLegacyGroup=b.vehicle==='bmws1000rr'&&['engine','drive'].includes(assembly)?assembly:null;
  const isolatedPorscheEngine=Boolean(exhibit?.inspectionSections?.engine && assembly==='engine' && this.isolate && !focusView);
  const bodyModules=assembly==='body'&&['bmw325ci','bmw328xi','c63','hrv','hrvlx'].includes(b.vehicle);
- const sourceKey=JSON.stringify([isolatedPorscheEngine,bikeLegacyGroup,bodyModules,b.vehicle,b.paint,b.finish,b.wheelDesign,b.roofPosition,b.slGlass,b.slWindstop,b.slComfort,this.inspection?.studySeat,this.slRoofFraction,b.bmwVentPosition,Boolean(this.inspection?.engineCutaway),b.parts,this.lights,!exhibit,engineOwnsM54Rail,ownGearbox,porscheLegacy,showDrive,showFloor,activeService?.id,focusView?.id,movingAssembly,phase]);
+ const sourceParts=[isolatedPorscheEngine,bikeLegacyGroup,bodyModules,b.vehicle,b.paint,b.finish,b.wheelDesign,b.roofPosition,b.slGlass,b.slWindstop,b.slComfort,this.inspection?.studySeat,this.slRoofFraction,b.bmwVentPosition,Boolean(this.inspection?.engineCutaway),b.parts,this.lights,!exhibit,engineOwnsM54Rail,ownGearbox,porscheLegacy,showDrive,showFloor,activeService?.id,focusView?.id,movingAssembly,phase],sourceKey=JSON.stringify(sourceParts);
+ // Everything that shapes the mesh except the paint (sourceParts[4]).
+ const paintFree=JSON.stringify(sourceParts.map((v,i)=>i===4?null:v))+(b.lift?.mm&&!focusView?JSON.stringify(b.lift):'');
  const lift=!focusView&&b.lift?.mm?b.lift:null;
  const key=lift?sourceKey+JSON.stringify(lift):sourceKey;
  if(this.assembledMesh?.key===key)this.meshCache=this.assembledMesh;
@@ -750,7 +777,24 @@ export class GarageRenderer{
    const base=this.suspensionBase;
    this.meshCache={key,groundZ:base.groundZ,faces:lift?applySuspensionLift(base.faces,b):base.faces};
  }
- if(this.meshCache?.key!==key){
+ // While the paint picker is dragged, recolour builds made at two probe paints (paint-preview.js)
+ // instead of drawing the whole vehicle again. The exact build follows when the picker settles.
+ let previewed=false;
+ if(this.meshCache?.key!==key&&this.paintPreview&&!this.probingPaint){
+   if(this.paintModel?.key!==paintFree){
+     const probe=hex=>{
+       const build=this.build,inspection=this.inspection;this.build={...build,paint:hex};this.probingPaint=true;
+       try{this.buildMesh();return this.meshCache;}finally{this.build=build;this.inspection=inspection;this.probingPaint=false;}
+     };
+     const low=probe(PROBES[0]),high=probe(PROBES[1]);
+     this.paintModel={key:paintFree,recolour:paintModel(low?.faces,high?.faces),groundZ:low?.groundZ};
+   }
+   if(this.paintModel.recolour){
+     this.meshCache={key:key+'#preview',faces:this.paintModel.recolour(paintChoice(b.paint).hex),groundZ:this.paintModel.groundZ};
+     previewed=true;
+   }
+ }
+ if(!previewed&&this.meshCache?.key!==key){
    this.faces=[];
    const paint=paintChoice(b.paint).hex;
    const finish=FINISHES.find(p=>p.id===b.finish)?.hex || FINISHES[0].hex;
@@ -859,7 +903,7 @@ export class GarageRenderer{
  if(this.cacheDraws){
    const sceneKey=JSON.stringify([this.build,i.vehicle,i.assembly,i.part,i.instance,i.studySeat,i.system,i.detailView?.id,i.detailPart,i.expanded,i.separation,i.previewGroup,
      i.onlyPart,i.frameEngine,i.engineCutaway,this.progress,this.isolate,this.schematic,
-     this.sectionPlane,this.seeThroughBody,this.lights,this.mechanismPhase,this.slRoofFraction,this.dragContext?.part,this.partPositions?.size?[...this.partPositions]:null]);
+     this.sectionPlane,this.seeThroughBody,this.lights,this.mechanismPhase,this.slRoofFraction,this.dragContext?.part,this.partPositions?.size?[...this.partPositions]:null,studioTheme().key,Boolean(this.paintPreview)]);
    geometryKey=sceneKey+JSON.stringify([this.hoverHit?.part,this.hoverHit?.instance]);
    const baseFrame=JSON.stringify([sceneKey,w,h,dpr,this.angle,this.elevation,this.zoom,this.blueprint,this.keepAssemblyFrame,
      this.selectionFocus?.id,this.selectionFocus?.instance,this.drag?.move,this.drag?.moved,this.focusPan?.start]);
@@ -881,9 +925,15 @@ export class GarageRenderer{
    depth:near[0]*x+near[1]*y+near[2]*z
  });this.project=project;
  const bg=ctx.createRadialGradient(w*.52,h*.47,10,w*.52,h*.47,w*.6);
- bg.addColorStop(0,this.blueprint?'#1d383a':'#34383b');bg.addColorStop(1,this.blueprint?'#142629':'#171b1e');
+ const ground=studioTheme()[this.blueprint?'blueprint':'ground'];
+ bg.addColorStop(0,ground[0]);bg.addColorStop(1,ground[1]);
  ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
  if(!geometryKey||this.drawGeometryKey!==geometryKey||this.drawnFaces!==this.faces){this.buildMesh();this.drawGeometryKey=geometryKey;this.drawnFaces=this.faces;}
+ this.orbitTransform=null;
+ const orbit=canOrbitFast(this)?orbitFrame(this,{w,h,rect,right,down,near,scale}):null;
+ if(orbit){project=orbit.project;this.project=project;this.orbitTransform=orbit.transform;}
+ else{
+ this.hitFacesStale=false;
  this.partFrames=new Map();
  const projectKey=JSON.stringify([w,h,this.angle,this.elevation,this.zoom,this.inspection?.detailView?.id]);
  if(this.pointProjectionKey!==projectKey){this.pointProjectionKey=projectKey;this.projectedWorld=new WeakMap();this.alignedWorld=new WeakMap();this.alignmentKey=null;}
@@ -967,9 +1017,10 @@ export class GarageRenderer{
    }
    project=p=>align(baseProject(p));this.project=project;
  }
+ }
  const focused=Boolean(this.inspection?.detailView||this.inspection?.onlyPart||(this.isolate&&this.inspection?.assembly));
  if(!focused){
-   ctx.strokeStyle=this.blueprint?'#5d97933b':'#7b858d20';ctx.lineWidth=1;
+   ctx.strokeStyle=studioTheme()[this.blueprint?'blueprintGrid':'grid'];ctx.lineWidth=1;
    const floor=this.meshCache?.groundZ||0;
    for(let n=-8;n<=8;n++){
      for(const line of [[[n,-8,floor],[n,8,floor]],[[-8,n,floor],[8,n,floor]]]){
@@ -985,6 +1036,7 @@ export class GarageRenderer{
      ctx.fillStyle=shadow;ctx.beginPath();ctx.arc(0,0,radius,0,Math.PI*2);ctx.fill();ctx.restore();
    }
  }
+ if(this.orbitTransform)this.captureHover=false;
  if(this.captureHover&&typeof document!=='undefined'&&this.canvas.getContext){
    const back=this.hoverBackdrop??=document.createElement('canvas');
    if(back.width!==c.width||back.height!==c.height){back.width=c.width;back.height=c.height;}
@@ -1001,7 +1053,7 @@ export class GarageRenderer{
  }
  }
  frameLabels(w,h){
-   const ctx=this.ctx;ctx.fillStyle='#91a58a';ctx.textAlign='left';ctx.font='9px monospace';
+   const ctx=this.ctx;ctx.fillStyle=studioTheme().label;ctx.textAlign='left';ctx.font='9px monospace';
    ctx.fillText(this.inspection?.detailView?'COMPONENT STUDY':this.inspection?.assembly?'ASSEMBLY SCHEMATIC':'VEHICLE OVERVIEW',18,h-20);
    ctx.textAlign='right';ctx.fillText('REFERENCE GEOMETRY · NOT SERVICE CAD',w-18,h-20);
  }

@@ -3,9 +3,13 @@ import {GarageRenderer} from './render.js';
 import {DEFAULT_BUILD} from './model.js';
 import {softwareDepthRender} from './surface-materials.js';
 import {dimensionStudies,measureStockMesh,coupeProfileStations} from './factory-dimensions.js';
+import {onStudioTheme} from './studio-theme.js';
 
 const format=n=>n.toLocaleString('en-US');
 const $=id=>document.getElementById(id);
+// The drawing's ground, lines and labels in the site's colour and mode (theme.js leaves the
+// garage's canvases alone so the vehicles keep their real paint).
+const ink=value=>typeof pageTheme!=='undefined'?pageTheme.convert(value):value;
 
 // An elevation is a perpendicular projection of the same faces used on the workbench.
 // It has a separate stock build so opening a drawing never changes a saved setup or pose.
@@ -18,51 +22,51 @@ function drawElevation(canvas,faces,study,view,definition,profile){
   const scale=Math.min((w-108)/span,(h-115)/(max[2]-ground));
   const x=u=>w/2+(u-mid)*scale,base=h-67;
   const project=p=>({x:x(horizontal(p)),y:base-(p[2]-ground)*scale,depth:side?-p[1]:front?-p[0]:p[0]});
-  ctx.fillStyle='#192320';ctx.fillRect(0,0,w,h);
-  ctx.strokeStyle='#4c5a52';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(25,base);ctx.lineTo(w-25,base);ctx.stroke();
+  ctx.fillStyle=ink('#192320');ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle=ink('#4c5a52');ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(25,base);ctx.lineTo(w-25,base);ctx.stroke();
   softwareDepthRender({faces,ctx,canvas},w,h,project);
   function dimension(a,b,y,label){
     const left=Math.min(a,b),right=Math.max(a,b);
-    ctx.strokeStyle='#a4bbad';ctx.lineWidth=1.5;ctx.beginPath();
+    ctx.strokeStyle=ink('#a4bbad');ctx.lineWidth=1.5;ctx.beginPath();
     ctx.moveTo(left,y);ctx.lineTo(right,y);
     for(const end of [left,right]){ctx.moveTo(end,y-6);ctx.lineTo(end,y+6);}
     ctx.stroke();
     ctx.font='500 18px system-ui, sans-serif';ctx.textBaseline='middle';ctx.textAlign='center';
     const labelWidth=ctx.measureText(label).width+15;
-    ctx.fillStyle='#192320';ctx.fillRect((left+right-labelWidth)/2,y-11,labelWidth,22);
-    ctx.fillStyle='#e4eddf';ctx.fillText(label,(left+right)/2,y);
+    ctx.fillStyle=ink('#192320');ctx.fillRect((left+right-labelWidth)/2,y-11,labelWidth,22);
+    ctx.fillStyle=ink('#e4eddf');ctx.fillText(label,(left+right)/2,y);
   }
   if(side && profile){
     const locate=point=>project(registeredProfilePoint(point,profile,wheels));
     ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
     for(const line of profile.curves||[]){
       ctx.beginPath();line.forEach((pt,i)=>{const p=locate(pt);if(i)ctx.lineTo(p.x,p.y);else ctx.moveTo(p.x,p.y);});
-      ctx.strokeStyle='#362d1e';ctx.lineWidth=3.7;ctx.stroke();
-      ctx.strokeStyle='#f6c75d';ctx.lineWidth=1.9;ctx.stroke();
+      ctx.strokeStyle=ink('#362d1e');ctx.lineWidth=3.7;ctx.stroke();
+      ctx.strokeStyle=ink('#f6c75d');ctx.lineWidth=1.9;ctx.stroke();
     }
     const dots=profile==='coupe'?coupeProfileStations.map(([station,height])=>project([station,0,ground+height])):(profile.points||[]).map(locate);
     for(const p of dots){
       ctx.beginPath();ctx.moveTo(p.x,p.y-5);ctx.lineTo(p.x+5,p.y);ctx.lineTo(p.x,p.y+5);ctx.lineTo(p.x-5,p.y);ctx.closePath();
-      ctx.fillStyle='#f6c75d';ctx.strokeStyle='#3a3223';ctx.fill();ctx.stroke();
+      ctx.fillStyle=ink('#f6c75d');ctx.strokeStyle=ink('#3a3223');ctx.fill();ctx.stroke();
     }
     ctx.restore();
   }
   dimension(x(mid-span/2),x(mid+span/2),22,display(span));
   // The vertical span starts at the bottom of the modeled tread.
   const rail=x(mid+span/2)+29,roof=base-(max[2]-ground)*scale,midZ=(roof+base)/2;
-  ctx.save();ctx.strokeStyle='#a4bbad';ctx.lineWidth=1.5;ctx.beginPath();
+  ctx.save();ctx.strokeStyle=ink('#a4bbad');ctx.lineWidth=1.5;ctx.beginPath();
   ctx.moveTo(rail,roof);ctx.lineTo(rail,base);
   for(const y of [roof,base]){ctx.moveTo(rail-5,y);ctx.lineTo(rail+5,y);}
   ctx.stroke();ctx.translate(rail,midZ);ctx.rotate(-Math.PI/2);
   const heightLabel=display(meters.height);
   const heightLabelWidth=ctx.measureText(heightLabel).width+14;
-  ctx.fillStyle='#192320';ctx.fillRect(-heightLabelWidth/2,-11,heightLabelWidth,22);
-  ctx.fillStyle='#e4eddf';ctx.fillText(heightLabel,0,0);ctx.restore();
+  ctx.fillStyle=ink('#192320');ctx.fillRect(-heightLabelWidth/2,-11,heightLabelWidth,22);
+  ctx.fillStyle=ink('#e4eddf');ctx.fillText(heightLabel,0,0);ctx.restore();
   const axle=front?'front':'rear';
   if(!side&&wheels.front)return;
   const centers=side?[wheels.front||wheels['front-left'],wheels.rear||wheels['rear-left']]:[wheels[axle+'-left'],wheels[axle+'-right']];
   const positions=centers.map(p=>x(horizontal(p)));
-  ctx.save();ctx.setLineDash([3,5]);ctx.strokeStyle='#9fbaaaa0';ctx.beginPath();
+  ctx.save();ctx.setLineDash([3,5]);ctx.strokeStyle=ink('#9fbaaaa0');ctx.beginPath();
   for(const u of positions){ctx.moveTo(u,project(centers[0]).y);ctx.lineTo(u,base+32);}
   ctx.stroke();ctx.restore();
   const name=side?'Wheelbase':front?'Front track':'Rear track';
@@ -72,6 +76,7 @@ function drawElevation(canvas,faces,study,view,definition,profile){
 export function enableFactoryElevations(selectedVehicle){
   const dialog=$('factory-drawing'),canvas=$('factory-elevation'),marks=$('profile-markers');
   let stock,study,gap,loadedVehicle,view='side';
+  onStudioTheme(()=>{if(dialog.open&&stock)showView(view);});
   function showView(next){
     const definition=dimensionStudies[loadedVehicle];
     view=next;

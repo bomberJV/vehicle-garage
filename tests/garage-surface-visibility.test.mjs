@@ -66,7 +66,7 @@ test('opaque door hides the ribbon behind it, including when blueprint and hover
      const location=[x,x*.7/1.2,0],q=project(location),onNearSide=location[1]*Math.cos(angle)>0;
      const ix=Math.floor(q.x),iy=Math.floor(q.y);
      assert.equal(r.hitTest(ix+.5,iy+.5)?.part,onNearSide?'wiring.ribbon':'door.shell');
-     assert.equal(pixel(ix,iy).slice(0,3).join(),onNearSide?'240,208,48':blueprint?'58,106,110':'110,168,104');
+     assert.equal(pixel(ix,iy).slice(0,3).join(),onNearSide?'240,208,48':blueprint?'58,110,105':'110,168,104');
    }
  }
 });

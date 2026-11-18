@@ -153,7 +153,7 @@ function skin(r,cfg,paint){
  }
 }
 function mirror(r,cfg,side,x,z,paint){
- const width=section(cfg.stations,x)[0],yc=side*(width+.064);
+ const width=section(cfg.stations,x)[0],yc=side*(width+(cfg.mirrorOut??.064));
  r.rod([x+.03,side*(width-.056),z-.045],[x,yc,z],.024,SEAL,10);
  const points=[[-.116,0],[-.086,.053],[.015,.074],[.116,.051],[.129,-.011],[.073,-.038],[-.073,-.035]];
  const ring=(y,k)=>points.map(([xx,zz])=>[x+xx*k,y,z+zz*k]);
@@ -196,7 +196,7 @@ function cabin(r,cfg,paint){
     if(!cfg.coupe)line(win[1],win[2],side,.008,SEAL);
     if(piece==='front-door'){
      if(cfg.drawMirror)cfg.drawMirror(r,side,paint);
-     else mirror(r,cfg,side,cfg.mirrorX??door[0]+.18,cfg.belt+.041,paint);
+     else mirror(r,cfg,side,cfg.mirrorX??door[0]+.18,cfg.belt+(cfg.mirrorLift??.041),paint);
     }
     if(movable&&cfg.doorHandle){cfg.doorHandle(r,side,paint);}
     else if(movable){

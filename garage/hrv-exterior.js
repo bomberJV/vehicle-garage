@@ -34,11 +34,11 @@ export const hrvBody={
  cabinFloor:.44,cabin:{cargo:[.98,.48,.60],sillEnd:.92,rearSeat:[.48,.88,.57,.70,.86,.96]},
  backGlassOpacity:.92,backGlassColor:'#141a1e',
  windowGlass:{front:['#2c3a40',.62],privacy:['#141b1f',.88]},windshieldGlass:['#41525a',.48],
- moonroofGlass:['#151b1e',.92],moonroofFrame:BLACK,aPillarColor:TRIM,mirrorX:-.56,
+ moonroofGlass:['#151b1e',.92],moonroofFrame:BLACK,aPillarColor:TRIM,mirrorX:-.56,mirrorOut:.012,mirrorLift:.030,
  // Black A-pillar trim and the mirror sail at the front corner of the door glass.
  blackouts:[[[-.98,1.188],[-.88,1.198],[-.355,1.572],[-.27,1.592]],[[-.80,1.214],[-.50,1.214],[-.70,1.335]]],
  stations:[[-2.2235,.855,1.005],[-2.17,.885,1.035],[-2.08,.900,1.06],[-1.95,.905,1.09],[-1.62,.905,1.12],[-1.327,.912,1.15],[-.98,.905,1.175],[-.70,.905,1.19],
-  [.30,.912,1.205],[1.00,.915,1.22],[1.30,.912,1.228],[1.70,.892,1.255],[2.04,.855,1.27],[2.2235,.80,1.17]],
+  [.30,.912,1.205],[1.00,.915,1.22],[1.30,.912,1.228],[1.70,.885,1.255],[2.04,.815,1.27],[2.2235,.80,1.17]],
  wind:[[-.98,1.185],[-.27,1.590]],
  roof:[[-.27,1.590],[-.05,1.607],[.30,1.615],[.70,1.614],[1.05,1.607],[1.35,1.595],[1.70,1.572]],rear:[[1.70,1.572],[2.04,1.275]],
  frontWindow,rearWindow,quarter,
@@ -163,6 +163,7 @@ function frontEnd(r,paint){
 
 // Hatch outline, rows of (x, half-width, z) from the glass down to the bumper.
 const hatchRows=[[2.04,.72,1.275],[2.13,.69,1.19],[2.19,.64,1.09],[2.222,.625,.97],[2.238,.63,.82],[2.244,.64,.655]];
+const SMOKE='#241619';
 function hatchAt(z){let i=1;while(i<hatchRows.length-1&&z<hatchRows[i][2])i++;const [x,y,za]=hatchRows[i-1],[xx,yy,zb]=hatchRows[i],t=clamp((za-z)/(za-zb));return [mix(x,xx,t),mix(y,yy,t)];}
 
 function rearEnd(r,paint){
@@ -175,16 +176,17 @@ function rearEnd(r,paint){
  },vs);
  both(r,'lighting.indicator',s,[[.43,.575],[.68,.575],[.68,.59],[.43,.59]],'#8d2a31',.008);
  // Single exhaust outlet under the right side of the bumper.
- r.tag('body.structure',()=>{const c=s.on(.62,.35,.004);r.rod([c[0]-.06,c[1],c[2]],[c[0]+.012,c[1],c[2]],.037,'#b3babb',16);r.discX(c[0]+.013,c[1],c[2],.030,'#101518',16);});
+ r.tag('body.structure',()=>{const c=s.on(-.62,.35,.004);r.rod([c[0]-.06,c[1],c[2]],[c[0]+.012,c[1],c[2]],.037,'#b3babb',16);r.discX(c[0]+.013,c[1],c[2],.030,'#101518',16);});
  // Outer tail lamps on the corners: vertical strips, each at one plan position.
  r.tag('lighting.indicator',()=>{for(const side of [-1,1]){
   const ys=Array.from({length:9},(_,i)=>.64+i*(.79-.64)/8);
-  const lo=y=>mix(1.02,1.05,(y-.64)/.15),hi=y=>mix(1.10,1.165,(y-.64)/.15);
+  const lo=y=>mix(1.005,1.035,(y-.64)/.15),hi=y=>mix(1.112,1.165,(y-.64)/.15);
   for(let i=1;i<ys.length;i++){
    const col=y=>{const q=s.on(y,(lo(y)+hi(y))/2,.006);return [q[0],side*y];};
    const [xa,ya]=col(ys[i-1]),[xb,yb]=col(ys[i]);
-   r.polygon([[xa,ya,lo(ys[i-1])],[xb,yb,lo(ys[i])],[xb,yb,hi(ys[i])],[xa,ya,hi(ys[i-1])]],'#6e2129',false);
-   r.polygon([[xa+.002,ya,lo(ys[i-1])+.012],[xb+.002,yb,lo(ys[i])+.012],[xb+.002,yb,lo(ys[i])+.026],[xa+.002,ya,lo(ys[i-1])+.026]],r.lights?'#e2535c':'#b73f47',false);
+   r.polygon([[xa,ya,lo(ys[i-1])],[xb,yb,lo(ys[i])],[xb,yb,hi(ys[i])],[xa,ya,hi(ys[i-1])]],SMOKE,false);
+   r.polygon([[xa+.002,ya,lo(ys[i-1])+.013],[xb+.002,yb,lo(ys[i])+.013],[xb+.002,yb,lo(ys[i])+.031],[xa+.002,ya,lo(ys[i-1])+.031]],r.lights?'#ff5a64':'#c8323d',false);
+   if(i>=ys.length-3)r.polygon([[xa+.002,ya,lo(ys[i-1])+.031],[xb+.002,yb,lo(ys[i])+.031],[xb+.002,yb,hi(ys[i])-.012],[xa+.002,ya,hi(ys[i-1])-.012]],r.lights?'#ff5a64':'#9a2c35',false);
   }
  }});
 }
@@ -200,8 +202,9 @@ function hatch(r,paint){
   }
   const at=(y,z,lift=.004)=>{const [x]=hatchAt(z);return [x+lift,y,z];};
   for(const sgn of [-1,1]){
-   r.polygon([at(sgn*.33,1.045),at(sgn*.62,1.02),at(sgn*.62,1.10),at(sgn*.33,1.085)],'#6e2129',false);
-   r.polygon([at(sgn*.34,1.052,.006),at(sgn*.62,1.030,.006),at(sgn*.62,1.044,.006),at(sgn*.34,1.064,.006)],r.lights?'#e2535c':'#b73f47',false);
+   r.polygon([at(sgn*.33,1.045),at(sgn*.45,1.030),at(sgn*.62,1.005),at(sgn*.62,1.112),at(sgn*.45,1.098),at(sgn*.33,1.085)],SMOKE,false);
+   r.polygon([at(sgn*.36,1.050,.006),at(sgn*.62,1.018,.006),at(sgn*.62,1.036,.006),at(sgn*.36,1.064,.006)],r.lights?'#ff5a64':'#c8323d',false);
+   r.polygon([at(sgn*.50,1.080,.006),at(sgn*.62,1.085,.006),at(sgn*.62,1.096,.006),at(sgn*.50,1.090,.006)],r.lights?'#ff5a64':'#9a2c35',false);
   }
   r.polygon([at(-.33,1.045,.003),at(.33,1.045,.003),at(.33,1.085,.003),at(-.33,1.085,.003)],GLOSS,false);
   // Emblem, plate recess and the model badge.
@@ -210,10 +213,10 @@ function hatch(r,paint){
   r.polygon([at(-.47,.905,.006),at(-.36,.905,.006),at(-.36,.92,.006),at(-.47,.92,.006)],CHROME,false);
   // Roof spoiler: it carries the roof line past the glass and ends in a black lip
   // over the high-mounted stop lamp.
-  const sp=[[1.36,.69,1.600],[1.55,.69,1.594],[1.70,.68,1.580],[1.80,.64,1.560]];
+  const sp=[[1.36,.60,1.600],[1.55,.60,1.594],[1.70,.59,1.580],[1.80,.56,1.560]];
   for(let i=1;i<sp.length;i++){const [x,y,z]=sp[i-1],[xx,yy,zz]=sp[i];r.polygon([[x,-y,z],[x,y,z],[xx,yy,zz],[xx,-yy,zz]],tone(paint,1.08-i*.04),false);}
-  for(const sgn of [-1,1])r.polygon(sp.map(([x,y,z])=>[x,sgn*y,z]).concat([[1.80,sgn*.64,1.540],[1.36,sgn*.69,1.588]]),tone(paint,.80),false);
-  r.polygon([[1.80,-.64,1.560],[1.80,.64,1.560],[1.76,.62,1.538],[1.76,-.62,1.538]],BLACK,false);
+  for(const sgn of [-1,1])r.polygon(sp.map(([x,y,z])=>[x,sgn*y,z]).concat([[1.80,sgn*.56,1.545],[1.36,sgn*.60,1.592]]),GLOSS,false);
+  r.polygon([[1.80,-.56,1.560],[1.80,.56,1.560],[1.76,.54,1.538],[1.76,-.54,1.538]],BLACK,false);
   r.box(1.775,-.14,1.536,1.785,.14,1.542,'#a2393f');
   r.rod([2.00,-.30,1.31],[2.00,.24,1.31],.008,BLACK,8);
  });
@@ -228,8 +231,8 @@ function quarterLamps(r){
   const col=(x,dy)=>side*(sideY(x,(lo(x)+hi(x))/2)+dy);
   for(let i=1;i<xs.length;i++){
    const a=xs[i-1],b=xs[i];
-   r.polygon([[a,col(a,.010),lo(a)],[b,col(b,.010),lo(b)],[b,col(b,.010),hi(b)],[a,col(a,.010),hi(a)]],'#8a2a33',false);
-   r.polygon([[a,col(a,.013),lo(a)+.010],[b,col(b,.013),lo(b)+.010],[b,col(b,.013),lo(b)+.024],[a,col(a,.013),lo(a)+.024]],r.lights?'#e2535c':'#b73f47',false);
+   r.polygon([[a,col(a,.010),lo(a)],[b,col(b,.010),lo(b)],[b,col(b,.010),hi(b)],[a,col(a,.010),hi(a)]],SMOKE,false);
+   r.polygon([[a,col(a,.013),lo(a)+.008],[b,col(b,.013),lo(b)+.008],[b,col(b,.013),lo(b)+.022],[a,col(a,.013),lo(a)+.022]],r.lights?'#ff5a64':'#c8323d',false);
   }
  }});
 }

@@ -28,7 +28,7 @@ test('the fitted bonnet follows independent side crown and plan hem readings fro
     assert(Math.abs(highest(x)-z)<.011,'side crown at '+u);
     for(const side of [-1,1]){
       assert.equal(r.hitTest(x,side*(y-.022))?.part,'body.hood','inside plan outline at '+u);
-      assert.equal(r.hitTest(x,side*(y+.022))?.part,'body.structure','on the fixed wing at '+u);
+      assert.equal(r.hitTest(x,side*(y+.022))?.part,'body.fender-'+(side<0?'left':'right'),'on the fixed wing at '+u);
     }
   }
   assert(r.faces.filter(f=>f.part==='body.hood').every(f=>f.rigid.name==='bonnet'));

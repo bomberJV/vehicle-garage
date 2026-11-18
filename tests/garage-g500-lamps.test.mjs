@@ -19,7 +19,7 @@ test('the U.S. G500 exterior exposes each side marker, repeater and bumper lamp 
     r.project=([x,y,z])=>({x:y,y:z,depth:x});assert.equal(r.hitTest(.641*side,.552)?.part,side<0?'lighting.rear-fog':'lighting.reverse');
   }
   // Removing a front fog module exposes an actual opening through the bumper skin.
-  r.faces=r.faces.filter(f=>f.part==='body.structure'&&f.points.every(p=>p[0]<-2.119+.078&&p[2]<.69));
+  r.faces=r.faces.filter(f=>f.part.startsWith('body.front-bumper')&&f.points.every(p=>p[0]<-2.119+.078&&p[2]<.69));
   r.project=([x,y,z])=>({x:y,y:z,depth:-x});
   assert.equal(r.hitTest(.598,.553),null);assert.ok(r.hitTest(.598,.65));
 });

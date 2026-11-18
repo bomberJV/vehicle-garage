@@ -52,7 +52,7 @@ test('the diagonal hem leaves the rear wheel flare on the fixed quarter',()=>{
   buildG500Exterior(r,'#747f75');
   r.project=([x,y,z])=>({x,y:z,depth:-y});
   assert.equal(r.hitTest(.86,.73)?.part,'body.rear-left');
-  assert.equal(r.hitTest(1.05,.71)?.part,'body.structure');
+  assert.equal(r.hitTest(1.05,.71)?.part,'body.wheel-flares');
   assert.equal(r.hitTest(1.075,1.08)?.part,'body.rear-left');
   const arch=r.faces.filter(f=>f.rigid.name==='body-shell'&&f.color==='#353a3a');
   for(const axle of [-1.425,1.425])for(const side of [-1,1]){

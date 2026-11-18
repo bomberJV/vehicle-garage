@@ -25,11 +25,17 @@ export function drawBodyMirror(r,side,paint){
   // The octagonal bow follows the rectangular housing with radiused corners.
   const section=[[-.081,-.051],[-.071,-.066],[.065,-.066],[.083,-.047],[.083,.045],[.067,.065],[-.066,.065],[-.081,.05]];
   const hoop=(x,scale,cy=.9205)=>section.map(([u,v])=>[x,side*(cy+u*scale),1.365+v*scale]);
-  r.rod([-.690,side*.868,1.248],[-.680,side*.918,1.296],.017,'#30383a',8);
-  const front=hoop(-.751,.80),belly=hoop(-.727,1),end=hoop(-.649,.99),gasket=hoop(-.646,.91),glass=hoop(-.645,.843);
-  r.polygon(front,shade(paint,.89),false);
-  ring(r,front,belly,shade(paint,.96));ring(r,belly,end,shade(paint,1.02));
-  ring(r,end,gasket,shade(paint,.80));ring(r,gasket,glass,'#303638');r.polygon(glass,'#91a2a3',false);
+  const hand=side<0?'left':'right',tag=(id,fn)=>r.tag?r.tag(id,fn):fn();
+  // The door-base gasket seals the arm foot against the door skin.
+  tag('body.mirror-gaskets',()=>r.instance?r.instance(hand,()=>r.box(-.708,Math.min(side*.861,side*.871),1.232,-.672,Math.max(side*.861,side*.871),1.264,'#202526')):null);
+  tag('body.mirror-'+hand,()=>{
+    r.rod([-.690,side*.868,1.248],[-.680,side*.918,1.296],.017,'#30383a',8);
+    const front=hoop(-.751,.80),belly=hoop(-.727,1),end=hoop(-.649,.99),gasket=hoop(-.646,.91);
+    r.polygon(front,shade(paint,.89),false);
+    ring(r,front,belly,shade(paint,.96));ring(r,belly,end,shade(paint,1.02));
+    ring(r,end,gasket,shade(paint,.80));
+    tag('body.mirror-glass-'+hand,()=>{const glass=hoop(-.645,.843);ring(r,gasket,glass,'#303638');r.polygon(glass,'#91a2a3',false);});
+  });
 }
 
 export function formedRoof(r,paint){

@@ -6,6 +6,7 @@ import {get993Study} from './porsche993-system-studies.js';
 
 import {refs} from './porsche993-sources.js';
 import {boxerFrame,cylinderX} from './porsche-boxer-layout.js';
+import {chassisGroups} from './porsche993-chassis.js';
 // Engine-mounted parts follow the installed flat-six frame (118 mm pitch,
 // crank centre behind the rear axle).
 const E=boxerFrame({rear:1.112},false),along=dx=>E.cx+E.f*dx;
@@ -155,12 +156,13 @@ const heatRows=[
   // Both refrigerant runs pass under the left sill, outboard of the warm-air
   // duct, then climb inboard of the front wheel tub to the condenser.
   // From the compressor both lines run forward, cross over the transaxle
-  // behind the folded-top compartment and drop down the left side.
-  channel(r,[compPort(0),add(compPort(0),[0,0,.035]),[1.48,.50,.64],[1.40,.50,.64],[1.14,.40,.665],[1.12,-.42,.665],[.89,-.45,.47],[.72,-.48,.30],[.55,-.62,.24],[.40,-.673,.228],[-.66,-.673,.228],[-.72,-.673,.21],[-.76,-.43,.21],[-.86,-.43,.30],[-1.08,-.43,.40],[-1.38,-.47,.55],[-1.56,-.50,.585],[-1.72,-.53,.55]],.009,steel);
+  // behind the folded-top compartment and drop down the left side, inboard
+  // of the rear spring and damper.
+  channel(r,[compPort(0),add(compPort(0),[0,0,.035]),[1.48,.50,.64],[1.40,.50,.64],[1.14,.40,.665],[1.12,-.42,.665],[1.00,-.325,.66],[.88,-.325,.50],[.86,-.40,.47],[.72,-.48,.30],[.55,-.62,.24],[.40,-.673,.228],[-.66,-.673,.228],[-.72,-.673,.21],[-.76,-.43,.21],[-.86,-.43,.30],[-1.08,-.43,.40],[-1.38,-.47,.55],[-1.56,-.50,.585],[-1.72,-.53,.55]],.009,steel);
   channel(r,[[-1.72,-.61,.33],[-1.64,-.50,.34],[-1.40,-.50,.513],[-1.15,-.50,.64],[-.95,-.50,.594],add(dryer,[0,0,.083])],.008,steel);
   // Between the brake booster and the bulkhead, up and across to the valve.
   channel(r,[add(dryer,[.014,0,.083]),[-.83,-.50,.62],[-.822,-.47,.78],[-.80,-.219,.78],valve],.008,steel);
-  channel(r,[valve,[-.84,-.219,.72],[-.86,-.48,.62],[-.86,-.48,.24],[-.74,-.48,.21],[-.70,-.705,.21],[.40,-.705,.21],[.55,-.65,.24],[.72,-.515,.31],[.90,-.48,.48],[1.10,-.45,.69],[1.12,.43,.69],[1.40,.485,.66],[1.50,.52,.65],add(compPort(.028),[0,0,.035]),compPort(.028)],.013,black);
+  channel(r,[valve,[-.84,-.219,.72],[-.86,-.48,.62],[-.86,-.48,.24],[-.74,-.48,.21],[-.70,-.705,.21],[.40,-.705,.21],[.55,-.65,.24],[.72,-.515,.31],[.86,-.425,.48],[.90,-.355,.56],[1.00,-.355,.69],[1.10,-.45,.69],[1.12,.43,.69],[1.40,.485,.66],[1.50,.52,.65],add(compPort(.028),[0,0,.035]),compPort(.028)],.013,black);
  }),
  row('evaporator','Evaporator and expansion valve','The valve meters refrigerant into the evaporator. Cabin air loses heat as it passes across the cold fins.',[-.21,.09,.28],refs.cabin,r=>{
   matrix(r,evap,.428,.146,.060);box(r,valve,[.042,.043,.049],brass);
@@ -187,6 +189,7 @@ function assembly(id,name,description,source,rows){
 }
 export const groups=[
  assembly('993-lubrication','Dry-sump lubrication','Trace oil from the separate tank into the engine and back through the thermostat. The two long sill pipes connect the hot return circuit to the right-front cooler.',refs.oilCooler,oilRows),
+ ...chassisGroups,
  assembly('993-climate','Cabin heat and air conditioning','The 993 heats the cabin with air from jackets around its exhaust pipes. A separate refrigerant loop cools the incoming air at the front of the car. Pipe bends and installed dimensions are approximate.',refs.cabin,heatRows)
 ];
 export function drawGroup(r,id){

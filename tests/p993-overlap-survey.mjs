@@ -22,7 +22,7 @@ export const errorClasses=['through','overlap'];
 const system=id=>id.split('.')[0];
 
 // Wires, hoses, pipes and ducts.
-export const lines=new Set(['993-climate.lines','993-climate.supply','993-lubrication.outbound','993-lubrication.return',
+export const lines=new Set(['993-steering.lines','993-climate.lines','993-climate.supply','993-lubrication.outbound','993-lubrication.return',
   '993-lubrication.connections','brakes.lines','electrical.cables','fuel.supply']);
 // Systems a line cannot end in: trim, structure and running gear.
 const noPorts=new Set(['floor','shell','running','cabin','roof']);
@@ -48,6 +48,22 @@ export const mounts=[
   ['993-climate.exchanger-right','engine.exhaust','the three primaries of each bank run through its heat-exchanger jacket'],
   ['drivetrain.halfshafts','shell.fenders','each half-shaft passes through the opening in the inner wheel housing to its hub; the housing wall is drawn closed'],
   ['engine.exhaust','shell.bumpers','each tailpipe leaves through its opening in the rear apron; the apron is drawn without the cut-out'],
+  // Chassis (round 3). The inner wheel-housing wall is drawn as a closed
+  // flat disc at |y| 0.535; on the car the arms, links and struts reach the
+  // wheel through the housing's open lower edge and the strut towers.
+  ...['993-suspension.front-strut','993-suspension.front-arm','993-suspension.rear-strut','993-suspension.rear-lower-arm','993-suspension.rear-upper-arm','993-suspension.rear-toe-link','993-steering.tie-rod']
+    .flatMap(id=>['left','right'].map(hand=>[id+'-'+hand,'shell.fenders','it reaches the wheel through the open wheel housing; the housing wall is drawn as a closed disc'])),
+  ...['left','right'].flatMap(hand=>[
+    ['993-suspension.front-hub-'+hand,'brakes.front-disc','the disc is bolted to the hub flange'],
+    ['993-suspension.rear-hub-'+hand,'brakes.rear-disc','the disc is bolted to the hub flange'],
+    ['993-suspension.rear-hub-'+hand,'brakes.parking','the parking-brake drum is the disc hat around the hub'],
+    ['993-suspension.rear-hub-'+hand,'drivetrain.halfshafts','the drive shaft\'s outer joint is splined into the hub'],
+    ['993-suspension.rear-carrier-'+hand,'drivetrain.halfshafts','the drive shaft passes through the wheel carrier into the hub bearing'],
+    ['993-steering.tie-rod-'+hand,'993-suspension.front-carrier-'+hand,'the tie-rod ball joint is bolted into the carrier\'s steering arm']
+  ]),
+  ['993-steering.column','cabin.controls','the column passes through the facia below the instruments to the wheel'],
+  ['993-steering.column','floor.pan','the intermediate shaft passes through its grommet in the toe board'],
+  ['993-steering.column','floor.carpet','the intermediate shaft passes through its grommet in the toe board'],
   ['roof','shell.deck','the folded top lies in its compartment behind the seats; the deck surface is drawn closed across the compartment opening'],
 ];
 // Reviewed pairs that the rules would pass but are wrong.

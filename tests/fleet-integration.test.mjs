@@ -20,7 +20,7 @@ test('named vehicles keep their identity in the collection and saved state',()=>
     assert.deepEqual(importBuild(JSON.stringify(clean)),clean);
     if(!hasBuildPlan(id))assert.deepEqual(availableParts(id),[]);
   }
-  assert.deepEqual(counts,{Land:14,Air:17,Sea:8});
+  assert.deepEqual(counts,{Land:15,Air:17,Sea:8});
   for(const id of ['porsche993cab','porsche992scab','bmws1000rr']){
     const item=availableParts(id).find(p=>!p.mockup&&p.price===null);assert.ok(item);assert.equal(item.price,null);
     const b=togglePart({...DEFAULT_BUILD,vehicle:id},item.id);

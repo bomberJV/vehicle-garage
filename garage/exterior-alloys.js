@@ -2,10 +2,11 @@
 // with an outer face and side walls. The vent spaces between spokes are empty.
 import {tint} from './exterior-coachwork.js';
 import {style43Face} from './e46-wheels.js';
+import {baseVehicle} from './vehicle-variants.js';
 
 export function roadWheelSpokes(r,{vehicle,x,y,z,side,rim,finish}){
  if(vehicle==='bmw325ci')return style43Face(r,{x,y,z,side,rim,finish});
- const honda=vehicle==='hrv',amg=vehicle==='c63',e90=vehicle==='bmw328xi';
+ const honda=baseVehicle(vehicle)==='hrv',lx=vehicle==='hrvlx',amg=vehicle==='c63',e90=vehicle==='bmw328xi';
  const skin=honda?tint(finish,.96):finish;
  const vertex=(angle,radius,depth)=>[x+Math.cos(angle)*radius,y+side*depth,z+Math.sin(angle)*radius];
  function blade(angle,stations){
@@ -26,6 +27,12 @@ export function roadWheelSpokes(r,{vehicle,x,y,z,side,rim,finish}){
   }else if(amg){
    // The W204 factory 18-inch face has five pairs with narrow parallel arms.
    for(const branch of [-1,1])blade(a,[[.245,branch*.125,.087,-.008],[.48,branch*.140,.062,.003],[.92,branch*.122,.043,.013]]);
+  }else if(lx){
+   // LX 17-inch pewter gray: a broad stem leaves the hub and forks at about
+   // half the radius; the two arms flare apart and land on the rim, leaving a
+   // narrow triangular window inside each Y and wide windows between them.
+   blade(a,[[.24,0,.30,-.004],[.36,0,.24,.004],[.50,0,.19,.010]]);
+   for(const b of [-1,1])blade(a,[[.48,b*.075,.080,.010],[.70,b*.150,.100,.013],[.93,b*.200,.118,.015]]);
   }else{
    // EX-L 18-inch wheels: five machined spokes leave a broad hub, twist slightly,
    // and split into two arms before the rim, with dark painted pockets between.

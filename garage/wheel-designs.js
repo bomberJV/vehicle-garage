@@ -50,7 +50,14 @@ const options={
     fitment:'W204 C63 AMG. Front 8J × 19 ET45. Rear 9J × 19 ET54.',
     source:cBook,buy:link('Wheel Boys Edition 507 front wheel','https://wheel-boys.com/product/mercedes-c63-amg-19-inch-front-rim-oem-2014-2015-original-507-edition-204-wheel/'),buyRear:link('Wheel Boys Edition 507 rear wheel','https://wheel-boys.com/product/mercedes-c63-amg-19-inch-rear-rim-oem-2014-2015-original-507-edition-w204-wheel/')
   }],
-  hrv:[stock('17-inch LX alloy',[17],'Alternating wide and narrow branches around five mounting holes.',link('2026 Honda HR-V trim specifications','https://automobiles.honda.com/2026/hr-v/specs-features-trim-comparison'),hParts),{
+  hrv:[stock('18-inch EX-L alloy',[18],'Five machined spokes each split into two arms before the rim, over gloss black inserts.',link('Honda Info Center · 2026 HR-V wheels and tires','https://www.hondainfocenter.com/2026/HR-V/Feature-Guide/Exterior-Features/Wheels-and-Tires/'),hParts),{
+    id:'hpd',name:'17-inch HPD alloy',maker:'Honda',partNumber:'08W17-3V0-100',frontDiameter:17,rearDiameter:17,lugs:5,boltCircle:114.3,
+    description:'Five Y-shaped spokes split toward the outer lip. Honda sells this version in Glint Black.',
+    fitment:'17 × 7 accessory wheel for the U.S. HR-V. Sold individually.',
+    source:link('Honda HPD wheel and installation sheet','https://www.collegehillshonda.com/product/08W17-3V0-100.html'),
+    buy:link('Honda Automotive Parts HPD wheel','https://www.hondaautomotiveparts.com/oem-parts/honda-17-inch-glint-black-hpd-alloy-wheels-8w173v0100')
+  }],
+  hrvlx:[stock('17-inch LX alloy',[17],'Five pewter gray spokes fork near the hub; each arm runs out to the rim.',link('Honda Info Center · 2026 HR-V wheels and tires','https://www.hondainfocenter.com/2026/HR-V/Feature-Guide/Exterior-Features/Wheels-and-Tires/'),hParts),{
     id:'hpd',name:'17-inch HPD alloy',maker:'Honda',partNumber:'08W17-3V0-100',frontDiameter:17,rearDiameter:17,lugs:5,boltCircle:114.3,
     description:'Five Y-shaped spokes split toward the outer lip. Honda sells this version in Glint Black.',
     fitment:'17 × 7 accessory wheel for the U.S. HR-V. Sold individually.',

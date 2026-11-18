@@ -42,6 +42,7 @@ import {buildC63Exterior,buildHrvExterior} from './exterior-modern.js';
 import {buildEngineBay,enginePartOffset} from './engine-geometry.js';
 import {drawF350Frame,drawTwinIBeams,drawTwinIBeamLinkage,drawTwinIBeamSpringSeats,drawF350RearLeafSprings} from './f350-powertrain.js';
 import {getEngineDefinition} from './engine-data.js';
+import {baseVehicle} from './vehicle-variants.js';
 const shade=(hex,f)=>{const h=hex.replace('#','');return '#'+[0,2,4].map(i=>Math.min(255,Math.max(0,Math.round(parseInt(h.slice(i,i+2),16)*f))).toString(16).padStart(2,'0')).join('');};
 function physicalInstance(face){
   if(face.instance)return face.instance;
@@ -560,16 +561,17 @@ export class GarageRenderer{
    this.tag('wheels.hub',()=>{this.tubeY(x,y-side*.065,y+side*.041,z,.039,'#717b7d',24);this.ringY(x,y+side*.042,z,.039,0,'#a2acaf',24);});
    return;
  }
- const disc=vehicle==='g500'?(x<0?.1575:.136):stockRadius*.81;
- this.tag('wheels.disc',()=>{const plane=y-side*.025;if(vehicle==='g500'){drawG500InstalledRotor(this,x>0,side);return;}const bore=vehicle==='hrv'?.062:.045;this.ringY(x,plane,z,disc,bore,'#717b80',N);this.ringY(x,plane-side*.018,z,disc,bore,'#525b60',N);this.tubeY(x,plane-side*.018,plane,z,disc,'#899395',N);});
+ // HR-V: 12.3-inch front and 12.2-inch rear discs on every trim, whatever the wheel.
+ const disc=vehicle==='g500'?(x<0?.1575:.136):baseVehicle(vehicle)==='hrv'?.160:stockRadius*.81;
+ this.tag('wheels.disc',()=>{const plane=y-side*.025;if(vehicle==='g500'){drawG500InstalledRotor(this,x>0,side);return;}const bore=baseVehicle(vehicle)==='hrv'?.062:.045;this.ringY(x,plane,z,disc,bore,'#717b80',N);this.ringY(x,plane-side*.018,z,disc,bore,'#525b60',N);this.tubeY(x,plane-side*.018,plane,z,disc,'#899395',N);});
  this.tag('wheels.hub',()=>{
   if(vehicle==='g500'&&x<0){
    const profile=[[-.070,.021],[-.070,.025],[-.045,.025],[-.041,.0275],[.020,.0275],[.024,.039],[.040,.039],[.040,.0424],[.050,.0424],[.050,.021],[-.070,.021]];
    turnWheelHub(this,[x,y,z],lateralAxis,profile.map(([station,rad])=>[side*station,rad]),hubSteel,{n:36});return;
   }
   // The HR-V hub starts at the outer face of its knuckle.
-  this.tubeY(x,y-side*(vehicle==='hrv'?.052:.065),y+side*.047,z,.048,'#777f82',24);this.ringY(x,y+side*.05,z,.048,0,'#a5adb0',24);});
- this.tag('wheels.caliper',()=>{if(vehicle==='g500'){drawG500InstalledCaliper(this,g500RotorCenter(x>0,side),x>0,side);return;}if(vehicle==='hrv'){
+  this.tubeY(x,y-side*(baseVehicle(vehicle)==='hrv'?.052:.065),y+side*.047,z,.048,'#777f82',24);this.ringY(x,y+side*.05,z,.048,0,'#a5adb0',24);});
+ this.tag('wheels.caliper',()=>{if(vehicle==='g500'){drawG500InstalledCaliper(this,g500RotorCenter(x>0,side),x>0,side);return;}if(baseVehicle(vehicle)==='hrv'){
    // Piston housing and outer pad bracket either side of the friction ring, bridged beyond its edge.
    const plane=y-side*.025,c='#545d62';
    this.box(x+disc*.65,y-side*.07,z-disc*.35,x+disc*1.04,plane-side*.022,z+disc*.35,c);
@@ -581,7 +583,7 @@ export class GarageRenderer{
  }
  mechanicalMesh(){
  if(this.build.vehicle==='bmw325ci'){drawE46Suspension(this);return;}
- const v=VEHICLES[this.build.vehicle],g=this.build.vehicle==='g500',awd=this.build.vehicle==='hrv',truck=v.body==='truck',w=v.width/2,wb=v.wheelbase,front=-wb/2,rear=wb/2,tag=(id,fn)=>this.tag(id,fn),box=(...a)=>this.box(...a),rod=(...a)=>this.rod(...a),metal='#69757c',dark='#353e43';
+ const v=VEHICLES[this.build.vehicle],g=this.build.vehicle==='g500',awd=baseVehicle(this.build.vehicle)==='hrv',truck=v.body==='truck',w=v.width/2,wb=v.wheelbase,front=-wb/2,rear=wb/2,tag=(id,fn)=>this.tag(id,fn),box=(...a)=>this.box(...a),rod=(...a)=>this.rod(...a),metal='#69757c',dark='#353e43';
  if(this.build.vehicle==='f350'){drawF350Chassis(this,tag);return;}
  tag('suspension.frame',()=>{if(g){drawG500Frame(this);return;}if(truck){for(const y of [-.48,.48])box(-wb/2-.43,y-.055,.35,wb/2+.40,y+.055,.49,dark);for(const x of [-wb/2,-.25,.63,wb/2])box(x-.045,-.52,.35,x+.045,.52,.46,dark);}else if(awd){
    // AWD HR-V: the front cradle sits beneath the half-shafts and transfer; the rear
@@ -737,7 +739,7 @@ export class GarageRenderer{
  const movingAssembly=topMotion&&phase?(topMotion.assembly||assembly):null;
  const bikeLegacyGroup=b.vehicle==='bmws1000rr'&&['engine','drive'].includes(assembly)?assembly:null;
  const isolatedPorscheEngine=Boolean(exhibit?.inspectionSections?.engine && assembly==='engine' && this.isolate && !focusView);
- const bodyModules=assembly==='body'&&['bmw325ci','bmw328xi','c63','hrv'].includes(b.vehicle);
+ const bodyModules=assembly==='body'&&['bmw325ci','bmw328xi','c63','hrv','hrvlx'].includes(b.vehicle);
  const sourceKey=JSON.stringify([isolatedPorscheEngine,bikeLegacyGroup,bodyModules,b.vehicle,b.paint,b.finish,b.wheelDesign,b.roofPosition,b.slGlass,b.slWindstop,b.slComfort,this.inspection?.studySeat,this.slRoofFraction,b.bmwVentPosition,Boolean(this.inspection?.engineCutaway),b.parts,this.lights,!exhibit,engineOwnsM54Rail,ownGearbox,porscheLegacy,showDrive,showFloor,activeService?.id,focusView?.id,movingAssembly,phase]);
  const lift=!focusView&&b.lift?.mm?b.lift:null;
  const key=lift?sourceKey+JSON.stringify(lift):sourceKey;
@@ -775,7 +777,7 @@ export class GarageRenderer{
    }
    else {
      const v=VEHICLES[b.vehicle], selected=b.parts.map(id=>PARTS.find(p=>p.id===id)).filter(Boolean);
-     const exterior={g500:buildG500Exterior,f350:buildFordExterior,c63:buildC63Exterior,hrv:buildHrvExterior,bmw325ci:buildBmwExterior,bmw328xi:buildE90Exterior}[b.vehicle];
+     const exterior={g500:buildG500Exterior,f350:buildFordExterior,c63:buildC63Exterior,hrv:buildHrvExterior,hrvlx:buildHrvExterior,bmw325ci:buildBmwExterior,bmw328xi:buildE90Exterior}[b.vehicle];
      exterior(this,paint,selected);
      this.mechanicalMesh();
      if(b.vehicle==='g500'&&!showDrive)drawG500Differentials(this);

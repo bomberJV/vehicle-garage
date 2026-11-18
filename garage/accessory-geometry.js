@@ -209,7 +209,7 @@ export function drawAccessories(r,build,paint,phase=0) {
   switch(build.vehicle) {
     case 'g500': break; // Mounted inside the G500's removable roof group.
     case 'bmws1000rr': if(ids.includes('s1k-puig-cowl'))soloCowl(r);break;
-    case 'hrv': if(ids.includes('h-roof-bars'))drawHrvCrossbars(r);break;
+    case 'hrv':case 'hrvlx': if(ids.includes('h-roof-bars')||ids.includes('hl-roof-bars'))drawHrvCrossbars(r);break;
     case 'f350': if(ids.includes('f-deezee-bedmat'))drawMat(r);break;
     case 'bmw325ci':
     case 'c63':{

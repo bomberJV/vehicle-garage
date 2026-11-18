@@ -1,3 +1,4 @@
+import {baseVehicle,withVariants} from './vehicle-variants.js';
 // The side studies use the silhouette of the US-market body style in this collection.
 // The two glass heights at the B-pillar and the sloping leading edge are independent.
 const ref=(label,url)=>({label,url});
@@ -20,6 +21,7 @@ export const references={
   benzLid:ref('Mercedes-Benz · 2014 C63 trunk lid and latch','https://mbparts.mbusa.com/v-2014-mercedes-benz-c63-amg--base--6-3l-v8-gas/trunk-lid--trunk-lid-push-button-lock-trunk-lid-detachable-parts'),
   latch:ref('NHTSA · latch, rotor, pawl and striker definitions','https://www.nhtsa.gov/sites/nhtsa.gov/files/documents/tp-201-02b_tag.pdf')
 };
+withVariants(references);
 // Outline vertices are [fraction along the door, height above the sill].
 // Radii, hardware internals and thicknesses are schematic.
 const profiles={
@@ -48,8 +50,9 @@ const profiles={
     pane:[[.018,.7],[.35,1.085],[.69,1.108],[.90,1.061],[.981,.737]],
     note:'The door has a flush exterior handle and frameless glass. The electric regulator and drive motor are separate catalog assemblies.'}
 };
+withVariants(profiles);
 export function doorProfile(vehicle,rear=false){
   const p=profiles[vehicle];
   if(!p||rear&&!p.rearPane)return null;
-  return {...p,vehicle,rear,source:vehicle==='hrv'&&rear?references.hrvRear:references[vehicle],length:rear?p.rearLength:p.length,pane:rear?p.rearPane:p.pane};
+  return {...p,vehicle,rear,source:baseVehicle(vehicle)==='hrv'&&rear?references.hrvRear:references[vehicle],length:rear?p.rearLength:p.length,pane:rear?p.rearPane:p.pane};
 }

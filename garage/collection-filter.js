@@ -12,6 +12,8 @@ export function modelFilters(ids,domain='All',type='All'){
 
 // Variants keep their existing IDs for saved builds, models and deep links.
 const families={
+ hrv:{id:'honda-hrv',name:'Honda HR-V',trim:'2026 EX-L AWD · US'},
+ hrvlx:{id:'honda-hrv',name:'Honda HR-V',trim:'2026 LX AWD · US'},
   sl550:{id:'mercedes-sl',name:'Mercedes-Benz SL',trim:'2014 SL550 · R231 · US'},
   porsche993cab:{id:'porsche-911',name:'Porsche 911',trim:'1998 Carrera Cabriolet · 993 · manual',order:1998},
   porsche996cab:{id:'porsche-911',name:'Porsche 911',trim:'1999 Carrera Cabriolet · 996 · manual',order:1999},

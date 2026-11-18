@@ -1,5 +1,6 @@
 // Section coordinates use each vehicle's floor height and extent in the shared road model.
 import {section,part,slab,source} from './section-primitives.js';
+import {withVariants} from './vehicle-variants.js';
 
 // The W463 floor rises on the passenger side over the transfer case, whose body
 // stands right of the tunnel (VG 150 front view). Piecewise-linear in x and y,
@@ -17,6 +18,7 @@ const profiles={
  porsche996cab:{front:-.99,rear:1.00,width:.74,height:.400,seatWidth:.350,carpet:'#3f4143',mat:'#4d4f51',tunnel:.16,rise:.16,rows:2,description:'The 996 Cabriolet has longer footwells than the 993, a center console on the tunnel and two small rear seats ahead of the roof well.',ref:source('Bring a Trailer · 1999 Carrera Cabriolet interior photographs','https://bringatrailer.com/listing/1999-porsche-911-carrera-71/')},
  porsche992scab:{front:-1.02,rear:1.09,width:.77,height:.400,seatWidth:.356,carpet:'#42423f',mat:'#515048',tunnel:.20,rise:.19,rows:2,description:'The 992.1 Cabriolet has a wide center console above the tunnel and short rear footwells. The Cabriolet trim diagram identifies the floor lining and shaped foam pieces.',ref:source('Porsche parts diagram 807-110 · 992.1 Cabriolet','https://www.pitp.club/diagrams/d/50852/0')},
 };
+withVariants(profiles);
 
 function ramp(nodes,t){
  if(t<=nodes[0][0]||t>=nodes.at(-1)[0])return 0;

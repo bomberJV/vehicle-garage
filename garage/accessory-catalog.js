@@ -65,6 +65,13 @@ export const ACCESSORY_PARTS = [
     description:'Front and rear carrier bars bridge four shaped cushions. Each outer clamp hooks the roof edge under a keyed cover.',
     source:reference('American Honda · crossbar fit and clamp section, pp. 5–7','https://www.collegehillshonda.com/instructions/hrv/2023/roofrack.pdf#page=7')
   }),
+  listing('hl-roof-bars','hrvlx',roof,{
+    name:'Honda locking roof crossbars', sku:'08L02-3V0-100', seller:'College Hills Honda',
+    url:'https://www.collegehillshonda.com/product/08L02-3V0-100.html',
+    fit:'2023–2027 US HR-V, all trims. The LX has a fixed roof, so no moonroof visor is in the way. This dealer offers local pickup.',
+    description:'Front and rear carrier bars bridge four shaped cushions. Each outer clamp hooks the roof edge under a keyed cover.',
+    source:reference('American Honda · crossbar fit and clamp section, pp. 5–7','https://www.collegehillshonda.com/instructions/hrv/2023/roofrack.pdf#page=7')
+  }),
   listing('b46-splitter','bmw325ci',aero,{
     name:'Maxton Design E46 front splitter', sku:'BM-3-46-CE-FD1G', seller:'Maxton Design USA', unit:'splitter',
     url:'https://maxtondesignusa.net/products/front-splitter-bmw-3-e46-coupe',

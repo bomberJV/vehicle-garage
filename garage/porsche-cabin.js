@@ -261,9 +261,12 @@ function dash(r,car){
   const modern=car.modern,x=car.cockpit[0];
   const top=car.belt-.021;
   const panels=[];
+  // The 993's dash ends meet the door seals: its doors close at |y| 0.582, so
+  // the panel stops just inside them. The later cars keep their wider dash.
+  const w=modern?1:.578/.658;
   for(let j=0;j<=18;j++){
     const u=j/9-1;
-    panels.push([[x+.12*u*u,u*.654,top-.013*u*u],[x+.216-.018*u*u,u*.658,top+.008*(1-u*u)],[x+.271,u*.637,top-.028],[x+.257,u*.619,top-.125]]);
+    panels.push([[x+.12*u*u,u*.654*w,top-.013*u*u],[x+.216-.018*u*u,u*.658*w,top+.008*(1-u*u)],[x+.271,u*.637*w,top-.028],[x+.257,u*.619*w,top-.125]]);
   }
   for(let i=1;i<panels.length;i++)for(let k=1;k<4;k++)r.polygon([panels[i-1][k-1],panels[i][k-1],panels[i][k],panels[i-1][k]],['#424447','#484a4c','#393b3c'][k-1],false);
   const dsx=x+.264,dsz=top+.015,dy=-.335;

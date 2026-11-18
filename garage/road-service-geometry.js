@@ -47,12 +47,12 @@ export function drumParts(r,key){const c=[0,0,.48],R=.38;
   cyl(r,[0,0,.209],x,-.10,.10,.022,metal,14);sleeve(r,[0,0,.209],x,-.031,.031,.042,.020,iron,12);
 }
 // An optional tunnel {y,half,top} recesses the underside, offsets relative to the tank center.
-export function tankBody(r,c,shape,tunnel=null){
+export function tankBody(r,c,shape,tunnel=null,dims=null){
   if(shape==='saddle'){
     for(const s of [-1,1])slab(r,c[0],c[1]+s*.31,c[2]-.096,.69,.49,.21,rubber,.095);
     slab(r,c[0]+.03,c[1],c[2]+.045,.57,.19,.072,'#414a47',.053);
   }else{
-    const [l,w,h]=shape==='nose'?[.70,.82,.27]:shape==='midship'?[1.12,.38,.28]:shape==='bike'?[.46,.285,.184]:[.72,.93,.20];
+    const [l,w,h]=dims||(shape==='nose'?[.70,.82,.27]:shape==='midship'?[1.12,.38,.28]:shape==='bike'?[.46,.285,.184]:[.72,.93,.20]);
     const sides=shape==='bike'?[[-.5,.54,.64],[-.34,.94,.96],[.10,1,1],[.35,.60,.46],[.414,.39,.15]]:[[-.50,.77,.70],[-.40,1,.94],[.33,1,1],[.50,.80,.75]];
     const loop=([dx,fw,fh])=>{const x0=c[0]+dx*l,W=w*fw/2,H=h*fh/2,ring=[[-.85,-1],[.85,-1],[1,-.66],[1,.51],[.78,1],[-.78,1],[-1,.51],[-1,-.66]].map(([y,z])=>[x0,c[1]+y*W,c[2]+z*H]);
       if(tunnel){const a=c[1]+tunnel.y-tunnel.half,b=c[1]+tunnel.y+tunnel.half,top=c[2]+tunnel.top;ring.splice(1,0,[x0,a,c[2]-H],[x0,a,top],[x0,b,top],[x0,b,c[2]-H]);}

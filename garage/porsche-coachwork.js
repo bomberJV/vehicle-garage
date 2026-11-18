@@ -247,7 +247,9 @@ function floorAndSills(r,car,paint){
   r.tag('shell.fenders',()=>{
     const p=car.kit?.id==='996'?
       [[first+.20,-.52,cutOf(car,first+.20)-.012],[car.front,-.52,.172],[car.front+.36,-.67,.170],[car.rear-.35,-.67,.172],[car.rear,-.53,.215],[last-.24,-.52,cutOf(car,last-.24)-.012]]:
-      [[first+.18,-.55,.176],[car.front,-.52,.149],[car.front+.36,-.67,.134],[car.rear-.35,-.67,.134],[car.rear,-.53,.15],[last-.24,-.52,.18]];
+      // The 993 underbody widens to the sills only once it is clear of each
+      // tyre footprint (front tyre ends 0.27 m behind its axle at this height).
+      [[first+.18,-.55,.176],[car.front,-.52,.149],[car.front+.30,-.565,.14],[car.front+.42,-.67,.134],[car.rear-.42,-.67,.134],[car.rear-.30,-.565,.14],[car.rear,-.53,.15],[last-.24,-.52,.18]];
     strip(r,p,p.map(([x,y,z])=>[x,-y,z]),'#303235');
     for (const [axle,rad] of [[car.front,car.frontRadius],[car.rear,car.rearRadius]])for(const s of [-1,1]){
       const ring=[];

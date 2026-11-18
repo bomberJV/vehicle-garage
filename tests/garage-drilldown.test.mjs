@@ -20,7 +20,7 @@ test('model families keep individual saved-build IDs under one year and trim sel
   const ids=Object.keys(VEHICLES),groups=vehicleFamilies(ids);
   assert.deepEqual(groups.flatMap(g=>g.variants.map(v=>v.id)).sort(),[...ids].sort());
   assert.deepEqual(groups.filter(g=>g.variants.length>1).map(g=>g.name),['Porsche 911']);
-  assert.deepEqual(groups.find(g=>g.id==='porsche-911').variants.map(v=>v.id),['porsche993cab','porsche992scab']);
+  assert.deepEqual(groups.find(g=>g.id==='porsche-911').variants.map(v=>v.id),['porsche993cab','porsche996cab','porsche992scab']);
   assert.equal(vehicleFamilies(modelFilters(ids,'Sea').models).some(g=>g.id==='porsche-911'),false);
 });
 test('every model has at least one reachable authored detail and all its subparts have outward moves',()=>{

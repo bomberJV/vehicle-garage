@@ -75,3 +75,25 @@ test('the alternator is on the fan axis and the rails carry one injector per cyl
     assert(lo<cylinderX(frame.cx,frame.f,0,s)&&hi>cylinderX(frame.cx,frame.f,2,s));
   }
 });
+
+test('the installed crank has the 993 journals: 60 mm mains, 55 × 19 mm big ends on a 38.2 mm throw',()=>{
+  assert(m64.journalSource.url.startsWith('https://'));
+  // Each journal is drawn as two six-point rings in planes across the crank axis.
+  const byX=new Map();
+  for(const p of points('engine.crankshaft')){const k=p[0].toFixed(6);byX.set(k,(byX.get(k)||[]).concat([p]));}
+  const mains=[],pins=[];
+  for(const [k,pts] of byX){
+    const u=[...new Map(pts.map(p=>[p[1].toFixed(6)+','+p[2].toFixed(6),p])).values()];
+    if(u.length!==6)continue;
+    const c=[0,1,2].map(i=>u.reduce((a,p)=>a+p[i],0)/6),rad=u.map(p=>Math.hypot(p[1]-c[1],p[2]-c[2]));
+    if(Math.max(...rad)-Math.min(...rad)>1e-6)continue;
+    const off=Math.hypot(c[1],c[2]-frame.z);
+    (off<1e-6?mains:pins).push({x:+k,r:rad[0],off});
+  }
+  assert(mains.some(m=>Math.abs(m.r-m64.journals.main/2)<1e-6),`main radii ${[...new Set(mains.map(m=>m.r.toFixed(4)))]}`);
+  const big=pins.filter(p=>Math.abs(p.r-m64.journals.rod/2)<1e-6);
+  assert.equal(big.length,12,'six big-end journals, two rings each');
+  for(const p of big)assert(Math.abs(p.off-m64.stroke/2)<1e-6,`throw ${p.off}`);
+  const xs=big.map(p=>p.x).sort((a,b)=>a-b);
+  for(let i=0;i<12;i+=2)assert(Math.abs(xs[i+1]-xs[i]-m64.journals.rodWidth)<1e-6,`big end ${i/2+1} width ${(xs[i+1]-xs[i]).toFixed(4)}`);
+});

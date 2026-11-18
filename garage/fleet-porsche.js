@@ -24,7 +24,7 @@ const running={
 function boxer(r,car,modern){
   const {cx,f,z}=boxerFrame(car,modern),type996=modern==='996';
   drawFleetIgnition(r,porscheVehicle(modern),[cx,0,z],f);
-  drawEngineCore(r,cx,z,modern,f,modern?null:m64.stroke);
+  drawEngineCore(r,cx,z,modern,f,modern?null:m64.stroke,modern?null:m64.journals);
   // The 993's 100 mm bores sit 118 mm apart, so its finned barrels are
   // smaller than the 992/996 water jackets drawn at the wider model pitch.
   const [barrelR,finR]=modern?[.077,.086]:[.054,.0575];

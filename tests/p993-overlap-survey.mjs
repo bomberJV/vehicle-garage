@@ -41,18 +41,16 @@ export const mounts=[
   ['993-lubrication.outbound','993-lubrication.thermostat','the cooler supply pipe leaves the thermostat housing'],
   ['993-lubrication.connections','shell.fenders','the filler hose passes through its grommet in the right rear inner wing'],
   ['brakes.abs','brakes.lines','the brake lines leave the ports of the ABS hydraulic unit'],
-  ['brakes.lines','shell.fenders','each hard line ends at a bracket on the inner wing, where its hose passes through to the caliper'],
   ['cabin.controls','floor','the centre console is screwed to the tunnel through the carpet'],
   ['fuel.filler','shell.fenders','the filler neck passes through its sealed opening in the left front inner wing'],
   ['993-climate.exchanger-left','engine.exhaust','the three primaries of each bank run through its heat-exchanger jacket'],
   ['993-climate.exchanger-right','engine.exhaust','the three primaries of each bank run through its heat-exchanger jacket'],
-  ['drivetrain.halfshafts','shell.fenders','each half-shaft passes through the opening in the inner wheel housing to its hub; the housing wall is drawn closed'],
   ['engine.exhaust','shell.bumpers','each tailpipe leaves through its opening in the rear apron; the apron is drawn without the cut-out'],
-  // Chassis (round 3). The inner wheel-housing wall is drawn as a closed
-  // flat disc at |y| 0.535; on the car the arms, links and struts reach the
-  // wheel through the housing's open lower edge and the strut towers.
-  ...['993-suspension.front-strut','993-suspension.front-arm','993-suspension.rear-strut','993-suspension.rear-lower-arm','993-suspension.rear-upper-arm','993-suspension.rear-toe-link','993-steering.tie-rod']
-    .flatMap(id=>['left','right'].map(hand=>[id+'-'+hand,'shell.fenders','it reaches the wheel through the open wheel housing; the housing wall is drawn as a closed disc'])),
+  // Chassis. Below the dome the inner wheel-housing wall is open behind the
+  // tire (classicWheelOpening, round 5), so arms, links, tie rods, drive
+  // shafts and sensor leads reach the wheel without crossing it. The front
+  // strut still rises through the dome into its tower.
+  ...['left','right'].map(hand=>['993-suspension.front-strut-'+hand,'shell.fenders','the strut rises through the wheel-housing dome to its top mount in the body tower']),
   ...['left','right'].flatMap(hand=>[
     ['993-suspension.front-hub-'+hand,'brakes.front-disc','the disc is bolted to the hub flange'],
     ['993-suspension.rear-hub-'+hand,'brakes.rear-disc','the disc is bolted to the hub flange'],
@@ -61,7 +59,6 @@ export const mounts=[
     ['993-suspension.rear-carrier-'+hand,'drivetrain.halfshafts','the drive shaft passes through the wheel carrier into the hub bearing'],
     ['993-steering.tie-rod-'+hand,'993-suspension.front-carrier-'+hand,'the tie-rod ball joint is bolted into the carrier\'s steering arm']
   ]),
-  ...['abs-lead-front-left','abs-lead-front-right','abs-lead-rear-left','abs-lead-rear-right'].map(id=>['993-electrics.'+id,'shell.fenders','the sensor lead leaves the wheel through the open wheel housing; the housing wall is drawn as a closed disc']),
   ['993-evap.purge','shell.fenders','the purge line passes through its grommet in the inner wheel-housing panel, as the oil filler hose does on the right'],
   ['993-electrics.engine-harness','floor.pan','the harness passes through its grommet in the floor behind the seat'],
   ['993-electrics.engine-harness','floor.carpet','the harness passes through its grommet in the floor behind the seat'],

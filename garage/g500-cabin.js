@@ -112,11 +112,11 @@ function dashboard(r){
   // A 20 mm skin over the top and down the front; the HVAC housing, ducts,
   // column and control units sit in the hollow beneath it.
   // The front skin stops at z 1.165 so the column and stack wiring can rise behind it.
-  r.profile([[-.744,1.265],[-.672,1.30],[-.493,1.302],[-.443,1.267],[-.446,1.196],[-.470,1.165],
-   [-.4945,1.165],[-.466,1.200],[-.463,1.258],[-.498,1.282],[-.672,1.280],[-.744,1.245]],-.76,.76,'#424749');
+  r.tag('body.instrument-panel',()=>r.profile([[-.744,1.265],[-.672,1.30],[-.493,1.302],[-.443,1.267],[-.446,1.196],[-.470,1.165],
+   [-.4945,1.165],[-.466,1.200],[-.463,1.258],[-.498,1.282],[-.672,1.280],[-.744,1.245]],-.76,.76,'#424749'));
   // The binnacle hood is a 15 mm shell over the instrument cluster.
-  r.profile([[-.601,1.25],[-.601,1.324],[-.542,1.376],[-.444,1.367],[-.419,1.327],[-.421,1.29],
-   [-.436,1.29],[-.434,1.322],[-.452,1.352],[-.537,1.360],[-.586,1.318],[-.586,1.25]],-.613,-.209,'#3c4143');
+  r.tag('body.cluster-trim',()=>r.profile([[-.601,1.25],[-.601,1.324],[-.542,1.376],[-.444,1.367],[-.419,1.327],[-.421,1.29],
+   [-.436,1.29],[-.434,1.322],[-.452,1.352],[-.537,1.360],[-.586,1.318],[-.586,1.25]],-.613,-.209,'#3c4143'));
   // The installed electrical.cluster owns the gauge faces and rear housing.
   // The center stack is a fascia over a hollow: COMAND, the upper control
   // panel and the climate panel sit behind it, the HVAC housing behind them.
@@ -136,9 +136,12 @@ function dashboard(r){
    // The center opening receives electrical.diff-lock-control.
   }
   // Passenger grab handle is raised off the dash and has a wood insert.
-  for(const cy of [.245,.628])r.rod([-.468,cy,1.202],[-.404,cy,1.213],.022,'#606467',9);
-  r.rod([-.404,.245,1.213],[-.404,.628,1.213],.025,'#555b5c',10);
-  r.rod([-.383,.273,1.213],[-.383,.599,1.213],.009,wood,8);
+  r.tag('body.grab-handle',()=>{
+   for(const cy of [.245,.628])r.rod([-.468,cy,1.202],[-.404,cy,1.213],.022,'#606467',9);
+   r.rod([-.404,.245,1.213],[-.404,.628,1.213],.025,'#555b5c',10);
+   r.rod([-.383,.273,1.213],[-.383,.599,1.213],.009,wood,8);
+  });
+  r.tag('body.steering-wheel',()=>{
   const center=[-.311,-.410,1.228],P=a=>[center[0]-.039*Math.sin(a),center[1]+.169*Math.cos(a),center[2]+.155*Math.sin(a)];
   for(let i=0;i<32;i++){
    const angle=i*Math.PI/16;
@@ -146,21 +149,25 @@ function dashboard(r){
   }
   for(const a of [.08,Math.PI-.08,1.25*Math.PI,1.75*Math.PI])r.rod(center,P(a),.023,rubber,9);
   upholstery(r,[[-.310,-.410,1.169,.022,.055],[-.309,-.410,1.203,.034,.084],[-.313,-.410,1.258,.034,.094],[-.319,-.410,1.282,.026,.076]],'#484e4e');
+  });
   // The console stands on the carpeted tunnel and is tall enough to house the
   // selector, transmission, restraint, yaw, transfer-case and rear SAM units.
   // It starts in front of the stack fascia so its top stays clear of COMAND.
   const shell=[.04,0,.812,.460,.140];
+  r.tag('body.center-console',()=>{
   upholstery(r,[shell,[.038,0,.930,.456,.143],[.039,0,.990,.444,.130]],'#474b4d',true,.15);
   // An open skirt carries the shell down toward the carpet, following the tunnel.
   // It stops 40 mm short of the carpet facets so the harnesses on the carpet pass under its edge.
   {const arc=t=>Math.sign(t)*Math.abs(t)**.15,[cx,cy,cz,d,w]=shell;
    const ring=Array.from({length:16},(_,i)=>{const a=i*Math.PI/8,x=cx+d*arc(Math.cos(a)),y=cy+w*arc(Math.sin(a));return [x,y,cabinFloorTop('g500',x,y)+.040];});
    for(let i=0;i<16;i++){const a=ring[i],b=ring[(i+1)%16];r.polygon([[a[0],a[1],cz],[b[0],b[1],cz],b,a],tint('#474b4d',.80),false);}}
-  r.box(-.400,-.091,.992,-.161,.094,1.002,wood);
-  r.box(-.359,-.027,1.003,-.185,.022,1.006,rubber);
-  r.rod([-.292,-.013,1.001],[-.267,-.013,1.092],.012,silver,9);
-  upholstery(r,[[-.268,-.013,1.078,.025,.024],[-.26,-.013,1.106,.032,.029],[-.261,-.013,1.128,.026,.025]],rubber);
-  upholstery(r,[[.107,0,.977,.160,.101],[.107,0,1.029,.164,.103],[.107,0,1.049,.15,.095]],leather);
+  });
+  // Wood trim plate, shift panel, lever and knob on the console top.
+  r.tag('body.console-trim-plate',()=>r.box(-.400,-.091,.992,-.161,.094,1.002,wood));
+  r.tag('body.shift-panel',()=>r.box(-.359,-.027,1.003,-.185,.022,1.006,rubber));
+  r.tag('body.selector-lever',()=>r.rod([-.292,-.013,1.001],[-.267,-.013,1.092],.012,silver,9));
+  r.tag('body.shift-knob',()=>upholstery(r,[[-.268,-.013,1.078,.025,.024],[-.26,-.013,1.106,.032,.029],[-.261,-.013,1.128,.026,.025]],rubber));
+  r.tag('body.console-lid',()=>upholstery(r,[[.107,0,.977,.160,.101],[.107,0,1.029,.164,.103],[.107,0,1.049,.15,.095]],leather));
  });
 }
 function rearviewMirror(r){

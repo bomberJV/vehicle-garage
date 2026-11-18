@@ -3,7 +3,9 @@ export const seeThroughCars=new Set(['g500','bmw325ci','bmw328xi','sl550','hrv',
 const cabinParts=new Set(['body.front-seats','body.rear-seats','body.rear-bench','body.dashboard','body.console',
   'body.cabin-trim','body.rearview-mirror','body.instrument-panel','body.cluster-trim','body.grab-handle','body.steering-wheel',
   'body.center-console','body.selector-lever','body.console-lid','body.console-trim-plate','body.shift-panel','body.shift-knob',
-  'body.glove-box','body.glove-box-lock-cap','body.glove-box-lamp','body.lower-cover-left','body.lower-cover-right','body.column-cover','body.dash-speakers','body.dash-speaker-covers']);
+  'body.glove-box','body.glove-box-lock-cap','body.glove-box-lamp','body.lower-cover-left','body.lower-cover-right','body.column-cover','body.dash-speakers','body.dash-speaker-covers',
+  'body.rear-bench-back-left','body.rear-bench-back-right','body.rear-bench-cushion-left','body.rear-bench-cushion-right',
+  'body.rear-bench-pad-left','body.rear-bench-pad-right','body.rear-bench-headrests']);
 const slRoofSkin=new Set(['roof.windshield','roof.sky-glass','roof.rear-glass','roof.pillars','roof.door-glass','roof.quarter-glass']);
 export function bodyVisibility(faces,selection){
   return faces.map(face=>{

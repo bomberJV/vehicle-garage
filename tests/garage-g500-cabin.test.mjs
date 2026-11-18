@@ -19,7 +19,7 @@ test('five head restraints rise into the greenhouse on two front buckets and the
  const front=r.faces.filter(f=>f.part==='body.front-seats');
  assert.deepEqual(new Set(front.map(f=>f.instance)),new Set(['front-left','front-right']));
  for(const [id,heads] of [['body.front-seats',[-.418,.418]],['body.rear-bench',[-.451,0,.451]]]){
-  const points=r.faces.filter(f=>f.part===id).flatMap(f=>f.points);
+  const points=r.faces.filter(f=>f.part===id||f.part.startsWith(id+'-')).flatMap(f=>f.points);
   const crown=points.filter(p=>p[2]>1.52);
   for(const y of heads)assert(crown.some(p=>Math.abs(y-p[1])<.04));
   assert(crown.every(p=>heads.some(y=>Math.abs(y-p[1])<.15)),id);

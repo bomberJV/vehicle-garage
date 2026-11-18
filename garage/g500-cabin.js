@@ -95,15 +95,17 @@ function rearBench(r){
    const cy=(a+b)/2,w=(b-a)/2;
    upholstery(r,[[.752,cy,.674,.185,w*.96],[.757,cy,.752,.234,w],[.762,cy,.783,.239,w*.995]],rubber);
   }
+  // The wide left section carries the left and middle places; the right section one place.
   for(const [a,b] of [[-.689,.216],[.224,.689]]){
    const cy=(a+b)/2,w=(b-a)/2;
-   upholstery(r,[[.980,cy,.792,.050,w*.97],[1.001,cy,.89,.057,w],[1.104,cy,1.317,.053,w*.99],[1.113,cy,1.365,.043,w*.955]],rubber);
+   r.tag('body.rear-bench-back-'+(cy<0?'left':'right'),()=>upholstery(r,[[.980,cy,.792,.050,w*.97],[1.001,cy,.89,.057,w],[1.104,cy,1.317,.053,w*.99],[1.113,cy,1.365,.043,w*.955]],rubber));
   }
   // The center cushion is thin: the battery lies beneath it, under the floor.
   for(const [cy,w] of [[-.451,.218],[0,.207],[.451,.218]]){
-   cushion(r,.757,cy,.79,w,.220,cy===0);
-   backrest(r,.963,cy,.821,.54,w);
-   headrest(r,1.104,cy,1.397,.128);
+   const section=cy>.2?'right':'left',place=cy<-.2?'outer':cy>.2?'outer':'middle';
+   r.tag('body.rear-bench-cushion-'+section,()=>r.instance(place,()=>cushion(r,.757,cy,.79,w,.220,cy===0)));
+   r.tag('body.rear-bench-pad-'+section,()=>r.instance(place,()=>backrest(r,.963,cy,.821,.54,w)));
+   r.tag('body.rear-bench-headrests',()=>r.instance(cy<-.2?'left':cy>.2?'right':'middle',()=>headrest(r,1.104,cy,1.397,.128)));
   }
  });
 }

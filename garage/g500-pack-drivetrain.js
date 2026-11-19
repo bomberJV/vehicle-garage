@@ -8,7 +8,7 @@
 // - claims: evidence entries {ids,kind,fact,need,source} for every part in the pack's studies.
 // Each part name carries its Mercedes number (xxx-xxx-xx-xx) and each part or study cites the
 // catalog page that lists it.
-import {metal,steel,dark,gold,copper,turn,cyl,sleeve,gear,part,study,x,y,z} from './mechanism-shapes.js';
+import {TAU,metal,steel,dark,gold,copper,turn,cyl,sleeve,gear,part,study,x,y,z} from './mechanism-shapes.js';
 
 const ref=(label,url)=>({label,url});
 const vg150e=ref('awd.tech · VG150 E transfer case parts list, G-Class (cases 463-280-17-00 and 463-280-20-00)','https://awd.tech/apps/catalog/transmission/vg150%20e-mercedes-benz');
@@ -181,13 +181,193 @@ const transmissionRows=[...shiftRows(connectorRows,[0,.55,0]),...shiftRows(bushi
 const transmissionParts=study('g500-722-attachments','722.6 case connector, selector rod bushing and cooler hose','Three G500 parts attached to the outside of the five-speed automatic: the round case connector to the conductor plate inside, the bushing where the selector rod meets the transmission lever, and the flexible lower hose in the cooler line.',fcpTransmission,transmissionRows);
 transmissionParts.viewAngle=[-.55,.3];
 
-export const studies=[rangeSet,caseFittings,rearShafts,frontAxleParts,transmissionParts];
+// ===========================================================================
+// Round 2: rear axle, differential gear sets, axle locks, hub ends, propeller
+// shafts and the VG150 E center differential and lock actuator.
+const mbpg=(label,path)=>ref('MB Parts Giant · '+label,'https://www.mbpartsgiant.com/'+path);
+const rearAxle02=mbpg('2002 G500 rear axle diagram','parts-list/2002-mercedes_benz-g500/driveline-axles/rear-axle');
+const rearAxle08=mbpg('2008 G500 rear axle diagram','parts-list/2008-mercedes_benz-g500/driveline-axles/rear-axle');
+const rearHousing02=mbpg('2002 G500 rear axle housing diagram','parts-list/2002-mercedes_benz-g500/suspension/axle-housing-rear');
+const frontAxle02=mbpg('2002 G500 front axle diagram','parts-list/2002-mercedes_benz-g500/driveline-axles/front-axle');
+const frontCarrier02=mbpg('2002 G500 front axle carrier diagram','parts-list/2002-mercedes_benz-g500/suspension/front-axle-carrier');
+const frontHub02=mbpg('2002 G500 stabilizer bar and components diagram (front hub, bearings, knuckle)','parts-list/2002-mercedes_benz-g500/suspension/stabilizer-bar-components');
+const rearProp02=mbpg('2002 G500 rear propeller shaft diagram','parts-list/2002-mercedes_benz-g500/driveline-axles/rear-propeller-shaft');
+const frontShaft06=mbpg('2006 G500 drive shaft, front diagram','parts-list/2006-mercedes_benz-g500/suspension/drive-shaft-front');
+const driveShafts=mbpg('G500 drive shafts, 2002–2008 G500 fitment','oem-mercedes_benz-g500-drive_shaft');
+const sensorRings=mbpg('G500 ABS sensor rings, 2002–2008 G500 fitment','oem-mercedes_benz-g500-abs_reluctor_ring');
+const hubSeal=mbpg('G500 wheel (hub) seal, 2002–2008 G500 fitment','oem-mercedes_benz-g500-wheel_seal');
+const pinionBearings=mbpg('G500 pinion bearings, 2002–2008 G500 fitment','oem-mercedes_benz-g500-pinion_bearing');
+const ringPinion=mbpg('G500 ring and pinion sets, 2002–2008 G500 fitment','oem-mercedes_benz-g500-ring_and_pinion');
+const transfer08=mbpg('2008 G500 transfer case page: motor 463-540-00-88, seal 015-997-08-47-64, case 463-280-20-00','parts-list/2008-mercedes_benz-g500/transmission/transfer-case');
+Object.assign(drivetrainPackSources,{rearAxle02,rearAxle08,rearHousing02,frontAxle02,frontCarrier02,frontHub02,rearProp02,frontShaft06,driveShafts,sensorRings,hubSeal,pinionBearings,ringPinion,transfer08});
+
+const hex=(r,c,a,inner,outer,width,color=steel)=>turn(r,c,a,[[0,inner],[0,outer],[width,outer],[width,inner],[0,inner]],color,{n:6,start:Math.PI/6});
+const mirror=a=>a.map(v=>-v);
+// Bevel gear facing along a: the teeth narrow toward the face.
+const bevel=(r,c,a,outer,width,teeth,color=steel)=>gear(r,c,a,0,width,outer,outer*.72,teeth,color,0,.3);
+// Ring of small teeth (an ABS tone ring) along a.
+const toneRing=(r,c,a,outer,inner,width,teeth)=>{sleeve(r,c,a,0,width,outer-.012,inner,iron,teeth);gear(r,c,a,0,width,outer,outer,teeth,iron,0,(outer-.014)/outer);};
+
+// Rear axle housing with its pinion bearing, pinion seal, spacer and side bearings.
+// Axle along y, pinion nose along -x.
+const housingRows=[
+  part('housing','Rear axle housing · 463-350-02-03','The rigid rear axle casing: the center bowl that holds the differential and the two tubes out to the wheel ends.',[0,0,-.45],r=>{
+    turn(r,[0,-.3,0],y,[[0,.12],[.06,.3],[.18,.38],[.44,.38],[.56,.3],[.6,.12]],iron,{n:20});
+    for(const s of [-1,1])cyl(r,[0,s*.3,0],[0,s,0],0,.62,.085,iron,14);
+    sleeve(r,[-.3,0,0],[-1,0,0],0,.32,.14,.1,iron,18);}),
+  src(part('side-bearings','Carrier side bearings · 000-980-19-02','The two tapered roller bearings that carry the differential case in the housing, one at each side of the bowl. Both axles use this number.',[0,0,.45],r=>{
+    for(const s of [-1,1])taper(r,[0,s*.24,0],[0,s,0],.1,.17,.06);}),pinionBearings),
+  src(part('outer-pinion-bearing','Rear outer pinion bearing · 007-981-53-05','The tapered roller bearing at the flange end of the rear drive pinion, in the nose of the housing.',[-.35,0,.25],r=>taper(r,[-.52,0,0],[-1,0,0],.04,.1,.05)),pinionBearings),
+  part('pinion-seal','Rear pinion seal · 013-997-18-47','The radial seal in the end of the pinion nose, under the companion flange.',[-.55,0,0],r=>sleeve(r,[-.62,0,0],x,0,.03,.11,.05,rubber,18)),
+  src(part('pinion-spacer','Pinion spacer, 34 × 21 mm · 639-353-00-53','The larger of the two pinion spacers the diagram gives between the inner and outer pinion bearings; it sets the bearing preload.',[-.2,-.35,0],r=>sleeve(r,[-.48,0,0],x,0,.13,.058,.045,zinc,14)),rearAxle08)
+];
+const rearHousing=study('g500-rear-housing-pinion','Rear axle housing, pinion bearing, seal and side bearings','The rear axle housing carries the differential on two side bearings. The drive pinion runs in two tapered bearings in the nose, held apart by a spacer and sealed under the companion flange.',rearAxle02,housingRows);
+rearHousing.viewAngle=[-.55,.3];
+
+// Rear differential gear set: crown wheel, pinion, case, cross shaft, pinions and washers.
+const pinionHead=(r,s)=>{bevel(r,[s*.46,0,0],[-s,0,0],.11,.12,11,metal);cyl(r,[s*.46,0,0],[s,0,0],0,.45,.04,steel,12);};
+const crownWheel=(r,s)=>{bevel(r,[0,.08,0],y,.4,.08,31,steel);sleeve(r,[0,.07,0],y,0,.02,.32,.2,steel,24);};
+const diffCase=(r,color)=>turn(r,[0,-.24,0],y,[[0,.05],[0,.09],[.08,.12],[.12,.2],[.3,.21],[.32,.3],[.34,.3],[.34,.05]],color,{n:20});
+const rearGearRows=[
+  src(part('ring-pinion','Rear ring and pinion · 904-350-00-39','The matched crown wheel and drive pinion of the rear axle. The crown wheel bolts to the differential case; the pinion comes in from the propeller shaft.',[-.25,0,.35],r=>{crownWheel(r);pinionHead(r,-1);}),ringPinion),
+  part('case','Rear differential case · 901-350-00-23','The case that the crown wheel bolts to. It turns in the two side bearings and carries the cross shaft and differential pinions.',[0,-.4,0],r=>diffCase(r,dark)),
+  src(part('cross-shaft','Differential pinion shaft · 601-350-05-26','The cross shaft through the case that the two differential pinions turn on. The front axle uses the same number.',[0,0,.55],r=>cyl(r,[0,0,-.19],z,0,.38,.024,metal,10)),ringPinion),
+  src(part('pinion-gears','Differential pinion gears · 107-353-00-14','The two small bevel gears on the cross shaft that mesh with the side gears and let the wheels turn at different speeds.',[.3,0,.35],r=>{for(const s of [-1,1])bevel(r,[0,0,s*.14],[0,0,-s],.075,.06,10,metal);}),ringPinion),
+  part('thrust-washers','Spherical thrust washers · 668-353-00-24','Domed washers behind the differential pinions, between each pinion and the case.',[.3,0,-.35],r=>{
+    for(const s of [-1,1])turn(r,[0,0,s*.15],[0,0,s],[[0,.03],[0,.085],[.018,.075],[.018,.03],[0,.03]],gold,{n:14});})
+];
+const rearGears=study('g500-rear-diff-gears','Rear differential gear set','The rear crown wheel and pinion, the differential case, its cross shaft, the two differential pinions and their domed thrust washers.',rearAxle02,rearGearRows);
+rearGears.viewAngle=[-.6,.35];
+
+// Front differential gear set from the 2002 front axle page.
+const frontGearRows=[
+  src(part('ring-pinion','Front ring and pinion · 461-330-03-39','The matched crown wheel and drive pinion of the front axle. The pinion points back toward the transfer case.',[.25,0,.35],r=>{crownWheel(r);pinionHead(r,1);}),ringPinion),
+  part('case','Front differential case · 463-330-07-23','The front differential case that the crown wheel bolts to, turning in the side bearings.',[0,-.4,0],r=>diffCase(r,'#5b6b70')),
+  part('gear-kit','Front differential gear kit · 668-350-00-26','The kit of differential bevel gears: two side gears splined to the axle shafts and two pinions on the cross shaft.',[0,0,.5],r=>{
+    for(const s of [-1,1]){bevel(r,[0,s*.17,0],[0,-s,0],.11,.06,14,metal);bevel(r,[0,0,s*.14],[0,0,-s],.075,.06,10,metal);}
+    cyl(r,[0,0,-.19],z,0,.38,.022,steel,8);})
+];
+const frontGears=study('g500-front-diff-gears','Front differential gear set','The front crown wheel and pinion, the differential case, and the kit of side gears and pinions inside it.',frontAxle02,frontGearRows);
+frontGears.viewAngle=[-.6,.35];
+
+// Axle lock parts common to both G500 axle pages.
+const lockRows=[
+  part('cylinder','Axle lock cylinder · 463-330-00-54','The shift cylinder on the axle housing that engages the differential lock; both G500 axle pages list it.',[0,0,-.35],r=>{
+    cyl(r,[-.3,0,0],x,0,.55,.17,'#59666a',18);cyl(r,[-.35,0,0],x,0,.05,.2,steel,18);cyl(r,[.25,0,0],x,0,.25,.035,metal,10);
+    cyl(r,[-.1,0,.17],z,0,.08,.035,steel,10);}),
+  part('switch','Lock engagement switch · 000-545-05-64-64','The switch that reports when a differential lock is engaged. The axle pages list it with each axle lock, and the VG150 E list gives the same switch on the transfer case.',[0,0,.45],r=>{
+    cyl(r,[.1,0,.17],z,0,.1,.045,dark,12);hex(r,[.1,0,.27],z,0,.06,.04);cyl(r,[.1,0,.31],z,0,.08,.03,'#2f3436',10);}),
+  part('repair-package','Lock repair package · 460-350-07-84','A repair package listed in the lock group between the lock shaft and the lock flange; the page does not list its contents, so it is drawn as two seal rings on the shaft.',[.45,0,0],r=>{
+    for(const px of [.32,.4])sleeve(r,[px,0,0],x,0,.03,.065,.035,rubber,14);})
+];
+const lockParts=study('g500-axle-lock-parts','Axle lock cylinder, switch and repair package','The numbered parts of each axle differential lock: the shift cylinder, its engagement switch and the repair package.',rearAxle02,lockRows);
+lockParts.viewAngle=[-.5,.3];
+
+// Rear wheel ends: bearing, seal, retainers, lock, gasket, sensor ring, repair kit.
+// Both ends drawn along y; left end at -y.
+const endRows=[
+  src(part('bearings','Rear axle shaft bearings · 017-981-46-05','The bearing at each outer end of the rear axle, on the shaft inside the end of the axle tube.',[0,0,.35],r=>{
+    for(const s of [-1,1])ring(r,[0,s*.5,0],[0,s,0],.06,.15,.1);}),fcpAxle),
+  src(part('seals','Rear axle shaft seals · 902-997-02-46','The shaft seal at each tube end, outboard of the bearing.',[0,0,-.35],r=>{
+    for(const s of [-1,1])sleeve(r,[0,s*.62,0],[0,s,0],0,.03,.1,.055,rubber,18);}),fcpAxle),
+  part('retainer-left','Rear bearing retainer, left · 463-357-01-19','The bearing cover that bolts over the left tube end and holds the bearing.',[0,-.3,.15],r=>{
+    turn(r,[0,-.46,0],[0,-1,0],[[0,.1],[0,.24],[.025,.24],[.025,.16],[.2,.16],[.2,.13],[.025,.12],[.025,.1],[0,.1]],metal,{n:20});}),
+  part('retainer-right','Rear bearing retainer, right · 463-357-02-19','The bearing cover that bolts over the right tube end and holds the bearing.',[0,.3,.15],r=>{
+    turn(r,[0,.46,0],y,[[0,.1],[0,.24],[.025,.24],[.025,.16],[.2,.16],[.2,.13],[.025,.12],[.025,.1],[0,.1]],metal,{n:20});}),
+  part('lock','Grooved-nut lock · 902-357-00-73','The lock plate that keeps the grooved nut on each rear shaft from turning.',[.35,0,0],r=>{
+    for(const s of [-1,1]){sleeve(r,[0,s*.7,0],[0,s,0],0,.012,.085,.045,zinc,14);block(r,[0,s*.706,.095],[.03,.012,.03],zinc);}}),
+  part('gasket','Tube-end gasket · 902-357-01-80','The gasket between each bearing retainer and the axle tube flange.',[-.35,0,0],r=>{
+    for(const s of [-1,1])sleeve(r,[0,s*.445,0],[0,s,0],0,.008,.24,.1,'#7a6a4f',20);}),
+  src(part('sensor-ring','Rear ABS sensor ring · 463-357-03-51','A toothed sensor ring listed for the G500 with 2002–2008 fitment; the listing does not give its position, and it is drawn on each rear shaft inboard of the bearing.',[0,0,.55],r=>{
+    for(const s of [-1,1])toneRing(r,[0,s*.38,0],[0,s,0],.1,.065,.025,24);}),sensorRings),
+  src(part('repair-kit','Rear axle repair kit · 902-350-14-10','A repair kit the rear axle housing page lists for both sides, after the shaft, bearing cover and grooved nut. Its contents are not listed; it is drawn as a ring outboard of the nut.',[0,0,-.55],r=>{
+    for(const s of [-1,1])sleeve(r,[0,s*.8,0],[0,s,0],0,.04,.07,.04,'#8b999c',12);}),rearHousing02)
+];
+const shaftEnds=study('g500-rear-shaft-ends','Rear axle bearings, seals, retainers and sensor rings','At each end of the rear axle the shaft runs in a bearing inside the tube. A retainer over a gasket closes the tube end, a seal keeps the oil in, and a lock holds the grooved nut.',rearAxle02,endRows);
+shaftEnds.viewAngle=[-.3,.25];
+
+// Front hub along y, wheel flange outboard at +y.
+const hubRows=[
+  part('hub','Front wheel hub · 463-330-01-25','The front hub that turns on the two tapered wheel bearings on the steering knuckle and carries the brake disc and wheel.',[0,.35,0],r=>{
+    turn(r,[0,0,0],y,[[0,.12],[0,.2],[.3,.2],[.3,.38],[.36,.38],[.36,.14],[.46,.12],[.46,.09]],'#8b999c',{n:24});
+    for(let i=0;i<5;i++){const a=i*TAU5;cyl(r,[.28*Math.cos(a),.36,.28*Math.sin(a)],y,0,.1,.018,steel,6);}}),
+  src(part('hub-seal','Front hub seal · 015-997-79-47','The seal at the inner end of each front hub, between the hub and the knuckle journal.',[0,-.35,0],r=>sleeve(r,[0,-.04,0],y,0,.04,.19,.12,rubber,20)),hubSeal),
+  part('installation-kit','Wheel-bearing installation kit · 463-331-00-44','A kit listed at the wheel-bearing callout of the front hub diagram. Its contents are not listed; it is drawn as a nut and washer at the outer bearing.',[0,.6,.2],r=>{
+    sleeve(r,[0,.47,0],y,0,.01,.085,.05,zinc,14);hex(r,[0,.48,0],y,.05,.08,.04);}),
+  src(part('abs-ring','Front ABS sensor ring · 463-334-00-15','The toothed sensor ring the front axle carrier diagram lists on each front axle shaft, drawn here inboard of the hub.',[0,-.5,.2],r=>toneRing(r,[0,-.16,0],y,.13,.08,.03,30)),frontCarrier02)
+];
+const TAU5=2*Math.PI/5;
+const frontHub=study('g500-front-hub-parts','Front hub, hub seal, bearing kit and ABS ring','Each front hub turns on two tapered bearings on the knuckle. A seal closes the inner end, a toothed ring for the wheel-speed sensor sits on the axle shaft, and an installation kit is listed with the bearings.',frontHub02,hubRows);
+frontHub.viewAngle=[-.45,.3];
+
+// Propeller shafts, laid out along x with the transfer case at the origin.
+function propShaft(r,a,b,rad,color){
+  const d=b[0]-a[0],s=Math.sign(d),len=Math.abs(d),c=a;
+  for(const [px,dir] of [[a[0],[s,0,0]],[b[0],[-s,0,0]]]){
+    const p=[px,a[1],a[2]];
+    turn(r,p,dir,[[0,0],[0,.1],[.02,.1],[.02,.04],[.05,.04],[.05,0]],steel,{n:16});
+    block(r,[px+(dir[0])*.08,a[1],a[2]],[.04,.1,.03],metal);block(r,[px+(dir[0])*.08,a[1],a[2]],[.04,.03,.1],metal);
+  }
+  cyl(r,[c[0]+s*.13,c[1],c[2]],[s,0,0],0,len-.26,rad,color,14);
+  sleeve(r,[c[0]+s*.15,c[1],c[2]],[s,0,0],0,.16,rad+.02,rad,dark,14);
+}
+const propRows=[
+  src(part('front-shaft','Front propeller shaft · 463-410-13-02','The shaft from the transfer case forward to the front axle pinion. It replaces 460-410-22-18.',[0,-.35,0],r=>propShaft(r,[-.08,-.2,-.05],[-1,-.2,-.05],.035,'#6c8189')),driveShafts),
+  src(part('rear-shaft','Rear propeller shaft · 463-410-11-02','The shaft from the transfer case back to the rear axle pinion. It replaces 460-410-21-18.',[0,.35,0],r=>propShaft(r,[.08,0,0],[1,0,0],.04,steel)),rearProp02),
+  src(part('center-shaft','Transmission-to-transfer-case shaft · 463-410-07-02','The short shaft between the transmission output and the transfer-case input.',[0,0,.4],r=>propShaft(r,[-.08,.15,.3],[-.62,.15,.3],.035,metal)),rearProp02),
+  src(part('shaft-plate','Drive shaft plate · 463-413-01-84','A plate listed on the 2006 G500 front drive shaft diagram with the shaft bolts and nuts, drawn at the front shaft’s transfer-case flange.',[.2,-.45,-.2],r=>{
+    turn(r,[-.05,-.2,-.05],[-1,0,0],[[0,.03],[0,.12],[.012,.12],[.012,.03],[0,.03]],zinc,{n:6,start:Math.PI/6});}),frontShaft06)
+];
+const propShafts=study('g500-propeller-shafts','Propeller shafts','Three shafts carry drive on the G500: a short one from the five-speed automatic to the transfer case, and one each from the transfer case to the front and rear axles.',rearProp02,propRows);
+propShafts.viewAngle=[-.5,.35];
+
+// VG150 E center differential along x: front output toward -x, rear toward +x.
+const centerRows=[
+  part('pins','Center differential pins · 668-353-00-21','The two cross pins in the differential housing that carry the four bevel gears.',[0,0,.5],r=>{cyl(r,[0,-.2,0],y,0,.4,.022,metal,10);cyl(r,[0,0,-.2],z,0,.4,.022,metal,10);}),
+  part('bevel-gears','Center differential bevel gears · 667-353-02-14','The four bevel gears on the cross pins that split torque between the front and rear outputs.',[0,.45,0],r=>{
+    for(const d of [y,mirror(y),z,mirror(z)])bevel(r,d.map(v=>v*.15),mirror(d),.07,.05,10,metal);}),
+  part('drive-shaft','Transfer-case drive shaft · 463-283-05-05','The shaft the parts list calls the drive shaft in the center differential group, drawn here as the front output side.',[-.4,0,0],r=>{
+    cyl(r,[-.12,0,0],[-1,0,0],0,.7,.045,steel,14);bevel(r,[-.16,0,0],x,.12,.05,14,steel);}),
+  part('rear-main-shaft','Rear main shaft · 463-283-06-05','The rear main shaft that leads out of the center differential to the rear output flange.',[.4,0,0],r=>{
+    cyl(r,[.12,0,0],x,0,.7,.045,steel,14);bevel(r,[.16,0,0],mirror(x),.12,.05,14,steel);}),
+  part('front-taper','Center differential taper bearing · 009-981-59-05','A tapered roller bearing in the center differential group, next to the shift collar.',[-.3,-.3,0],r=>taper(r,[-.3,0,0],[-1,0,0],.045,.11,.06)),
+  part('rear-taper','Center differential taper bearing · 007-981-14-05','The second tapered roller bearing of the center differential group.',[.3,-.3,0],r=>taper(r,[.3,0,0],x,.045,.11,.06)),
+  part('output-flanges','Output flanges · 463-282-01-45','The two flanges, front and rear, that the propeller shafts bolt to.',[0,0,-.45],r=>{
+    for(const s of [-1,1])turn(r,[s*.85,0,0],[s,0,0],[[0,.04],[0,.17],[.03,.17],[.03,.07],[.1,.07],[.1,.04],[0,.04]],metal,{n:20});})
+];
+const centerDiff=study('g500-vg150-center-diff','VG150 E center differential, shafts and output flanges','The center differential of the VG150 E case: four bevel gears on two cross pins between the front and rear shafts, two tapered bearings, and the two output flanges.',vg150e,centerRows);
+centerDiff.viewAngle=[-.55,.35];
+
+// Center lock actuator: piston, diaphragm, spring and shift collar along x.
+const lockActRows=[
+  part('piston','Lock actuator piston · 463-284-00-12','The piston of the vacuum lock actuator in the front-cover group of the case.',[0,0,.4],r=>{sleeve(r,[-.2,0,0],x,0,.04,.26,.05,metal,22);cyl(r,[-.2,0,0],x,-.1,.3,.03,steel,10);}),
+  src(part('diaphragm','Lock actuator diaphragm · 463-284-00-94','The flexible partition the vacuum pulls on to move the lock piston. The W463 listing sells it as the transfer-case diaphragm.',[-.35,0,0],r=>sleeve(r,[-.24,0,0],x,0,.012,.32,.05,rubber,24)),gWagenTransfer),
+  part('spring','Lock pressure spring · 463-993-02-01','The coil spring that returns the lock piston when the vacuum is released.',[0,.4,0],r=>{
+    const pts=[];for(let i=0;i<=48;i++){const a=i*TAU/12;pts.push([-.15+i*.006,.14*Math.cos(a),.14*Math.sin(a)]);}path(r,pts,.01,'#5e7f8a');}),
+  part('shift-collar','Center lock shift collar · 463-283-04-23','The splined collar in the center differential group that the lock moves to tie the differential together.',[.4,0,0],r=>{
+    turn(r,[.25,0,0],x,[[0,.06],[0,.16],[.03,.16],[.03,.13],[.08,.13],[.08,.16],[.11,.16],[.11,.06],[0,.06]],metal,{n:18});})
+];
+const lockActuator=study('g500-vg150-lock-actuator','VG150 E lock actuator piston, diaphragm, spring and shift collar','The vacuum actuator for the transfer-case lock: a diaphragm and piston, a return spring, and the splined shift collar in the center differential group.',vg150e,lockActRows);
+lockActuator.viewAngle=[-.55,.3];
+
+export const studies=[rangeSet,caseFittings,rearShafts,frontAxleParts,transmissionParts,rearHousing,rearGears,frontGears,lockParts,shaftEnds,frontHub,propShafts,centerDiff,lockActuator];
 export const views=new Map([
   ['g500-center-diff.housing',rangeSet],
   ['g500-center-diff.rear-output',caseFittings],
   ['drivetrain.halfshafts',rearShafts],
   ['g500-front-housing.shafts',frontAxleParts],
-  ['g500-transmission.shift-cable',transmissionParts]
+  ['g500-transmission.shift-cable',transmissionParts],
+  ['g500-rear-diff.carrier',rearHousing],
+  ['g500-rear-diff.crown',rearGears],
+  ['g500-front-diff.crown',frontGears],
+  ['g500-axle-lock.casting',lockParts],
+  ['chassis.rear-bearings',shaftEnds],
+  ['chassis.front-hub-ends',frontHub],
+  ['g500-rear-propeller.tube',propShafts],
+  ['g500-front-propeller.tube',propShafts],
+  ['g500-input-shaft.spindle',propShafts],
+  ['g500-center-diff.spider',centerDiff],
+  ['g500-center-lock.housing',lockActuator]
 ]);
 
 const ids=(s,keys)=>keys.map(k=>s.id+'.'+k);
@@ -218,5 +398,48 @@ export const claims=[
   {ids:ids(transmissionParts,['lower-hose']),kind:'diagram',
    fact:'The W463 transmission listing gives lower transmission cooler hose 019-997-72-82 for the G500.',need:'Confirm the hose position in the cooler line and measure its length and end fittings.',source:gWagenTransfer},
   {ids:ids(transmissionParts,['case-connector']),kind:'diagram',
-   fact:'The G500 automatic transmission parts category lists transmission connector 203-540-02-53, the 722.6 case plug.',need:'The listing names other 722.6 cars and does not show G500 fitment; confirm the number by VIN and measure the connector body and pin layout.',source:fcpTransmission}
+   fact:'The G500 automatic transmission parts category lists transmission connector 203-540-02-53, the 722.6 case plug.',need:'The listing names other 722.6 cars and does not show G500 fitment; confirm the number by VIN and measure the connector body and pin layout.',source:fcpTransmission},
+  // Round 2
+  {ids:ids(rearHousing,['housing','pinion-seal']),kind:'diagram',
+   fact:'The 2002 G500 rear axle diagram lists axle housing 463-350-02-03 at callout 1 and pinion seal 013-997-18-47 at callout 22, both for the G500 and G55 AMG.',need:'Measure the bowl, tube length and pinion-nose bore on the fitted axle; the geometry is schematic.',source:rearAxle02},
+  {ids:ids(rearHousing,['side-bearings','outer-pinion-bearing']),kind:'diagram',
+   fact:'The G500 pinion bearing listing gives side bearing 000-980-19-02 and outer pinion bearing 007-981-53-05 for 2002–2008 G500. The 2002 rear axle diagram lists them at callouts 12 and 21; the front axle diagram lists the same side bearing.',need:'Measure bearing bore, outside diameter and width; the outer bearing position at the flange end follows the diagram callout order.',source:pinionBearings},
+  {ids:ids(rearHousing,['pinion-spacer']),kind:'diagram',
+   fact:'The 2008 G500 rear axle diagram gives two pinion spacers at callout 20: 108-353-00-42 (32 × 16 mm) and 639-353-00-53 (34 × 21 mm).',need:'Which spacer a given axle carries depends on its pinion; confirm by axle number. The 2002 page lists only the smaller spacer.',source:rearAxle08},
+  {ids:ids(rearGears,['ring-pinion','cross-shaft','pinion-gears']),kind:'diagram',
+   fact:'The G500 ring and pinion listing gives ring and pinion 904-350-00-39, pinion shaft 601-350-05-26 and pinion gear 107-353-00-14 for 2002–2008 G500. The 2002 rear axle diagram lists them at callouts 18, 14 and 16.',need:'Confirm the ratio and tooth counts on the fitted axle; tooth counts drawn here are schematic.',source:ringPinion},
+  {ids:ids(rearGears,['case','thrust-washers']),kind:'diagram',
+   fact:'The 2002 G500 rear axle diagram lists differential case 901-350-00-23 at callout 11 and thrust washer 668-353-00-24 at callout 17. The VG150 E list gives the same washer as the rounded washer of the center differential.',need:'Measure the case and washer radius; the case outline is schematic.',source:rearAxle02},
+  {ids:ids(frontGears,['ring-pinion']),kind:'diagram',
+   fact:'The G500 ring and pinion listing gives ring and pinion 461-330-03-39 (replacing 461-330-01-39) for 2002–2008 G500, and the 2002 front axle diagram lists it at callout 13.',need:'Confirm the ratio and tooth counts on the fitted front axle.',source:ringPinion},
+  {ids:ids(frontGears,['case','gear-kit']),kind:'diagram',
+   fact:'The 2002 G500 front axle diagram lists differential case 463-330-07-23 at callout 7 and gear kit 668-350-00-26 at callout 12.',need:'The kit contents are inferred from its callout among the differential gears; confirm what the kit holds and measure the case.',source:frontAxle02},
+  {ids:ids(lockParts,['cylinder','switch','repair-package']),kind:'diagram',
+   fact:'The 2002 G500 rear axle diagram lists the differential-lock switch 000-545-05-64-64 and cylinder 463-330-00-54 at callouts 25 and 26 and repair package 460-350-07-84 at callout 29; the front axle diagram lists the same three at callouts 20, 21 and 24. The VG150 E list gives pressure switch 000-545-05-64.',need:'The repair package contents are not listed. Measure the cylinder body and switch thread on the fitted axle.',source:rearAxle02},
+  {ids:ids(shaftEnds,['bearings','seals']),kind:'diagram',
+   fact:'The G500 axle parts listing gives Genuine Mercedes rear axle shaft bearing 017-981-46-05 and rear shaft seal 902-997-02-46. The 2002 G500 rear axle diagram lists them at callouts 7 and 6.',need:'Measure bearing bore, outside diameter and width and the seal section at the tube end.',source:fcpAxle},
+  {ids:ids(shaftEnds,['retainer-left','retainer-right','lock','gasket']),kind:'diagram',
+   fact:'The 2002 G500 rear axle diagram lists bearing retainers 463-357-01-19 left and 463-357-02-19 right at callout 5, lock 902-357-00-73 at callout 8 and gasket 902-357-01-80 at callout 10.',need:'Measure the retainer flange, bolt circle and gasket on the fitted tube ends.',source:rearAxle02},
+  {ids:ids(shaftEnds,['sensor-ring']),kind:'diagram',
+   fact:'The G500 ABS sensor ring listing gives sensor (spacer) ring 463-357-03-51 for 2002–2008 G500, beside front ring 463-334-00-15.',need:'The listing gives no position; that it is the rear ring is inferred from its 463-357 rear-axle-shaft group. Confirm its seat and tooth count.',source:sensorRings},
+  {ids:ids(shaftEnds,['repair-kit']),kind:'diagram',
+   fact:'The 2002 G500 rear axle housing diagram lists repair kit 902-350-14-10 at callout 9 for both sides.',need:'The kit contents are not listed; confirm what it holds before drawing it as anything more than a placeholder ring.',source:rearHousing02},
+  {ids:ids(frontHub,['hub','installation-kit']),kind:'diagram',
+   fact:'The 2002 G500 front hub diagram lists front hub 463-330-01-25 at callout 1 and installation kit 463-331-00-44 at callout 2, with front wheel bearings 009-981-41-05 inner and 009-981-48-05 outer.',need:'The kit contents are not listed. Measure the hub flange, bolt circle and bearing seats; the wheel bearings themselves are drawn in their own studies.',source:frontHub02},
+  {ids:ids(frontHub,['hub-seal']),kind:'diagram',
+   fact:'The G500 wheel seal listing gives hub seal 015-997-79-47 for 2002–2008 G500, and the 2002 front hub diagram lists it at callout 3.',need:'Measure the seal bore and section on the fitted hub.',source:hubSeal},
+  {ids:ids(frontHub,['abs-ring']),kind:'diagram',
+   fact:'The 2002 G500 front axle carrier diagram lists ABS ring 463-334-00-15 at callout 4, on the driver and passenger sides, after the axle shafts.',need:'Confirm its seat on the axle shaft and its tooth count.',source:frontCarrier02},
+  {ids:ids(propShafts,['front-shaft']),kind:'diagram',
+   fact:'The G500 drive shaft listing gives 463-410-13-02 (replacing 460-410-22-18) for 2002–2008 G500, and the 2006 front drive shaft diagram lists it as the shaft to the front axle.',need:'Measure the shaft length, tube diameter and joint sizes; the joints are drawn schematically.',source:driveShafts},
+  {ids:ids(propShafts,['rear-shaft','center-shaft']),kind:'diagram',
+   fact:'The 2002 G500 rear propeller shaft page lists drive shaft 463-410-11-02 "Transfer Case To Axle" and 463-410-07-02 "Transmission To Transfer Case".',need:'Measure both shafts and their joints on the vehicle.',source:rearProp02},
+  {ids:ids(propShafts,['shaft-plate']),kind:'diagram',
+   fact:'The 2006 G500 front drive shaft diagram lists drive shaft plate 463-413-01-84 at callout 4, between the shaft bolt and nut callouts.',need:'The page gives no notes for the plate; confirm where it sits on the 2002 vehicle and measure it.',source:frontShaft06},
+  {ids:ids(centerDiff,centerRows.map(p=>p.id)),kind:'diagram',
+   fact:'The VG150 E parts list gives differential pins 668-353-00-21, bevel gears 667-353-02-14 (four), drive shaft 463-283-05-05, rear main shaft 463-283-06-05, taper bearings 009-981-59-05 and 007-981-14-05 and two flanges 463-282-01-45 in its center differential and output groups.',need:vgNeed+' The G500 transfer-case pages list only the motor, output seal and case 463-280-20-00. Which shaft carries the front output and where each bearing sits are read from the callout order and are unconfirmed.',source:vg150e},
+  {ids:ids(lockActuator,['piston','spring','shift-collar']),kind:'diagram',
+   fact:'The VG150 E parts list gives piston 463-284-00-12 and pressure spring 463-993-02-01 in the front-cover actuator group and shift collar 463-283-04-23 in the center differential group.',need:vgNeed+' That these parts form the vacuum lock actuator is read from the diagram grouping.',source:vg150e},
+  {ids:ids(lockActuator,['diaphragm']),kind:'diagram',
+   fact:'The W463 transmission and transfer-case listing sells 463-284-00-94 as the transfer case diaphragm; the VG150 E list gives the same number as the partition in the actuator group.',need:'Confirm against the G500 VIN and measure the diaphragm diameter.',source:gWagenTransfer}
 ];

@@ -2,11 +2,16 @@
 // number from the cited diagram; parts the register already models elsewhere
 // (evaporator, heater core, blower motor, expansion valve, gears, carrier
 // bearings, lock cylinder) are left out.
-import {TAU,metal,steel,dark,gold,copper,turn,cyl,sleeve,part,study,x,y,z} from './mechanism-shapes.js';
+import {TAU,metal,steel,dark,gold,copper,turn,cyl,sleeve,gear,part,study,x,y,z} from './mechanism-shapes.js';
+import {getRoadDetail} from './road-mechanisms.js';
 
 const hvacPlate={label:'MB Parts Giant · 2004 G500 evaporator and heater components diagram',url:'https://www.mbpartsgiant.com/parts-list/2004-mercedes_benz-g500/a-c-heating/blower-motor-fan-air-condition'};
 const frontAxlePlate={label:'MB Parts Giant · 2003 G500 front axle shafts and differential diagram',url:'https://www.mbpartsgiant.com/parts-list/2003-mercedes_benz-g500/driveline-axles/front-axle-shafts-differential'};
-export const catalogStudySources={hvacPlate,frontAxlePlate};
+const transmissionPlate={label:'MB Parts Giant · 2004 G500 automatic transmission diagram',url:'https://mbpartsgiant.com/parts-list/2004-mercedes_benz-g500/transmission/automatic-transmission-transmission'};
+const controlPlate={label:'MB Parts Giant · 2004 G500 electrical components diagram',url:'https://www.mbpartsgiant.com/parts-list/2004-mercedes_benz-g500/electrical/electrical-components'};
+const brakePlate={label:'MB Parts Giant · 2005 G500 brake hydraulic system diagram',url:'https://mbpartsgiant.com/parts-list/2005-mercedes_benz-g500/brakes/hydraulic-system'};
+const absPlate={label:'MB Parts Giant · 2003 G500 ABS components diagram',url:'https://www.mbpartsgiant.com/parts-list/2003-mercedes_benz-g500/electrical/abs-components-electrical'};
+export const catalogStudySources={hvacPlate,frontAxlePlate,transmissionPlate,controlPlate,brakePlate,absPlate};
 
 const plastic='#3a3f42',foam='#55524a',rubber='#26292b',grey='#8f9a9c';
 const block=(r,c,s,color)=>r.box(c[0]-s[0]/2,c[1]-s[1]/2,c[2]-s[2]/2,c[0]+s[0]/2,c[1]+s[1]/2,c[2]+s[2]/2,color);
@@ -82,6 +87,47 @@ const housingRows=[
 const frontHousing=study('g500-front-housing','Front axle housing, shafts and lock linkage','The housing, cover and seals around the front differential, the two axle shafts and the levers that work the lock.',frontAxlePlate,housingRows);
 frontHousing.viewAngle=[-.55,.3];
 
-const views=new Map([['hvac.case',hvacModule],['g500-front-diff.pinion',frontPinion],['g500-front-diff.carrier',frontHousing]]);
-export const g500CatalogStudies=[...views.values()];
-export function getG500CatalogStudy(vehicle,id){return vehicle==='g500'?views.get(id)||null:null;}
+
+// The 722.6 with the parts the G500 diagram lists around it. The gear sets
+// open into the shared planetary study.
+const transRows=[
+  {...part('gearsets','Planetary gear sets, inside transmission 463-270-41-01-80','Three planetary sets inside the case give the five forward ratios. Open them to see how a planetary set works.',[0,0,.45],r=>{
+    for(const [px,rad] of [[-.1,.2],[.15,.21],[.4,.2]]){sleeve(r,[px,0,0],x,0,.12,rad,rad-.05,steel,22);cyl(r,[px+.02,0,0],x,0,.08,.06,gold,14);}
+  }),source:transmissionPlate},
+  {...part('converter','Torque converter · 140-250-06-02-80','The fluid coupling between the engine and the transmission input, with a lock-up clutch.',[-.45,0,0],r=>
+    turn(r,[-.6,0,0],x,[[0,.05],[0,.26],[.04,.33],[.14,.34],[.24,.3],[.28,.18],[.28,.05],[0,.05]],'#9aa7a9',{n:26})),source:transmissionPlate},
+  {...part('drive-plate','Drive plate · 628-030-00-12','The flexible plate bolts to the crankshaft and carries the converter and starter ring gear.',[-.75,0,0],r=>{
+    sleeve(r,[-.68,0,0],x,0,.012,.3,.05,metal,26);gear(r,[-.68,0,0],x,0,.014,.34,.34,48,dark,0,.88);}),source:transmissionPlate},
+  {...part('extension-seal','Extension housing seal · 015-997-12-46','The radial seal where the output shaft leaves the tail of the case.',[.45,0,0],r=>sleeve(r,[.62,0,0],x,0,.03,.08,.045,dark,18)),source:transmissionPlate},
+  {...part('shift-cable','Shift control cable · 210-267-04-64','Links the steering lock to the shifter so the key cannot come out unless the selector is in Park.',[0,-.45,.2],r=>{
+    const pts=[[.1,-.25,.25],[0,-.3,.4],[-.2,-.3,.55],[-.45,-.25,.65]];for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i],d=b.map((v,k)=>v-a[k]);cyl(r,a,d,0,Math.hypot(...d),.012,'#26292b',8);}}),source:transmissionPlate},
+  {...part('control-upper-bracket','Transmission control module upper bracket · 463-545-28-47','Holds the top of the transmission control module.',[.2,.45,.3],r=>{r.box(.05,.3,.3,.25,.32,.36,steel);r.box(.05,.3,.36,.08,.36,.4,steel);}),source:controlPlate},
+  {...part('control-lower-bracket','Transmission control module lower bracket · 463-540-51-73','The tray bracket under the transmission control module.',[.2,.45,-.1],r=>{r.box(.0,.28,.12,.3,.38,.14,steel);r.box(.0,.36,.12,.3,.38,.24,steel);}),source:controlPlate}
+];
+const transmission=study('g500-transmission','722.6 automatic transmission and attached parts','The five-speed automatic with the parts the G500 diagram lists around it: torque converter, drive plate, tail seal, shift-lock cable and control-module brackets.',transmissionPlate,transRows);
+transmission.viewAngle=[-.6,.3];
+
+
+// Service parts around the master cylinder and the ABS unit.
+const brakeRows=[
+  part('reservoir-cap','Brake reservoir cap · 202-430-00-14-64','The vented screw cap with the fluid-level contact.',[0,0,.4],r=>turn(r,[0,0,.25],z,[[0,0],[0,.09],[.06,.09],[.08,.07],[.08,0]],dark,{n:20})),
+  part('strainer','Reservoir strainer · 000-431-43-34-64','A mesh basket in the filler neck that catches debris when the reservoir is topped up.',[0,0,.15],r=>{sleeve(r,[0,0,.05],z,0,.16,.065,.058,'#8f9a9c',16);cyl(r,[0,0,.04],z,0,.012,.065,'#8f9a9c',16);}),
+  part('booster-gasket','Brake booster gasket · 000-431-23-80','Seals the booster to the firewall.',[-.35,0,0],r=>sleeve(r,[-.3,0,-.2],x,0,.012,.2,.12,rubber,24))
+];
+const brakeService=study('g500-brake-service','Master cylinder service parts','The cap, strainer and booster gasket the G500 brake diagram lists with the master cylinder and booster.',brakePlate,brakeRows);
+brakeService.viewAngle=[-.6,.3];
+const absRows=[
+  part('pump-bracket','ABS hydraulic unit bracket · 210-431-01-40','The bracket that carries the hydraulic unit on the body.',[0,0,-.35],r=>{r.box(-.25,-.15,-.2,.25,.15,-.18,steel);r.box(-.25,.13,-.2,.25,.15,.05,steel);}),
+  part('pump-buffers','Hydraulic unit rubber buffers · 604-094-00-85','Rubber isolators between the hydraulic unit and its bracket.',[0,-.35,-.1],r=>{for(const [bx,by] of [[-.15,-.08],[.15,-.08],[0,.08]])cyl(r,[bx,by,-.18],z,0,.05,.03,rubber,12);}),
+  part('module-bracket','ABS control module bracket · 463-540-55-73','The bracket that holds the ABS control module.',[.4,0,.2],r=>{r.box(.3,-.12,0,.32,.12,.2,steel);r.box(.3,-.12,0,.45,.12,.02,steel);})
+];
+const absMount=study('g500-abs-mounting','ABS unit mounting','The bracket, rubber buffers and control-module bracket that the G500 ABS diagram lists with the hydraulic unit.',absPlate,absRows);
+absMount.viewAngle=[-.6,.3];
+
+const views=new Map([['g500-brake-hydraulics.cylinder',brakeService],['g500-abs-electrical.block',absMount],['powertrain.transmission',transmission],['drivetrain.gearbox',transmission],['hvac.case',hvacModule],['g500-front-diff.pinion',frontPinion],['g500-front-diff.carrier',frontHousing]]);
+export const g500CatalogStudies=[hvacModule,frontPinion,frontHousing,transmission,brakeService,absMount];
+export function getG500CatalogStudy(vehicle,id){
+  if(vehicle!=='g500')return null;
+  if(id==='g500-transmission.gearsets')return getRoadDetail('f350','drivetrain.gearbox');
+  return views.get(id)||null;
+}

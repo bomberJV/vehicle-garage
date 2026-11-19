@@ -5,14 +5,14 @@
 import {TAU,metal,steel,dark,gold,copper,turn,cyl,sleeve,gear,part,study,x,y,z} from './mechanism-shapes.js';
 import {getRoadDetail} from './road-mechanisms.js';
 
-const hvacPlate={label:'MB Parts Giant · 2004 G500 evaporator and heater components diagram',url:'https://www.mbpartsgiant.com/parts-list/2004-mercedes_benz-g500/a-c-heating/blower-motor-fan-air-condition'};
-const frontAxlePlate={label:'MB Parts Giant · 2003 G500 front axle shafts and differential diagram',url:'https://www.mbpartsgiant.com/parts-list/2003-mercedes_benz-g500/driveline-axles/front-axle-shafts-differential'};
-const transmissionPlate={label:'MB Parts Giant · 2004 G500 automatic transmission diagram',url:'https://mbpartsgiant.com/parts-list/2004-mercedes_benz-g500/transmission/automatic-transmission-transmission'};
-const controlPlate={label:'MB Parts Giant · 2004 G500 electrical components diagram',url:'https://www.mbpartsgiant.com/parts-list/2004-mercedes_benz-g500/electrical/electrical-components'};
-const brakePlate={label:'MB Parts Giant · 2005 G500 brake hydraulic system diagram',url:'https://mbpartsgiant.com/parts-list/2005-mercedes_benz-g500/brakes/hydraulic-system'};
-const absPlate={label:'MB Parts Giant · 2003 G500 ABS components diagram',url:'https://www.mbpartsgiant.com/parts-list/2003-mercedes_benz-g500/electrical/abs-components-electrical'};
-const enginePlate={label:'MB Parts Giant · G500 5.0 engine parts diagram (2008 G500, M113)',url:'https://www.mbpartsgiant.com/parts-list/2008-mercedes_benz-g500/air-fuel-delivery/intake-manifold'};
-const fuelPlate={label:'MB Parts Giant · 2004 G500 fuel system components diagram',url:'https://mbpartsgiant.com/parts-list/2004-mercedes_benz-g500/air-fuel-delivery/fuel-supply'};
+const hvacPlate={label:'MB Parts Giant · 2002 G500 blower motor and fan diagram',url:'https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/a-c-heating/blower-motor-fan'};
+const frontAxlePlate={label:'MB Parts Giant · 2002 G500 front axle shafts and differential diagram',url:'https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/driveline-axles/front-axle-shafts-differential'};
+const transmissionPlate={label:'MB Parts Giant · 2002 G500 automatic transmission parts list',url:'https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/transmission/automatic-transmission'};
+const controlPlate={label:'MB Parts Giant · 2002 G500 electrical components diagram',url:'https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/electrical/electrical-components'};
+const brakePlate={label:'MB Parts Giant · 2002 G500 brake hydraulic system diagram',url:'https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/brakes/hydraulic-system-brakes'};
+const absPlate={label:'MB Parts Giant · 2002 G500 ABS components diagram',url:'https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/electrical/abs-components-electrical'};
+const enginePlate={label:'MB Parts Giant · 2008 G500 engine parts plate; its M113 valve cover and lower oil pan are listed for the 2002–2008 G500',url:'https://www.mbpartsgiant.com/parts-list/2008-mercedes_benz-g500/air-fuel-delivery/intake-manifold'};
+const fuelPlate={label:'MB Parts Giant · 2002 G500 fuel system components diagram',url:'https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/air-fuel-delivery/fuel-supply'};
 export const catalogStudySources={hvacPlate,frontAxlePlate,transmissionPlate,controlPlate,brakePlate,absPlate,enginePlate,fuelPlate};
 
 const plastic='#3a3f42',foam='#55524a',rubber='#26292b',grey='#8f9a9c';

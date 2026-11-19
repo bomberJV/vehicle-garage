@@ -164,13 +164,129 @@ const cargoRows=[
 const cargo=study('g500-cargo-trim','Cargo net and cargo-area trim','The load space behind the rear seat: the cargo net with its brackets, bushings, spacer, support and strap, a tie plate, the mat bracket, the rear vent grille and the linings over the rear wheelhouses.',cargoNetPlate,cargoRows);
 cargo.viewAngle=[-.4,.3];
 
-export const studies=[rearBase,rearBack,consoleParts,pillarTrim,cargo];
+// ---- Round 2 ----
+const roofPlate={label:'MB Parts Giant · 2002 G500 roof interior trim diagram',url:'https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/interior-exterior-trim/interior-trim-roof'};
+const windshieldPlate={label:'MB Parts Giant · 2002 G500 windshield glass diagram',url:'https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/body-hardware/glass-windshield'};
+const frontDoorPlate={label:'MB Parts Giant · 2002 G500 front door interior trim diagram',url:'https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/interior-exterior-trim/interior-trim-front-door'};
+const rearDoorPlate={label:'MB Parts Giant · 2002 G500 rear door interior trim diagram',url:'https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/interior-exterior-trim/interior-trim-rear-door'};
+const frontSeatPlate={label:'MB Parts Giant · 2002 G500 front seat components diagram',url:'https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/body-hardware/front-seat-components'};
+const rearBodyPlate={label:'MB Parts Giant · 2002 G500 rear body and floor interior trim diagram',url:'https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/interior-exterior-trim/interior-trim-rear-body'};
+const matSetPage={label:'newparts.com · Mercedes-Benz floor mat set 463-684-91-00-9F87 with 2002–2008 G500 fitment',url:'https://newparts.com/product/genuine-mercedes-benz/46368491009F87'};
+const leather='#2b2b2d',pile='#3b3d40',sheet='#6f7d84';
+const pairPart=(key,name,nums,desc,offsets,draw)=>sides.map(s=>part(key+'-'+sideName(s),name+', '+(s<0?'driver':'passenger')+' · '+(s<0?nums[0]:nums[1]),desc,s<0?offsets[0]:offsets[1],r=>draw(r,s)));
+
+// Headliner, sun visors, assist straps and inside mirror.
+const roofRows=[
+  part('headliner','Headliner, sunroof cars · 463-690-78-50','The moulded roof lining with the sunroof opening. Cars without a sunroof take 463-690-80-50.',[0,0,.45],r=>{
+    for(const [yy,d] of [[-.62,.36],[.55,.7]])block(r,[0,yy,1],[1.7,d,.02],cloth);
+    for(const s of sides)block(r,[s*.6,-.09,1],[.5,.7,.02],cloth);}),
+  part('rear-header','Rear header trim · 463-690-77-50','The trim strip across the rear of the roof above the cargo door; -7101 gray, -9051 black.',[0,.35,.3],r=>block(r,[0,.94,.96],[1.7,.05,.08],trim)),
+  part('visor-left','Sun visor, driver · 463-810-05-10','The driver sun visor; -7095 is the 2002 colour suffix.',[-.25,-.35,.15],r=>{block(r,[-.42,-.8,.93],[.62,.03,.2],cloth);cyl(r,[-.76,-.8,1.0],x,0,.05,.01,metal,8);}),
+  part('visor-right','Sun visor, passenger · 463-810-06-10','The passenger sun visor; -7095 is the 2002 colour suffix.',[.25,-.35,.15],r=>{block(r,[.42,-.8,.93],[.62,.03,.2],cloth);cyl(r,[.71,-.8,1.0],x,0,.05,.01,metal,8);}),
+  part('visor-support','Sun visor support · 202-810-07-12','The inboard clip that holds the free end of each visor; one number for both sides.',[0,-.45,.25],r=>{for(const s of sides){block(r,[s*.09,-.8,.99],[.04,.04,.02],trim);cyl(r,[s*.09,-.8,.97],z,-.03,0,.008,metal,8);}}),
+  part('assist-strap','Assist strap · 463-810-01-46','The fold-up grab strap above each door opening, front and rear, both sides.',[0,0,-.25],r=>{
+    for(const s of sides)for(const yy of [-.25,.35]){block(r,[s*.84,yy,.95],[.03,.22,.03],webbing);for(const d of [-1,1])block(r,[s*.84,yy+d*.1,.98],[.04,.03,.04],dark);}}),
+  part('dome-bezel','Dome lamp bezel · 463-825-00-56','A bezel listed next to the dome lamp on the roof diagram.',[0,.15,-.2],r=>{block(r,[0,.1,.98],[.2,.12,.015],trim);block(r,[0,.1,.97],[.16,.08,.01],plastic);}),
+  withSource(part('inside-mirror','Inside rearview mirror · 463-810-08-17','The interior mirror listed for the 2002–2006 G500.',[0,-.7,-.35],r=>{
+    block(r,[0,-.86,.86],[.26,.03,.08],dark);block(r,[0,-.84,.86],[.24,.01,.06],metal);tube(r,[0,-.86,.9],[0,-.9,.97],.008,dark,8);}),windshieldPlate),
+  withSource(part('mirror-plate','Inside mirror plate · 115-811-01-11','The plate bonded to the windshield that the mirror foot locks onto.',[0,-.9,.1],r=>block(r,[0,-.9,.98],[.05,.01,.04],steel)),windshieldPlate)
+].map(p=>p.source?p:withSource(p,roofPlate));
+const roofTrim=study('g500-roof-trim','Headliner, sun visors and inside mirror','The roof lining with its rear header trim, the two sun visors and their clips, the assist straps over the doors, the dome lamp bezel and the inside mirror with its windshield plate.',roofPlate,roofRows);
+roofTrim.viewAngle=[-.6,.35];
+
+// Door trim panels: a panel in the y-z plane on each side, inner face toward the cabin.
+const doorX=s=>s*.6;
+const frontDoorRows=[
+  ...pairPart('panel','Front door trim panel',['463-720-35-70','463-720-37-70'],'The full inner trim panel of the front door; -9A84 is the black trim.',[[-.25,0,0],[.25,0,0]],(r,s)=>{
+    block(r,[doorX(s),0,.45],[.03,.9,.8],trim);block(r,[doorX(s)-s*.02,0,.62],[.01,.8,.3],leather);}),
+  part('clip','Door trim panel clip · 463-988-02-78','The push clips round the panel edge; the same clip serves the rear doors, the cargo door and the quarter trim.',[0,.4,-.5],r=>{for(const s of sides)for(const [yy,zz] of [[-.4,.1],[.4,.1],[-.4,.7],[.4,.7],[0,.08]])cyl(r,[doorX(s)+s*.03,yy,zz],x,0,s*.03,.012,dark,8);}),
+  part('insulation','Door trim panel insulation · 463-682-00-40','The sound pad on the back of the front door panel.',[0,-.4,-.4],r=>{for(const s of sides)block(r,[doorX(s)+s*.035,.05,.35],[.015,.6,.4],foam);}),
+  ...pairPart('deflector','Front door water deflector',['463-727-05-30','463-727-08-30'],'The plastic sheet behind the trim panel that keeps water in the door off the panel.',[[-.55,0,0],[.55,0,0]],(r,s)=>block(r,[doorX(s)+s*.07,0,.4],[.005,.78,.6],sheet)),
+  ...pairPart('window-trim','Front door window trim',['463-725-00-71','463-725-01-71'],'The trim along the top of the panel at the window line; -7101 gray, -9051 black.',[[-.2,0,.3],[.2,0,.3]],(r,s)=>block(r,[doorX(s)-s*.01,0,.87],[.06,.9,.03],trim)),
+  part('knob-guide','Lock knob guide · 201-992-12-05','The grommet in the window trim that the lock knob rises through.',[0,.3,.5],r=>{for(const s of sides)sleeve(r,[doorX(s)-s*.01,.38,.88],z,0,.025,.014,.007,dark,12);}),
+  ...pairPart('pull-handle','Door pull handle',['463-760-11-59','463-760-12-59'],'The pull handle moulded into the armrest of the trim panel; the same pair is listed for the rear doors.',[[-.35,-.1,.1],[.35,-.1,.1]],(r,s)=>{
+    block(r,[doorX(s)-s*.07,.05,.5],[.1,.4,.05],leather);for(const yy of [-.12,.22])block(r,[doorX(s)-s*.04,yy,.5],[.06,.03,.05],leather);}),
+  part('handle-cap','Pull handle cap · 210-727-03-88','The cap that covers the screw in each pull handle; -7101 gray, -9B51 black.',[0,-.3,.25],r=>{for(const s of sides)cyl(r,[doorX(s)-s*.12,.05,.5],x,0,-s*.01,.018,dark,10);}),
+  part('pocket','Door pocket · 463-720-01-58','The map pocket at the bottom of the panel; -7095 gray, -9045 black.',[0,0,-.3],r=>{for(const s of sides){block(r,[doorX(s)-s*.06,.05,.17],[.08,.6,.02],plastic);block(r,[doorX(s)-s*.1,.05,.23],[.01,.6,.14],plastic);}}),
+  part('welt','Door welt · 463-727-11-30','The edge welt along the trim panel; also listed for the rear doors. -7098 gray, -9051 black.',[0,.55,0],r=>{for(const s of sides)block(r,[doorX(s)-s*.02,.46,.45],[.02,.02,.8],rubber);})
+].map(p=>withSource(p,frontDoorPlate));
+const frontDoorTrim=study('g500-front-door-trim','Front door trim panels','The front door inner trim panels with their clips, insulation and water deflectors, the window trim and lock knob guide, the pull handles and caps, the door pocket and the welt. The switch bezels belong to the electrical pack.',frontDoorPlate,frontDoorRows);
+frontDoorTrim.viewAngle=[-.25,.2];
+
+const rearDoorRows=[
+  ...pairPart('panel','Rear door trim panel',['463-730-44-70','463-730-46-70'],'The full inner trim panel of the rear door; -7C12 gray, -9A84 black.',[[-.25,0,0],[.25,0,0]],(r,s)=>{
+    block(r,[doorX(s),0,.45],[.03,.8,.8],trim);block(r,[doorX(s)-s*.02,0,.62],[.01,.7,.3],leather);block(r,[doorX(s)-s*.07,.05,.5],[.1,.36,.05],leather);}),
+  ...pairPart('window-trim','Rear door window trim',['463-735-00-71','463-735-01-71'],'The trim along the top of the rear door panel; -7101 gray, -9051 black.',[[-.2,0,.3],[.2,0,.3]],(r,s)=>block(r,[doorX(s)-s*.01,0,.87],[.06,.8,.03],trim)),
+  part('ashtray','Rear door ashtray · 463-810-04-30','The ashtray set in each rear door panel, one number for both sides.',[0,-.35,.1],r=>{for(const s of sides){block(r,[doorX(s)-s*.04,-.25,.38],[.05,.14,.07],dark);block(r,[doorX(s)-s*.065,-.25,.4],[.01,.14,.02],metal);}}),
+  ...pairPart('deflector','Rear door water deflector',['463-737-04-30','463-737-07-30'],'The plastic sheet behind the rear door trim panel.',[[-.55,0,0],[.55,0,0]],(r,s)=>block(r,[doorX(s)+s*.07,0,.4],[.005,.7,.6],sheet)),
+  ...pairPart('speaker-housing','Rear door speaker housing',['463-732-01-14','463-732-02-14'],'The housing in the lower rear door that holds the door speaker.',[[-.4,.2,-.3],[.4,.2,-.3]],(r,s)=>{
+    sleeve(r,[doorX(s)+s*.02,.2,.22],x,0,s*.06,.1,.07,plastic,18);block(r,[doorX(s)+s*.05,.2,.22],[.01,.22,.22],plastic);})
+].map(p=>withSource(p,rearDoorPlate));
+const rearDoorTrim=study('g500-rear-door-trim','Rear door trim panels','The rear door inner trim panels, window trims, ashtrays, water deflectors and speaker housings. The clips, lock knob guide, pull handles and caps and welt are the front-door numbers.',rearDoorPlate,rearDoorRows);
+rearDoorTrim.viewAngle=[-.25,.2];
+
+// Front seats: two seats side by side at x = ±.5; cushion parts in one study, backrest parts in another.
+const seatX=s=>s*.5;
+const bothSeats=(r,f)=>{for(const s of sides)f(seatX(s),s);};
+const cushionRows=[
+  part('frame','Front seat frame · 463-910-03-00','The cushion frame of each front seat, one number for both.',[0,0,-.2],r=>bothSeats(r,c=>{rect(r,[c,0,.1],.46,.5,.03,steel);block(r,[c,0,.1],[.46,.02,.02],steel);})),
+  part('cushion','Front seat cushion pad · 463-910-11-50','The foam cushion pad on the frame, listed for the 2002–2005 G500.',[0,0,.15],r=>bothSeats(r,c=>block(r,[c,0,.19],[.44,.48,.12],foam))),
+  part('cover','Front seat cushion cover · 463-910-30-46','The upholstery cover over the cushion pad; -7C12 gray, -9A84 black.',[0,-.1,.4],r=>bothSeats(r,c=>{block(r,[c,0,.26],[.46,.5,.02],leather);block(r,[c,-.25,.2],[.46,.02,.12],leather);})),
+  part('extension','Cushion extension · 203-910-00-75','The front extension of the seat cushion.',[0,-.45,.1],r=>bothSeats(r,c=>block(r,[c,-.3,.17],[.4,.08,.06],foam))),
+  ...pairPart('base','Front seat base',['463-910-30-23','463-910-31-23'],'The lower base that carries the seat on the tracks.',[[-.2,0,-.45],[.2,0,-.45]],(r,s)=>{for(const d of [-1,1])block(r,[seatX(s)+d*.2,0,-.02],[.03,.52,.08],steel);block(r,[seatX(s),0,.03],[.43,.03,.02],steel);}),
+  ...pairPart('side-cover','Front seat side cover',['463-911-17-37','463-911-18-37'],'The outboard side cover over the seat mechanism; -7101 gray, -9051 black.',[[-.4,0,0],[.4,0,0]],(r,s)=>block(r,[seatX(s)+s*.25,0,.09],[.02,.5,.14],plastic))
+].map(p=>withSource(p,frontSeatPlate));
+const seatCushion=study('g500-front-seat-cushion','Front seat cushion and base','Each front seat sits on its own base with a side cover over the mechanism. A shared frame carries the cushion pad, its extension and the cushion cover.',frontSeatPlate,cushionRows);
+seatCushion.viewAngle=[-.6,.35];
+
+const backRows2=[
+  ...pairPart('back-frame','Front seat back frame',['203-910-09-34','203-910-10-34'],'The steel frame of the backrest.',[[-.2,.3,0],[.2,.3,0]],(r,s)=>{const c=seatX(s);for(const d of [-1,1])block(r,[c+d*.2,.25,.65],[.03,.03,.7],steel);block(r,[c,.25,.99],[.43,.03,.03],steel);block(r,[c,.25,.33],[.43,.03,.03],steel);}),
+  part('back-pad','Front seat back pad · 463-910-08-16','The foam pad of the backrest.',[0,-.2,0],r=>bothSeats(r,c=>block(r,[c,.2,.66],[.42,.08,.62],foam))),
+  part('back-cover','Front seat back cover · 463-910-09-47','The upholstery cover on the front of the backrest; -7C12 gray, -9A84 black.',[0,-.4,.05],r=>bothSeats(r,c=>block(r,[c,.15,.66],[.44,.02,.64],leather))),
+  part('back-panel','Front seat back panel · 463-910-23-39','The hard panel on the back of the backrest; -7095 gray, -9045 black.',[0,.5,0],r=>bothSeats(r,c=>block(r,[c,.29,.66],[.44,.015,.64],plastic))),
+  part('lumbar-center','Center lumbar support · 203-910-06-75','The centre air cushion of the lumbar support in both seats.',[0,-.15,-.25],r=>bothSeats(r,c=>block(r,[c,.23,.5],[.16,.02,.12],rubber))),
+  ...pairPart('lumbar-outer','Outer lumbar support',['203-910-03-75','203-910-04-75'],'The outer air cushion of the lumbar support.',[[-.25,-.15,-.3],[.25,-.15,-.3]],(r,s)=>{const c=seatX(s);for(const d of [-1,1])block(r,[c+d*.13,.23,.52],[.07,.02,.16],rubber);}),
+  part('distributor','Lumbar air distributor · 201-805-01-22','The distributor that splits the pump air between the lumbar cushions.',[0,.35,-.35],r=>bothSeats(r,c=>{block(r,[c,.27,.38],[.06,.02,.04],dark);for(const d of [-1,0,1])tube(r,[c+d*.02,.27,.4],[c+d*.05,.24,.47],.004,dark,6);})),
+  part('pump','Lumbar pump · 203-800-00-78','The electric air pump for the lumbar supports.',[0,.6,-.4],r=>bothSeats(r,c=>{cyl(r,[c,.33,.4],x,-.05,.05,.035,dark,14);block(r,[c,.33,.36],[.12,.04,.02],steel);})),
+  part('pump-bracket','Lumbar pump bracket · 203-910-04-14','The bracket that holds the lumbar pump on the backrest frame.',[0,.75,-.15],r=>bothSeats(r,c=>{block(r,[c,.3,.36],[.14,.02,.06],steel);block(r,[c,.315,.33],[.14,.03,.01],steel);})),
+  part('headrest','Front head restraint · 463-970-20-50','The power-adjusted head restraint; -7C12 gray, -9A84 black.',[0,0,.45],r=>bothSeats(r,c=>{block(r,[c,.2,1.2],[.26,.09,.16],leather);for(const d of [-1,1])tube(r,[c+d*.07,.2,1.0],[c+d*.07,.2,1.12],.008,metal,8);})),
+  part('headrest-guide','Head restraint guide · 203-970-08-41','The guide sleeves in the top of the backrest that the restraint posts slide in; -7101 gray, -9051 black.',[0,-.25,.25],r=>bothSeats(r,c=>{for(const d of [-1,1])sleeve(r,[c+d*.07,.2,.97],z,0,.04,.018,.01,trim,10);})),
+  part('headrest-motor','Head restraint motor · 210-970-00-26','The motor in the backrest top that raises and lowers the head restraint.',[0,.45,.3],r=>bothSeats(r,c=>{cyl(r,[c,.24,.92],x,-.05,.05,.025,dark,12);block(r,[c,.24,.88],[.04,.03,.06],metal);}))
+].map(p=>withSource(p,frontSeatPlate));
+const seatBack=study('g500-front-seat-back','Front seat backrest and head restraint','The front backrest frame, pad, cover and back panel, the pneumatic lumbar cushions with their distributor, pump and bracket, and the power head restraint with its guides and motor.',frontSeatPlate,backRows2);
+seatBack.viewAngle=[-.6,.25];
+
+// Cargo floor coverings, the load cover and the floor mat set.
+const floorRows=[
+  part('floor-cover','Cargo floor cover · 463-680-52-46','The carpeted cover over the load floor; -7088 black, -7144 gray.',[0,0,-.25],r=>block(r,[0,.45,0],[1.3,.8,.02],pile)),
+  part('mat','Cargo floor mat · 463-684-00-00','The removable mat on the load floor; it replaces 463-684-01-05.',[0,0,.15],r=>block(r,[0,.45,.03],[1.2,.7,.015],rubber)),
+  ...pairPart('lining','Cargo side lining',['463-684-03-05','463-684-04-05'],'The carpeted lining on the side of the load space; -7088 black, -7144 gray.',[[-.3,0,0],[.3,0,0]],(r,s)=>block(r,[s*.68,.45,.25],[.02,.8,.45],pile)),
+  part('cover','Cargo floor trim cover · 463-680-71-89','A cover on the rear body floor diagram; the row only calls it Cover. Drawn as the rear load-floor edge.',[0,.3,-.4],r=>block(r,[0,.88,.04],[1.2,.06,.05],plastic)),
+  part('scuff-outer','Load sill scuff plate, outer · 460-680-01-35','The outer scuff plate on the cargo door sill; -7101 gray, -9051 black.',[0,.55,-.2],r=>block(r,[0,.97,.02],[1.2,.05,.03],metal)),
+  part('scuff-inner','Load sill scuff plate, inner · 463-686-11-36','The inner scuff plate on the cargo door sill; -7101 gray, -9051 black.',[0,.45,.1],r=>block(r,[0,.92,.07],[1.2,.03,.06],metal)),
+  part('cargo-cover','Cargo cover · 463-810-00-09','The roll-out cover over the load space; -64-9126 black, -7142 gray.',[0,-.2,.4],r=>{cyl(r,[-.62,.05,.55],x,0,1.24,.035,dark,14);block(r,[0,.45,.55],[1.2,.8,.005],cloth);}),
+  part('cargo-cover-bracket','Cargo cover bracket · 463-868-09-14','The bracket that holds each end of the cargo cover cassette; -7142 gray, -9126 black.',[0,-.4,.2],r=>{for(const s of sides)block(r,[s*.65,.05,.55],[.04,.08,.1],trim);}),
+  part('cargo-cover-clamp','Cargo cover clamp · 463-868-04-32','The clamp that holds the pulled-out cover at the rear; -64-9126 black, -7142 gray.',[0,.6,.35],r=>{for(const s of sides)block(r,[s*.62,.85,.55],[.05,.04,.05],trim);}),
+  part('hook','Cargo hook · 463-811-01-41','A hook in the side trim of the load space, both sides; -7101 gray, -9051 black.',[0,.2,.55],r=>{for(const s of sides){block(r,[s*.66,.6,.4],[.02,.04,.04],dark);tube(r,[s*.66,.6,.4],[s*.62,.6,.36],.006,dark,6);}}),
+  withSource(part('mat-set','Floor mat set, front and rear · 463-684-91-00','The carpeted mats for the front and rear footwells, sold as a set; -9F87 black.',[0,-.6,0],r=>{
+    for(const s of sides){block(r,[s*.35,-.85,.02],[.4,.3,.012],pile);block(r,[s*.35,-.35,.02],[.4,.22,.012],pile);}}),matSetPage)
+].map(p=>p.source?p:withSource(p,rearBodyPlate));
+const floorCoverings=study('g500-floor-coverings','Floor coverings and load cover','The cargo floor cover and mat, the side linings and load-sill scuff plates, the roll-out cargo cover with its brackets and clamps, the cargo hooks, and the front and rear floor mat set.',rearBodyPlate,floorRows);
+floorCoverings.viewAngle=[-.5,.45];
+
+export const studies=[rearBase,rearBack,consoleParts,pillarTrim,cargo,roofTrim,frontDoorTrim,rearDoorTrim,seatCushion,seatBack,floorCoverings];
 export const views=new Map([
   ['body.rear-bench',rearBase],
   ['body.rear-bench-back-left',rearBack],
   ['body.center-console',consoleParts],
   ['body.belt-lower-covers',pillarTrim],
-  ['body.rear-bench-back-right',cargo]
+  ['body.rear-bench-back-right',cargo],
+  ['body.rearview-mirror',roofTrim],
+  ['door-g500-front-left-lining.carrier',frontDoorTrim],
+  ['door-g500-rear-left-lining.carrier',rearDoorTrim],
+  ['g500-front-seat.frame',seatCushion],
+  ['g500-front-seat.back',seatBack],
+  ['floor.rear-lining',floorCoverings]
 ]);
 
 const ids=(s,keep=()=>true)=>s.groups[0].parts.filter(keep).map(p=>p.id);
@@ -184,5 +300,12 @@ export const claims=[
   {ids:ids(pillarTrim,from(pillarList)),kind:'diagram',fact:'The G500 pillar trim listing gives these windshield, center and rear pillar trims by side, with 2002–2003 fitment for the windshield pillars and 2002–2005 for the center and rear pillars.',need:'The listing has no drawing. Pillar trim sections and lengths are schematic; the trim colour suffix needs the car’s interior code.',source:pillarList},
   {ids:ids(pillarTrim,from(pillarPlate)),kind:'diagram',fact:'The related-parts list for center pillar trim 463-690-06-40 (2002–2005 G500, ref 3) gives the windshield pillar lower cover, the footwell (cowl) trim and the two sill retainer plates from the same pillar diagram.',need:'The page does not give sides or positions for these pieces; they are drawn on the driver side as an assumption.',source:pillarPlate},
   {ids:ids(cargo,from(cargoNetPlate)),kind:'diagram',fact:'Cargo net 463-860-00-74 is ref 20 on the 2002–2003 G500 cargo-area diagram. Its related-parts list gives the net bracket, bushing, spacer, support, strap, tie plate, mat bracket and vent grille from the same diagram.',need:'The related list has no reference numbers or positions, so the layout is schematic. Check each related number’s fitment against the VIN.',source:cargoNetPlate},
-  {ids:ids(cargo,from(wheelhouseList)),kind:'diagram',fact:'The G500 wheelhouse listing gives wheelhouse trim 463-680-13-42 (driver) and 463-680-28-46 (passenger) for 2002–2005.',need:'The trim shape over each wheelhouse is schematic and needs measuring.',source:wheelhouseList}
+  {ids:ids(cargo,from(wheelhouseList)),kind:'diagram',fact:'The G500 wheelhouse listing gives wheelhouse trim 463-680-13-42 (driver) and 463-680-28-46 (passenger) for 2002–2005.',need:'The trim shape over each wheelhouse is schematic and needs measuring.',source:wheelhouseList},
+  {ids:ids(roofTrim,from(roofPlate)),kind:'diagram',fact:'The 2002 G500 roof interior trim diagram lists the headliner (ref 1, with and without sunroof), rear header trim (3), sun visors by side (4), visor support (6), assist strap front and rear, both sides (7) and the bezel (11) beside the dome lamp.',need:'The diagram is unscaled. Headliner outline, visor and strap positions are schematic; colour suffixes need the car’s interior code.',source:roofPlate},
+  {ids:ids(roofTrim,from(windshieldPlate)),kind:'diagram',fact:'The 2002 G500 windshield glass diagram lists the inside mirror 463-810-08-17 (ref 9) and the inside mirror plate 115-811-01-11 (ref 10).',need:'Mirror size and plate position on the glass are schematic.',source:windshieldPlate},
+  {ids:ids(frontDoorTrim),kind:'diagram',fact:'The 2002 G500 front door interior trim diagram lists these panels, clip, insulation, window trims, lock knob guide, pull handles and cap, pocket, water deflectors and welt with their sides and colour suffixes.',need:'The diagram is unscaled; panel outline, handle and pocket positions are schematic. The diagram also lists a gray panel 163-720-14-70 that is left out as doubtful.',source:frontDoorPlate},
+  {ids:ids(rearDoorTrim),kind:'diagram',fact:'The 2002 G500 rear door interior trim diagram lists the panels, window trims, ashtray, water deflectors and speaker housings by side, and repeats the front-door clip, knob guide, handles, cap and welt numbers.',need:'Positions and sizes are schematic and need measuring on a door.',source:rearDoorPlate},
+  {ids:[...ids(seatCushion),...ids(seatBack)],kind:'diagram',fact:'The 2002 G500 front seat components diagram lists these frames, pads, covers, panels, lumbar supports, distributor, pump and bracket, head restraint with guide and motor, seat bases and side covers, with sides and colour suffixes.',need:'The diagram is unscaled; all shapes are schematic. Ref 11 (463-820-08-10, listed as Seat Heater) is left out because its page link names a passenger-detection sensor.',source:frontSeatPlate},
+  {ids:ids(floorCoverings,from(rearBodyPlate)),kind:'diagram',fact:'The 2002 G500 rear body and floor interior trim diagram lists the floor cover (ref 6), cover (9), side linings (10), mat (11), outer and inner scuff plates (13, 14), cargo cover (15), its bracket (16) and clamp (17), and the hook (19).',need:'The diagram is unscaled; the cover (ref 9) is unnamed beyond Cover and its place is assumed. All outlines are schematic.',source:rearBodyPlate},
+  {ids:ids(floorCoverings,from(matSetPage)),kind:'diagram',fact:'newparts.com lists the genuine floor mat set 463-684-91-00-9F87 (front and rear, carpeted, black) for the 2002–2008 G500 (463.249).',need:'This is a retailer fitment page, not a Mercedes diagram; mat outlines are schematic and the set number should be confirmed by VIN.',source:matSetPage}
 ];

@@ -15,19 +15,21 @@ const strut=(r,sites)=>{
 for(const [s,hand] of [[-1,'left'],[1,'right']]){
  const label=s<0?'Left':'Right';
  const add=(key,name,description,offset,source,draw)=>parts.push({...part('p992-suspension.'+key+'-'+hand,label+' '+name,description,offset,draw),source});
- add('front-strut','front spring strut','The front wheel carrier locates the lower end of this MacPherson strut. Its upper mount sits in the body tower.',[0,s*.27,.32],factory,r=>strut(r,[[-1.20,s*.706,.359],[-1.15,s*.580,.771]]));
+ add('front-strut','front spring strut','The front wheel carrier locates the lower end of this MacPherson strut. Its upper mount sits in the body tower.',[0,s*.27,.32],factory,r=>strut(r,[[-1.20,s*.706,.359],[-1.15,s*.555,.771]]));
  add('front-arms','front wishbone and trailing link','Two links locate the lower joint while the strut controls the top of the wheel carrier.',[-.20,s*.33,-.14],factory,r=>{
   const hub=[-1.20,s*.729,.296];barrel(r,hub,[-1.14,s*.376,.285],.020,metal,5);barrel(r,[-1.17,s*.594,.292],[-.924,s*.415,.304],.018,metal,5);
  });
- add('rear-damper','rear spring and damper','The coil carries load through its seats while the shock controls wheel motion. Five separate links guide the rear wheel.',[0,s*.28,.28],rearPlate,r=>strut(r,[[1.25,s*.682,.337],[1.27,s*.556,.812]]));
+ // The rear coil-over stands on the wheel carrier ahead of and above the
+ // drive shaft, inboard of the two upper links' outer joints.
+ add('rear-damper','rear spring and damper','The coil carries load through its seats while the shock controls wheel motion. Five separate links guide the rear wheel.',[0,s*.28,.28],rearPlate,r=>strut(r,[[1.20,s*.60,.452],[1.27,s*.556,.812]]));
  // Five separate links from the hub carrier to the rear subframe. Mount
  // coordinates and cross sections illustrate the linkage topology.
  for(const [key,name,inner,outer] of [
   ['upper-front','rear upper forward link',[1.010,.430,.487],[1.226,.709,.443]],
-  ['upper-rear','rear upper rearward link',[1.476,.468,.512],[1.285,.701,.444]],
-  ['lower','rear lower transverse link',[1.266,.367,.264],[1.264,.731,.289]],
-  ['longitudinal','rear longitudinal link',[.932,.452,.308],[1.216,.714,.302]],
-  ['toe','rear toe link',[1.477,.442,.336],[1.323,.718,.340]]
+  ['upper-rear','rear upper rearward link',[1.476,.50,.525],[1.285,.701,.444]],
+  ['lower','rear lower transverse link',[1.266,.367,.239],[1.264,.731,.262]],
+  ['longitudinal','rear longitudinal link',[.932,.452,.290],[1.216,.714,.278]],
+  ['toe','rear toe link',[1.477,.442,.336],[1.33,.70,.29]]
  ])add(key,name,'This independent link guides the wheel carrier at the rear axle. Compare its body-side pivot with the four other links.',[0,s*.26,key.startsWith('upper')?.24:-.19],rearPlate,r=>{
   const mirror=([x,y,z])=>[x,y*s,z];barrel(r,mirror(inner),mirror(outer),key==='lower'?.020:.014,metal,5);
  });

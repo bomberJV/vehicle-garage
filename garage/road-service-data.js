@@ -1,4 +1,5 @@
 import {p993Layout} from './porsche993-layout.js';
+import {p992Layout} from './porsche992-layout.js';
 const ref=(label,url)=>({label,url});
 const bmw=ref('BMW · March 2003 U.S. 325Ci M54 catalog, groups 12/16/34/54/61','https://www.realoem.com/bmw/enUS/partgrp?id=BN33-USA-03-2003-E46-BMW-325Ci');
 const e90=ref('BMW · 2008 328xi sedan parts catalog (catalog mirror)','https://www.bmwpartsdeal.com/oem-2008-bmw-328xi-brake_disc.html');
@@ -28,3 +29,4 @@ export const roadSystems={
 // The LX AWD shares the EX-L's chassis, brakes, fuel and electrical systems; it has a fixed roof.
 roadSystems.hrvlx={...roadSystems.hrv,name:'2026 HR-V LX AWD',roofType:null};
 Object.assign(roadSystems.porsche993cab,p993Layout);
+Object.assign(roadSystems.porsche992scab,p992Layout);

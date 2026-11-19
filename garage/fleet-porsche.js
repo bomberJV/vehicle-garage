@@ -4,7 +4,7 @@ import {draw993CoolingFan} from './porsche-fan.js';
 import {drawInstalledBoxer} from './porsche-engine-dress.js';
 import {drawEngineCore} from './porsche-crankshaft.js';
 import {drawFleetIgnition} from './fleet-ignition.js';
-import {boxerFrame,cylinderX,m64} from './porsche-boxer-layout.js';
+import {boxerFrame,cylinderX,m64,nineA2} from './porsche-boxer-layout.js';
 import {ellipse,barrel,wheel} from './road-primitives.js';
 import {drawCoachwork,porscheShape} from './porsche-coachwork.js';
 import {drawCabrioletCabin} from './porsche-cabin.js';
@@ -24,10 +24,11 @@ const running={
 function boxer(r,car,modern){
   const {cx,f,z}=boxerFrame(car,modern),type996=modern==='996';
   drawFleetIgnition(r,porscheVehicle(modern),[cx,0,z],f);
-  drawEngineCore(r,cx,z,modern,f,modern?null:m64.stroke,modern?null:m64.journals);
+  drawEngineCore(r,cx,z,modern,f,modern===true?nineA2.stroke:modern?null:m64.stroke,modern?null:m64.journals);
   // The 993's 100 mm bores sit 118 mm apart, so its finned barrels are
   // smaller than the 992/996 water jackets drawn at the wider model pitch.
-  const [barrelR,finR]=modern?[.077,.086]:[.054,.0575];
+  // The 992's 91 mm bores share the 118 mm pitch; its water jackets fit within it.
+  const [barrelR,finR]=modern===true?[.054,.058]:modern?[.077,.086]:[.054,.0575];
   for(const s of [-1,1]){
     for(let n=0;n<3;n++){
       const x=cylinderX(cx,f,n,s);

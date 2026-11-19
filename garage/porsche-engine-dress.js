@@ -60,8 +60,8 @@ function heads(r,cx,z,modern,side,f=1){
     cover(r,cx,side,z,modern,f);
     if(modern){
       const shape=[[.322,-.065],[.335,-.087],[.372,-.096],[.392,-.056],[.391,.051],[.367,.095],[.329,.081],[.315,.048]];
-      const center=cx-.0065+side*.0445;
-      loft(r,[[-.267,.86],[-.249,1],[.249,1],[.267,.88]].map(([dx,k])=>shape.map(([y,h])=>[center+dx,side*y,z+h*k])),CAST);
+      const center=cx+f*(-.0065+side*.0445);
+      loft(r,[[-.267,.86],[-.249,1],[.249,1],[.267,.88]].map(([dx,k])=>shape.map(([y,h])=>[center+dx*f,side*y,z+h*k])),CAST);
       return;
     }
     for(let n=0;n<3;n++){
@@ -114,7 +114,7 @@ function classicInduction(r,cx,z,f=1){
     const back=curve.map(([x,y,h])=>[x-.012,y,h]);for(let i=1;i<curve.length;i++)r.polygon([curve[i-1],curve[i],back[i],back[i-1]],'#aaa994',false);
   });
 }
-function modernInduction(r,cx,z,na=false){
+function modernInduction(r,cx,z,na=false,f=1){
   if(na){
     // M96/01: one resonance distributor across the engine, a resonance flap
     // between its halves and a single throttle body fed from the left airbox.
@@ -134,15 +134,19 @@ function modernInduction(r,cx,z,na=false){
   for(const s of [-1,1]){
     r.tag('engine.intake',()=>{
       for(let n=0;n<3;n++){
-        const x=cx-.1845+n*.178+s*.0445;
-        sweep(r,[[x-.008,s*.147,z+.15],[x-.021,s*.232,z+.181],[x,s*.302,z+.153],[x,s*.355,z+.077]],.037,'#4a5356',8);
+        const x=cylinderX(cx,f,n,s);
+        sweep(r,[[x-.008*f,s*.147,z+.15],[x-.021*f,s*.232,z+.181],[x,s*.302,z+.153],[x,s*.355,z+.077]],.037*Math.min(1,f*1.2),'#4a5356',8);
       }
-      barrel(r,[cx-.240,s*.154,z+.152],[cx+.202,s*.154,z+.152],.053,'#434d52',12);
-      const p=[cx-.14,s*.139,z+.19];barrel(r,[p[0],p[1],p[2]],[p[0]+.062,p[1],p[2]],.046,'#929c9a',12);
-      sweep(r,[[1.22,s*.210,.755],[cx-.300,s*.256,.727],[cx-.267,s*.163,.700],[cx-.138,s*.145,z+.19]],.030,'#3c474a',8);
+      barrel(r,[cx-.240*f,s*.154,z+.152],[cx+.202*f,s*.154,z+.152],.053,'#434d52',12);
+      // Throttle on the forward end of each plenum, fed by the charge pipe
+      // from the intercooler above.
+      const p=[cx-.14*f-.03,s*.139,z+.19];barrel(r,[p[0],p[1],p[2]],[p[0]+.062,p[1],p[2]],.046,'#929c9a',12);
+      sweep(r,f<1?[[cx-.20,s*.210,.755],[cx-.235,s*.236,.735],[cx-.225,s*.163,.705],[p[0],s*.145,z+.19]]:[[1.22,s*.210,.755],[cx-.300,s*.256,.727],[cx-.267,s*.163,.700],[cx-.138,s*.145,z+.19]],.030,'#3c474a',8);
     });
     r.tag('engine.turbos',()=>{
-      const x=cx+.066,y=s*.426,h=z-.124;
+      // On the 992 each turbocharger sits at the rear outer corner, behind the
+      // last cylinder, with its compressor facing aft to the airbox.
+      const x=cx+(f<1?.16:.066),y=s*.426,h=z-.124;
       // A turbine and compressor share a shaft. The outside of each chamber
       // grows toward its tangential duct; distinct exhaust and charge-air
       // connections keep the coiled casings recognisable from either quarter.
@@ -155,8 +159,8 @@ function modernInduction(r,cx,z,na=false){
         loft(r,shell,col);
       }
       barrel(r,[x-.059,y,h],[x+.098,y,h],.031,'#778183',14);
-      const p=[x+.059,y+s*.060,h+.023],q=[cx+.085,s*.455,z+.074],end=[1.548,s*.253,.745];
-      sweep(r,[p,[x+.070,s*.486,h+.089],q,[cx+.064,s*.403,z+.169],end],.028,'#465155',10);
+      const p=[x+.059,y+s*.060,h+.023],q=[x+.019,s*.455,z+.074],end=[1.548,s*.253,.745];
+      sweep(r,[p,[x+.070,s*.486,h+.089],q,[x-.002,s*.403,z+.169],end],.028,'#465155',10);
       for(const t of [.37,.50]){const a=mix(q,end,t);barrel(r,a,[a[0]-.002,a[1]-s*.004,a[2]+.007],.031,'#afb6b2',10);}
     });
   }
@@ -197,21 +201,25 @@ function naExhaust(r,cx,z){
     }
   });
 }
+const mix1=(a,b,t)=>a+(b-a)*t;
 function exhaust(r,cx,z,modern,rear,f=1){
   if(modern==='996'){naExhaust(r,cx,z);return;}
   r.tag('engine.exhaust',()=>{
     for(const s of [-1,1]){
-      const collector=modern?[cx+.012,s*.427,z-.133]:[cx+.185*f,s*.318,z-.176];
+      const collector=modern?[cx+(f<1?.106:.012),s*.427,z-.133]:[cx+.185*f,s*.318,z-.176];
       for(let n=0;n<3;n++){
         const x=cylinderX(cx,f,n,s);
-        const path=modern?[[x,s*.351,z-.063],[x+.014,s*.391,z-.108],[x+.036,s*.410,z-.151-.011*n],collector]:
+        const path=modern&&f<1?[[x,s*.351,z-.063],[x+.004,s*.384,z-.108],[mix1(x,collector[0],.5),s*(.396-.006*n),z-.150-.011*n],collector]:
+          modern?[[x,s*.351,z-.063],[x+.014,s*.391,z-.108],[x+.036,s*.410,z-.151-.011*n],collector]:
           [[x,s*.351,z-.063],[x-.02*f,s*.359,z-.123],[x-.022*f,s*(.351-.025*n),z-.175-.011*n],[x+.08*f,s*(.315-.017*n),z-.201],collector];
         sweep(r,path,modern?.024:.022,modern?'#8a7565':HEAT,8);
       }
       const end=modern?[rear-.100,s*.455,.311]:[classicTailpipeEnd(),s*classicTailpipe.y,classicTailpipe.z];
       if(modern){
         const centralX=rear-.285;
-        sweep(r,[[cx+.095,s*.426,z-.134],[cx+.235,s*.45,z-.154],[centralX-.085,s*.40,.309],[centralX,s*.321,.323]],.042,'#777e7d',10);
+        // The turbine outlet drops under its housing and runs aft below the
+        // compressor inlet to the transverse silencer.
+        sweep(r,f<1?[[cx+.114,s*.426,z-.20],[cx+.144,s*.43,z-.26],[cx+.30,s*.43,z-.262],[centralX-.085,s*.40,.25],[centralX,s*.321,.30]]:[[cx+.095,s*.426,z-.134],[cx+.235,s*.45,z-.154],[centralX-.085,s*.40,.309],[centralX,s*.321,.323]],.042,'#777e7d',10);
         const fork=[centralX+.034,s*.385,.281];
         sweep(r,[[centralX,s*.32,.317],[centralX+.008,s*.367,.308],fork],.039,'#737b7a',10);
         sweep(r,[fork,[end[0]-.070,end[1],.299],[end[0]+.013,end[1],end[2]+.002]],.041,'#6c7675',12);
@@ -232,7 +240,7 @@ function exhaust(r,cx,z,modern,rear,f=1){
 export function drawInstalledBoxer(r,cx,z,modern,rear,f=1){
   const start=r.faces.length;
   for(const side of [-1,1])heads(r,cx,z,modern,side,f);
-  if(modern)modernInduction(r,cx,z,modern==='996');else classicInduction(r,cx,z,f);
+  if(modern)modernInduction(r,cx,z,modern==='996',f);else classicInduction(r,cx,z,f);
   exhaust(r,cx,z,modern,rear,f);
   // Carry one indexed surface per material and side. Each original triangle
   // and its shade survives; the two cylinder banks still section independently.

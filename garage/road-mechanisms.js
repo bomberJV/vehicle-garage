@@ -150,7 +150,7 @@ function carrera(id){
  const spec=layouts[id],rear=spec.rear,modern=id==='porsche992scab';
  // The crankshaft flange is the forward end of the installed flat-six. The
  // gearbox input shares its axis; the differential outputs sit at hub height.
- const frame=boxerFrame({rear},id==='porsche993cab'?false:true),flange=flangeX(frame.cx,frame.f),clutchDepth=.068,caseDepth=.48;
+ const frame=boxerFrame({rear},id==='porsche993cab'?false:id==='porsche996cab'?'996':true),flange=flangeX(frame.cx,frame.f),clutchDepth=.068,caseDepth=.48;
  const back=flange-clutchDepth,axleZ={porsche992scab:.358,porsche996cab:.324}[id]??.320,hubY={porsche992scab:.778,porsche996cab:.75}[id]??.722;
  return register(id,[
   inputComponent(id,spec,r=>gearbox(r,[back-caseDepth/2,0,frame.z],[-1,0,0],.145,caseDepth)),

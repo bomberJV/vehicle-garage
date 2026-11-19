@@ -835,7 +835,7 @@ export class GarageRenderer{
      const radius=v.wheelRadius||(['sedan','coupe'].includes(v.body)?.33:v.body==='crossover'?.36:.405);
      for(const x of [-v.wheelbase/2,v.wheelbase/2])for(const side of [-1,1]){
        const track=x<0?v.trackFront:v.trackRear;
-       this.instance((x<0?'front':'rear')+'-'+(side<0?'left':'right'),()=>this.wheel(x,side*(track?track/2:v.width/2-.08),radius,finish,side));
+       this.instance((x<0?'front':'rear')+'-'+(side<0?'left':'right'),()=>this.wheel(x,side*(track?track/2:v.width/2-.08),x>0&&v.wheelRadiusRear||radius,finish,side));
      }
    }
    if(porsche&&!focusView&&!isolatedPorscheEngine)drawPorscheInstalledServices(this,b.vehicle,assembly);

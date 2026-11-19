@@ -22,10 +22,10 @@ import {applySuspensionLift,wheelContactPlane} from './lift-geometry.js';
 import {paintChoice} from './paint-colors.js';
 import {drawAccessories,drawActiveLip,hasActiveLip} from './accessory-geometry.js';
 import {motionEnvelope} from './motion-envelope.js';
-import {sectionFaces} from './section-plane.js';
+import {sectionFaces,sectionLimit} from './section-plane.js';
 import {faceTriangles} from './mesh-triangles.js';
 import {getCabinFloor,drawCabinFloor} from './floor-trim.js';
-import {softwareDepthRender,gpuDepthRender,gpuWorldRender,recolorHover} from './surface-materials.js';
+import {softwareDepthRender,gpuDepthRender,gpuWorldRender,prepareWorldGeometry,recolorHover} from './surface-materials.js';
 import {origin, planSeparation, displaced, intersects, allowedTravel, sampleMotion} from './exploded-layout.js';
 import {planTravel,offsetAt} from './explosion-travel.js';
 import {bindViewerInput,refreshPointerHover} from './viewer-input.js';
@@ -47,6 +47,7 @@ import {getEngineDefinition} from './engine-data.js';
 import {baseVehicle} from './vehicle-variants.js';
 import {PROBES,paintModel} from './paint-preview.js';
 import {canOrbitFast,orbitFrame} from './orbit-frame.js';
+import {depthVertexShader} from './depth-vertex.js';
 const shade=(hex,f)=>{const h=hex.replace('#','');return '#'+[0,2,4].map(i=>Math.min(255,Math.max(0,Math.round(parseInt(h.slice(i,i+2),16)*f))).toString(16).padStart(2,'0')).join('');};
 function physicalInstance(face){
   if(face.instance)return face.instance;
@@ -103,11 +104,20 @@ export class GarageRenderer{
  initDepthRenderer(){
  this.surface=document.createElement('canvas');const gl=this.surface.getContext('webgl',{alpha:true,depth:true,antialias:true,premultipliedAlpha:true});this.gl=gl;if(!gl)return;
  const shader=(type,source)=>{const sh=gl.createShader(type);gl.shaderSource(sh,source);gl.compileShader(sh);return sh;};
- const program=gl.createProgram();gl.attachShader(program,shader(gl.VERTEX_SHADER,'uniform mat4 view;attribute vec3 position;attribute vec4 color;varying mediump vec4 tint;void main(){gl_Position=view*vec4(position,1.0);tint=color;}'));gl.attachShader(program,shader(gl.FRAGMENT_SHADER,shellFragmentShader));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS)){this.gl=null;return;}this.program=program;this.buffer=gl.createBuffer();
+ const program=gl.createProgram();gl.attachShader(program,shader(gl.VERTEX_SHADER,depthVertexShader));gl.attachShader(program,shader(gl.FRAGMENT_SHADER,shellFragmentShader));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS)){this.gl=null;return;}this.program=program;this.buffer=gl.createBuffer();
  gl.useProgram(program);this.viewUniform=gl.getUniformLocation(program,'view');gl.uniformMatrix4fv(this.viewUniform,false,new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]));
+ this.eyeUniform=gl.getUniformLocation(program,'eye');this.clipUniform=gl.getUniformLocation(program,'clip');this.shadeAttribute=gl.getAttribLocation(program,'shade');
+ if(this.shadeAttribute>=0){gl.disableVertexAttribArray(this.shadeAttribute);gl.vertexAttrib4f(this.shadeAttribute,0,0,0,0);}
  }
  softwareRender(w,h,project){return softwareDepthRender(this,w,h,project);}
- depthRender(w,h,dpr,project){return this.orbitTransform?gpuWorldRender(this,w,h,dpr,project,this.orbitTransform):gpuDepthRender(this,w,h,dpr,project);}
+ depthRender(w,h,dpr,project){
+   if(this.orbitTransform)return gpuWorldRender(this,w,h,dpr,project,this.orbitTransform);
+   const drawn=gpuDepthRender(this,w,h,dpr,project);
+   if(drawn&&typeof requestIdleCallback==='function'&&!this.worldPrebuild){
+     this.worldPrebuild=requestIdleCallback(()=>{this.worldPrebuild=0;if(!this.interacting)prepareWorldGeometry(this);},{timeout:2000});
+   }
+   return drawn;
+ }
  // Orbiting, zooming and sliding the section plane draw on the orbit path (orbit-frame.js), at
  // most once per display frame. The full frame follows when the interaction ends.
  requestDraw(){
@@ -891,7 +901,13 @@ export class GarageRenderer{
  }
  this.faces=this.meshCache.faces;
  this.prepareInspection(exhibit);
- if(this.sectionPlane){
+ this.deferredSection=null;
+ if(this.sectionPlane&&this.deferSection){
+   // The orbit path cuts on the GPU (gpuWorldRender), so the uncut list it already holds stays
+   // valid while the plane slides. The full frame after the slide clips here as usual.
+   this.cameraFrameFaces=this.faces;
+   this.deferredSection=sectionLimit(this.faces,this.sectionPlane);
+ }else if(this.sectionPlane){
    this.cameraFrameFaces=this.faces;
    this.faces=sectionFaces(this.faces,this.sectionPlane);
    if(this.partPositions?.size)this.faces=this.faces.map(face=>{
@@ -906,11 +922,13 @@ export class GarageRenderer{
  }
  draw(){if(!this.build)return;const c=this.canvas,ctx=this.ctx,rect=c.getBoundingClientRect();if(!rect.width)return;this.panPick=null;const w=rect.width,h=rect.height,dpr=Math.min(window.devicePixelRatio||1,2);
  const i=this.inspection||{};
+ // While the section plane slides on the orbit path the GPU makes the cut (buildMesh).
+ this.deferSection=Boolean(this.sectionPlane&&canOrbitFast(this,{built:false}));
  let geometryKey=null;
  if(this.cacheDraws){
    const sceneKey=JSON.stringify([this.build,i.vehicle,i.assembly,i.part,i.instance,i.studySeat,i.system,i.detailView?.id,i.detailPart,i.expanded,i.separation,i.previewGroup,
      i.onlyPart,i.frameEngine,i.engineCutaway,this.progress,this.isolate,this.schematic,
-     this.sectionPlane,this.seeThroughBody,this.lights,this.mechanismPhase,this.slRoofFraction,this.dragContext?.part,this.partPositions?.size?[...this.partPositions]:null,studioTheme().key,Boolean(this.paintPreview)]);
+     this.sectionPlane,this.seeThroughBody,this.lights,this.mechanismPhase,this.slRoofFraction,this.dragContext?.part,this.partPositions?.size?[...this.partPositions]:null,studioTheme().key,Boolean(this.paintPreview),this.deferSection]);
    geometryKey=sceneKey+JSON.stringify([this.hoverHit?.part,this.hoverHit?.instance]);
    const baseFrame=JSON.stringify([sceneKey,w,h,dpr,this.angle,this.elevation,this.zoom,this.blueprint,this.keepAssemblyFrame,
      this.selectionFocus?.id,this.selectionFocus?.instance,this.drag?.move,this.drag?.moved,this.focusPan?.start]);

@@ -10,11 +10,29 @@
 // and before anything picks.
 import {componentProjection} from './selection-camera.js';
 
+// The framing points of a face list as one flat array, built once per list: the frame-by-frame
+// fit then runs over numbers in order instead of nested point arrays.
+const flattened = new WeakMap();
+function framePoints(faces, engineFocus) {
+  let cache = flattened.get(faces);
+  if (!cache) flattened.set(faces, cache = {});
+  const key = engineFocus ? 'engine' : 'all';
+  if (cache[key]) return cache[key];
+  let count = 0;
+  const kept = engineFocus ? faces.filter(f => !(f.part === 'engine.cooling' && !(f.points[0][0] > 0))) : faces;
+  for (const f of kept) count += f.points.length;
+  const out = new Float64Array(count * 3);
+  let i = 0;
+  for (const f of kept) for (const p of f.points) { out[i++] = p[0]; out[i++] = p[1]; out[i++] = p[2]; }
+  return cache[key] = out;
+}
+
 // Whether this frame can be drawn on the fast path; the full path handles everything else.
-export function canOrbitFast(r) {
+// {built: false} asks before the mesh is built, so the face list is not yet known.
+export function canOrbitFast(r, {built = true} = {}) {
   const gl = r.gl, state = r.inspection || {};
   return Boolean(r.interacting && gl && !gl.isContextLost?.() && r.checkedDepthContext === gl && r.depthBufferBits >= 24 &&
-    r.faces?.length && !r.focusPan && !r.focusTransition && !r.partPositions?.size && !r.drag?.move && !r.motion &&
+    (!built || r.faces?.length) && !r.focusPan && !r.focusTransition && !r.partPositions?.size && !r.drag?.move && !r.motion &&
     !r.returnMotion && !r.placementFrame && !(state.detailView && r.activeLayout?.canExpand) &&
     !((state.expanded || r.motion) && r.activeLayout));
 }
@@ -35,13 +53,12 @@ export function orbitFrame(r, {w, h, rect, right, down, near, scale}) {
   const engineFocus = state.frameEngine && r.isolate && !state.onlyPart && !state.detailView && framePart !== 'engine.cooling';
   const frameFaces = (preserve ? r.overviewFrame.faces : r.cameraFrameFaces) || r.faces;
   const [r0, r1] = right, [d0, d1, d2] = down;
+  const points = framePoints(frameFaces, engineFocus);
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-  for (const f of frameFaces) {
-    if (engineFocus && f.part === 'engine.cooling' && !(f.points[0][0] > 0)) continue;
-    for (const p of f.points) {
-      const x = w / 2 + (r0 * p[0] + r1 * p[1]) * scale, y = h * .65 + (d0 * p[0] + d1 * p[1] + d2 * p[2]) * scale;
-      if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y;
-    }
+  for (let i = 0; i < points.length; i += 3) {
+    const px = points[i], py = points[i + 1], pz = points[i + 2];
+    const x = w / 2 + (r0 * px + r1 * py) * scale, y = h * .65 + (d0 * px + d1 * py + d2 * pz) * scale;
+    if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y;
   }
   const top = r.canvas.clientWidth > 0 && rect.height >= 360 ? 68 : 13, bottom = 35, usable = Math.max(1, h - top - bottom);
   r.placementArea = {left: 6, right: w - 6, top: top + 2, bottom: h - bottom - 2};

@@ -24,7 +24,14 @@ function clipRing(points,axis,limit,sign){
  return out;
 }
 export function sectionFaces(faces,plane){
- if(!faces.length||plane.percent>=100)return faces;
+ const cut=sectionLimit(faces,plane);
+ return cut?clipFaces(faces,cut):faces;
+}
+
+// Where the plane cuts a model: the axis, the coordinate and which side is kept, or null when the
+// plane removes nothing. The orbit path draws the cut on the GPU from this.
+export function sectionLimit(faces,plane){
+ if(!faces.length||plane.percent>=100)return null;
  const axis=plane.axis,sign=plane.reverse?-1:1;
  // The model's extent along the axis changes only with the face list, not as the plane slides.
  let extent=extents.get(faces)?.[axis];
@@ -35,8 +42,13 @@ export function sectionFaces(faces,plane){
    const all=extents.get(faces)||[];all[axis]=extent;extents.set(faces,all);
  }
  const [min,max]=extent;
- if(max<=min||!Number.isFinite(min))return faces;
+ if(max<=min||!Number.isFinite(min))return null;
  const k=Math.max(0,Math.min(1,plane.percent/100)),limit=plane.reverse?max-(max-min)*k:min+(max-min)*k;
+ return {axis,limit,sign};
+}
+
+// The faces on the kept side of a cut, with the faces it crosses trimmed to it.
+export function clipFaces(faces,{axis,limit,sign}){
  const out=[];
  for(const f of faces){
   let within=0;

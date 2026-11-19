@@ -25,7 +25,7 @@ export function studioPaintReflection(base,normal,view,alloy=false){
 }
 
 const normals=new WeakMap();
-function planeNormal(points){
+export function planeNormal(points){
   let normal=normals.get(points);
   if(!normal){
     const [a,b,c]=points,ux=b[0]-a[0],uy=b[1]-a[1],uz=b[2]-a[2];

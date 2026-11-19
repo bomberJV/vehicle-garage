@@ -18,7 +18,7 @@ test('every exterior part split from the body shell is drawn and sourced',()=>{
 
 test('catalog-numbered exterior parts carry their Mercedes part number and diagram',()=>{
   const numbered=G500_BODY_PARTS.filter(p=>/ · \d{3}-\d{3}-\d{2}-\d{2}/.test(p.name));
-  assert.ok(numbered.length>=89,`${numbered.length} numbered parts`);
+  assert.ok(numbered.length>=94,`${numbered.length} numbered parts`);
   const numbers=new Set();
   for(const p of numbered){
     assert.ok(drawn.has(p.id),p.id);

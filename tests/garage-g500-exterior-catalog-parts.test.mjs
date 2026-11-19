@@ -8,7 +8,7 @@ const faces=GarageRenderer.assembledFaces(sanitizeBuild({vehicle:'g500'}));
 const drawn=new Set(faces.map(f=>f.part));
 
 test('every exterior part split from the body shell is drawn and sourced',()=>{
-  const split=['rub-strips','wheelhouses','wheel-flares','wing-intakes','v8-badges','running-boards','cowl','wipers','rear-plate-panel','licence-lamps'];
+  const split=['rub-strips','wheelhouses','wheel-flares','wing-intakes','v8-badges','running-boards','cowl','rear-plate-panel','licence-lamps'];
   for(const key of split){
     const part=G500_BODY_PARTS.find(p=>p.id==='body.'+key);
     assert.ok(part,key);assert.ok(drawn.has(part.id),key);
@@ -18,7 +18,7 @@ test('every exterior part split from the body shell is drawn and sourced',()=>{
 
 test('catalog-numbered exterior parts carry their Mercedes part number and diagram',()=>{
   const numbered=G500_BODY_PARTS.filter(p=>/ · \d{3}-\d{3}-\d{2}-\d{2}/.test(p.name));
-  assert.ok(numbered.length>=62,`${numbered.length} numbered parts`);
+  assert.ok(numbered.length>=80,`${numbered.length} numbered parts`);
   const numbers=new Set();
   for(const p of numbered){
     assert.ok(drawn.has(p.id),p.id);

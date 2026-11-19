@@ -9,6 +9,7 @@ import {glazingFace} from './surface-materials.js';
 import {sideSheet,formedRoof,drawBodyMirror,wheelhouse,cargoDoor,rearJamb,g500BodyReferences} from './g500-body-closures.js';
 import {drawFrontBumperBrackets,drawRearBumperBrackets,g500BumperParts,bumperRefs} from './g500-bumpers.js';
 import {g500DashFittingParts,dashFittingsRef} from './g500-dash-fittings.js';
+import {g500RestraintParts,restraintRefs} from './g500-restraints.js';
 import {roofFrontLip} from './g500-roof-datums.js';
 import {drawG500Bonnet,drawG500FrontDeck,drawG500Scuttle} from './g500-bonnet.js';
 import {drawG500Cabin,drawG500DoorTrim,g500CabinSource} from './g500-cabin.js';
@@ -200,7 +201,7 @@ function bodyShell(r,paint) {
     r.polygon([windscreenFrame[1],windscreenFrame[2],roofFrontLip,[roofFrontLip[0],-roofFrontLip[1],roofFrontLip[2]]],paint,false);
     r.tag('body.wipers',()=>{for(const y of [-.395,.374]) r.instance(y<0?'left':'right',()=>{
       r.rod([-.768,y-.118,1.358],[-.742,y+.157,1.417],.009,dark,8);
-      r.rod([-.749,y+.002,1.401],[-.734,y+.278,1.434],.011,dark,8);
+      r.tag('body.wiper-blades',()=>r.rod([-.749,y+.002,1.401],[-.734,y+.278,1.434],.011,dark,8));
     });});
     r.tag('body.front-bumper',()=>{
       bumperSkin(r,{face:front-.116,back:front+.037,width:.923,low:.480,high:.685,span:.229,center:.598,lightZ:.553,lightHeight:.092,paint:tone(paint,.8),ends:['body.front-bumper-cap-left','body.front-bumper-cap-right']});
@@ -299,6 +300,7 @@ const exteriorPlates={
   'grille-star':giantRef('grille and components','grille-components'),
   ...Object.fromEntries(['rear-bench-back-left','rear-bench-back-right','rear-bench-cushion-left','rear-bench-cushion-right','rear-bench-pad-left','rear-bench-pad-right','rear-bench-headrests'].map(k=>[k,giantRef('rear seat components','rear-seat-components')])),
   ...Object.fromEntries(g500DashFittingParts.map(([key])=>[key,dashFittingsRef])),
+  ...Object.fromEntries(g500RestraintParts.map(([key,,,ref])=>[key,restraintRefs[ref]])),
   ...Object.fromEntries(['instrument-panel','cluster-trim','grab-handle'].map(k=>[k,giantRef('instrument panel','instrument-panel')])),
   ...Object.fromEntries(['center-console','console-trim-plate','shift-panel','shift-knob','console-lid'].map(k=>[k,giantRef('center console','center-console')])),
   'steering-wheel':exteriorPlate('steering wheel','steering--steering-wheel'),
@@ -315,7 +317,8 @@ const exteriorPlates={
   'wing-intakes':exteriorPlate('fender and components','body--fender-and-components'),
   'v8-badges':exteriorPlate('decals and emblems','accessories--decals-and-emblems'),
   cowl:exteriorPlate('cowl','body--cowl'),
-  wipers:exteriorPlate('wiper arm, blade and related components','wiper-and-washer--wiper-arm-blade-and-related-components'),
+  wipers:{label:'MB Parts Giant · 2002 G500 windshield wiper and washer diagram',url:'https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/electrical/wipers'},
+  'wiper-blades':{label:'MB Parts Giant · 2002 G500 windshield wiper and washer diagram',url:'https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/electrical/wipers'},
   ...Object.fromEntries(['mirror-left','mirror-right','mirror-glass-left','mirror-glass-right','mirror-gaskets'].map(k=>[k,giantRef('front door outside mirrors','outside-mirrors')])),
   ...Object.fromEntries(['fender-left','fender-right','fender-liner-left','fender-liner-right'].map(k=>[k,giantRef('fender and components','fender-components')]))
 };
@@ -368,7 +371,8 @@ export const G500_BODY_PARTS = [
   ['wing-intakes','Front-wing louvers','A trapezoidal louver sits on each front wing between the door hinge and the wheel arch.'],
   ['v8-badges','V8 wing scripts','A chrome V8 script sits on each front wing, below the rub strip and just ahead of the door.'],
   ['cowl','Cowl panel','The cowl panel spans the base of the windshield and carries the wipers, independent of the hood.'],
-  ['wipers','Windshield wiper arms and blades','Two wiper arms park at the base of the windshield, each carrying a blade.'],
+  ['wipers','Windshield wiper arms · 463-820-00-44','Two wiper arms park at the base of the windshield.'],
+  ['wiper-blades','Windshield wiper blades · 463-820-05-45','Each arm carries a blade lying along the base of the glass.'],
   ['mirror-left','Exterior mirror assembly, left · 463-810-39-16','The housing and arm stand on the front corner of the left door window frame.'],
   ['mirror-right','Exterior mirror assembly, right · 463-810-40-16','The housing and arm stand on the front corner of the right door window frame.'],
   ['mirror-glass-left','Mirror glass, left · 463-810-83-16','The flat glass sits in a black frame inside the housing.'],
@@ -391,5 +395,6 @@ export const G500_BODY_PARTS = [
   ['grille-star','Grille star emblem · 601-817-01-16','The large three-pointed star stands ahead of the grille vanes on its backing plate.'],
   ['licence-lamps','Licence-plate lamps','Two small lamps in the top edge of the plate recess light the plate.'],
   ...g500BumperParts.map(([key,name,description])=>[key,name,description]),
-  ...g500DashFittingParts
+  ...g500DashFittingParts,
+  ...g500RestraintParts.map(([key,name,description])=>[key,name,description])
 ].map(([key,name,description])=>({id:'body.'+key,name,description,source:['front-seats','rear-bench','dashboard','rearview-mirror'].includes(key)?g500CabinSource:g500BodyReferences[key]||g500BodyReferences.structure,...(exteriorPlates[key]?{source:exteriorPlates[key]}:{}),...(key==='fog-lamps'?{source:lampRefs.fog}:key==='rear-lights'?{source:lampRefs.manual}:key==='grille'?{source:giantRef('grille and components','grille-components')}:{})}));

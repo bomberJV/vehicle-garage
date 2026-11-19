@@ -1,6 +1,6 @@
 // The 993's compact road-model half-shafts (drive.axles in fleet-porsche.js)
-// run from the transaxle's final-drive outputs to the rear hub centres. The
-// 992 and 996 keep their level shafts at z .345.
+// run from the transaxle's final-drive outputs to the rear hub centres, and so
+// do the 996's. The 992 keeps its level shafts at z .345.
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {GarageRenderer} from '../garage/render.js';
@@ -51,8 +51,31 @@ test('the 993 inner shaft ends sit at the final-drive output height of the insta
   }
 });
 
-test('the 992 and 996 compact half-shafts keep their level line at z .345',()=>{
-  for(const [vehicle,modern] of [['porsche992scab',true],['porsche996cab','996']]){
+test('the 996 compact half-shafts run from its final drive to the hub centre',()=>{
+  const faces=GarageRenderer.assembledFaces({vehicle:'porsche996cab',parts:[],roofPosition:'up',paint:'silver'});
+  const [lo,hi]=range(faces,'drivetrain.rear-differential'),outputZ=(lo+hi)/2,hubZ=porscheShape('996').rearRadius+.006;
+  assert(Math.abs(hubZ-roadSystems.porsche996cab.wheel[1])<1e-9);
+  const all=caps('porsche996cab','996');
+  assert.equal(all.length,8);
+  for(const s of [-1,1]){
+    const shafts=all.filter(k=>Math.abs(k.radius-.025)<1e-3&&Math.sign(k.c[1])===s).sort((a,b)=>Math.abs(a.c[1])-Math.abs(b.c[1]));
+    assert(Math.abs(shafts[0].c[2]-outputZ)<.003,`inner ${shafts[0].c[2]}`);
+    assert(Math.abs(shafts[1].c[2]-hubZ)<.003,`outer ${shafts[1].c[2]}`);
+    for(const k of all.filter(k=>Math.abs(k.radius-.046)<1e-3&&Math.sign(k.c[1])===s))assert(Math.abs(k.c[2]-hubZ)<.003);
+  }
+});
+
+test('the 996 brakes are centred on its wheels',()=>{
+  const faces=GarageRenderer.assembledFaces({vehicle:'porsche996cab',parts:[],roofPosition:'up',paint:'silver'});
+  const mid=(part,front)=>{const zs=faces.filter(f=>f.part===part).flatMap(f=>f.points).filter(p=>front?p[0]<-.5:p[0]>.5).map(p=>p[2]);return (Math.min(...zs)+Math.max(...zs))/2;};
+  for(const front of [true,false]){
+    const tyre=mid('running.tires',front);
+    assert(Math.abs(mid(front?'brakes.front-disc':'brakes.rear-disc',front)-tyre)<.001,`${front?'front':'rear'} disc`);
+  }
+});
+
+test('the 992 compact half-shafts keep their level line at z .345',()=>{
+  for(const [vehicle,modern] of [['porsche992scab',true]]){
     const all=caps(vehicle,modern);
     assert.equal(all.length,8,vehicle);
     for(const k of all)assert(Math.abs(k.c[2]-.345)<1e-9,`${vehicle} z ${k.c[2]}`);

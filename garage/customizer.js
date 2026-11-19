@@ -163,7 +163,7 @@ export function createCustomizer({current,palette,savePalette,style,accessory}){
       if(!kind&&url.searchParams.has('equipment')){
         url.searchParams.delete('equipment');history.replaceState(null,'',url);
       }
-      const defaultSection=['g500','porsche993cab','porsche992scab'].includes(build.vehicle)?'equipment':'paint';
+      const defaultSection=['g500','porsche993cab','porsche992scab','porsche996cab','bmw328xi','sl550'].includes(build.vehicle)?'equipment':'paint';
       showSection(requested||defaultSection,false);currentVehicle=build.vehicle;
     }
     if(!kinds.includes(kind))kind='';

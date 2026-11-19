@@ -18,12 +18,12 @@ export const porscheVehicle=modern=>modern==='996'?'porsche996cab':modern?'porsc
 const running={
   // Half-shafts: the inner joints sit at the final-drive output of the installed
   // transaxle (road-mechanisms.js carrera(), z .320), at the side of the gearbox
-  // case drawn below; the outer joints sit on the rear hub centre. The 992 and
-  // 996 keep their level shafts at z .345.
+  // case drawn below; the outer joints sit on the rear hub centre. The 993 and
+  // 996 final drives are at z .320 and .324; the 992 keeps its level shafts at z .345.
   porsche993cab:{width:[.205,.245],track:[1.405,1.444],brake:[.2032,.2032],rim:alloy993,shaft:{innerY:.080,innerZ:.320}},
   porsche992scab:{width:[.245,.305],track:[1.59,1.556],brake:[.254,.2667],rim:alloy992},
   // 1999 Carrera: 205/50 ZR 17 and 255/40 ZR 17 on 7J and 9J × 17 wheels.
-  porsche996cab:{width:[.205,.255],track:[1.455,1.500],brake:[.2159,.2159],rim:alloy996}
+  porsche996cab:{width:[.205,.255],track:[1.455,1.500],brake:[.2159,.2159],rim:alloy996,shaft:{innerY:.080,innerZ:.324}}
 };
 function boxer(r,car,modern){
   const {cx,f,z}=boxerFrame(car,modern),type996=modern==='996';

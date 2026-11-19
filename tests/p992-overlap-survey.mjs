@@ -15,6 +15,7 @@ import {writeFileSync,readFileSync} from 'node:fs';
 import {GarageRenderer} from '../garage/render.js';
 import {normalizedLift,liftOptions} from '../garage/lift-options.js';
 import {crossingPairs} from './mesh-proximity.mjs';
+import {fitLines,fitMounts} from '../garage/p992-fits.js';
 
 export const vehicle='porsche992scab';
 export const baselineFile=new URL('./p992-overlap-baseline.json',import.meta.url);
@@ -25,7 +26,7 @@ const system=id=>id.split('.')[0];
 export const lines=new Set(['brakes.lines','electrical.cables','fuel.supply',
   'p992-coolant.feed','p992-coolant.return','p992-coolant.heater-feed',
   'p992-hvac.discharge','p992-hvac.suction','p992-hvac.bridge','p992-hvac.metering',
-  'p992-clutch.line','p992-seats.leads','p992-intake.inlet-left','p992-intake.inlet-right']);
+  'p992-clutch.line','p992-seats.leads','p992-intake.inlet-left','p992-intake.inlet-right',...fitLines]);
 // Systems a line cannot end in: trim, structure and running gear.
 const noPorts=new Set(['floor','shell','running','cabin','roof']);
 // Pairs of systems that are one unit.
@@ -56,6 +57,8 @@ export const mounts=[
   ['p992-coolant.feed','engine.cooling','each radiator hose is clamped onto the inlet spigot of its corner radiator'],
   ['p992-seats.leads','cabin.seats','the heating-mat leads leave the cushion and backrest through the seat base to the connector beneath it'],
   ['roof','shell.deck','the folded top lies in its compartment behind the seats; the deck surface is drawn closed across the compartment opening'],
+  // Reviewed contacts of the installed parts in the fit packs (garage/p992-fit-*.js).
+  ...fitMounts,
 ];
 // Reviewed pairs that the rules would pass but are wrong.
 export const errors=[];

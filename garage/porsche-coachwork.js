@@ -31,7 +31,9 @@ const kit996={id:'996',sweep:sweep996,headlampSeat:headlampSeat996,rocker:rocker
   // The engine lid runs between the tail lamps behind the roof compartment lid.
   deckHalf:deckHalf996,deckStart:1.52};
 export const coupeShape=[
-  {modern:false,width:1.735,front:-1.16,rear:1.112,frontRadius:.316,rearRadius:.314,
+  // 993 radii are the nominal 205/55 R16 and 245/45 R16 outside radii; each
+  // wheel centre sits at its radius above the tyre contact (tests/garage-p993-tyre-radii).
+  {modern:false,width:1.735,front:-1.16,rear:1.112,frontRadius:.316,rearRadius:.3135,
   // Two US Cabriolets photographed side-on show about 85 mm of fender above
   // the front tyre and 55 mm above the rear (tests/garage-p993-photo-audit).
   archLift:[.046,.016],
@@ -722,6 +724,8 @@ function exteriorLights(r,car,paint){
   r.tag('shell.bumpers',()=>{
     const plate=tail.point(0,modern?car.kit.plateZ:.361,-.002);
     if(car.kit?.id==='996'){
+      // The plate sits in the 16 mm recess of the cover, not proud of it.
+      plate[0]-=.016;
       // Black rubber guards flank the US plate recess.
       for(const side of [-1,1]){
         const y=side*.235,base=tail.point(y,plate[2],-.002)[0];

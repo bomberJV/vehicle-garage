@@ -42,26 +42,37 @@ const sideAtZ=(z,top)=>{const l=(z-SILL)/(top-SILL);return l>=0?c63Side(l):-.026
 // 6 mm behind that station (C63_AXLES), which leaves about 1.049 m.
 // FX and RX map the original nose and tail layout onto those overhangs.
 const FX=x=>x<-1.8?-1.8+(x+1.8)*.81:x,RX=x=>x>1.64?1.64+(x-1.64)*1.167:x;
-// The nose in plan. At the lamps the corners are swept far back: from the
-// grille's edge the face runs back at about 40 degrees to the fender, so the
-// main-beam bowl (y 0.69 on the head-on photograph) sits at x -1.93 on the side
-// photograph and the lamp's tail reaches the fender at x -1.73. Lower down the
-// bumper is fuller, turning the corner on a 0.17 m radius. NOSE_TOP is the
-// corner at lamp height as (depth behind the nose station, half-width,
-// shoulder height): the shoulder runs 10 mm under the lamp's top edge, which
-// dips beside the grille and arches over the main beam.
+// The nose in plan. The corners are swept back and raked. At the lamps' top
+// edge the face runs back from the grille's edge (y 0.46) at about 40 degrees
+// to the fender, reaching y 0.81 at x -1.72, the lamp's tail: matched on both
+// photographs, the lamp top's height for a given y on the head-on one meets
+// the height for the corresponding x on the side one. Lower down the corner is
+// fuller, on a 0.17 m radius from a face 0.715 wide, and the two blend
+// between 0.57 and 0.72 m. So the lamp's rear edge, which climbs from x -2.0
+// at 0.60 to x -1.73 at 0.765, stays near y 0.81 all the way up: the round,
+// tall outer end of the lamp seen head-on. NOSE_TOP is (depth behind the
+// nose station, half-width, shoulder height); the shoulder runs 10 mm under
+// the lamp's top edge. Behind the lamp the upper fender widens back to the
+// body by x -1.30.
 const NOSE_X=FX(-2.17);
-const NOSE_TOP=[[0,.49,.698],[.01,.51,.699],[.03,.55,.708],[.06,.60,.723],[.10,.65,.747],[.145,.69,.762],[.19,.73,.769],
- [.23,.77,.770],[.275,.81,.767],[.315,.845,.762],[.35,.87,.760],[.38,.893,.763]];
+const NOSE_TOP=[[0,.462,.690],[.03,.54,.703],[.06,.60,.717],[.10,.655,.738],[.15,.705,.753],[.20,.745,.760],
+ [.25,.775,.760],[.30,.792,.757],[.34,.802,.755],[.38,.808,.755]];
 const noseArc=()=>NOSE_TOP.map(([d,w,z])=>[NOSE_X+d,w,z]);
+const UPPER_FENDER=[[NOSE_X+.38,.808],[-1.60,.845],[-1.45,.868]];
 // The bumper's corner below the lamps: a 0.17 m radius from a face 0.715 wide.
 const lowCornerW=d=>d<.17?.715+Math.sqrt(.17*.17-(.17-d)**2):mix(.885,.893,clamp((d-.17)/.21));
-// Half-width at (x, z) ahead of the front wheel: the lamp-height plan above
-// 0.60 m, the bumper's below 0.50 m.
+// Width of the upper band (lamps, shoulder, bonnet edge) at x.
+function upperW(x,w){
+ if(x<NOSE_X+.38)return w;
+ if(x>=-1.30)return w;
+ const L=[...UPPER_FENDER,[-1.30,w]];return edgeAt(L,x);
+}
+const rakeK=z=>{const k=clamp((z-.57)/.15);return k*k*(3-2*k);};
+// Half-width at (x, z) ahead of x -1.30.
 function planW(x,z,w){
- const d=x-NOSE_X;if(d>=.38)return w;
- const k=clamp((z-.50)/.10),kk=k*k*(3-2*k);
- return mix(lowCornerW(Math.max(0,d)),w,kk);
+ const d=x-NOSE_X;if(x>=-1.30)return w;
+ const low=d<.38?lowCornerW(Math.max(0,d)):x<-1.60?mix(.893,.900,(x-NOSE_X-.38)/(-1.60-NOSE_X-.38)):w;
+ return mix(low,upperW(x,w),rakeK(z));
 }
 const frontWindow=[[-.62,.945],[-.05,1.300],[.30,1.331],[.30,.968]];
 const rearWindow=[[.405,.971],[.405,1.335],[.92,1.297],[.92,.987]];
@@ -78,7 +89,7 @@ export const c63Body={
  // grille, then arches over the lamp. See hoodShape below.
  hoodFrac:.86,hoodLanes:[0,.15,.30,.42,.52,.60,.64,.67,.70,.73,.76,.79,.82,.85,.88,.91,.94,.97,1],
  hoodHalf:x=>hoodHalfAt(x),hoodSurface:(x,t)=>hoodShape(x,t*hoodHalfAt(x)),hoodFaceTint:(pts,s)=>slopeTint(pts),
- cuts:[.004,.008,.013,.02,.028,.038,.05,.065,.08,.10,.12,.145,.17,.20,.23,.26,.29,.32,.35].map(d=>FX(-2.17)+d),
+ cuts:[.004,.008,.013,.02,.028,.038,.05,.065,.08,.10,.12,.14,.16,.18,.20,.22,.24,.26,.28,.30,.32,.34,.36,.40,.44,.50,.58,.68].map(d=>FX(-2.17)+d),
  customEnds:true,capFollowsSide:true,
  cabin:{cargo:[1.66,.40,.36],sillEnd:1.02,rearSeat:[1.18,1.49,.385,.515,1.40,1.49]},
  sideSection:(w,l,x)=>sideW(x,l),
@@ -107,9 +118,12 @@ function section(x){
 }
 // Same side section as the shared generator, flat between the side band levels
 // like the panels, so the ends meet the side panels exactly.
+// Ahead of x -1.60 the upper band's plan is the surface itself (it is read
+// off the photographs), so the side profile's pull-in at the shoulder fades
+// out there.
 function sideW(x,l){
- const [w,top]=section(x),z=B.base+l*(top-B.base);
- return planW(x,z,w)+sideAtZ(z,top);
+ const [w,top]=section(x),z=B.base+l*(top-B.base),f=clamp((-1.30-x)/.30);
+ return planW(x,z,w)+sideAtZ(z,top)*(1-rakeK(z)*f);
 }
 function sideY(x,z){
  const top=section(x)[1],level=clamp((z-B.base)/(top-B.base)),L=B.sideLevels;
@@ -124,7 +138,7 @@ const NOSE=()=>B.stations[0][0];
 const hoodCentre=[[-2.10,.773],[-2.00,.818],[-1.90,.843],[-1.80,.863],[-1.60,.893],[-1.40,.912],[-1.20,.930],[-1.00,.945],[-.83,.956]];
 // Half-width of the bonnet: almost the full width at the nose, where it runs
 // over the lamps, then a few centimetres inside the fender tops.
-function hoodHalfAt(x){const [w]=section(x);return w-.028-(.008+.042*clamp((x-NOSE())/(B.hoodEnd-NOSE())));}
+function hoodHalfAt(x){const w=upperW(x,section(x)[0]);return w-.028-(.008+.042*clamp((x-NOSE())/(B.hoodEnd-NOSE())));}
 // Bonnet height at (x, y). The centre section reaches out to yc, which runs
 // back from the grille's top corners (0.446) toward the cowl (0.546). At the
 // nose it follows the grille's top edge; behind, it is nearly flat. Outside
@@ -235,21 +249,19 @@ function ringOn(r,s,tag,cy,cz,ry,rz,color,lift,n=20){
 // splitter and two outer intakes carrying the daytime running lamps.
 function frontEnd(r,paint){
  const base=endSurface(-1);
- // One surface for the whole front: across the face, round the swept corner
- // and back along the fender. Features are placed by v: on the face and round
- // the corner v is the head-on y (as the head-on photograph measures it); once
- // the corner has turned to y 0.85, v carries on as distance along the skin,
- // so the lamp tails and the intakes run back along the fender in one piece.
- const YL=.85,tables=new Map();
+ // One surface for the whole front: across the face, round the corner and
+ // back along the fender. Features are placed by v: y across the face, then
+ // the face's edge plus distance along the skin. Features measured on the
+ // head-on photograph off the face are placed by y (onY); along the fender, by
+ // x (vAtX). A table per z (cached to 1 mm) maps v to (x, y).
+ const tables=new Map();
  const table=z=>{
   const key=Math.round(z*1000);let t=tables.get(key);if(t)return t;
   const zz=key/1000,e=base.edge(zz),V=[],X=[],Y=[];
   for(let y=0;y<e;y+=.005){const p=base.on(y,zz,0);V.push(y);X.push(p[0]);Y.push(p[1]);}
   {const p=base.on(e,zz,0);V.push(e);X.push(p[0]);Y.push(p[1]);}
-  const side0=V.length;let x=base.x0,y=e,v=e,past=e>=YL;
-  while(x<-1.2){const x1=x+(x<-1.6?.002:.01),y1=sideY(x1,zz),d=Math.hypot(x1-x,y1-y);
-   if(past)v+=d;else if(y1>=YL){past=true;v=YL+Math.hypot(x1-x,y1-y)*(y1-YL)/Math.max(1e-9,y1-y);}else v=y1;
-   x=x1;y=y1;V.push(v);X.push(x);Y.push(y);}
+  const side0=V.length;let x=base.x0,y=e,v=e;
+  while(x<-1.2){const x1=x+(x<-1.6?.002:.01),y1=sideY(x1,zz);v+=Math.hypot(x1-x,y1-y);x=x1;y=y1;V.push(v);X.push(x);Y.push(y);}
   t={V,X,Y,side0};tables.set(key,t);return t;
  };
  const pt=(v,z)=>{
@@ -260,15 +272,18 @@ function frontEnd(r,paint){
  };
  // v at a given x along the fender (x at or behind the nose station).
  const vAtX=(x,z)=>{const {V,X,side0}=table(z);for(let i=side0;i<X.length;i++)if(X[i]>=x){const t=(x-X[i-1])/((X[i]-X[i-1])||1);return mix(V[i-1],V[i],clamp(t));}return V.at(-1);};
+ // v at a given head-on y (before the corner has turned to the side).
+ const vAtY=(y,z)=>{const {V,Y}=table(z);for(let i=1;i<Y.length;i++)if(Y[i]>=y){const t=(y-Y[i-1])/((Y[i]-Y[i-1])||1);return mix(V[i-1],V[i],clamp(t));}return V.at(-1);};
  const on=(sv,z,lift=.006)=>{
   const sg=sv<0?-1:1,a=Math.abs(sv),p=pt(a,z);
   if(!lift)return [p[0],sg*p[1],p[2]];
   const lo=a<.012?pt(.012-a,z).map((c,i)=>i===1?-c:c):pt(a-.012,z),hi=pt(a+.012,z),tx=hi[0]-lo[0],ty=hi[1]-lo[1],n=Math.hypot(tx,ty)||1;
   return [p[0]-ty/n*lift,sg*(p[1]+tx/n*lift),p[2]];
  };
+ const onY=(y,z,lift)=>{const sg=y<0?-1:1,p=on(vAtY(Math.abs(y),z),z,lift);return [p[0],sg*p[1],p[2]];};
  const s={...base,on},band=bander(r,s);
  const cols=symCols([.05,.14,.24,.34,.44,.52,.60,.68,.75,.81,.86,.90,.935,.96,.98,.993,1]);
- const vs=[.18,.21,.238,.27,.30,.33,.36,.39,.414,.45,.48,.51,.54,.57,.60,.63,.66,.69,.72,.745].map(z=>s.vAt(z)).concat([.965,.985,1]).sort((a,b)=>a-b).filter((v,i,a)=>i===a.length-1||a[i+1]-v>.01);
+ const vs=[.18,.21,.238,.27,.30,.33,.36,.39,.414,.45,.48,.51,.54,.57,.585,.60,.615,.63,.645,.66,.675,.69,.705,.72,.745].map(z=>s.vAt(z)).concat([.965,.985,1]).sort((a,b)=>a-b).filter((v,i,a)=>i===a.length-1||a[i+1]-v>.01);
  // Toward the corners the face takes on the side panels' shading at the same
  // height, so the rounded corner reads as one surface with the fender.
  const sideTone=(z,y)=>{const top=section(base.x0)[1],l=clamp((z-B.base)/(top-B.base)),L=B.sideLevels;let i=1;while(i<L.length-1&&l>L[i])i++;return B.sideTints[i-1]*(y<0?.95:1);};
@@ -281,30 +296,34 @@ function frontEnd(r,paint){
  const lamp={tag:'lighting.headlamp'};
  const inset=(pts,ky,kz,zc)=>pts.map(([y,z])=>[y*ky,zc+(z-zc)*kz]);
 
- // Grille: wide and shallow. The top edge peaks slightly at the centre, the
- // sides slant in toward the bottom, and the bottom edge falls to a V. A
- // gloss-black frame holds a fine black mesh; one chrome bar runs out from
- // the star.
- const gTop=sym([[0,.765],[.15,.762],[.30,.755],[.40,.745],[.43,.737],[.446,.729],[.452,.716]]);
- const gLow=sym([[0,.541],[.10,.548],[.22,.558],[.34,.569],[.40,.578],[.43,.593],[.445,.653],[.452,.716]]);
- const oTop=inset(gTop,.975,.92,.652),oLow=inset(gLow,.975,.92,.652);
- band(gLow,gTop,GLOSS,.010,{mirror:false,step:.02});
- band(oLow,oTop,MESH,.012,{mirror:false,step:.02});
+ // Grille, from the head-on photograph: wide, with a nearly flat top that
+ // rounds down at the outer corners; the sides lean inward toward the bottom,
+ // which is almost level. A gloss-black frame holds a fine black mesh, a
+ // silver surround runs down the sides and along the bottom, and one chrome
+ // bar runs out from the star and stops short of the frame.
+ const gTop=sym([[0,.766],[.10,.766],[.20,.762],[.30,.757],[.36,.752],[.40,.748],[.42,.745],[.435,.740],[.445,.732],[.450,.720]]);
+ const gLow=sym([[0,.546],[.10,.549],[.20,.553],[.30,.558],[.37,.563],[.395,.568],[.410,.580],[.420,.605],[.430,.640],[.440,.680],[.447,.705],[.450,.720]]);
+ const sTop=sym([[0,.766],[.30,.757],[.40,.748],[.435,.740],[.452,.732],[.462,.718]]);
+ const sLow=sym([[0,.534],[.20,.541],[.30,.546],[.37,.551],[.405,.558],[.425,.580],[.440,.640],[.452,.690],[.462,.718]]);
+ const oTop=inset(gTop,.975,.94,.652),oLow=inset(gLow,.975,.94,.652);
+ band(sLow,sTop,'#a9b0b3',.008,{mirror:false,step:.012});
+ band(gLow,gTop,GLOSS,.010,{mirror:false,step:.012});
+ band(oLow,oTop,MESH,.012,{mirror:false,step:.012});
  r.tag('body.structure',()=>{
   // Fine diamond mesh.
-  for(const dir of [-1,1])for(let k=-22;k<=22;k++){
-   const n=8;for(let i=0;i<n;i++){
-    const za=mix(.548,.758,i/n),zb=mix(.548,.758,(i+1)/n),ya=k*.021+dir*(za-.653)*.9,yb=k*.021+dir*(zb-.653)*.9;
+  for(const dir of [-1,1])for(let k=-34;k<=34;k++){
+   const n=12;for(let i=0;i<n;i++){
+    const za=mix(.548,.762,i/n),zb=mix(.548,.762,(i+1)/n),ya=k*.014+dir*(za-.648)*.9,yb=k*.014+dir*(zb-.648)*.9;
     const ok=(y,z)=>Math.abs(y)<.438&&z<edgeAt(oTop,y)-.003&&z>edgeAt(oLow,y)+.003;
     if(!ok(ya,za)||!ok(yb,zb))continue;
-    r.polygon([s.on(ya-.0016,za,.0135),s.on(ya+.0016,za,.0135),s.on(yb+.0016,zb,.0135),s.on(yb-.0016,zb,.0135)],'#1f2528',false);
+    r.polygon([s.on(ya-.0011,za,.0135),s.on(ya+.0011,za,.0135),s.on(yb+.0011,zb,.0135),s.on(yb-.0011,zb,.0135)],'#1a1f22',false);
    }
   }
  });
  // The chrome bar, with a darker lower edge, from the star ring to the frame.
- const starZ=.653,starR=.089,starK=.83;
- band([[.094,starZ+.002],[.436,starZ]],[[.094,starZ+.010],[.436,starZ+.008]],CHROME,.016,{step:.04});
- band([[.094,starZ-.003],[.436,starZ-.005]],[[.094,starZ+.002],[.436,starZ]],'#7d878b',.016,{step:.04});
+ const starZ=.648,starR=.082,starK=1;
+ band([[.084,.644],[.396,.644],[.400,.6455]],[[.084,.652],[.396,.652],[.400,.6505]],CHROME,.016,{step:.03});
+ band([[.084,.640],[.398,.640]],[[.084,.644],[.398,.644]],'#6f797d',.016,{step:.03});
  // The star: a chrome ring and a faceted three-pointed star, laid on the
  // raked face so no part sinks behind the mesh. The mesh shows through.
  r.tag('body.structure',()=>{
@@ -320,42 +339,44 @@ function frontEnd(r,paint){
   r.polygon([s.on(ya,za-.007,.004),s.on(yb,zb-.007,.004),s.on(yb,zb-.002,.004),s.on(ya,za-.002,.004)],'#22272a',false);
  }});
 
- // Headlamps (facelift W204). Across the face and round the corner the outline
- // is the head-on photograph's; along the fender, the side photograph's. The
- // inner end stands just outside the grille, leaving a slanted strip of body
- // colour, and leans inward going down. The top edge runs 10 mm over the
- // shoulder, just under the bonnet's edge, so it dips beside the grille,
- // arches over the main beam and, as the lamp wraps back along the fender,
- // curves down to the tail's tip at x -1.73, z 0.765. The lower edge is nearly
- // level across the face, then climbs along the fender to the tip.
- const xOf=v=>pt(v,.68)[0],tipX=-1.73,tipZ=.765,vTip=vAtX(tipX,tipZ);
- const lowX=[[NOSE_X-.05,.585],[NOSE_X+.02,.587],[NOSE_X+.10,.598],[-1.95,.620],[-1.90,.645],[-1.85,.680],[-1.80,.715],[tipX,tipZ]];
- const lowAt=v=>v<.60?mix(.585,.590,clamp((v-.465)/.135)):Math.max(mix(.590,.600,clamp((v-.60)/.10)),edgeAt(lowX,xOf(v)));
- const ridge=v=>{const x=xOf(v),z=section(x)[1]+.010;return z-(z-tipZ)*sm((x-(tipX-.07))/.07);};
- const topAt=v=>v<.49?mix(lowAt(.465),ridge(.49),clamp((v-.465)/.025)):ridge(v);
- const ss=[.465,.47,.475,.48,.485,.49];for(let v=.50;v<vTip-.004;v+=.01)ss.push(v);ss.push(vTip);
- const lampTop=ss.map(v=>[v,Math.max(lowAt(v),topAt(v))]),lampLow=ss.map(v=>[v,lowAt(v)]);
- // Inner layers stop short of the tip, where the lamp is too thin for them.
- const fade=v=>1-clamp((v-(vTip-.18))/.15);
+ // Headlamps (facelift W204). Head-on the lamp is a broad shape: an inner end
+ // standing just outside the grille, 13 cm tall; a top edge rising under the
+ // bonnet's edge from 0.70 to 0.77; a nearly level lower edge at 0.57-0.58;
+ // and a round, tall outer end. In 3D the top runs back round the swept corner
+ // to the tail's tip on the fender (x -1.73, z 0.755), curving down over its
+ // last 12 cm so the outer end reads round from the front, and
+ // the rear edge climbs to it from x -2.0 at 0.60; on the raked corner that
+ // rear edge stays near y 0.81 head-on, which makes the round outer end.
+ const tipX=-1.73,tipZ=.755;
+ const topD=[];for(let d=0;d<=.37;d+=.01)topD.push(Math.min(d,tipX-NOSE_X));
+ const topZ=x=>{const z=section(x)[1]+.010;return z-(z-tipZ)*sm((x-(tipX-.12))/.12);};
+ const upper=[[.458,.567],[.462,.700]];
+ for(const d of topD.slice(1)){const x=NOSE_X+d,z=topZ(x),v=vAtX(x,z);if(v>upper.at(-1)[0]+.002)upper.push([v,z]);}
+ const rear=[[-2.09,.578],[-2.06,.592],[-2.02,.610],[-1.96,.635],[-1.89,.668],[-1.81,.705],[tipX,tipZ]];
+ const lower=[[.458,.567]];
+ for(let y=.47;y<=.70;y+=.02)lower.push([vAtY(y,.57),mix(.567,.575,(y-.46)/.24)]);
+ for(const [x,z] of rear){const v=vAtX(x,z);if(v>lower.at(-1)[0]+.002)lower.push([v,z]);}
+ const vTip=Math.max(upper.at(-1)[0],lower.at(-1)[0]);upper.at(-1)[0]=vTip;lower.at(-1)[0]=vTip;
+ const zUp=v=>edgeAt(upper,v),zLo=v=>edgeAt(lower,v);
+ const ss=[...new Set([...upper,...lower].map(p=>+p[0].toFixed(4)))].sort((a,b)=>a-b);
+ const fade=v=>1-clamp((v-(vTip-.12))/.10);
  const layer=(f0,f1,from,to)=>{const vs=ss.filter(v=>v>=from&&v<=to);return [vs.map(v=>[v,f0(v)]),vs.map(v=>[v,Math.max(f0(v)+.0006,f1(v))])];};
- band(lampLow,lampTop,'#15191b',.008,{...lamp,step:.015});
- // Interior below a black band along the top.
- band(...layer(v=>lowAt(v)+.009*fade(v),v=>topAt(v)-.022*fade(v),.50,vTip-.03),'#2a3236',.010,{...lamp,step:.015});
- // Two lamps: the large round main-beam bowl where the face turns the corner,
- // and a smaller projector inboard. Placed by head-on y, so they read round
- // from the front even on the swept face.
- const bowl=(y,z,rad,rings,lift)=>r.tag('lighting.headlamp',()=>{const n=32,P=(a,k)=>s.on(y+Math.cos(a)*rad*k,z+Math.sin(a)*rad*k,lift);
-  for(let j=0;j<rings.length;j++){const [k1,color]=rings[j],k0=rings[j+1]?.[0]??0;
-   for(let i=0;i<n;i++){const a=i/n*2*Math.PI,b=(i+1)/n*2*Math.PI,q=k0?[P(a,k0),P(b,k0),P(b,k1),P(a,k1)]:[P(a,0),P(a,k1),P(b,k1)];r.polygon(y<0?q.reverse():q,color,false);}}});
- for(const sg of [-1,1]){
-  bowl(sg*.690,.664,.058,[[1,'#8d979c'],[.90,'#56616a'],[.80,'#a9b2b6'],[.56,'#cdd3d5'],[.34,'#5f6a72'],[.20,r.lights?'#eef2ec':'#a4aeb2']],.016);
-  bowl(sg*.565,.648,.030,[[1,'#4a545a'],[.80,'#7f898e'],[.52,'#a8b1b5'],[.26,r.lights?'#e2e8e4':'#6d787d']],.016);
- }
- // Chrome line along the lower part, and the LED strip along the bottom
- // edge of the inner half.
- band(...layer(v=>lowAt(v)+.016*fade(v),v=>lowAt(v)+.022*fade(v),.53,vTip-.06),'#96a0a5',.012,{...lamp,step:.015});
- band(...layer(v=>lowAt(v)+.004,v=>lowAt(v)+.012,.49,.64),r.lights?'#f6faf7':'#dfe7e8',.013,{...lamp,step:.015});
- band(lampLow,lampTop,null,.019,{...lamp,glass:true,step:.015});
+ band(ss.map(v=>[v,zLo(v)]),ss.map(v=>[v,Math.max(zLo(v),zUp(v))]),'#121618',.008,{...lamp,step:.012});
+ // Interior, under a black band along the top.
+ band(...layer(v=>zLo(v)+.010*fade(v),v=>zUp(v)-.022*fade(v),.468,vTip-.02),'#262d31',.010,{...lamp,step:.012});
+ // A chrome bezel rings the outer end; inside it the main-beam reflector,
+ // and a smaller projector inboard. Placed by head-on y.
+ const ring=(cy,cz,r0,r1,a0,a1,color,lift)=>r.tag('lighting.headlamp',()=>{const n=36;
+  for(const sg of [-1,1])for(let i=0;i<n;i++){const a=mix(a0,a1,i/n),b=mix(a0,a1,(i+1)/n),P=(t,rad)=>onY(sg*(cy+Math.cos(t)*rad),cz+Math.sin(t)*rad,lift);
+   const q=r0?[P(a,r0),P(b,r0),P(b,r1),P(a,r1)]:[P(a,0),P(a,r1),P(b,r1)];r.polygon(sg<0?q.reverse():q,color,false);}});
+ ring(.728,.675,.064,.072,-1.75,1.75,'#a3acb0',.014);
+ ring(.728,.675,.057,.064,-1.75,1.75,'#4d575d',.014);
+ const bowl=(cy,cz,rings)=>{for(let j=0;j<rings.length;j++){const [k1,color]=rings[j],k0=rings[j+1]?.[0]??0;ring(cy,cz,k0,k1,0,2*Math.PI,color,.016);}};
+ bowl(.688,.678,[[.044,'#353d42'],[.038,'#6f797e'],[.030,'#454e53'],[.020,'#7d878c'],[.010,r.lights?'#e8ede9':'#5f6a6f']]);
+ bowl(.566,.656,[[.029,'#323a3f'],[.023,'#646e73'],[.015,'#424b50'],[.007,r.lights?'#dfe5e2':'#5a656a']]);
+ // Chrome strip along the bottom of the interior.
+ band(...layer(v=>zLo(v)+.010,v=>zLo(v)+.0145,.47,vAtY(.70,.58)),'#8c969b',.012,{...lamp,step:.012});
+ band(ss.map(v=>[v,zLo(v)]),ss.map(v=>[v,Math.max(zLo(v),zUp(v))]),null,.019,{...lamp,glass:true,step:.012});
 
  // Apron. The central intake is a trapezoid, wider at the bottom, filled with
  // black honeycomb, over the black splitter. Body-colour struts slant between
@@ -395,7 +416,7 @@ function frontEnd(r,paint){
  // Parking sensors across the band under the grille.
  for(const y of [.25,.667])for(const sg of [-1,1])ringOn(r,s,'body.structure',sg*y,.446,.011,.011,tone(paint,.78),.007,10);
  // Amber side markers on the fenders, under the lamp tails.
- {const m0=vAtX(-1.83,.60),m1=vAtX(-1.73,.60);band([[m0,.578],[m1,.592]],[[m0,.606],[m1,.624]],'#c27a34',.006,{tag:'lighting.indicator',step:.02});}
+ {const m0=vAtX(-1.85,.60),m1=vAtX(-1.755,.60);band([[m0,.578],[m1,.592]],[[m0,.606],[m1,.624]],'#c27a34',.006,{tag:'lighting.indicator',step:.008});}
 }
 
 // Boot lid face between the tail lamps: its outline across the back, (half-width, z).

@@ -38,7 +38,7 @@ export const coupeShape=[
     screen:[-.613,-.155,1.260,.700,.577],screenFootSweep:.240,screenHeaderSweep:.065, cockpit:[-.62,.725],door:classicDoor,belt:.840,
     stations:classicStations},
   {modern:true,width:1.852,front:-1.2,rear:1.25,frontRadius:.333,rearRadius:.352,
-    screen:[-.869,-.238,1.248,.755,.647],screenFootSweep:.281,screenHeaderSweep:.113,screenFoot:[.014,.05],cockpit:[-.695,.84],door:door992,belt:.866,
+    screen:[-.869,-.238,1.248,.755,.647],screenFootSweep:.281,screenHeaderSweep:.113,screenFoot:[.032,.008],cockpit:[-.695,.84],door:door992,belt:.866,
     stations:stations992,kit:kit992},
   // 1999 Carrera Cabriolet (996.1). The water-cooled loft with the 996 kit; the
   // string flag keeps every shared water-cooled branch while naming the body.

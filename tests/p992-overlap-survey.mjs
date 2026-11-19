@@ -40,6 +40,8 @@ export const mounts=[
   ['brakes.abs','brakes.lines','the brake lines leave the ports of the PSM hydraulic unit'],
   ['brakes.lines','shell.fenders','each hard line ends at a bracket on the inner wing, where its hose passes through to the caliper'],
   ['brakes.master','p992-clutch.master','the clutch master cylinder is fed from the brake-fluid reservoir through its own hose'],
+  ['electrical.battery','electrical.cables','the main cable leaves the battery positive terminal'],
+  ['fuel.supply','fuel.tank','the supply line leaves through the delivery flange in the tank top'],
   ['fuel.supply','fuel.sender','the supply line leaves the delivery flange on top of the tank'],
   ['cabin.controls','floor','the centre console is screwed to the tunnel through the carpet'],
   ['drivetrain.halfshafts','shell.fenders','each half-shaft passes through the opening in the inner wheel housing to its hub; the housing wall is drawn closed'],

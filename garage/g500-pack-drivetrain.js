@@ -387,7 +387,7 @@ export const claims=[
   {ids:ids(rearShafts,['left-nut','right-nut']),kind:'diagram',
    fact:'The G500 spindle-nut listing gives grooved nuts 902-357-01-26 driver side and 902-357-02-26 passenger side for 2002–2008 G500.',need:'Measure the nut across-flats and slot count; the thread hand per side is unconfirmed.',source:axleNuts},
   {ids:ids(frontAxleParts,['companion-flange','pinion-nut']),kind:'diagram',
-   fact:'The 2006 G500 front axle diagram lists companion flange 460-350-05-45 at callout 18 and nut 601-351-01-72 at callout 19. The 2002 page gives 464-350-32-00 as the flange replacement.',need:'Measure the flange diameter, bolt circle and nut across-flats on the fitted axle.',source:frontAxle},
+   fact:'The 2002 G500 front axle diagram lists companion flange 460-350-05-45 at callout 18 and nut 601-351-01-72 at callout 19. The 2002 page gives 464-350-32-00 as the flange replacement.',need:'Measure the flange diameter, bolt circle and nut across-flats on the fitted axle.',source:frontAxle},
   {ids:ids(frontAxleParts,['shaft-bearing']),kind:'diagram',
    fact:'The G500 axle parts listing gives Genuine Mercedes axle shaft bearing 463-337-00-49 for the front axle of the G500 and G55 AMG.',need:'Confirm the bearing position in the knuckle against a G500 diagram and measure its bore and width.',source:fcpAxle},
   {ids:ids(transmissionParts,['shift-rod-bushing']),kind:'diagram',

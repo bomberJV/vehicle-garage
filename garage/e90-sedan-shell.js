@@ -341,6 +341,21 @@ function capPoint(c,u,kind){
   }
   return [top[0],y,z];
 }
+// Height of the lid and deck cap at station x and offset y, interpolated between
+// the same ribs that caps() draws. null outside the cap. Used to seat the rear
+// spoiler accessory (e90-accessory-geometry.js) on the lid.
+export function e90DeckHeight(x,y){
+  const ribs=E90_COLUMNS.filter(c=>c.px>=DECK_START-1e-6).map(c=>{const top=columnPoint(c,c.zt,1);return {c,x:top[0],half:top[1]};});
+  for(let i=1;i<ribs.length;i++){
+    const a=ribs[i-1],b=ribs[i];
+    if(x<Math.min(a.x,b.x)||x>Math.max(a.x,b.x))continue;
+    const t=(x-a.x)/((b.x-a.x)||1),half=mix(a.half,b.half,t);
+    if(Math.abs(y)>half)return null;
+    const z=c=>capPoint(c.c,clamp(y/c.half,-1,1),'deck')[2];
+    return mix(z(a),z(b),t);
+  }
+  return null;
+}
 function caps(r,paint,buckets){
   const cols=E90_COLUMNS;
   const across=[-1,-.985,-.95,-.88,-.78,-.66,-.52,-.38,-.24,-.12,0,.12,.24,.38,.52,.66,.78,.88,.95,.985,1];
@@ -508,12 +523,16 @@ function transverseGlass(r,start,end,back){
   }
   return point;
 }
+// Roof skin height at station x and offset y, and the half-width of the roof
+// panel out to the drip strips. Also used to seat the roof-rack accessories.
+export function e90RoofHeight(x,y){return roofEdge(x)+.050*(1-(y/roofHalf(x))**2);}
+export const e90RoofHalf=x=>roofHalf(clamp(x,roofSpan[0],roofSpan[1]));
 function roofAndGlass(r,paint){
   panel(r,'windshield',[-.20,0,.22],'body.glass',()=>transverseGlass(r,...wind,false));
   panel(r,'backlight',[.20,0,.22],'body.glass',()=>transverseGlass(r,...rear,true));
   // Roof skin with the glass moonroof fitted to the US 328xi.
   const lidX=.30,left=lidX-.32,right=lidX+.32,openHalf=.475;
-  const height=(x,y)=>roofEdge(x)+.050*(1-(y/roofHalf(x))**2);
+  const height=e90RoofHeight;
   const xs=[];for(let x=roof[0][0];x<=roof.at(-1)[0]+1e-9;x+=.04)xs.push(+x.toFixed(4));
   xs.push(roof.at(-1)[0],left,right);const stops=[...new Set(xs)].sort((a,b)=>a-b);
   const ys=[-1,-.96,-.86,-.74,-openHalf/.62,-.5,-.25,0,.25,.5,openHalf/.62,.74,.86,.96,1];

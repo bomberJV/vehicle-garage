@@ -1,5 +1,5 @@
 import {g500FieldOptions} from './g500-field-options.js';
-import {carrier993Id} from './porsche-roof-state.js';
+import {carrier993Id,skiCarrier993Id} from './porsche-roof-state.js';
 // The IDs g-rack and f-bed also occur in older saved builds and presets.
 const roof = 'Roof racks';
 const aero = 'Body kits & aero';
@@ -31,9 +31,12 @@ export const FORD_BED = listing('f-bed','f350',bed,{
   source:reference('RealTruck · F-350 accessories by configuration','https://realtruck.com/v/ford/f350/')
 });
 
+const tequipment993='https://porschecarshistory.com/wp-content/old/brochures3/32/2001%20993%20Tequipment.pdf';
+const classicCatalog='https://www.stuttcars.com/wp-content/uploads/2021/04/Classic-Accessories-1950-1998.pdf';
+const classicPartner='https://www.porsche.com/usa/accessoriesandservice/classic/classic-partner/';
 const carrier993=listing(carrier993Id,'porsche993cab',roof,{
   name:'Porsche Tequipment Cabriolet load carrier', sku:'993 801 055 01', seller:'Porsche Classic Partner',
-  type:'supplier search', fieldKind:'carrier', unit:'base carrier set',
+  type:'supplier search', fieldKind:'carrier', unit:'base carrier set', exclusive:'993-roof',
   url:'https://www.porsche.com/usa/accessoriesandservice/classic/classic-partner/',
   fit:'The 993 Tequipment brochure lists 993 801 055 01 for the 911 Cabriolet (055 00 is the Coupé, 055 02 the Targa) and limits the load to 35 kg on the Cabriolet. It is long discontinued; ask a Classic Partner or look for a used set.',
   description:'A lockable base carrier for Porsche touring attachments such as the ski holder (000 044 000 04) and bicycle carrier (000 044 000 48). The brochure photographs only the Coupé version, so the crossbar feet on the raised top are an approximation. The preview keeps the top up while the carrier is fitted.',
@@ -48,7 +51,47 @@ const litronic993=listing('993-litronic-us','porsche993cab','Headlights',{
   source:reference('Porsche Classic accessories catalogue, illustration 903-00: 000 044 900 15, USA 94–98, left and right headlamps, two control units and harnesses','https://www.stuttcars.com/wp-content/uploads/2021/04/Classic-Accessories-1950-1998.pdf#page=64')
 });
 
-export const FIELD_ACCESSORIES=[...g500FieldOptions,carrier993,litronic993];
+// Further period Porsche Tequipment and Porsche Classic items for the 1998
+// Carrera 2 Cabriolet. Each one is recorded in p993-accessory-audit.js.
+const tequipment993Items=[
+  listing(skiCarrier993Id,'porsche993cab',roof,{
+    name:'Porsche Tequipment Cabriolet carrier with ski holder', sku:'993 801 055 01 + 000 044 000 04', seller:'Porsche Classic Partner',
+    type:'supplier search', fieldKind:'skiCarrier', unit:'carrier and holder', exclusive:'993-roof', url:classicPartner,
+    fit:'The Cabriolet base carrier (993 801 055 01) with the Tequipment ski holder (000 044 000 04) mounted on its crossbars. The carrier is limited to 35 kg on the Cabriolet. Both are discontinued.',
+    description:'Lockable rubber-jawed clamps on each crossbar hold the skis lengthwise; two pairs are shown. As with the base carrier, the mounting on the raised top is an approximation.',
+    source:reference('Porsche 993 Tequipment brochure, Touring, p. 15: ski holder and load carrier',tequipment993+'#page=8')
+  }),
+  listing('993-strut-brace','porsche993cab','Chassis',{
+    name:'Porsche Tequipment front strut brace', sku:'964 343 042 00', seller:'Porsche Classic Partner',
+    type:'supplier search', fieldKind:'strutBrace', unit:'brace', url:classicPartner,
+    fit:'Listed in the 993 Tequipment brochure for the 911; the part number carries over from the 964. It bolts to the two front strut tower tops in the luggage compartment.',
+    description:'A tubular brace ties the strut towers together. Porsche says it increases torsional stiffness for better handling on the track or on demanding roads. The preview’s proportions are an approximation.',
+    source:reference('Porsche 993 Tequipment brochure, Engine & chassis, p. 13: front strut brace',tequipment993+'#page=7')
+  }),
+  listing('993-sports-tailpipes','porsche993cab','Exhaust',{
+    name:'Porsche Tequipment sports tail pipes', sku:'000 044 200 01', seller:'Porsche Classic Partner',
+    type:'supplier search', fieldKind:'tailpipes', unit:'set', url:classicPartner,
+    fit:'The brochure lists set 000 044 200 01 for the Carrera and Carrera 4, which includes the Carrera 2 Cabriolet.',
+    description:'Chrome-plated stainless tail pipes with a larger oval cross-section replace the standard outlets under each rear corner. The preview’s proportions are an approximation.',
+    source:reference('Porsche 993 Tequipment brochure, Engine & chassis, p. 13: sports tail pipes',tequipment993+'#page=7')
+  }),
+  listing('993-wind-deflector','porsche993cab','Interior',{
+    name:'Porsche Tequipment wind deflector', sku:'000 043 202 10', seller:'Porsche Classic Partner', category:'interior',
+    type:'supplier search', fieldKind:'windDeflector', unit:'deflector', url:classicPartner,
+    fit:'Made for the 911 Cabriolet. The brochure shows it on a 993 Cabriolet; a storage bag is 000 043 202 11.',
+    description:'The folding deflector reduces turbulence for the driver and passenger and covers luggage on the rear seats. It can stay in place when the top is closed. The preview’s proportions are an approximation.',
+    source:reference('Porsche 993 Tequipment brochure, Touring, p. 14: wind deflector',tequipment993+'#page=8')
+  }),
+  listing('993-door-entry-guards','porsche993cab','Interior',{
+    name:'Porsche stainless door entry guards, Carrera', sku:'993 551 980 01', seller:'Porsche Classic Partner', category:'interior',
+    type:'supplier search', fieldKind:'sillGuards', unit:'pair', url:classicPartner,
+    fit:'Porsche Classic lists the Carrera set for the 911 (964 and 993), 1989–98.',
+    description:'Brushed stainless plates with the Carrera script cover the door sills on both sides. The preview’s proportions are an approximation.',
+    source:reference('Porsche Classic accessories catalogue, illustration 801-00: scuff plate set, Carrera logo',classicCatalog+'#page=54')
+  })
+];
+
+export const FIELD_ACCESSORIES=[...g500FieldOptions,carrier993,litronic993,...tequipment993Items];
 export const ACCESSORY_PARTS = [
   ...FIELD_ACCESSORIES,
   listing('g-rack-short','g500',roof,{

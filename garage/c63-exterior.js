@@ -32,7 +32,8 @@ const quarter=[[.985,.989],[.985,1.272],[1.20,1.165],[1.34,.997]];
 export const c63Body={
  wb:2.76,arch:.385,axleZ:.367,base:.27,hoodEnd:-.83,deckStart:1.64,
  door:[-.76,.345,1.17],doorSill:.335,belt:.945,roofZ:1.405,roofWidth:.60,cabinWidth:.795,roofCrown:.036,screenSweep:.015,sideRound:.026,sailTints:[1.05,1.01,.97,.93,.90,.87],roofPinch:.02,
- hoodFrac:.77,hoodCrown:.032,customEnds:true,capFollowsSide:true,
+ hoodFrac:.86,hoodCrown:.032,
+ hoodCrownAt:x=>.006+.026*clamp((x-FX(-2.17))/.50)**.8,customEnds:true,capFollowsSide:true,
  cabin:{cargo:[1.66,.40,.36],sillEnd:1.02,rearSeat:[1.18,1.49,.385,.515,1.40,1.49]},
  sideSection:(w,l)=>w+c63Side(l),
  sideLevels:[0,.07,.16,.30,.46,.62,.74,.80,.83,.88,.94,1],
@@ -43,9 +44,9 @@ export const c63Body={
  // Black B-pillar and the thin pillar ahead of the fixed rear quarter glass.
  blackouts:[[[.30,.968],[.405,.971],[.405,1.335],[.30,1.331]],[[.92,.987],[.985,.989],[.985,1.272],[.92,1.297]]],
  // Fender top from the lamp to the A-pillar base, then the belt and the boot.
- stations:[[FX(-2.17),.775,.752],[FX(-2.06),.845,.785],[FX(-1.92),.88,.815],[-1.72,.895,.852],[-1.38,.906,.880],[-1.08,.896,.902],[-.83,.888,.912],
+ stations:[[FX(-2.17),.775,.815],[FX(-2.06),.845,.835],[FX(-1.92),.88,.848],[-1.72,.895,.862],[-1.38,.906,.893],[-1.08,.896,.915],[-.83,.888,.935],
   [-.50,.885,.945],[.30,.887,.968],[1.00,.893,.990],[1.38,.902,1.000],[1.64,.892,.995],[RX(1.90),.878,.955],[RX(2.10),.852,.925],[RX(2.22),.80,.905]],
- wind:[[-.78,.955],[.0,1.336]],
+ wind:[[-.78,.978],[.0,1.336]],
  roof:[[.0,1.336],[.15,1.352],[.35,1.369],[.55,1.369],[.75,1.358],[.90,1.340],[1.0,1.322]],rear:[[1.0,1.322],[1.63,1.056]],
  frontWindow,rearWindow,quarter,
  windowTopLine:[[-.05,1.300],[.30,1.331],[.60,1.330],[.92,1.297],[1.20,1.165]]
@@ -73,7 +74,9 @@ function endSurface(end){
  const dir=front?-1:1;
  // Front: the bumper stands upright under the grille and rolls back into the
  // bonnet edge above the lamps. Rear: the bumper stands proud under the lid.
- const bulge=front?v=>F*.19*(v<.30?.78+.22*Math.sin(Math.PI/2*v/.30):1)*(v>.70?1-((v-.70)/.30)**2:1)
+ // The nose leans back from the bumper: full bulge to the top of the intakes,
+ // then a steady rake through the grille and lamps into the bonnet edge.
+ const bulge=front?v=>F*.19*(v<.30?.78+.22*Math.sin(Math.PI/2*v/.30):1)*(v>.36?1-((v-.36)/.64)**1.6:1)
   :v=>.118*(v<.62?1:1-.55*((v-.62)/.38)**1.4);
  const pw=front?3.2:3.4,plan=u=>1-Math.abs(u)**pw,dplan=u=>-pw*Math.sign(u)*Math.abs(u)**(pw-1);
  // Lift a point off the surface along its plan normal, so lamps and trim stay
@@ -85,7 +88,7 @@ function endSurface(end){
   const t=Math.abs(y)/hoodHalf;
   if(t>=1){const edge=sideY(x0,top0);return top0+.0152*clamp((edge-Math.abs(y))/(edge-hoodHalf));}
   // Lanes [0,.55,1] of the shared bonnet, a hair under its edge.
-  const hz=t=>top0+.016+B.hoodCrown*(1-t*t);
+  const hz=t=>top0+.016+B.hoodCrownAt(x0)*(1-t*t);
   return (t<.55?mix(hz(0),hz(.55),t/.55):mix(hz(.55),hz(1),(t-.55)/.45))-.0008;
  };
  const at=(u,v,lift=0)=>{
@@ -141,7 +144,7 @@ function ringOn(r,s,tag,cy,cz,ry,rz,color,lift,n=20){
 // headlamps with their LED strip, and the AMG apron with a wide central intake
 // and two outer intakes carrying the daytime running lamps.
 function frontEnd(r,paint){
- const base=endSurface(-1),Z=z=>.25+(z-.25)*.897,s={...base,on:(y,z,l)=>base.on(y,Z(z),l)},band=bander(r,s);
+ const base=endSurface(-1),Z=z=>.25+(z-.25)*.95,s={...base,on:(y,z,l)=>base.on(y,Z(z),l)},band=bander(r,s);
  const cols=symCols([.05,.14,.24,.34,.44,.52,.60,.68,.75,.81,.86,.90,.935,.96,.98,.993,1]);
  const vs=[.27,.30,.33,.36,.40,.44,.48,.52,.56,.60,.64,.68,.72,.76,.80].map(z=>s.vAt(Z(z))).concat([.92,.96,.985,1]).sort((a,b)=>a-b).filter((v,i,a)=>i===a.length-1||a[i+1]-v>.01);
  drawEnd(r,base,'body.structure',(z,y,u)=>tone(paint,mix(.90+.14*clamp((z-.40)/.45),.86,Math.abs(u)**5)),vs,cols);
@@ -174,7 +177,7 @@ function frontEnd(r,paint){
  const lampLow=[[.462,.712],[.49,.668],[.60,.656],[.70,.664],[.78,.690],[.815,.716]];
  const lampTop=[[.462,.712],[.50,.800],[.56,.836],[.66,.848],[.75,.852],[.80,.842],[.815,.826]];
  band(lampLow,lampTop,'#1a1f22',.008,{...lamp,step:.02});
- band(shift(lampLow,.012),shift(lampTop,-.010),'#7e898f',.010,{...lamp,from:.50,to:.80,step:.02});
+ band(shift(lampLow,.012),shift(lampTop,-.010),'#5b666c',.010,{...lamp,from:.50,to:.80,step:.02});
  band(shift(lampLow,.018),shift(lampTop,-.016),'#3b454b',.011,{...lamp,from:.51,to:.795,step:.02});
  for(const [y0,z,rad] of [[.560,.722,.036],[.680,.728,.046]])for(const y of [-y0,y0]){
   // Satin surrounds and dark lenses: with the lamps off the real projectors barely show.
@@ -188,24 +191,27 @@ function frontEnd(r,paint){
  // Apron. Central intake: a wide trapezoid with honeycomb mesh, over the black
  // splitter lip. Outer intakes: under the lamps, with a fin across and the
  // daytime running lamp strip along the top.
- const iTop=sym([[0,.476],[.30,.476],[.425,.468],[.512,.300]]),iLow=sym([[0,.288],[.40,.290],[.512,.300]]);
+ const iTop=sym([[0,.476],[.30,.476],[.462,.472],[.478,.455],[.488,.300]]),iLow=sym([[0,.288],[.40,.290],[.488,.300]]);
  band(iLow,iTop,'#0a0c0d',.008,{mirror:false,step:.02});
  r.tag('body.structure',()=>{
-  for(let j=0;j<6;j++)for(let i=-15;i<=15;i++){
-   const y=i*.034+(j%2?.017:0),z=.302+j*.029,half=.512-(z-.30)*.518;if(Math.abs(y)>half-.02||z>.462)continue;
-   const c=[[y-.014,z],[y,z-.012],[y+.014,z],[y,z+.012]];r.polygon(c.map(([yy,zz])=>s.on(yy,zz,.010)),'#252c30',false);
+  // Fine honeycomb: small dark cells, as on the car.
+  for(let j=0;j<9;j++)for(let i=-21;i<=21;i++){
+   const y=i*.0235+(j%2?.0118:0),z=.304+j*.0195,half=.488-(z-.30)*.10;if(Math.abs(y)>half-.014||z>.462)continue;
+   const c=[[y-.0098,z],[y,z-.0082],[y+.0098,z],[y,z+.0082]];r.polygon(c.map(([yy,zz])=>s.on(yy,zz,.010)),'#1d2326',false);
   }
  });
- const oiLow=[[.505,.43],[.535,.322],[.70,.318],[.825,.340]],oiTop=[[.505,.43],[.52,.482],[.70,.488],[.825,.492]];
+ const oiLow=[[.508,.318],[.70,.316],[.80,.326],[.835,.345]],oiTop=[[.508,.474],[.70,.480],[.80,.484],[.835,.486]];
  band(oiLow,oiTop,'#0a0c0d',.008,{step:.012});
- band([[.53,.396],[.82,.404]],[[.53,.410],[.82,.418]],'#2b3134',.011,{step:.02});
- band([[.575,.460],[.79,.464]],[[.575,.472],[.79,.476]],r.lights?'#f6faf7':'#cfd8da',.012,{...lamp,step:.02});
+ band([[.515,.392],[.825,.400]],[[.515,.406],[.825,.414]],'#2b3134',.011,{step:.02});
+ band([[.53,.452],[.80,.458]],[[.53,.464],[.80,.470]],r.lights?'#f6faf7':'#cfd8da',.012,{...lamp,step:.02});
  // Black splitter lip under the whole apron.
  band([[-.62,.272],[.62,.272]],[[-.62,.292],[.62,.292]],BLACK,.012,{mirror:false,step:.03});
  r.tag('body.structure',()=>{
   const p=(y,z,dx)=>{const q=s.on(y,z,.004);return [q[0]+dx,q[1],q[2]];};
   r.polygon([p(-.60,.27,0),p(.60,.27,0),p(.60,.25,.012),p(-.60,.25,.012)],BLACK,false);
  });
+ // Headlamp washer covers, under the outer half of each lamp.
+ band([[.60,.592],[.70,.598]],[[.60,.612],[.70,.618]],tone(paint,.84),.007,{step:.05});
  // Parking sensors and the amber marker on each bumper corner.
  for(const y of [.22,.62])for(const sg of [-1,1])ringOn(r,s,'body.structure',sg*y,.556,.011,.011,tone(paint,.80),.009,10);
  // Lifted along the plan normal of the body side, which faces mostly forward at the nose.
@@ -219,7 +225,7 @@ function frontEnd(r,paint){
   const tip=-1.80,xs=[s.x0,-2.07,-2.04,-2.00,-1.96,-1.92,-1.88,-1.84,tip];
   const e=s.edge(.74),t=x=>clamp((x-s.x0)/(tip-s.x0));
   // The top edge stays under the fender's shut line, as the lamp on the front face does.
-  const lo=x=>mix(Z(edgeAt(lampLow,e)),.795,t(x)**1.15),hi=x=>Math.min(mix(Z(edgeAt(lampTop,e)),.812,Math.sqrt(t(x))),section(x)[1]-.006);
+  const turn=.42,lo=x=>t(x)<turn?Z(edgeAt(lampLow,e))+.012*t(x)/turn:mix(Z(edgeAt(lampLow,e))+.012,.795,((t(x)-turn)/(1-turn))**1.1),hi=x=>Math.min(mix(Z(edgeAt(lampTop,e)),.812,Math.sqrt(t(x))),section(x)[1]-.006);
   for(let i=1;i<xs.length;i++){
    const p=(x,z,dy)=>sideAt(x,z,dy,side);
    // Same layers as the front of the lamp: housing, grey reflector, LED strip along the bottom.
@@ -228,7 +234,8 @@ function frontEnd(r,paint){
     const m=Math.max(1,Math.ceil(Math.max(ha-l0(a),hb-l0(b))/.02));
     for(let k=0;k<m;k++){const q=[p(a,mix(l0(a),ha,k/m),dy),p(b,mix(l0(b),hb,k/m),dy),p(b,mix(l0(b),hb,(k+1)/m),dy),p(a,mix(l0(a),ha,(k+1)/m),dy)];r.polygon(side<0?q:q.reverse(),color,false);}};
    layer(lo,hi,.007,'#1a1f22');
-   layer(x=>lo(x)+.012*(1-t(x)),x=>hi(x)-.010*(1-t(x)),.009,'#6c777d');
+   layer(x=>lo(x)+.012*(1-t(x)),x=>hi(x)-.010*(1-t(x)),.009,'#5b666c');
+   layer(x=>lo(x)+.018*(1-t(x)),x=>hi(x)-.016*(1-t(x)),.0095,'#3b454b');
    layer(x=>lo(x)+.003*(1-t(x)),x=>lo(x)+.010*(1-t(x)),.010,r.lights?'#f6faf7':'#dfe7e8');
   }
  }});
@@ -320,11 +327,11 @@ function quarterLamps(r){
 function powerDomes(r,paint){
  panel(r,'bonnet',[0,0,.71],'body.hood',()=>{
   const xs=[FX(-2.02),FX(-1.90),-1.70,-1.45,-1.20,-1.02,-.90];
-  const hood=(x,y)=>{const [w,z]=section(x),half=w*B.hoodFrac-.008,t=Math.min(1,Math.abs(y)/half);return z+.016+B.hoodCrown*(1-t*t);};
+  const hood=(x,y)=>{const [w,z]=section(x),half=w*B.hoodFrac-.008,t=Math.min(1,Math.abs(y)/half);return z+.016+B.hoodCrownAt(x)*(1-t*t);};
   const rise=x=>.022*clamp((x-FX(-2.02))/.18)*clamp((-.90-x)/.22);
   for(const s of [-1,1])for(let i=1;i<xs.length;i++)for(let j=0;j<6;j++){
    const u=-1+j/3,v=u+1/3,p=(x,uu)=>{const y=s*(.305+.080*uu);return [x,y,hood(x,y)+.0015+rise(x)*(1-uu*uu)];};
-   r.polygon([p(xs[i-1],u),p(xs[i],u),p(xs[i],v),p(xs[i-1],v)],tone(paint,1.17-.07*u*s),false);
+   r.polygon([p(xs[i-1],u),p(xs[i],u),p(xs[i],v),p(xs[i-1],v)],tone(paint,(s<0?1.11:1.17)-.035*u*s),false);
   }
  });
 }

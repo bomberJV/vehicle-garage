@@ -15,6 +15,7 @@ import {manual,clutch,cvJoint,multiClutch,finalChain} from './mechanism-shaft.js
 import {hrvAwdRows,getHrvAwdDetail} from './hrv-awd.js';
 import {drawE4OD,drawE4ODConverter,drawF350Propshaft,drawSterlingCarrier,drawSterlingHousing,drawSterlingShafts,drawFullFloatingHubs} from './f350-powertrain.js';
 import {baseVehicle,withVariants} from './vehicle-variants.js';
+import {C63_AXLES,C63_WHEELBASE,C63_WHEEL_DIMENSIONS} from './c63-wheel-specs.js';
 
 const references={
  hrv:{label:'Honda · 2026 HR-V transmission and drivetrain specifications',url:'https://hondanews.com/en-US/releases/release-6f8b202ddb1c7f26ecd92774bb014b0c-2026-honda-hr-v-specifications-and-features'},
@@ -90,7 +91,8 @@ function hrvShafts(r){
 const g500FrontProp=g500AxleShaftStudy(true),g500RearProp=g500AxleShaftStudy(false);
 const layouts={
  g500:{wheelbase:2.85,box:'Five-speed automatic',desc:'The longitudinal five-speed drives a separate two-speed VG150E. A center differential feeds both solid axles in normal driving. Selecting low range and locking the center differential operate separate mechanisms.'},
- c63:{wheelbase:2.76,box:'Seven-speed AMG MCT',desc:'A wet start-up clutch couples the V8 to the seven-speed MCT. The propeller shaft carries drive rearward to the final drive and independently suspended rear wheels.'},
+ // The C63's final drive and half-shafts sit on the rear hub axis: tyre radius above the 0.04 m ground plane.
+ c63:{wheelbase:C63_WHEELBASE,axles:C63_AXLES,axleZ:C63_WHEEL_DIMENSIONS.wheelRadiusRear+.04,box:'Seven-speed AMG MCT',desc:'A wet start-up clutch couples the V8 to the seven-speed MCT. The propeller shaft carries drive rearward to the final drive and independently suspended rear wheels.'},
  hrv:{wheelbase:2.654,box:'Continuously variable transmission',desc:'This 2026 US HR-V EX-L has Real Time AWD. The CVT, reduction gears and front differential share a transaxle beside the engine. A transfer unit at the front differential drives a two-piece propeller shaft, and an electronically controlled coupling at the rear differential sets how much torque reaches the rear wheels. The rear driveline shapes and routing are estimated. Open the CVT to watch the belt move.'},
  porsche993cab:{rear:1.112,box:'Six-speed manual transaxle',desc:'On the 993 Carrera, the engine sits behind the rear axle. A clutch and six-speed transaxle ahead of the engine feed both rear wheels through half-shafts.'},
  porsche996cab:{rear:1.175,box:'Six-speed manual transaxle',desc:'The 1999 Carrera’s six-speed manual transaxle sits ahead of the water-cooled flat-six, with the final drive between the rear wheels. Half-shafts with a joint at each end drive the rear hubs.'},
@@ -107,7 +109,9 @@ function inputComponent(id,spec,draw){
  return ['gearbox',spec.box,baseVehicle(id)==='hrv'?'Open the variator to see both pulley pairs, their shafts and the steel pushbelt.':id==='c63'?'The MCT uses a wet launch clutch ahead of the automatic gearsets.':'This housing transmits drive from the engine toward the final drive.',[-.18,0,.51],draw];
 }
 function sedan(id){
- const spec=layouts[id],ax=spec.wheelbase/2,front=-ax,z0=.39;
+ const spec=layouts[id],ax=spec.wheelbase/2,[front,rear]=spec.axles||[-ax,ax],z0=.39;
+ // A layout with its own axle height drops the final drive and half-shafts to it; the others keep the shared 0.39 m line.
+ const zr=spec.axleZ??z0;
  const transverse=baseVehicle(id)==='hrv',g=id==='g500',c=transverse?[front+.16,.39,.50]:[front+.82,0,.49];
  const arr=[inputComponent(id,spec,g?drawG500Gearbox:transverse?hrvCvtCase:r=>gearbox(r,c,x,.174,.58))];
  if(transverse){
@@ -136,13 +140,13 @@ function sedan(id){
   }
   if(id==='c63')arr.push(['launch-clutch','Wet start-up clutch','An oil-cooled stack connects the crankshaft to the transmission at launch.',[-.45,0,.32],r=>housing(r,[c[0]-.34,0,.49],x,.185,.11)]);
   arr.push(['propshaft','Propeller shaft','The tubular shaft transmits torque longitudinally to the final drive.',[0,-.45,0],r=>{
-   const start=tail;
-   r.rod([start,0,z0],[ax-.20,0,z0],.047,steel,16);
-   for(const p of [start,ax-.21])cyl(r,[p,0,z0],x,-.04,.04,.074,metal,14);
-   sleeve(r,[center+.28,0,z0],x,-.042,.042,.075,.045,dark);
+   const start=tail,at=p=>z0+(zr-z0)*(p-start)/(rear-.20-start);
+   r.rod([start,0,z0],[rear-.20,0,zr],.047,steel,16);
+   for(const p of [start,rear-.21])cyl(r,[p,0,at(p)],x,-.04,.04,.074,metal,14);
+   sleeve(r,[center+.28,0,at(center+.28)],x,-.042,.042,.075,.045,dark);
   }],
-  ['rear-differential','Rear axle differential','The axle final drive turns the carrier. Open the gearset to follow each wheel’s output.',[.37,0,.42],r=>finalDrive(r,[ax,0,z0])],
-  ['halfshafts','Rear half-shafts','The left and right shafts join the final drive to the rear wheel hubs.',[0,.32,-.31],r=>shaft(r,ax,z0)]);
+  ['rear-differential','Rear axle differential','The axle final drive turns the carrier. Open the gearset to follow each wheel’s output.',[.37,0,.42],r=>finalDrive(r,[rear,0,zr])],
+  ['halfshafts','Rear half-shafts','The left and right shafts join the final drive to the rear wheel hubs.',[0,.32,-.31],r=>shaft(r,rear,zr)]);
  }
  return register(id,arr);
 }

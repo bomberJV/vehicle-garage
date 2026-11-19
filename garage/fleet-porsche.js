@@ -16,13 +16,18 @@ const TAU=2*Math.PI;
 export const porscheVehicle=modern=>modern==='996'?'porsche996cab':modern?'porsche992scab':'porsche993cab';
 // Running gear per car: tyre section widths, tracks, brake rim and the wheel face.
 const running={
-  porsche993cab:{width:[.205,.245],track:[1.405,1.444],brake:[.2032,.2032],rim:alloy993},
+  // Half-shafts: the inner joints sit at the final-drive output of the installed
+  // transaxle (road-mechanisms.js carrera(), z .320), at the side of the gearbox
+  // case drawn below; the outer joints sit on the rear hub centre. The 992 and
+  // 996 keep their level shafts at z .345.
+  porsche993cab:{width:[.205,.245],track:[1.405,1.444],brake:[.2032,.2032],rim:alloy993,shaft:{innerY:.080,innerZ:.320}},
   porsche992scab:{width:[.245,.305],track:[1.59,1.556],brake:[.254,.2667],rim:alloy992},
   // 1999 Carrera: 205/50 ZR 17 and 255/40 ZR 17 on 7J and 9J × 17 wheels.
   porsche996cab:{width:[.205,.255],track:[1.455,1.500],brake:[.2159,.2159],rim:alloy996}
 };
 function boxer(r,car,modern){
   const {cx,f,z}=boxerFrame(car,modern),type996=modern==='996';
+  const own=running[porscheVehicle(modern)].shaft,shaft=own?{...own,hubZ:car.rearRadius+.006}:{innerY:.109,innerZ:.345,hubZ:.345};
   drawFleetIgnition(r,porscheVehicle(modern),[cx,0,z],f);
   drawEngineCore(r,cx,z,modern,f,modern===true?nineA2.stroke:modern?null:m64.stroke,modern?null:m64.journals);
   // The 993's 100 mm bores sit 118 mm apart, so its finned barrels are
@@ -43,7 +48,7 @@ function boxer(r,car,modern){
         }
       });
     }
-    r.tag('drive.axles',()=>{barrel(r,[car.rear,s*.109,.345],[car.rear,s*.663,.345],.025,'#7e8281');barrel(r,[car.rear,s*.536,.345],[car.rear,s*.62,.345],.046,'#3d4449');});
+    r.tag('drive.axles',()=>{barrel(r,[car.rear,s*shaft.innerY,shaft.innerZ],[car.rear,s*.663,shaft.hubZ],.025,'#7e8281');barrel(r,[car.rear,s*.536,shaft.hubZ],[car.rear,s*.62,shaft.hubZ],.046,'#3d4449');});
     r.tag('engine.exhaust',()=>{
       // The 996 has one oval tailpipe below each rear corner of the bumper.
       const tip=type996?2.092:modern?car.stations.at(-1)[0]-.100:classicTailpipeEnd(),y=s*(type996?.500:modern?.455:classicTailpipe.y);

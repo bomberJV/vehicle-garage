@@ -151,7 +151,7 @@ function renderRoofControls(){
     $('roof-reference').href=ref.url;$('roof-reference').textContent=ref.label+' ↗';
     const down=$('roof-down');
     down.disabled=Boolean(hasRoofCarrier(build));
-    down.title=down.disabled?'Remove the load carrier to lower the top.':'';
+    down.title=down.disabled?'The preview keeps the top up while the load carrier is fitted.':'';
     for(const pos of ['down','up'])$('roof-'+pos).setAttribute('aria-pressed',String(build.roofPosition===pos));
   }
 }

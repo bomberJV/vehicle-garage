@@ -10,6 +10,8 @@ import {sideSheet,formedRoof,drawBodyMirror,wheelhouse,cargoDoor,rearJamb,g500Bo
 import {drawFrontBumperBrackets,drawRearBumperBrackets,g500BumperParts,bumperRefs} from './g500-bumpers.js';
 import {g500DashFittingParts,dashFittingsRef} from './g500-dash-fittings.js';
 import {g500RestraintParts,restraintRefs} from './g500-restraints.js';
+import {drawG500WiperDrive,g500WiperDriveParts,wiperDriveRef} from './g500-wiper-drive.js';
+import {g500SwitchParts,switchRef} from './g500-switches.js';
 import {roofFrontLip} from './g500-roof-datums.js';
 import {drawG500Bonnet,drawG500FrontDeck,drawG500Scuttle} from './g500-bonnet.js';
 import {drawG500Cabin,drawG500DoorTrim,g500CabinSource} from './g500-cabin.js';
@@ -194,6 +196,7 @@ function bodyShell(r,paint) {
     rearJamb(r,paint);
     // The cowl supports the wipers independently of the movable bonnet and glass.
     r.tag('body.cowl',()=>drawG500Scuttle(r,paint));
+    drawG500WiperDrive(r);
     outlineRing(r,windscreenFrame,windscreenAperture,paint);
     const recess=windscreenAperture.map(([x,y,z])=>[x+.018,y,z-.004]);
     outlineRing(r,windscreenAperture,recess,tone(paint,.68));
@@ -301,6 +304,8 @@ const exteriorPlates={
   ...Object.fromEntries(['rear-bench-back-left','rear-bench-back-right','rear-bench-cushion-left','rear-bench-cushion-right','rear-bench-pad-left','rear-bench-pad-right','rear-bench-headrests'].map(k=>[k,giantRef('rear seat components','rear-seat-components')])),
   ...Object.fromEntries(g500DashFittingParts.map(([key])=>[key,dashFittingsRef])),
   ...Object.fromEntries(g500RestraintParts.map(([key,,,ref])=>[key,restraintRefs[ref]])),
+  ...Object.fromEntries(g500WiperDriveParts.map(([key])=>[key,wiperDriveRef])),
+  ...Object.fromEntries(g500SwitchParts.map(([key])=>[key,switchRef])),
   ...Object.fromEntries(['instrument-panel','cluster-trim','grab-handle'].map(k=>[k,giantRef('instrument panel','instrument-panel')])),
   ...Object.fromEntries(['center-console','console-trim-plate','shift-panel','shift-knob','console-lid'].map(k=>[k,giantRef('center console','center-console')])),
   'steering-wheel':exteriorPlate('steering wheel','steering--steering-wheel'),
@@ -396,5 +401,7 @@ export const G500_BODY_PARTS = [
   ['licence-lamps','Licence-plate lamps','Two small lamps in the top edge of the plate recess light the plate.'],
   ...g500BumperParts.map(([key,name,description])=>[key,name,description]),
   ...g500DashFittingParts,
-  ...g500RestraintParts.map(([key,name,description])=>[key,name,description])
+  ...g500RestraintParts.map(([key,name,description])=>[key,name,description]),
+  ...g500WiperDriveParts,
+  ...g500SwitchParts
 ].map(([key,name,description])=>({id:'body.'+key,name,description,source:['front-seats','rear-bench','dashboard','rearview-mirror'].includes(key)?g500CabinSource:g500BodyReferences[key]||g500BodyReferences.structure,...(exteriorPlates[key]?{source:exteriorPlates[key]}:{}),...(key==='fog-lamps'?{source:lampRefs.fog}:key==='rear-lights'?{source:lampRefs.manual}:key==='grille'?{source:giantRef('grille and components','grille-components')}:{})}));

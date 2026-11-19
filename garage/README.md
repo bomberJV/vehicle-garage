@@ -79,6 +79,7 @@ Nothing is purchased by this app. External links open supplier pages; no affilia
 - `app.js`: interaction, safe DOM construction, saved plans and file exports.
 - `app.css` / `index.html`: responsive interface.
 - `SOURCES.md`: evidence and pricing scope.
+- [`NEW-VEHICLE.md`](NEW-VEHICLE.md): the procedure for adding any vehicle, from the variant decision to release. Current plans: [2026 X3 30 xDrive](bmw-x3-g45-plan.md), [2018 X1 xDrive28i](bmw-x1-f48-plan.md).
 
 No redistribution license has been selected for the application source. The shared font retains its existing license.
 

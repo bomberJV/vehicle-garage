@@ -116,3 +116,47 @@ test('the 2014 C63 floor cites the 2014 C63 floor plate',()=>{
   assert.doesNotMatch(text,/v-2013-mercedes-benz-c63/);
   assert.match(text,/source\('MB Parts Giant · 2014 C63 AMG sedan floor pans, tunnel stiffener and seat supports','https:\/\/www\.mbpartsgiant\.com\/parts-list\/2014-mercedes_benz-c63_amg\/body-hardware\/floor'\)/);
 });
+
+test('the G500 exhaust pack cites the 2002 emission plate and says why the later plates stay',async()=>{
+  const {exhaustPackSources:x,studies,claims}=await import('../garage/g500-pack-exhaust.js');
+  const text=read('g500-pack-exhaust.js');
+  const labelled=/(['"])((?:(?!\1)[^\\]|\\.)*)\1\s*,\s*(?:url\s*:\s*)?(['"])(https?:\/\/[^'"]*?(\d{4})-mercedes[_-]benz-g500[^'"]*)\3/g;
+  const seen=[...text.matchAll(new RegExp(plateYear.source,'g'))].filter(m=>m[1]!=='2002').length;
+  const other=[...text.matchAll(labelled)].filter(m=>m[5]!=='2002');
+  assert.equal(other.length,seen);
+  for(const m of other)assert(m[2].includes(m[5])&&m[2].includes('2002')&&/later-year plate/.test(m[2]),m[2]);
+  assert.match(x.exhaustPlate2004.label,/463-492-63-41 where the 2002 G500 plate and the hanger listing give 463-492-35-41/);
+  assert.match(x.emissionPlate2008.label,/the 2002 G500 plate lists the same part numbers/);
+  const parts=new Map(studies.flatMap(s=>s.groups.flatMap(g=>g.parts)).map(p=>[p.id.split('.').pop(),p]));
+  for(const key of ['egr-valve','egr-gasket','canister-bracket'])assert.equal(parts.get(key).source.url,x.emissionPlate.url,key);
+  assert.equal(parts.get('shutoff-gaskets').source.url,x.emissionPlate2008.url);
+  assert(claims.some(c=>c.source===x.emissionPlate2008));
+});
+
+test('the HR-V roof and floor sources say how they apply to the EX-L AWD',async()=>{
+  const {getCabinFloor}=await import('../garage/floor-trim.js');
+  const roof=roadSystems.hrv.refs.roof;
+  assert.match(roof.url,/5_door_ex_l_2wd-cvt\/interior_bumper\/roof_slide_components/);
+  assert.match(roof.label,/EX-L 2WD .*70200-TLA-A03.*70300-TLA-A03.*70305-TLA-A03.*70450-3W0-A01 are listed for the EX-L AWD too/);
+  const floor=getCabinFloor('hrv').source;
+  assert.match(floor.url,/5_door_lx_awd-cvt\/interior_bumper\/floor_mat/);
+  assert.match(floor.label,/LX AWD .*AWD floor layout.*EX-L has its own carpet, 83301-3W0-A11ZA, listed for the EX-L 2WD and AWD only/);
+  const lx=getCabinFloor('hrvlx').source;
+  assert.equal(lx.url,floor.url);
+  assert.equal(lx.label,'Honda parts diagram · 2026 HR-V LX AWD floor carpet and mat holders');
+});
+
+test('the engine reference notes cite the 2002 M113 document and explain the HR-V air-cleaner trim',()=>{
+  const md=read('engine-references.md');
+  assert.doesNotMatch(md,/lemon-manuals\.la\/Mercedes%20Benz\/2004\//);
+  assert(md.includes(ENGINE_SOURCES.m113.url));
+  assert.doesNotMatch(md,/later service-document revision/);
+  assert.match(md,/Sport AWD air-cleaner diagram[^\n]*case set 17201-6CT-A01 and element 17220-5BA-A00 fit every 2026 trim \(LX, Sport and EX-L, 2WD and AWD\)/);
+});
+
+test('the 1998 993 front axle and carrier labels say why the 1997 and 1994 pages apply',()=>{
+  assert.match(chassisRefs.frontAxle.url,/993_\(1997\)\/PartDiagrams\/401-000\//);
+  assert.match(chassisRefs.frontAxle.label,/1997 catalogue page; cross member 993 341 101 05 from model year 1995 .*apply to the 1998 car/);
+  assert.match(chassisRefs.frontCarrier.url,/993_\(1994\)\/PartDiagrams\/401-005\//);
+  assert.match(chassisRefs.frontCarrier.label,/1994 catalogue page; the 1998 car takes .*993 341 157 03 and 158 03 .*993 341 065 01 from model year 1995/);
+});

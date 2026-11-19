@@ -10,5 +10,21 @@
 // Every part name ends ' · <Porsche part number>' copied from the cited catalogue page,
 // and every study cites that page. Never invent a part number.
 export const hooks=["cabin.controls", "p992-seats.leads", "p992-seat-element.cover", "p992-seat-element.mat", "p992-seat-element.trace", "p992-seat-element.foam", "seat_track.anchor", "seat_track.slider", "seat_track.brackets", "carpet_edge.pile", "carpet_edge.backing", "carpet_edge.pad", "carpet_edge.binding"];
-export const studies=[];
-export const views=new Map();
+import {catalogueStudy} from './porsche992-catalog-studies.js';
+
+// Airbags, read from the Eurospares copy of catalogue diagram 812-050. Coupe-only
+// rows (seat side airbags for PK8C/PQ1K, head airbags and their nuts) are left
+// out; the knee airbag is the USA and California assembly kit (PB0T).
+const airbag={id:'airbags',code:'812-050',title:'Airbags',year:'2019 (992-1)',
+  url:'https://www.eurospares.co.uk/Porsche/992/2019_(992-1)/PartDiagrams/812-050/Airbag',
+  rows:[
+    ['1','992880201S TRP','Airbag unit for steering wheel, black'],
+    ['3','N 91073301','Hexagon socket flat head bolt M6x12'],
+    ['4','992880204B','Passenger airbag unit'],
+    ['5','N 91093502','Hexagon socket oval head bolt M6x30, self-locking'],
+    ['6','992880841','Knee airbag unit, USA'],
+    ['7','N 91188301','Hexagon socket head bolt M6x20, knee airbag'],
+  ]};
+
+export const studies=[catalogueStudy(airbag,'p992-interior-')];
+export const views=new Map([['cabin.controls',studies[0]]]);

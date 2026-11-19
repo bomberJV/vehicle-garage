@@ -40,7 +40,8 @@ test('cross-domain requests include the proper domain/subtype pairs, including w
   const membership=id=>new Set(trackingDefaults('request',id).categories.map(c=>c.domain+'/'+c.type));
   assert.deepEqual(membership('space'),new Set(['Air/Space','Land/Rovers']));
   assert.deepEqual(membership('heritage'),new Set(['Land/Tanks','Air/Planes','Air/Helicopters']));
-  assert.deepEqual(membership('rear-ladders'),new Set(['Land/SUVs','Land/Cars']));
+  // The rear ladder is a G500 item only; no car is linked to it.
+  assert.deepEqual(membership('rear-ladders'),new Set(['Land/SUVs']));
   assert.deepEqual(membership('maritime'),new Set(['Sea/Ships','Sea/Yachts','Sea/Fishing boats','Sea/Submarines']));
   for(const id of ['compact-explosion','model-validation','occlusion-report','references','narration','all-vehicles']){
     assert.deepEqual(new Set(trackingDefaults('request',id).vehicleIds),new Set(vehicleMap.keys()));

@@ -30,7 +30,7 @@ export const requestSections=[
   ]},
   {id:'cars',name:'Road vehicles and build options',items:[
     work('brush-guards','shipped','Fit the 2002 G500 brush guard','The polished tube wraps around both headlamps. Two black padded uprights meet the lower tie bar and the hinged bumper mounts.',g500Equipment('brush-guards')),
-    work('rear-ladders','shipped','Fit the G500 rear ladder','The four-step Front Runner ladder mounts beside the spare. On the 1998 911, Porsche offered a touring carrier for roof cargo.',[...g500Equipment('ladders'),equipment('993 Cabriolet touring carrier','porsche993cab','roof-racks')]),
+    work('rear-ladders','shipped','Fit the G500 rear ladder','The four-step Front Runner ladder mounts beside the spare.',g500Equipment('ladders')),
     work('raised-intakes','shipped','Fit the G500 raised intakes','Follow the two ORC ducts from the G500 front fenders to the windshield pillars.',g500Equipment('raised-intakes')),
     work('driving-lights','shipped','Fit the available road lighting','The Eurowise brackets carry a pair of auxiliary lamps at the G500 hood corners. The 993 Cabriolet has the period US Litronic headlamp retrofit.',[...g500Equipment('auxiliary-lighting'),equipment('993 Cabriolet headlamps','porsche993cab','headlights')]),
     work('police-lights','shipped','Preview G500 display lights','The G500 builder includes a steady red-and-blue light bar labeled as a design mock-up.',g500Equipment('display-lighting')),

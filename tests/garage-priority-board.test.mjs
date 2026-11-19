@@ -99,7 +99,7 @@ test('the Garage links to priorities and board sections and controls are accessi
 test('each equipment priority opens an option offered on that vehicle',()=>{
   const applications={
     'brush-guards':[['g500','brush-guards']],
-    'rear-ladders':[['g500','ladders'],['porsche993cab','roof-racks']],
+    'rear-ladders':[['g500','ladders']],
     'raised-intakes':[['g500','raised-intakes']],
     'driving-lights':[['g500','auxiliary-lighting'],['porsche993cab','headlights']],
     'police-lights':[['g500','display-lighting']]

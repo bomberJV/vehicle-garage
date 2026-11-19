@@ -15,6 +15,3 @@ export const p993AccessoryAudit=[
    states:'FVD505993RS: narrow body, polyurethane, left and right side included, no modifications to the original bodywork; fits 993 C2 (94–98) and C4 (95–98).',
    approximate:null}
 ];
-// Accessory kinds the 993 must not offer without a documented Porsche or
-// period item (see #7): none has been found for this car.
-export const p993Unsupported=/ladder|guard|snorkel|winch|light bar|aux/i;

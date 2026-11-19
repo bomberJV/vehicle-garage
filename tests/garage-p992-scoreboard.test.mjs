@@ -12,10 +12,9 @@ const target='porsche992scab';
 const measures=['clickable','studies','assemblies','installed'];
 const openGaps={
   'g500 clickable':1009,'g500 studies':138,'g500 assemblies':24,'g500 installed':258,
-  'porsche993cab clickable':456,'porsche993cab installed':146,
-  'bmw325ci clickable':472,'bmw325ci installed':169,
+  'porsche993cab installed':146,'bmw325ci installed':169,
   // Ties count as gaps: the 911 must lead outright.
-  'porsche993cab studies':63,'bmw325ci studies':63,'sl550 assemblies':21,
+  'sl550 assemblies':21,
 };
 const scores=Object.fromEntries(Object.keys(VEHICLES).map(v=>[v,measure(v)]));
 
@@ -29,5 +28,5 @@ test('the 911 leads every vehicle on every measure, apart from the recorded open
 
 test('the 911 never loses detail it already has',()=>{
   const s=scores[target];
-  assert(s.clickable>=428&&s.studies>=63&&s.assemblies>=21&&s.installed>=134,JSON.stringify(s));
+  assert(s.clickable>=780&&s.studies>=85&&s.assemblies>=21&&s.installed>=134,JSON.stringify(s));
 });

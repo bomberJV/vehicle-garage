@@ -9,10 +9,12 @@ precision mediump float;
 uniform mediump sampler2D skinDepth;
 #endif
 varying mediump vec4 tint;
+varying mediump float cut;
 uniform int layerMode;
 uniform sampler2D skinColor;
 uniform vec2 inverseSize;
 void main() {
+  if (cut > 0.0) discard;
   if (layerMode == 0) { gl_FragColor = tint; return; }
   vec2 uv = gl_FragCoord.xy * inverseSize;
   vec4 skin = texture2D(skinColor, uv);

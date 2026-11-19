@@ -1,7 +1,8 @@
 import {faceTriangles} from './mesh-triangles.js';
-import {hasStudioFinish,studioPaintReflection,studioSurfaceFinish} from './studio-finish.js';
+import {hasStudioFinish,studioPaintReflection,studioSurfaceFinish,planeNormal} from './studio-finish.js';
 import {glassOrder} from './glass-order.js';
-import {blueprintInk} from './studio-theme.js';
+import {blueprintInk,studioTheme} from './studio-theme.js';
+import {clipFaces} from './section-plane.js';
 import {shellTarget,bindShellTextures} from './shell-depth.js';
 
 // Mark a pane independently of its parent assembly. Trim and rubber remain opaque.
@@ -239,8 +240,8 @@ export function gpuDepthRender(renderer,w,h,dpr,project) {
   if(renderer.surface.width!==width||renderer.surface.height!==height){renderer.surface.width=width;renderer.surface.height=height;}
   gl.viewport(0,0,width,height);gl.clearColor(0,0,0,0);gl.depthMask(true);gl.clearDepth(1);
   gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LESS);gl.useProgram(renderer.program);
-  // Screen-space vertices; an orbit frame (gpuWorldRender) may have left a camera transform set.
-  if(renderer.viewMatrixSet){gl.uniformMatrix4fv(renderer.viewUniform,false,IDENTITY);renderer.viewMatrixSet=false;}
+  // Screen-space vertices; an orbit frame (gpuWorldRender) may have left its camera state set.
+  screenState(gl,renderer);
   const {opaque,glass,shell,mid,range}=splitSurfaces(renderer,project,w,h);
   const count=surfaces=>surfaces.reduce((sum,face)=>sum+face.indices.length,0);
   const opaqueCount=count(opaque),glassCount=count(glass),shellCount=count(shell),total=opaqueCount+glassCount+shellCount;
@@ -300,14 +301,18 @@ export function gpuDepthRender(renderer,w,h,dpr,project) {
   renderer.ctx.drawImage(renderer.surface,0,0,w,h);return true;
 }
 
-// The orbit path (orbit-frame.js): the vehicle's world-space triangles stay in a GPU buffer for as
-// long as the face list is the same, and each frame sends only the camera transform and the
-// view-dependent colours. Glass is still sorted and projected here each frame, as in
-// gpuDepthRender, and the depth range comes from the faces on screen, as there.
+// The orbit path (orbit-frame.js). The vehicle's world-space triangles stay in GPU buffers for as
+// long as the face list is the same, with each vertex's base colour, surface normal and lighting
+// kind (depth-vertex.js). A frame sends only the camera transform, the eye vector and the section
+// plane; the shader lights the paint. Glass is still sorted and projected here each frame, as in
+// gpuDepthRender.
 const IDENTITY=new Float32Array([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
-function worldGeometry(renderer,gl){
-  const faces=renderer.faces;let geo=renderer.worldGeometry;
-  if(geo?.faces===faces)return geo;
+const FLAT=0,CLEAR_COAT=1,STUDIO_PAINT=2,STUDIO_ALLOY=3;
+
+function worldGeometry(renderer,gl,faces){
+  const studio=hasStudioFinish(renderer.build?.vehicle),blueprint=Boolean(renderer.blueprint);
+  let geo=renderer.worldGeometry;
+  if(geo?.faces===faces&&geo.studio===studio&&geo.blueprint===blueprint&&geo.theme===studioTheme().key)return geo;
   const opaque=[],shell=[],panes=[],paneIndices=[];let opaqueCount=0,shellCount=0;
   for(const face of faces){
     const opacity=face.opacity??1;
@@ -318,14 +323,70 @@ function worldGeometry(renderer,gl){
     if(opacity<1){panes.push(face);paneIndices.push(indices);continue;}
     opaque.push({face,indices});opaqueCount+=indices.length;
   }
-  const positions=new Float32Array((opaqueCount+shellCount)*3);let pos=0;
-  for(const list of [opaque,shell])for(const {face,indices} of list)for(const i of indices){
-    const p=face.points[i];positions[pos++]=p[0];positions[pos++]=p[1];positions[pos++]=p[2];
+  const total=opaqueCount+shellCount;
+  const positions=new Float32Array(total*3),colors=new Uint8Array(total*4),shades=new Float32Array(total*4);
+  let v=0;
+  const put=(p,rgb,alpha,n,kind)=>{
+    positions[v*3]=p[0];positions[v*3+1]=p[1];positions[v*3+2]=p[2];
+    colors[v*4]=rgb[0];colors[v*4+1]=rgb[1];colors[v*4+2]=rgb[2];colors[v*4+3]=Math.round(alpha*255);
+    if(n){shades[v*4]=n[0];shades[v*4+1]=n[1];shades[v*4+2]=n[2];}
+    shades[v*4+3]=kind;v++;
+  };
+  const ink=rgb=>blueprintInk((.21*rgb[0]+.72*rgb[1]+.07*rgb[2])/255);
+  for(const {face,indices} of opaque){
+    const base=rgbOf(face.color);
+    if(face.highlighted){for(const i of indices)put(face.points[i],base,1,null,FLAT);continue;}
+    if(blueprint){const rgb=ink(base);for(const i of indices)put(face.points[i],rgb,1,null,FLAT);continue;}
+    if(face.vertexColors){
+      // As splitSurfaces: each painted vertex reflects the studio through its clear-coat normal.
+      for(const i of indices){
+        const n=face.clearcoatNormals?.[i];
+        put(face.points[i],rgbOf(face.vertexColors[i]),1,n,n?(studio?STUDIO_PAINT:CLEAR_COAT):FLAT);
+      }
+      continue;
+    }
+    // As studioSurfaceFinish: bright rim spokes take the studio's alloy reflection.
+    if(studio&&face.part==='running.rims'&&Math.max(...base)>=122){
+      const n=planeNormal(face.points);
+      for(const i of indices)put(face.points[i],base,1,n,STUDIO_ALLOY);
+      continue;
+    }
+    for(const i of indices)put(face.points[i],base,1,null,FLAT);
   }
-  geo={faces,opaque,shell,panes,paneIndices,opaqueCount,shellCount,colors:new Float32Array((opaqueCount+shellCount)*4),
-    positionBuffer:geo?.positionBuffer||gl.createBuffer(),colorBuffer:geo?.colorBuffer||gl.createBuffer()};
+  for(const {face,indices,opacity} of shell){
+    const base=rgbOf(face.color),rgb=blueprint&&!face.highlighted?ink(base):base;
+    for(const i of indices)put(face.points[i],rgb,opacity,null,FLAT);
+  }
+  // Each face's bounding sphere, for the depth range of the faces on screen.
+  const all=[...opaque.map(o=>o.face),...shell.map(o=>o.face),...panes],spheres=new Float64Array(all.length*4);
+  all.forEach((face,k)=>{
+    let x0=Infinity,y0=Infinity,z0=Infinity,x1=-Infinity,y1=-Infinity,z1=-Infinity;
+    for(const p of face.points){if(p[0]<x0)x0=p[0];if(p[0]>x1)x1=p[0];if(p[1]<y0)y0=p[1];if(p[1]>y1)y1=p[1];if(p[2]<z0)z0=p[2];if(p[2]>z1)z1=p[2];}
+    spheres[k*4]=(x0+x1)/2;spheres[k*4+1]=(y0+y1)/2;spheres[k*4+2]=(z0+z1)/2;spheres[k*4+3]=Math.hypot(x1-x0,y1-y0,z1-z0)/2;
+  });
+  geo={faces,studio,blueprint,theme:studioTheme().key,panes,paneIndices,opaqueCount,shellCount,spheres,
+    positionBuffer:geo?.positionBuffer||gl.createBuffer(),colorBuffer:geo?.colorBuffer||gl.createBuffer(),shadeBuffer:geo?.shadeBuffer||gl.createBuffer()};
   gl.bindBuffer(gl.ARRAY_BUFFER,geo.positionBuffer);gl.bufferData(gl.ARRAY_BUFFER,positions,gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ARRAY_BUFFER,geo.colorBuffer);gl.bufferData(gl.ARRAY_BUFFER,colors,gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ARRAY_BUFFER,geo.shadeBuffer);gl.bufferData(gl.ARRAY_BUFFER,shades,gl.STATIC_DRAW);
   renderer.worldGeometry=geo;return geo;
+}
+
+// Builds the GPU copy ahead of an orbit when the browser is idle, so the first drag frame does not
+// pay for it. Only for an uncut, 24-bit WebGL view: the orbit path uses that same face list.
+export function prepareWorldGeometry(renderer){
+  const {gl}=renderer;
+  if(!gl||gl.isContextLost?.()||renderer.depthBufferBits<24||renderer.sectionPlane||!renderer.faces?.length)return;
+  worldGeometry(renderer,gl,renderer.faces);
+}
+
+// Back to screen-space drawing after an orbit frame.
+function screenState(gl,renderer){
+  if(!renderer.viewMatrixSet)return;
+  gl.uniformMatrix4fv(renderer.viewUniform,false,IDENTITY);
+  gl.uniform4f(renderer.clipUniform,0,0,0,0);
+  if(renderer.shadeAttribute>=0){gl.disableVertexAttribArray(renderer.shadeAttribute);gl.vertexAttrib4f(renderer.shadeAttribute,0,0,0,0);}
+  renderer.viewMatrixSet=false;
 }
 
 export function gpuWorldRender(renderer,w,h,dpr,project,transform) {
@@ -334,51 +395,33 @@ export function gpuWorldRender(renderer,w,h,dpr,project,transform) {
   renderer.canvas.dataset.renderer='webgl-depth';
   const width=Math.round(w*dpr),height=Math.round(h*dpr);
   if(renderer.surface.width!==width||renderer.surface.height!==height){renderer.surface.width=width;renderer.surface.height=height;}
-  const geo=worldGeometry(renderer,gl);
+  const cut=renderer.deferredSection;
+  const geo=worldGeometry(renderer,gl,renderer.faces);
   const target=geo.shellCount?shellTarget(renderer,width,height):null;
   if(geo.shellCount&&!target)return renderer.softwareRender(w,h,project);
   gl.viewport(0,0,width,height);gl.clearColor(0,0,0,0);gl.depthMask(true);gl.clearDepth(1);
   gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LESS);gl.useProgram(renderer.program);
-  // Depth range of the faces on screen, as splitSurfaces measures it.
-  const {X,X3,Y,Y3,N}=transform;
+  // Depth range of the faces on screen, from each face's bounding sphere.
+  const {X,X3,Y,Y3,N}=transform,spheres=geo.spheres,reach=Math.hypot(X[0],X[1],X[2]);
   let min=Infinity,max=-Infinity;
-  const measure=face=>{
-    let left=Infinity,right=-Infinity,top=Infinity,bottom=-Infinity,near=-Infinity,far=Infinity;
-    for(const p of face.points){
-      const x=X[0]*p[0]+X[1]*p[1]+X3,y=Y[0]*p[0]+Y[1]*p[1]+Y[2]*p[2]+Y3,d=N[0]*p[0]+N[1]*p[1]+N[2]*p[2];
-      if(x<left)left=x;if(x>right)right=x;if(y<top)top=y;if(y>bottom)bottom=y;if(d<far)far=d;if(d>near)near=d;
-    }
-    if(right<0||left>w||bottom<0||top>h)return;
-    if(far<min)min=far;if(near>max)max=near;
-  };
-  for(const {face} of geo.opaque)measure(face);
-  for(const {face} of geo.shell)measure(face);
-  for(const face of geo.panes)measure(face);
+  for(let k=0;k<spheres.length;k+=4){
+    const cx=spheres[k],cy=spheres[k+1],cz=spheres[k+2],r=spheres[k+3],sr=r*reach;
+    const x=X[0]*cx+X[1]*cy+X3,y=Y[0]*cx+Y[1]*cy+Y[2]*cz+Y3;
+    if(x+sr<0||x-sr>w||y+sr<0||y-sr>h)continue;
+    const d=N[0]*cx+N[1]*cy+N[2]*cz;
+    if(d-r<min)min=d-r;if(d+r>max)max=d+r;
+  }
   const mid=Number.isFinite(min)?(min+max)*.5:0,range=Math.max((max-min)*.501,1e-7);
-  // View-dependent colours for the resident triangles.
-  const {eye,rgbFor,reflected}=surfaceShading(renderer,project);
-  const colors=geo.colors;let c=0;
-  for(const {face,indices} of geo.opaque){
-    const rgb=rgbFor(face);
-    const gradient=face.vertexColors && !renderer.blueprint && !face.highlighted ?
-      face.vertexColors.map((hex,i)=>reflected(rgbOf(hex),face.clearcoatNormals?.[i])):null;
-    for(const index of indices){
-      const color=gradient?gradient[index]:rgb;
-      colors[c++]=color[0]/255;colors[c++]=color[1]/255;colors[c++]=color[2]/255;colors[c++]=1;
-    }
-  }
-  for(const {face,indices,opacity} of geo.shell){
-    const rgb=rgbFor(face);
-    for(let k=0;k<indices.length;k++){colors[c++]=rgb[0]/255;colors[c++]=rgb[1]/255;colors[c++]=rgb[2]/255;colors[c++]=opacity;}
-  }
-  gl.bindBuffer(gl.ARRAY_BUFFER,geo.colorBuffer);gl.bufferData(gl.ARRAY_BUFFER,colors,gl.DYNAMIC_DRAW);
-  // Glass, sorted for this view, and the shell's screen-covering triangle, in screen space.
+  // Glass, cut and sorted for this view, and the shell's screen-covering triangle, in screen space.
+  const {eye,rgbFor}=surfaceShading(renderer,project);
   let glassCount=0,pos=0;
   const glass=[];
   if(geo.panes.length){
-    const paneColors=geo.panes.map(rgbFor);
-    for(const item of glassOrder(geo.panes,geo.paneIndices,eye,renderer)){
-      const face=geo.panes[item.face];
+    let panes=geo.panes,paneIndices=geo.paneIndices;
+    if(cut){panes=clipFaces(panes,cut);paneIndices=panes.map(face=>face.triangles||faceTriangles(face.points));}
+    const paneColors=panes.map(rgbFor);
+    for(const item of glassOrder(panes,paneIndices,eye,renderer)){
+      const face=panes[item.face];
       glass.push({ps:item.points.map(project),rgb:paneColors[item.face],opacity:face.opacity,indices:faceTriangles(item.points)});
     }
     for(const surface of glass)glassCount+=surface.indices.length;
@@ -392,23 +435,29 @@ export function gpuWorldRender(renderer,w,h,dpr,project,transform) {
     vertices[pos++]=rgb[0]/255;vertices[pos++]=rgb[1]/255;vertices[pos++]=rgb[2]/255;vertices[pos++]=opacity;
   }
   if(target){vertices.set([-1,-1,0,0,0,0,1, 3,-1,0,0,0,0,1, -1,3,0,0,0,0,1],pos);pos+=21;}
-  gl.bindBuffer(gl.ARRAY_BUFFER,renderer.buffer);gl.bufferData(gl.ARRAY_BUFFER,vertices.subarray(0,pos),gl.DYNAMIC_DRAW);
+  if(pos){gl.bindBuffer(gl.ARRAY_BUFFER,renderer.buffer);gl.bufferData(gl.ARRAY_BUFFER,vertices.subarray(0,pos),gl.DYNAMIC_DRAW);}
   // World to clip space: x and y from the camera fit, z from the depth range.
-  const view=renderer.viewUniform??=gl.getUniformLocation(renderer.program,'view');
   const world=new Float32Array([
     X[0]*2/w,-Y[0]*2/h,-N[0]/range,0,
     X[1]*2/w,-Y[1]*2/h,-N[1]/range,0,
     X[2]*2/w,-Y[2]*2/h,-N[2]/range,0,
     X3*2/w-1,1-Y3*2/h,mid/range,1]);
-  const position=gl.getAttribLocation(renderer.program,'position'),tint=gl.getAttribLocation(renderer.program,'color');
+  const length=Math.hypot(...N)||1;
+  const position=gl.getAttribLocation(renderer.program,'position'),tint=gl.getAttribLocation(renderer.program,'color'),shade=renderer.shadeAttribute;
   gl.enableVertexAttribArray(position);gl.enableVertexAttribArray(tint);
   const resident=()=>{
-    gl.uniformMatrix4fv(view,false,world);renderer.viewMatrixSet=true;
+    gl.uniformMatrix4fv(renderer.viewUniform,false,world);renderer.viewMatrixSet=true;
+    gl.uniform3f(renderer.eyeUniform,N[0]/length,N[1]/length,N[2]/length);
+    // The kept side is (p[axis] - limit) * sign <= 0; the shader discards where it is positive.
+    if(cut){const plane=[0,0,0];plane[cut.axis]=cut.sign;gl.uniform4f(renderer.clipUniform,plane[0],plane[1],plane[2],-cut.limit*cut.sign);}
+    else gl.uniform4f(renderer.clipUniform,0,0,0,0);
     gl.bindBuffer(gl.ARRAY_BUFFER,geo.positionBuffer);gl.vertexAttribPointer(position,3,gl.FLOAT,false,12,0);
-    gl.bindBuffer(gl.ARRAY_BUFFER,geo.colorBuffer);gl.vertexAttribPointer(tint,4,gl.FLOAT,false,16,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER,geo.colorBuffer);gl.vertexAttribPointer(tint,4,gl.UNSIGNED_BYTE,true,4,0);
+    gl.enableVertexAttribArray(shade);
+    gl.bindBuffer(gl.ARRAY_BUFFER,geo.shadeBuffer);gl.vertexAttribPointer(shade,4,gl.FLOAT,false,16,0);
   };
   const screen=()=>{
-    gl.uniformMatrix4fv(view,false,IDENTITY);
+    screenState(gl,renderer);
     gl.bindBuffer(gl.ARRAY_BUFFER,renderer.buffer);
     gl.vertexAttribPointer(position,3,gl.FLOAT,false,28,0);gl.vertexAttribPointer(tint,4,gl.FLOAT,false,28,12);
   };
@@ -426,8 +475,8 @@ export function gpuWorldRender(renderer,w,h,dpr,project,transform) {
     bindShellTextures(gl,target,true);
   }
   gl.drawArrays(gl.TRIANGLES,0,opaqueCount);
+  screen();
   if(glassCount||target){
-    screen();
     gl.depthMask(false);gl.enable(gl.BLEND);
     gl.blendFuncSeparate(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA,gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
     if(target){

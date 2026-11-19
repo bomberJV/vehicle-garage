@@ -611,7 +611,7 @@ export class GarageRenderer{
  }
  mechanicalMesh(){
  if(this.build.vehicle==='bmw325ci'){drawE46Suspension(this);return;}
- const v=VEHICLES[this.build.vehicle],g=this.build.vehicle==='g500',awd=baseVehicle(this.build.vehicle)==='hrv',truck=v.body==='truck',w=v.width/2,wb=v.wheelbase,front=-wb/2,rear=wb/2,tag=(id,fn)=>this.tag(id,fn),box=(...a)=>this.box(...a),rod=(...a)=>this.rod(...a),metal='#69757c',dark='#353e43';
+ const v=VEHICLES[this.build.vehicle],g=this.build.vehicle==='g500',awd=baseVehicle(this.build.vehicle)==='hrv',truck=v.body==='truck',w=v.width/2,wb=v.wheelbase,[front,rear]=v.axles||[-wb/2,wb/2],tag=(id,fn)=>this.tag(id,fn),box=(...a)=>this.box(...a),rod=(...a)=>this.rod(...a),metal='#69757c',dark='#353e43';
  if(this.build.vehicle==='f350'){drawF350Chassis(this,tag);return;}
  tag('suspension.frame',()=>{if(g){drawG500Frame(this);return;}if(truck){for(const y of [-.48,.48])box(-wb/2-.43,y-.055,.35,wb/2+.40,y+.055,.49,dark);for(const x of [-wb/2,-.25,.63,wb/2])box(x-.045,-.52,.35,x+.045,.52,.46,dark);}else if(awd){
    // AWD HR-V: the front cradle sits beneath the half-shafts and transfer; the rear
@@ -836,7 +836,8 @@ export class GarageRenderer{
        g500ServiceOwnsFlow:b.vehicle==='g500'&&!ownGearbox});
      if(!ownGearbox&&getRoadDrivetrain(b.vehicle))this.faces=this.faces.filter(f=>f.part!=='powertrain.transmission');
      const radius=v.wheelRadius||(['sedan','coupe'].includes(v.body)?.33:v.body==='crossover'?.36:.405);
-     for(const x of [-v.wheelbase/2,v.wheelbase/2])for(const side of [-1,1]){
+     // A vehicle whose axles are not symmetric about x 0 lists both stations.
+     for(const x of v.axles||[-v.wheelbase/2,v.wheelbase/2])for(const side of [-1,1]){
        const track=x<0?v.trackFront:v.trackRear;
        this.instance((x<0?'front':'rear')+'-'+(side<0?'left':'right'),()=>this.wheel(x,side*(track?track/2:v.width/2-.08),x>0&&v.wheelRadiusRear||radius,finish,side));
      }

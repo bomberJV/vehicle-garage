@@ -34,7 +34,7 @@ function partId(piece,side){
 }
 function lowerEdge(cfg,x){
  let bottom=cfg.lowerHem?cfg.lowerHem(x):cfg.base;
- for(const axle of [-cfg.wb/2,cfg.wb/2]){
+ for(const axle of (cfg.axles||[-cfg.wb/2,cfg.wb/2])){
   const t=Math.abs(x-axle);
   if(t<cfg.arch)bottom=Math.max(bottom,cfg.axleZ+Math.sqrt(cfg.arch*cfg.arch-t*t));
  }
@@ -55,7 +55,7 @@ function skin(r,cfg,paint){
  for(let x=ends[0];x<ends.at(-1);x+=.11)cuts.add(+x.toFixed(6));
  // cfg.cuts: extra slice positions where a body changes shape quickly.
  for(const x of cfg.cuts||[])cuts.add(+x.toFixed(6));
- for(const ax of [-cfg.wb/2,cfg.wb/2])for(let i=0;i<=30;i++)cuts.add(+(ax+Math.cos(i*Math.PI/30)*cfg.arch).toFixed(6));
+ for(const ax of (cfg.axles||[-cfg.wb/2,cfg.wb/2]))for(let i=0;i<=30;i++)cuts.add(+(ax+Math.cos(i*Math.PI/30)*cfg.arch).toFixed(6));
  const xs=[...cuts].sort((a,b)=>a-b);
  for(let i=1;i<xs.length;i++){
   const x0=xs[i-1],x1=xs[i];if(x1-x0<.0002)continue;
@@ -145,7 +145,7 @@ function skin(r,cfg,paint){
    for(const [lo,hi] of [[0,.26],[.26,.61],[.61,1]])face(r,[cap(lo),edge(lo),edge(hi),cap(hi)],tint(paint,.75+.16*hi));
   }});
  }
- for(const ax of [-cfg.wb/2,cfg.wb/2])for(const side of [-1,1]){
+ for(const ax of (cfg.axles||[-cfg.wb/2,cfg.wb/2]))for(const side of [-1,1]){
   for(let i=0;i<42;i++){
    const a=i/42*Math.PI,b=(i+1)/42*Math.PI,ring=(angle,rad)=>{const x=ax+Math.cos(angle)*rad;return[x,side*(section(cfg.stations,x)[0]+(cfg.archReturn??.003)),cfg.axleZ+Math.sin(angle)*rad];};
    const middleX=ax+Math.cos((a+b)/2)*cfg.arch,which=sidePiece(cfg,middleX);

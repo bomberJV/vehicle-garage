@@ -68,9 +68,15 @@ const options={
     maker:'BMW',fitment:'2008 U.S. 328xi sedan. Standard 7J × 16 with 205/55R16 tires; Sport Package cars use 17-inch wheels.'}],
   bmw325ci:[{...stock('Star Spoke 43',[16],'Five broad cast spokes surround a recessed hub and roundel.',eParts,link('ECS Tuning · BMW Style 43 wheel','https://www.ecstuning.com/b-genuine-bmw-parts/whl7x16styl43/36111094505/')),
     maker:'BMW',partNumber:'36 11 1 094 505',fitment:'2003 U.S. 325Ci coupe. Standard 7J × 16 ET47, front and rear, with 205/55 R16 91H M+S tires.'},{
+    id:'style44',name:'Star Spoke 44',maker:'BMW',partNumber:'36 11 1 094 506',frontDiameter:17,rearDiameter:17,lugs:5,boltCircle:120,
+    description:'Seven flat, straight spokes run from the hub to the rim, with the wheel bolts exposed between them.',
+    fitment:'The 2003 U.S. 325Ci coupe Sport Package wheel. 8J × 17 ET47, front and rear, with 225/45 R17 tires.',
+    source:link('BMW Parts Deal · 36 11 1 094 506 fitment, 325Ci coupe','https://bmwpartsdeal.com/parts/bmw-light_alloy_rim-36111094506.html'),
+    buy:link('Hubcap Haven Style 44 wheel','https://www.hubcaphaven.com/p/2393/aly59290-bmw-320i-323i-325i-328i-330i-wheel-silver-36111094506.html')
+  },{
     id:'style68',name:'M Double Spoke 68',maker:'BMW',partNumber:'36 11 2 229 180 front / 36 11 2 229 135 rear',frontDiameter:17,rearDiameter:17,lugs:5,boltCircle:120,
     description:'Five pairs of swept, unequal-width arms with recessed valleys.',
-    fitment:'A staggered BMW wheel listed for the 325Ci. Front 7.5J × 17 ET41 with 225/45 R17. Rear 8.5J × 17 ET50 with 245/40 R17.',
+    fitment:'The 2003 330Ci Sport Package wheel, also catalogued for the 325Ci. Front 7.5J × 17 ET41 with 225/45 R17. Rear 8.5J × 17 ET50 with 245/40 R17.',
     source:link('BMW Style 68 parts diagram','https://www.bmwpartsdeal.com/parts-list/2003-bmw-325ci-coupe_m54_engine_e46/wheels/bmw_alloy_wheel_m_double_spoke.html'),
     buy:link('BMW Parts Center front wheel','https://www.bmwpartscenter.com/oem-parts/bmw-wheel-alloy-36112229180'),
     buyRear:link('BMW Parts Center rear wheel','https://www.bmwpartscenter.com/oem-parts/bmw-wheel-alloy-36112229135')
@@ -81,12 +87,12 @@ const options={
   },{
     id:'sportclassic',name:'17-inch Sport Classic',maker:'Porsche',partNumber:'993.362.124.51 front / 993.362.128.51 rear',frontDiameter:17,rearDiameter:17,lugs:5,boltCircle:130,
     description:'A fine mesh of branching spokes sits inside a stepped outer lip.',
-    fitment:'Narrow-body 993 Carrera. Front 7J × 17 ET55. Rear 9J × 17 ET55.',
+    fitment:'Narrow-body 993 Carrera. Front 7J × 17 ET55 with 205/50 ZR17. Rear 9J × 17 ET55 with 255/40 ZR17.',
     source:link('Porsche 993 summer wheel bulletin, Sport Classic, p. 4','https://members.rennlist.com/geolab/Summer%20tire%204440_2003_640703us.pdf#page=4'),buy:link('TEILE.COM Sport Classic set','https://www.teile.com/en/porsche-parts-shop/model-911-993/2/Wheels-brakes/601C-Wheel-rim-sets/218/601-01-Wheel-rim-sets/17-inch-SportClassic-wheel-set-7J-x-17-ET-55-9J-x-17-ET-55/39758')
   },{
-    id:'cupii',name:'17-inch Cup II',maker:'Porsche',partNumber:'993.362.124.00 front / 993.362.128.00 rear',frontDiameter:17,rearDiameter:17,lugs:5,boltCircle:130,
-    description:'Five smooth, gently curved cast paddles frame large open windows.',
-    fitment:'Narrow-body 993 Carrera. Front 7J × 17 ET55. Rear 9J × 17 ET55.',
+    id:'cupii',name:'17-inch Cup Design ’93 (Cup II)',maker:'Porsche',partNumber:'993.362.124.00 front / 993.362.128.00 rear',frontDiameter:17,rearDiameter:17,lugs:5,boltCircle:130,
+    description:'The five-paddle Cup Design ’93 face of the 16-inch wheel, cast at 17 inches.',
+    fitment:'Narrow-body 993 Carrera. Front 7J × 17 ET55 with 205/50 ZR17. Rear 9J × 17 ET55 with 255/40 ZR17. Porsche also lists a 9J × 17 ET70 rear, 993.362.128.01.',
     source:p993,buy:link('TEILE.COM Cup II set','https://teile.com/en/porsche-tequipment-shop/model-911-993/2/wheels-rims-and-accessories/601c-wheel-rim-sets/218/17-inch-cup-ii-wheel-set-7j-x-17-et55-9j-x-17-et55/21704')
   }],
   porsche996cab:[{...stock('17-inch Carrera',[17],'Five twisted cast spokes run from a flat hub to the rim flange.',p996,p996Trade),

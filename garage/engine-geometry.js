@@ -245,12 +245,13 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  else if(ford){}
  else if(cfg.banks===2){
   // The W204's filter boxes sit flatter on the cam covers, under its lower bonnet.
-  const boxZ=id==='c63'?.215:.25,boxH=id==='c63'?.07:.12;
+  const boxZ=id==='c63'?.215:.25,boxH=id==='c63'?.05:.12;
   tag('airbox',()=>{for(const side of [-1,1]){const y=side*.34,z=headZ+boxZ;box(-L/2+.03,y-.135,z,L/2+.01,y+.135,z+boxH,BLACK);for(let x=-L/2+.06;x<L/2;x+=.065)box(x,y-.11,z+boxH,x+.012,y+.11,z+boxH+.007,DARK);}});
-  tag('maf',()=>{const xx=-L/2-.16;tube([xx-.045,0,intakeZ],[xx+.045,0,intakeZ],.052,.040,DARK,12);box(xx-.025,-.025,intakeZ+.049,xx+.025,.025,intakeZ+.074,BLACK);});
+  // Under the W204's low bonnet the meter is slimmer and its sensor plugs in from the side.
+  tag('maf',()=>{const xx=-L/2-.16;if(id==='c63'){tube([xx-.045,0,intakeZ],[xx+.045,0,intakeZ],.034,.027,DARK,12);box(xx-.025,.031,intakeZ-.020,xx+.025,.056,intakeZ+.020,BLACK);return;}tube([xx-.045,0,intakeZ],[xx+.045,0,intakeZ],.052,.040,DARK,12);box(xx-.025,-.025,intakeZ+.049,xx+.025,.025,intakeZ+.074,BLACK);});
   tag('intake-duct',()=>{for(const side of [-1,1]){const y=side*.34;
    // The W204 snorkels run level and slimmer, between the cam drives and the bonnet.
-   if(id==='c63'){const z=headZ+.200,rad=.030;route([[-L/2-.28,side*.47,z-.07],[-L/2-.15,side*.44,z],[-L/2-.02,side*.38,z+.045],[-L/2+.06,y,z+.06]],rad,RUBBER,10);for(let n=0;n<4;n++){const xx=-L/2-.25+n*.025;tube([xx,side*.465,z-.06],[xx+.008,side*.465,z-.06],.036,.031,DARK,10);}const outlet=-L/2-.12;route([[outlet,y,z+.012],[outlet,side*.13,z-.008],[outlet,0,intakeZ],[throttleX+.02,0,intakeZ]],.032,RUBBER,10);continue;}
+   if(id==='c63'){const z=headZ+.200,rad=.030;route([[-L/2-.28,side*.47,z-.11],[-L/2-.15,side*.44,z-.014],[-L/2-.02,side*.38,z+.036],[-L/2+.06,y,z+.055]],rad,RUBBER,10);for(let n=0;n<4;n++){const xx=-L/2-.25+n*.025;tube([xx,side*.465,z-.088+n*.018],[xx+.008,side*.465,z-.088+n*.018],.036,.031,DARK,10);}const outlet=-L/2-.12;route([[outlet,y,z+.012],[outlet,side*.13,z-.008],[outlet,0,intakeZ],[throttleX+.02,0,intakeZ]],.032,RUBBER,10);continue;}
    const z=headZ+.30;route([[-L/2-.37,side*.56,z-.14],[-L/2-.15,side*.48,z-.08],[-L/2+.04,y,z]],.061,RUBBER,10);for(let n=0;n<5;n++){const xx=-L/2-.24+n*.025;tube([xx,side*.50,z-.10],[xx+.008,side*.50,z-.10],.065,.058,DARK,10);}const outlet=-L/2-.12;route([[outlet,y,z],[outlet,side*.13,z-.04],[outlet,0,intakeZ],[throttleX+.02,0,intakeZ]],.042,RUBBER,10);}});
  }else if(honda){
   // Airbox over the CVT, inboard of the left strut, behind the battery. The

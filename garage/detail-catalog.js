@@ -23,7 +23,8 @@ import {getFloorDetail} from './floor-trim.js';
 
 import {getSLStudy} from './sl550-studies.js';
 import {getG500M113Internals} from './g500-m113-internals.js';
-const lookups=[getG500M113Internals,getSLStudy,getBmwLighting,getBmwCabinDetail,getBmwFuelDetail,
+import {getG500CatalogStudy} from './g500-catalog-studies.js';
+const lookups=[getG500M113Internals,getG500CatalogStudy,getSLStudy,getBmwLighting,getBmwCabinDetail,getBmwFuelDetail,
   getM54DisaDetail,
   getCivilAirframeService,getCivilServiceDetail,
   getPorscheCrankcaseDetail,getG500LampDetail,

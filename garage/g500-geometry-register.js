@@ -15,7 +15,8 @@ export const basisLabels={
   measured:'Measured part',estimate:'Estimated shape',missing:'Open vehicle coverage',plate:'Catalog group review'
 };
 import installedChecks from './g500-evidence-installed.js';
-const sources=[...body,...engine,...drive,...chassis,...cabin,...electrical,...installedChecks];
+import {packClaims} from './g500-packs.js';
+const sources=[...body,...engine,...drive,...chassis,...cabin,...electrical,...installedChecks,...packClaims];
 const byPart=new Map();
 for(const claim of sources){
   for(const id of claim.ids){

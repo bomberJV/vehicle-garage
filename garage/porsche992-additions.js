@@ -11,6 +11,7 @@ import {hardwareGroups,hardwareDetail} from './porsche992-closures.js';
 import {sources,sectionFor,turbos} from './porsche992-sections.js';
 import {frontCoolantStudy} from './porsche-coolant.js';
 import {E992,beltX} from './porsche992-layout.js';
+import {fitGroups,fitDetail} from './p992-fits.js';
 
 const alloy='#9eacab',iron='#647479',rubber='#364248',plastic='#485457',copper='#ad8062';
 const left=[0,-.43,.09],right=[0,.43,.09],up=[0,0,.44],down=[0,0,-.33],rear=[.39,0,.16],front=[-.39,0,.12];
@@ -172,7 +173,7 @@ const turboPair=study('p992-turbo-pair','Opposed Carrera S turbochargers',
  'One turbocharger serves each cylinder bank. Porsche mirrors the turbine and compressor wheels. Open either cartridge to watch the shaft and both wheels turn.',sources.induction,sides.map(([s,hand])=>part(hand,title(s)+' turbocharger','Open this unit to inspect its rotating assembly and housings.',offset(s),r=>{
  const c=[0,s*.19,0];peg(r,c,x,-.10,-.018,.10,'#947e6c');peg(r,c,x,-.019,.046,.053,iron);peg(r,c,x,.047,.111,.107,alloy);sleeve(r,c,x,.110,.157,.057,.041,plastic,14);
 })));
-export const groups=[induction,radiator,climate,clutch,seats,lamps,...hardwareGroups,suspensionGroup];
+export const groups=[induction,radiator,climate,clutch,seats,lamps,...hardwareGroups,suspensionGroup,...fitGroups];
 export function drawGroup(r,id,paint){
  const g=groups.find(g=>g.id===id);
  for(const p of g?.parts||[])r.tag(p.id,()=>p.draw(r));
@@ -184,5 +185,5 @@ export function detailFor(partId){
  if(partId==='p992-turbo-pair.left')return turbos[0];
  if(partId==='p992-turbo-pair.right')return turbos[1];
  if(partId==='p992-coolant.pump')return frontCoolantStudy;
- return sectionFor(partId)||hardwareDetail(partId);
+ return sectionFor(partId)||hardwareDetail(partId)||fitDetail(partId);
 }

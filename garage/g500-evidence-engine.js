@@ -2,6 +2,7 @@ import {g500FilterSources} from './g500-filter-geometry.js';
 import {m113DataSheet} from './g500-m113-geometry.js';
 import {g500FlowRefs} from './g500-flow.js';
 import {m113InternalStudies,m113InternalSources} from './g500-m113-internals.js';
+import {g500CatalogStudies,catalogStudySources} from './g500-catalog-studies.js';
 
 const rod={label:'Mercedes-Benz Classic USA · A 113 030 00 20 connecting rod for 4.3 and 5.0 SOHC V8s',url:'https://classicparts.mbusa.com/oem-parts/mercedes-benz-connecting-rod-1130300020'};
 const training={label:'DaimlerChrysler technical training · M112/M113 engine repair, technical data, p. 3',url:'https://4vezde.com/wp-content/uploads/2023/10/2001.03_%D0%A0%D0%B5%D0%BC%D0%BE%D0%BD%D1%82-%D0%B4%D0%B2%D0%B8%D0%B3%D0%B0%D1%82%D0%B5%D0%BB%D0%B5%D0%B9_%D0%9C112-%D0%9C113.pdf'};
@@ -19,8 +20,14 @@ const internalClaims=[
  {ids:['g500-m113-timing.cover'],kind:'diagram',fact:'The 112-010-06-33 timing cover is listed for the 2002–2008 G500.',need:'Trace the cover outline and bolt pattern from the casting.',source:m113InternalSources.timingCover},
  {ids:internalIds(timing).filter(id=>!/crank-sprocket|intermediate|chain$|cover$/.test(id)),kind:'diagram',fact:'The M113 5.0 parts diagram lists the tensioner, rail, guides and front seal by number.',need:'Confirm numbers against the G500 VIN and measure the guide profiles.',source:m113InternalSources.m113Plate}
 ];
+const [hvacModule,frontPinion,frontHousing]=g500CatalogStudies;
+const catalogClaims=[
+ {ids:internalIds(hvacModule),kind:'diagram',fact:'The 2004 G500 evaporator and heater diagram lists each of these components by callout and Mercedes number.',need:'Measure each part on the fitted module and confirm 2002 applicability by VIN.',source:catalogStudySources.hvacPlate},
+ {ids:[...internalIds(frontPinion),...internalIds(frontHousing)],kind:'diagram',fact:'The G500 front axle diagram lists each of these components by callout and Mercedes number for the G500 and G55 AMG.',need:'Measure bearing cups, cones, seal bores and housing sections on the fitted axle.',source:catalogStudySources.frontAxlePlate}
+];
 export default [
  ...internalClaims,
+ ...catalogClaims,
  {ids:['powertrain.block','powertrain.head-gasket'],kind:'dimensioned',fact:'The M113.962 data table gives the 97 mm nominal bore used for the eight cylinder openings.',need:'Measure the bore-end chamfers, casting exterior, deck, gasket outline and water passages.',source:m113DataSheet},
  {ids:['powertrain.crankshaft','slider.crank'],kind:'dimensioned',fact:'The 84 mm stroke sets the crankpin centers 42 mm from the main axis. These stations drive both the installed crank and the animation.',need:'Match journal widths and diameters, counterweight profiles, fillets, oil drillings and end flanges to a dimensioned crankshaft.',source:m113DataSheet},
  {ids:['powertrain.crankshaft','slider.crank'],kind:'diagram',fact:'Relative throw phasing follows the M113 firing order of 1–5–4–2–6–3–7–8.',need:'Confirm the forging clocking relative to the flywheel datum and front keyway.',source:firing},

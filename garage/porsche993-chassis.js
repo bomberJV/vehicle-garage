@@ -95,7 +95,7 @@ function frontBar(r){
 }
 // ---------------- Rear axle (LSA multi-link) -------------------------------
 export const rear={
- axle:1.112,hubY:.655,wheelZ:.320,
+ axle:1.112,hubY:.655,wheelZ:.3195,
  ball:[1.112,.655,.222],top:[1.112,.636,.470],
  frontCross:[.845,.885],crossY:.430,crossZ:[.262,.300],
  lowerFront:[.865,.420,.281],lowerRear:[1.268,.490,.262],

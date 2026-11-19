@@ -170,7 +170,7 @@ export const views=new Map([
   ['body.rear-bench-back-left',rearBack],
   ['body.center-console',consoleParts],
   ['body.belt-lower-covers',pillarTrim],
-  ['door-g500-front-left.inner-handle',switches],
+  ['seat-heating.front-switches',switches],
   ['body.rear-bench-back-right',cargo]
 ]);
 

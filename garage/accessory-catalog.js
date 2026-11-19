@@ -35,9 +35,9 @@ const carrier993=listing(carrier993Id,'porsche993cab',roof,{
   name:'Porsche Tequipment Cabriolet load carrier', sku:'993 801 055 01', seller:'Porsche Classic Partner',
   type:'supplier search', fieldKind:'carrier', unit:'base carrier set',
   url:'https://www.porsche.com/usa/accessoriesandservice/classic/classic-partner/',
-  fit:'Porsche specifies this base carrier for the 993 Cabriolet, including the 1998 Carrera 2. Ask a Classic Partner about availability of the complete period set.',
-  description:'Two lockable crossbars carry optional touring attachments above the raised soft top. Remove the carrier to lower the top.',
-  source:reference('Porsche 993 Tequipment brochure, Touring, p. 15','https://porschecarshistory.com/wp-content/old/brochures3/32/2001%20993%20Tequipment.pdf#page=7')
+  fit:'The 993 Tequipment brochure lists 993 801 055 01 for the 911 Cabriolet (055 00 is the Coupé, 055 02 the Targa) and limits the load to 35 kg on the Cabriolet. It is long discontinued; ask a Classic Partner or look for a used set.',
+  description:'A lockable base carrier for Porsche touring attachments such as the ski holder (000 044 000 04) and bicycle carrier (000 044 000 48). The brochure photographs only the Coupé version, so the crossbar feet on the raised top are an approximation. The preview keeps the top up while the carrier is fitted.',
+  source:reference('Porsche 993 Tequipment brochure, Touring, p. 15: load carrier part numbers and limits','https://porschecarshistory.com/wp-content/old/brochures3/32/2001%20993%20Tequipment.pdf#page=8')
 });
 
 const litronic993=listing('993-litronic-us','porsche993cab','Headlights',{
@@ -45,7 +45,7 @@ const litronic993=listing('993-litronic-us','porsche993cab','Headlights',{
   fieldKind:'headlamps', url:'https://www.suncoastparts.com/product/993LITRONIC.html',
   fit:'US-spec 1994-1998 993 Carrera, including the 1998 Carrera 2 Cabriolet. Confirm US kit 000 044 900 15 and availability with the seller.',
   description:'The left and right xenon projectors replace the original headlamps in their fender openings. The kit includes both control units.',
-  source:reference('Porsche Classic parts catalog, Litronic plate 903-00','https://www.stuttcars.com/wp-content/uploads/2021/04/Classic-Accessories-1950-1998.pdf#:~:text=000%20044%20900%2015')
+  source:reference('Porsche Classic accessories catalogue, illustration 903-00: 000 044 900 15, USA 94–98, left and right headlamps, two control units and harnesses','https://www.stuttcars.com/wp-content/uploads/2021/04/Classic-Accessories-1950-1998.pdf#page=64')
 });
 
 export const FIELD_ACCESSORIES=[...g500FieldOptions,carrier993,litronic993];
@@ -89,9 +89,9 @@ export const ACCESSORY_PARTS = [
   listing('993-rs-lips','porsche993cab',aero,{
     name:'FVD RS-style front spoiler pair', sku:'FVD505993RS', seller:'FVD Brombacher', unit:'pair',
     url:'https://www.fvd.net/en-us/shop/front-lip-spoiler-993-rs-style-narrow-body-polyurethane-2-piece-fvd505993rs~p274946',
-    fit:'Narrow-body 1994–1998 Carrera 2 Cabriolet with its standard bumper. FVD lists separate left and right polyurethane pieces.',
-    description:'Two corner lips wrap back toward the front wheel arches and leave the middle of the bumper open.',
-    source:reference('FVD · left/right product views and Carrera Cabrio applications','https://www.fvd.net/en-us/shop/front-lip-spoiler-993-rs-style-narrow-body-polyurethane-2-piece-fvd505993rs~p274946')
+    fit:'FVD lists this narrow-body set for the 993 C2 (1994–98) and C4 (1995–98), without naming body styles; the 1998 Carrera 2 Cabriolet is a narrow-body C2. It fits the standard bumper without modifying the bodywork.',
+    description:'An aftermarket RS-style pair, left and right, in polyurethane. The two corner lips wrap back toward the front wheel arches and leave the middle of the bumper open.',
+    source:reference('FVD · FVD505993RS product page: narrow body, left and right pieces, 993 C2 (94–98) and C4 (95–98)','https://www.fvd.net/en-us/shop/front-lip-spoiler-993-rs-style-narrow-body-polyurethane-2-piece-fvd505993rs~p274946')
   }),
   listing('992-spoiler-lip','porsche992scab',aero,{
     name:'TECHART Rear Spoiler I', sku:'092.100.800.009', seller:'TECHART USA', unit:'spoiler', exclusive:'992-aero',

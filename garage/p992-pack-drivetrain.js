@@ -40,20 +40,13 @@ const mounts={id:'transmission-mounts',code:'306-000',title:'Mounting parts for 
  url:es('2020_(992-1)','306-000','MOUNTING_PARTS_FOR_ENGINE_AND'),
  rows:[['1','992399231A','Transmission carrier, manual gearbox'],['2','992399107B','Side member, manual gearbox',sh.bracket],['5','PAF008603','Threaded pin M10x110, transmission carrier to body'],['6','PAF008660','Hexagon nut M10'],['7','PAF009267','Hexagon bolt M10x40, transmission carrier to body']]};
 
-// 102-000 (crankshaft, conrods and flywheel): only the manual-gearbox flywheel
-// and its bolt are taken here; the crank drive belongs to the crank-ignition pack.
-// The page lists 9P1105262C and 9P1105262E for the manual; the later E is kept.
-const flywheel={id:'flywheel',code:'102-000',title:'Dual-mass flywheel, 7-speed manual',year:'2020 (992-1)',
- url:es('2020_(992-1)','102-000','CRANKSHAFT'),
- rows:[['12','9P1105262E','Dual-mass flywheel, manual gearbox',(r,c)=>{sh.round(r,c);sh.round(r,[c[0],c[1]+.05,c[2]]);}],['13','PAF906651','Socket head bolt M10x1x29 with multipoint head']]};
-
-const [shaft,hydraulics,box,mount,fly]=[driveShaft,clutchHydraulics,gearbox,mounts,flywheel].map(d=>catalogueStudy(d,'p992-drivetrain-'));
-export const studies=[shaft,hydraulics,box,mount,fly];
+// The flywheel rows of 102-000 are built by the crank-ignition pack.
+const [shaft,hydraulics,box,mount]=[driveShaft,clutchHydraulics,gearbox,mounts].map(d=>catalogueStudy(d,'p992-drivetrain-'));
+export const studies=[shaft,hydraulics,box,mount];
 export const views=new Map([
   ['shaft.bar',shaft],
   ['p992-clutch.line',hydraulics],
   ['diff.carrier',box],
-  ['clutch.flywheel',fly],
   // The gearbox opens its own mounting.
   ['p992-drivetrain-gearbox.r1-0c4300042',mount],
 ]);

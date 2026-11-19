@@ -126,7 +126,8 @@ const rearHub={id:'rear-wheel-hub',code:'501-000',title:'Rear wheel carrier and 
   ['9','PAF100829','Hexagon head bolt (combi) M6x16'],
  ]};
 
-const ds=[wheels,wheels20,wheels19,parts,caps,tpms,frontHub,rearHub];
+// The front hub diagram (401-005) is built by the front-axle pack.
+const ds=[wheels,wheels20,wheels19,parts,caps,tpms,rearHub];
 export const studies=ds.map(d=>catalogueStudy(d,P));
 const by=Object.fromEntries(ds.map((d,i)=>[d.id,studies[i]]));
 const w=`${P}alloy-wheels.`;
@@ -134,7 +135,6 @@ export const views=new Map([
   ['running.rims',by['alloy-wheels']],
   ['tire-section.beads',by['tyre-pressure']],
   ['tire-section.liner',by['wheel-parts']],
-  [w+'r1-992601025',by['front-wheel-hub']],
   [w+'r1-992601025a',by['rear-wheel-hub']],
   [w+'r2-992601025dd',by['hub-caps']],
   [w+'r4-992601025dg',by['alloy-wheels-titanium']],

@@ -33,7 +33,7 @@ export const c63Body={
  wb:2.76,arch:.385,axleZ:.367,base:.27,hoodEnd:-.83,deckStart:1.64,
  door:[-.76,.345,1.17],doorSill:.335,belt:.945,roofZ:1.405,roofWidth:.60,cabinWidth:.795,roofCrown:.036,screenSweep:.015,sideRound:.026,sailTints:[1.05,1.01,.97,.93,.90,.87],roofPinch:.02,
  hoodFrac:.86,hoodCrown:.032,
- hoodCrownAt:x=>.006+.026*clamp((x-FX(-2.17))/.50)**.8,customEnds:true,capFollowsSide:true,
+ hoodCrownAt:x=>.020+.012*clamp((x-FX(-2.17))/.50)**.8,customEnds:true,capFollowsSide:true,
  cabin:{cargo:[1.66,.40,.36],sillEnd:1.02,rearSeat:[1.18,1.49,.385,.515,1.40,1.49]},
  sideSection:(w,l)=>w+c63Side(l),
  sideLevels:[0,.07,.16,.30,.46,.62,.74,.80,.83,.88,.94,1],
@@ -44,7 +44,7 @@ export const c63Body={
  // Black B-pillar and the thin pillar ahead of the fixed rear quarter glass.
  blackouts:[[[.30,.968],[.405,.971],[.405,1.335],[.30,1.331]],[[.92,.987],[.985,.989],[.985,1.272],[.92,1.297]]],
  // Fender top from the lamp to the A-pillar base, then the belt and the boot.
- stations:[[FX(-2.17),.775,.815],[FX(-2.06),.845,.835],[FX(-1.92),.88,.848],[-1.72,.895,.862],[-1.38,.906,.893],[-1.08,.896,.915],[-.83,.888,.935],
+ stations:[[FX(-2.17),.775,.828],[FX(-2.06),.845,.835],[FX(-1.92),.88,.848],[-1.72,.895,.862],[-1.38,.906,.893],[-1.08,.896,.915],[-.83,.888,.935],
   [-.50,.885,.945],[.30,.887,.968],[1.00,.893,.990],[1.38,.902,1.000],[1.64,.892,.995],[RX(1.90),.878,.955],[RX(2.10),.852,.925],[RX(2.22),.80,.905]],
  wind:[[-.78,.978],[.0,1.336]],
  roof:[[.0,1.336],[.15,1.352],[.35,1.369],[.55,1.369],[.75,1.358],[.90,1.340],[1.0,1.322]],rear:[[1.0,1.322],[1.63,1.056]],
@@ -150,42 +150,59 @@ function frontEnd(r,paint){
  drawEnd(r,base,'body.structure',(z,y,u)=>tone(paint,mix(.90+.14*clamp((z-.40)/.45),.86,Math.abs(u)**5)),vs,cols);
  const lamp={tag:'lighting.headlamp'};
 
- // Grille: gloss-black frame around a black mesh, trapezoidal with a shallow V
- // at the bottom. One twin chrome louvre runs across into the star.
- const gTop=sym([[.30,.842],[.40,.838],[.432,.820],[.446,.785]]),gLow=sym([[0,.646],[.22,.655],[.36,.668],[.42,.686],[.442,.720],[.446,.785]]);
- const oTop=sym([[.30,.826],[.39,.822],[.418,.805],[.428,.785]]),oLow=sym([[0,.664],[.22,.672],[.35,.684],[.405,.700],[.424,.728],[.428,.785]]);
+ // Grille: a wide, flattened hexagon. The top edge peaks slightly at the
+ // centre, the bottom has a V, and the ends taper to rounded points. A thin
+ // gloss-black frame holds a fine black mesh; a single chrome bar runs out
+ // from the star at mid-height.
+ const gTop=sym([[0,.862],[.15,.858],[.30,.851],[.38,.845],[.415,.838],[.435,.826],[.446,.806],[.450,.776]]);
+ const gLow=sym([[0,.640],[.08,.648],[.20,.664],[.32,.683],[.40,.698],[.43,.708],[.445,.728],[.450,.776]]);
+ const oTop=sym([[0,.855],[.15,.851],[.30,.844],[.38,.838],[.412,.831],[.430,.819],[.440,.800],[.443,.776]]);
+ const oLow=sym([[0,.647],[.08,.655],[.20,.671],[.32,.690],[.40,.705],[.425,.714],[.438,.732],[.443,.776]]);
  band(gLow,gTop,GLOSS,.010,{mirror:false,step:.02});
  band(oLow,oTop,MESH,.012,{mirror:false,step:.02});
  r.tag('body.structure',()=>{
-  // Diamond mesh behind the louvre.
-  for(const dir of [-1,1])for(let k=-14;k<=14;k++){
-   const n=5;for(let i=0;i<n;i++){
-    const za=mix(.668,.826,i/n),zb=mix(.668,.826,(i+1)/n),ya=k*.032+dir*(za-.745)*.9,yb=k*.032+dir*(zb-.745)*.9;
-    const ok=(y,z)=>Math.abs(y)<.42&&z<edgeAt(oTop,y)-.003&&z>edgeAt(oLow,y)+.003;
+  // Fine diamond mesh.
+  for(const dir of [-1,1])for(let k=-20;k<=20;k++){
+   const n=7;for(let i=0;i<n;i++){
+    const za=mix(.647,.855,i/n),zb=mix(.647,.855,(i+1)/n),ya=k*.021+dir*(za-.75)*.9,yb=k*.021+dir*(zb-.75)*.9;
+    const ok=(y,z)=>Math.abs(y)<.44&&z<edgeAt(oTop,y)-.003&&z>edgeAt(oLow,y)+.003;
     if(!ok(ya,za)||!ok(yb,zb))continue;
-    r.polygon([s.on(ya-.0025,za,.0135),s.on(ya+.0025,za,.0135),s.on(yb+.0025,zb,.0135),s.on(yb-.0025,zb,.0135)],'#2b3236',false);
+    r.polygon([s.on(ya-.0016,za,.0135),s.on(ya+.0016,za,.0135),s.on(yb+.0016,zb,.0135),s.on(yb-.0016,zb,.0135)],'#1f2528',false);
    }
   }
  });
- for(const [z0,z1] of [[.748,.758],[.731,.740]])band([[.09,z0],[.425,z0-.002]],[[.09,z1],[.425,z1-.002]],CHROME,.016,{step:.04});
- r.tag('body.structure',()=>{const c=s.on(0,.744,.032);starBadge(r,c,.088,'x',-1);});
+ // The chrome bar, with a darker lower edge, from the star ring to the frame.
+ band([[.090,.754],[.432,.752]],[[.090,.761],[.432,.759]],CHROME,.016,{step:.04});
+ band([[.090,.750],[.432,.748]],[[.090,.754],[.432,.752]],'#7d878b',.016,{step:.04});
+ // The star: a chrome ring and a faceted three-pointed star, laid on the
+ // raked face so no part sinks behind the mesh. The mesh shows through.
+ r.tag('body.structure',()=>{
+  const z0=.754,Rr=.088,n=40,P=(a,rad,l)=>s.on(Math.cos(a)*rad,z0+Math.sin(a)*rad,l);
+  for(let i=0;i<n;i++){const a=i/n*2*Math.PI,b=(i+1)/n*2*Math.PI;
+   r.polygon([P(a,Rr-.011,.020),P(b,Rr-.011,.020),P(b,Rr,.020),P(a,Rr,.020)],tone(CHROME,.86+.22*Math.max(0,Math.sin((a+b)/2))),false);}
+  for(let k=0;k<3;k++){const a=Math.PI/2+k*2*Math.PI/3,tip=P(a,Rr-.012,.024),c=P(0,0,.026),l=P(a-Math.PI/3,Rr*.11,.022),rr=P(a+Math.PI/3,Rr*.11,.022);
+   r.polygon([c,tip,l],tone(CHROME,1.08),false);r.polygon([c,rr,tip],tone(CHROME,.74),false);}
+ });
  // Bonnet shut line along the top of the grille and the lamps.
- band([[0,.858],[.44,.856],[.50,.850],[.62,.852],[.74,.856]],[[0,.862],[.44,.860],[.50,.854],[.62,.856],[.74,.860]],'#22272a',.011,{step:.04});
+ band([[0,.872],[.44,.866],[.50,.858],[.62,.858],[.74,.860]],[[0,.876],[.44,.870],[.50,.862],[.62,.862],[.74,.864]],'#22272a',.011,{step:.04});
 
- // Headlamps: black housing, swept up toward the outer corner. Two projectors,
- // a chrome bezel and the LED strip along the lower edge.
- const lampLow=[[.462,.712],[.49,.668],[.60,.656],[.70,.664],[.78,.690],[.815,.716]];
- const lampTop=[[.462,.712],[.50,.800],[.56,.836],[.66,.848],[.75,.852],[.80,.842],[.815,.826]];
- band(lampLow,lampTop,'#1a1f22',.008,{...lamp,step:.02});
- band(shift(lampLow,.012),shift(lampTop,-.010),'#5b666c',.010,{...lamp,from:.50,to:.80,step:.02});
- band(shift(lampLow,.018),shift(lampTop,-.016),'#3b454b',.011,{...lamp,from:.51,to:.795,step:.02});
- for(const [y0,z,rad] of [[.560,.722,.036],[.680,.728,.046]])for(const y of [-y0,y0]){
-  // Satin surrounds and dark lenses: with the lamps off the real projectors barely show.
-  ringOn(r,s,'lighting.headlamp',y,z,rad,rad,'#727e83',.012);
-  ringOn(r,s,'lighting.headlamp',y,z,rad*.80,rad*.80,'#20282c',.0125);
-  ringOn(r,s,'lighting.headlamp',y,z,rad*.48,rad*.48,r.lights?'#eef3ee':'#4a575d',.013);
+ // Headlamps (facelift W204): a pointed inner end beside the grille, the top
+ // edge under the bonnet line, a black band along the top, a large round
+ // chrome bowl outboard and a smaller one inboard, a chrome line across the
+ // lower part and the LED strip along the bottom edge.
+ const lampTop=[[.462,.786],[.48,.800],[.54,.818],[.62,.836],[.70,.850],[.76,.856],[.795,.850],[.815,.830]];
+ const lampLow=[[.462,.786],[.49,.664],[.56,.660],[.66,.660],[.75,.670],[.80,.692],[.815,.720]];
+ band(lampLow,lampTop,'#15191b',.008,{...lamp,step:.02});
+ band(shift(lampLow,.010),shift(lampTop,-.022),'#2c3438',.010,{...lamp,from:.49,to:.80,step:.02});
+ band(shift(lampLow,.020),shift(lampLow,.025),'#8d979b',.011,{...lamp,from:.50,to:.79,step:.02});
+ for(const [y0,z,rad,k] of [[.575,.732,.032,.88],[.695,.756,.056,1]])for(const y of [-y0,y0]){
+  // Chrome reflector bowls: dark rim, bright chrome bowl, a small lens.
+  ringOn(r,s,'lighting.headlamp',y,z,rad,rad,tone('#59636a',k),.019);
+  ringOn(r,s,'lighting.headlamp',y,z,rad*.86,rad*.86,tone('#9aa4a9',k),.0195);
+  ringOn(r,s,'lighting.headlamp',y,z,rad*.62,rad*.62,tone('#c3cbce',k),.020);
+  ringOn(r,s,'lighting.headlamp',y,z,rad*.26,rad*.26,r.lights?'#eef2ec':tone('#7b868c',k),.0205);
  }
- band(shift(lampLow,.004),shift(lampLow,.013),r.lights?'#f6faf7':'#dfe7e8',.013,{...lamp,from:.51,to:.80,step:.02});
+ band(shift(lampLow,.004),shift(lampLow,.012),r.lights?'#f6faf7':'#dfe7e8',.013,{...lamp,from:.49,to:.80,step:.02});
  band(lampLow,lampTop,null,.017,{...lamp,glass:true,step:.02});
 
  // Apron. Central intake: a wide trapezoid with honeycomb mesh, over the black

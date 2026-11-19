@@ -22,7 +22,7 @@ export function roadWheelSpokes(r,{vehicle,x,y,z,side,rim,finish}){
  for(let i=0;i<5;i++){
   const a=i/5*Math.PI*2+Math.PI*.5;
   if(e90){
-   // Star Spoke 156: five V-shaped pairs that meet at the hub and spread to the rim.
+   // Double Spoke 156: five V-shaped pairs that meet at the hub and spread to the rim.
    for(const branch of [-1,1])blade(a,[[.26,branch*.040,.055,-.008],[.52,branch*.105,.048,.004],[.93,branch*.175,.040,.014]]);
   }else if(amg){
    // The W204 C63's factory 18-inch AMG 5-spoke (A 204 401 39 02 front): five

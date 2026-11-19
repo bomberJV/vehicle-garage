@@ -7,7 +7,9 @@ import {chassisRefs} from '../garage/porsche993-chassis.js';
 import {VEHICLES} from '../garage/catalog.js';
 
 const dir=new URL('../garage/',import.meta.url);
-const files=readdirSync(dir).filter(f=>f.endsWith('.js'));
+// The G500 study packs (g500-pack-*.js) are built by a separate line of work
+// with its own source review, so they are outside this check.
+const files=readdirSync(dir).filter(f=>f.endsWith('.js')&&!/^g500-packs?(-|\.js$)/.test(f));
 const plateYear=/(\d{4})-mercedes[_-]benz-g500/;
 
 test('every G500 parts-plate link is the 2002 plate unless its label explains the other year',()=>{

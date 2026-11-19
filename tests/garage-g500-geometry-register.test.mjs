@@ -53,6 +53,12 @@ test('each explicit source claim references a selectable part, a scoped fact and
       for(const id of claim.ids){assert.ok(records.parts.has(id),category+' / '+id);assert.ok(records.parts.get(id).claims.includes(claim));total++;}
     }
   }
+  const {packClaims}=await import('../garage/g500-packs.js');
+  for(const claim of packClaims){
+    assert.ok(basisLabels[claim.kind]&&claim.fact&&claim.need&&claim.source.label);
+    assert.equal(new URL(claim.source.url).protocol,'https:');
+    for(const id of claim.ids){assert.ok(records.parts.has(id),'pack / '+id);assert.ok(records.parts.get(id).claims.includes(claim));total++;}
+  }
   assert.ok(total>=records.checked&&records.checked>0);
 });
 

@@ -64,7 +64,7 @@ const options={
     source:link('Honda HPD wheel and installation sheet','https://www.collegehillshonda.com/product/08W17-3V0-100.html'),
     buy:link('Honda Automotive Parts HPD wheel','https://www.hondaautomotiveparts.com/oem-parts/honda-17-inch-glint-black-hpd-alloy-wheels-8w173v0100')
   }],
-  bmw328xi:[{...stock('Star Spoke 156',[16],'Five pairs of spokes meet at the hub and spread toward the rim.',e90Spec),
+  bmw328xi:[{...stock('Double Spoke 156',[16],'Five pairs of spokes meet at the hub and spread toward the rim.',e90Spec),
     maker:'BMW',fitment:'2008 U.S. 328xi sedan. Standard 7J × 16 with 205/55R16 tires; Sport Package cars use 17-inch wheels.'}],
   bmw325ci:[{...stock('Star Spoke 43',[16],'Five broad cast spokes surround a recessed hub and roundel.',eParts,link('ECS Tuning · BMW Style 43 wheel','https://www.ecstuning.com/b-genuine-bmw-parts/whl7x16styl43/36111094505/')),
     maker:'BMW',partNumber:'36 11 1 094 505',fitment:'2003 U.S. 325Ci coupe. Standard 7J × 16 ET47, front and rear, with 205/55 R16 91H M+S tires.'},{

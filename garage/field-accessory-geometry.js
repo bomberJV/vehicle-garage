@@ -1,12 +1,13 @@
 import {headlamp993} from './porsche993-trim.js';
 import {coupeShape,porscheDeckPoint} from './porsche-coachwork.js';
+import {classicTailpipe,classicTailpipeEnd} from './porsche993-body-profile.js';
 import {roofPoint,roofSections} from './porsche-raised-top.js';
 import {barrel,tint} from './road-primitives.js';
 import {G500_FRONT} from './g500-lamps.js';
 
 const black='#303638',rubber='#24292a',steel='#596265',bright='#aeb8b9',dark='#444c4f';
 const TAU=Math.PI*2;
-const offsets={headlamps:[-.32,0,.24],carrier:[0,0,.48],guard:[-.65,0,0],ladder:[.48,-.37,.06],snorkel:[0,.56,.08],aux:[-.23,0,.47],display:[-.40,0,-.10]};
+const offsets={headlamps:[-.32,0,.24],carrier:[0,0,.48],skiCarrier:[0,0,.48],strutBrace:[-.30,0,.30],tailpipes:[.28,0,-.04],windDeflector:[.10,0,.42],sillGuards:[0,0,.22],guard:[-.65,0,0],ladder:[.48,-.37,.06],snorkel:[0,.56,.08],aux:[-.23,0,.47],display:[-.40,0,-.10]};
 
 export function defaultAccessoryOffset(kind){return offsets[kind];}
 
@@ -180,9 +181,93 @@ function carrier993(r){
   }
 }
 
+// Ski holder 000 044 000 04 on the Cabriolet base carrier: a rubber-jawed
+// clamp across each crossbar holding the skis lengthwise. Two pairs are shown.
+function skiCarrier993(r){
+  carrier993(r);
+  const rows=roofSections(coupeShape[0]),xs=[rows[1][0],rows[4][0]],barZ=1.404;
+  for(const x of xs){
+    r.box(x-.028,-.34,barZ+.015,x+.028,.34,barZ+.032,black);
+    r.box(x-.024,-.33,barZ+.032,x+.024,.33,barZ+.038,rubber);
+    r.box(x-.030,-.34,barZ+.062,x+.030,.34,barZ+.078,black);
+    for(const y of [-.33,.33])r.box(x-.026,y-.012,barZ+.032,x+.026,y+.012,barZ+.066,dark);
+  }
+  const front=Math.min(...xs)-.62,rear=Math.max(...xs)+.62;
+  for(const y of [-.24,-.17,.17,.24]){
+    const z=barZ+.038,len=rear-front;
+    for(let k=0;k<12;k++){
+      const a=front+len*k/12,b=front+len*(k+1)/12,lift=u=>u<.06?(.06-u)*.9:0;
+      const ua=k/12,ub=(k+1)/12;
+      r.polygon([[a,y-.033,z+lift(ua)],[b,y-.033,z+lift(ub)],[b,y+.033,z+lift(ub)],[a,y+.033,z+lift(ua)]],'#2c3133',false);
+      r.polygon([[a,y-.033,z+.011+lift(ua)],[b,y-.033,z+.011+lift(ub)],[b,y+.033,z+.011+lift(ub)],[a,y+.033,z+.011+lift(ua)]],y<0?'#b8382e':'#d6dadb',false);
+    }
+  }
+}
+
+// Tequipment front strut brace 964 343 042 00 across the two front strut
+// towers in the luggage compartment, under the lid.
+function strutBrace993(r){
+  const x=-1.122,plateZ=.742,barZ=.757;
+  for(const s of [-1,1]){
+    const [ya,yb]=[s*.425,s*.515].sort((a,b)=>a-b),[yc,yd]=[s*.435,s*.470].sort((a,b)=>a-b);
+    r.box(x-.052,ya,plateZ,x+.052,yb,plateZ+.007,steel);
+    for(const dx of [-.033,0,.033])barrel(r,[x+dx,s*.490,plateZ+.007],[x+dx,s*.490,plateZ+.016],.006,bright,8);
+    r.box(x-.020,yc,plateZ+.007,x+.020,yd,barZ+.010,dark);
+  }
+  barrel(r,[x,-.452,barZ],[x,.452,barZ],.0135,'#b8302b',16);
+  for(const s of [-1,1])barrel(r,[x,s*.40,barZ],[x,s*.452,barZ],.0155,'#8f2622',16);
+}
+
+// Sports tail pipes 000 044 200 01: chrome stainless sleeves with a larger
+// oval section than the standard outlets, one under each rear corner.
+function tailpipes993(r){
+  const tip=classicTailpipeEnd(),{y:ty,z}=classicTailpipe,n=24;
+  for(const s of [-1,1]){
+    const y=s*ty,ring=(x,a,b)=>Array.from({length:n},(_,i)=>[x,y+a*Math.cos(i*TAU/n),z+b*Math.sin(i*TAU/n)]);
+    const rings=[ring(tip-.012,.071,.046),ring(tip+.030,.080,.052),ring(tip+.046,.080,.052)];
+    linkRings(r,rings,'#d4dbdd','#aeb6b8');
+    r.polygon(ring(tip+.047,.066,.039),'#1d2224',false);
+  }
+}
+
+// Folding wind deflector 000 043 202 10: an upright mesh screen behind the
+// front seats and a cover over the rear seats. It can stay in place when the
+// top is closed.
+function windDeflector993(r){
+  const x=.335,zLow=.690,zTop=.975,w=.54,rear=.605,frame='#1f2325',mesh='#3a3f42';
+  barrel(r,[x,-w,zLow],[x,-w,zTop],.009,frame,8);barrel(r,[x,w,zLow],[x,w,zTop],.009,frame,8);
+  barrel(r,[x,-w,zTop],[x,w,zTop],.009,frame,8);barrel(r,[x,-w,zLow],[x,w,zLow],.009,frame,8);
+  for(let i=0;i<8;i++){
+    const y0=-w+.012+(2*w-.024)*i/8,y1=-w+.012+(2*w-.024)*(i+1)/8;
+    r.polygon([[x,y0,zLow+.01],[x,y1,zLow+.01],[x,y1,zTop-.01],[x,y0,zTop-.01]],i%2?mesh:tint(mesh,1.08),false);
+  }
+  barrel(r,[x,-w,zLow],[rear,-w,zLow],.008,frame,8);barrel(r,[x,w,zLow],[rear,w,zLow],.008,frame,8);
+  barrel(r,[rear,-w,zLow],[rear,w,zLow],.008,frame,8);
+  for(let i=0;i<6;i++){
+    const a=x+.01+(rear-x-.02)*i/6,b=x+.01+(rear-x-.02)*(i+1)/6;
+    r.polygon([[a,-w+.01,zLow+.004],[b,-w+.01,zLow+.004],[b,w-.01,zLow+.004],[a,w-.01,zLow+.004]],i%2?'#2b2f31':'#323739',false);
+  }
+}
+
+// Stainless door entry guards 993 551 980 01 ("Carrera") on both sills.
+function sillGuards993(r){
+  const x0=-.560,x1=.470,z=.4865,n=14;
+  for(const s of [-1,1]){
+    const yIn=s*.530,yOut=s*.576;
+    // Faces wind so each strip faces up on both sides.
+    for(let i=0;i<n;i++){
+      const a=x0+(x1-x0)*i/n,b=x0+(x1-x0)*(i+1)/n,shade=i%2?'#c4cacc':'#cfd5d7';
+      r.polygon([[a,yIn,z+.002],[b,yIn,z+.002],[b,yOut,z+.002],[a,yOut,z+.002]],shade,false);
+      r.polygon([[a,yIn,z],[b,yIn,z],[b,yIn,z+.002],[a,yIn,z+.002]],'#9aa1a3',false);
+    }
+    const m=(x0+x1)/2;
+    r.polygon([[m-.10,s*.546,z+.0025],[m+.10,s*.546,z+.0025],[m+.10,s*.560,z+.0025],[m-.10,s*.560,z+.0025]],'#2d3234',false);
+  }
+}
+
 const g500Draw={guard:gGuard,ladder:gLadder,snorkel:gSnorkel,aux:gAux,display:gDisplay};
 const cabrio993Draw={
-  carrier:carrier993,
+  carrier:carrier993,skiCarrier:skiCarrier993,strutBrace:strutBrace993,tailpipes:tailpipes993,windDeflector:windDeflector993,sillGuards:sillGuards993,
   headlamps(r,paint){
     for(const side of [-1,1])headlamp993(r,coupeShape[0],side,paint,porscheDeckPoint,true);
   }

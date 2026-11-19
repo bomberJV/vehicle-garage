@@ -1,6 +1,7 @@
 export const carrier993Id='993-cabrio-load-carrier';
+export const skiCarrier993Id='993-cabrio-ski-carrier';
 export function hasRoofCarrier(build){
-  return build.vehicle==='porsche993cab'&&build.parts?.includes(carrier993Id);
+  return build.vehicle==='porsche993cab'&&(build.parts?.includes(carrier993Id)||build.parts?.includes(skiCarrier993Id))===true;
 }
 export const roofReferences={
   sl550:{label:'Mercedes-Benz SL operator’s manual',url:'https://www.mbusa.com/content/dam/mb-nafta/us/owners/manuals/2014/operators/MY14_SL_Operator.pdf'},

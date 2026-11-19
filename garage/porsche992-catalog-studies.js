@@ -4,6 +4,7 @@
 // sensor, housing and so on); sizes and shapes are representative, while the
 // names, part numbers and grouping follow the cited diagram.
 import {TAU,metal,steel,dark,gold,turn,cyl,sleeve,bead,part,study,x,y,z} from './mechanism-shapes.js';
+export {draws as catalogueShapes};
 import {p992Diagrams} from './porsche992-catalog-data.js';
 
 const rubber='#26292b',plastic='#3a3f42',alloy='#9aa5a8',paint='#8a8f90',fabric='#3f4142',copperish='#b9875a';
@@ -62,23 +63,27 @@ const grey='#7f898c';
 // Side-handed parts lean to their own side of the grid.
 const slug=s=>s.toLowerCase().replace(/[^a-z0-9]/g,'');
 
-function build(d){
+// Builds a study from one catalogue diagram {id,code,title,year,url,rows}.
+// rows are [ref, Porsche number, description] with an optional fourth entry:
+// a draw(r,c) function that replaces the representative shape at grid cell c.
+export function catalogueStudy(d,prefix='p992-cat-'){return build(d,prefix);}
+function build(d,prefix='p992-cat-'){
   const n=d.rows.length,cols=Math.ceil(Math.sqrt(n*1.6)),rows=Math.ceil(n/cols),seen=new Map();
-  const parts=d.rows.map(([ref,mpn,name],i)=>{
+  const parts=d.rows.map(([ref,mpn,name,custom],i)=>{
     let id=`r${slug(ref)}-${slug(mpn)||'ref'}`;const k=(seen.get(id)||0)+1;seen.set(id,k);if(k>1)id+='-'+k;
     const col=i%cols,row=Math.floor(i/cols),c=[(col-(cols-1)/2)*.3,0,((rows-1)/2-row)*.26];
     const len=Math.hypot(c[0],c[2])||1,offset=[c[0]/len*.18,-.12,c[2]/len*.12];
-    const kind=kindOf(name),draw=draws[kind];
+    const kind=kindOf(name),draw=custom||draws[kind];
     return part(id,`${name} · ${mpn}`,`Ref. ${ref} on Porsche catalogue diagram ${d.code}. The shape is representative; the part number and name are from the catalogue.`,offset,r=>draw(r,c));
   });
   const source={label:`Eurospares · Porsche ${d.year} catalogue diagram ${d.code}, ${d.title.toLowerCase()}`,url:d.url};
   for(const p of parts)p.source=source;
-  const s=study(`p992-cat-${d.id}`,d.title,`Porsche catalogue diagram ${d.code} for the 992.1, laid out in diagram order: ${n} parts, each with its Porsche part number. Shapes are representative.`,source,parts);
-  s.viewAngle=[-.55,.25];s.catalogue={code:d.code,year:d.year,rows:n};
+  const s=study(`${prefix}${d.id}`,d.title,`Porsche catalogue diagram ${d.code} for the 992.1, laid out in diagram order: ${n} parts, each with its Porsche part number. Shapes are representative.`,source,parts);
+  s.viewAngle=[-.55,.25];s.catalogue={code:d.code,title:d.title,year:d.year,url:d.url,rows:n};
   return s;
 }
 
-export const p992CatalogStudies=p992Diagrams.map(build);
+export const p992CatalogStudies=p992Diagrams.map(d=>build(d));
 const views=new Map(p992Diagrams.map((d,i)=>[d.attach,p992CatalogStudies[i]]));
 export function getP992CatalogStudy(vehicle,id){
   if(vehicle!=='porsche992scab')return null;

@@ -1,5 +1,5 @@
 import {TAU,metal,steel,dark,gold,tint,turn,cyl,sleeve,part,study,y,origin} from './mechanism-shapes.js';
-const source={label:'Honda · variable-width pulleys and steel belt',url:'https://hondanews.com/en-US/releases/2016-honda-hr-v-powertrain'};
+const source={label:'Honda · 2023 HR-V press kit, CVT pulleys and steel belt',url:'https://hondanews.com/en-US/releases/release-db2492147c55da663fd32edfea1e6a46-2023-honda-hr-v-press-kit'};
 const beltSource={label:'Bosch · steel pushbelt and ring packs',url:'https://www.bosch-mobility.com/en/solutions/transmission-technology/pushbelt/'};
 const spacing=2.0,z0=.82;
 const initialLength=2*spacing+TAU*.57;

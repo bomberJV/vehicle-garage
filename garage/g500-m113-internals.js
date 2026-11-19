@@ -6,7 +6,7 @@ import {TAU,metal,steel,dark,gold,copper,turn,cyl,sleeve,gear,part,study,x,y,z} 
 
 const m113Plate={label:'MB Parts Giant · M113 5.0 engine parts, timing and lubrication diagram (2004 E500)',url:'https://mbpartsgiant.com/parts-list/2004-mercedes_benz-e500/engine/engine-parts-mounts-timing-lubrication-system'};
 const camGears={label:'MB Parts Giant · G500 camshaft and intermediate sprockets, 2002–2008 G500 fitment',url:'https://www.mbpartsgiant.com/oem-mercedes_benz-g500-cam_gear'};
-const g500Timing={label:'Mercedes-Benz Classic USA · G500 engine timing parts',url:'https://classicparts.mbusa.com/v-2007-mercedes-benz-g500--base--5-0l-v8-gas/engine--engine'};
+const g500Timing={label:'Mercedes-Benz Classic USA · 2007 G500 engine timing plate; the 2002–2008 G500 shares the M113 5.0 camshaft and intermediate sprockets and timing cover',url:'https://classicparts.mbusa.com/v-2007-mercedes-benz-g500--base--5-0l-v8-gas/engine--engine'};
 const timingCover={label:'MB Parts Giant · 112-010-06-33 timing cover, 2002–2008 G500 fitment',url:'https://www.mbpartsgiant.com/genuine/mercedes-benz~timing-cover~1120100633'};
 const rockerArm={label:'MB Parts Giant · 113-050-01-33 rocker arm',url:'https://www.mbpartsgiant.com/genuine/mercedes-benz~rocker-arms~1130500133'};
 const rockerShaft={label:'MB Parts Giant · 113-050-07-31 rocker shaft',url:'https://www.mbpartsgiant.com/genuine/mercedes-benz~rocker-shaft~1130500731'};

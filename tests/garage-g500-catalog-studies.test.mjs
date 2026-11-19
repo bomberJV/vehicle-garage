@@ -20,7 +20,7 @@ test('every catalog-study part is numbered, sourced, drawn and registered with a
       assert.match(p.name,/\d{3}-\d{3}-\d{2}-\d{2}/,p.id);
       assert(faces[p.id]>0,p.id+' draws nothing');
       const row=g.parts.get(p.id);assert(row&&row.claims.length,p.id);
-      assert.match((p.source||s.source).url,/mbpartsgiant\.com\/parts-list\/200[3458]-mercedes_benz-g500\//,p.id);
+      assert.match((p.source||s.source).url,/mbpartsgiant\.com\/parts-list\/200[28]-mercedes_benz-g500\//,p.id);
     }
   }
   assert(total>=70);

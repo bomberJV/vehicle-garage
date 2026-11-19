@@ -7,7 +7,7 @@ import {add, mix, part, cyl, turn, x, y, z, TAU} from './mechanism-shapes.js';
 export const chassisRefs={
  frontAxle:{label:'Porsche 993 parts catalogue · 401-000 cross member, track control arm',url:'https://eurospares.co.uk/Porsche/993/993_(1997)/PartDiagrams/401-000/CROSS_MEMBER_-_TRACK_CONTROL_ARM'},
  frontCarrier:{label:'Porsche 993 parts catalogue · 401-005 wheel carrier, wheel hub',url:'https://eurospares.co.uk/Porsche/993/993_(1994)/PartDiagrams/401-005/WHEEL_CARRIER_-_WHEEL_HUB'},
- strut:{label:'Design911 · 993 front suspension, shock absorber strut (402-00)',url:'https://www.design911.co.uk/porsche/993--911--rs-1994-97/porsche-front-shock-absorber-parts/'},
+ strut:{label:'Design911 · 993 Carrera 1994–98 front suspension, shock absorber strut (402-00)',url:'https://www.design911.co.uk/porsche/993--911--1994-98/porsche-front-shock-absorber-parts/'},
  shocks:{label:'Porsche Technical Information 145/15 · 993 replacement shock absorbers, coil springs and rear stabilizer links',url:'https://static.nhtsa.gov/odi/tsbs/2017/MC-10117512-9999.pdf'},
  rearAxle:{label:'Porsche 993 parts catalogue · 501-000 rear axle (wheel carrier, side panel, track control arms)',url:'https://www.eurospares.co.uk/Porsche/993/1998_(993)/PartDiagrams/501-000/REAR_AXLE'},
  rearCarrier:{label:'Porsche 993 parts catalogue · 501-001 rear axle carrier, stabilizer',url:'https://www.eurospares.co.uk/Porsche/993/1998_(993)/PartDiagrams/501-001/REAR_AXLE_CARRIER_-_STABILIZER'},

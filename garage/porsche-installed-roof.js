@@ -37,9 +37,11 @@ function mount(car,s){return car.modern?moved(car,[.755,s*.612,.763]):[.693,s*.5
 function positioned(r,id,alias,draw){r.tag(alias?'cabin.top':'roof.'+id,draw);}
 function roofFrame(r,car,raised,alias){
   const rows=roofSections(car);
-  // Only the 992 roof has panel bows and hydraulic cylinders. The 996 keeps
-  // tubular bows and an electric drive under its body-colour compartment lid.
-  const panel=car.kit?.id==='992';
+  // Only the 992 roof has panel bows. The 996 keeps tubular bows under its
+  // body-colour compartment lid; like the 992 it is moved by one hydraulic
+  // cylinder per side (parts suppliers list cylinder 997 561 945 02 for the
+  // 996 and 997, two per car). Cylinder positions are estimated.
+  const panel=car.kit?.id==='992',hydraulic=panel||car.variant==='996';
   const beam=(stage,u)=>{
     if(!raised)return loweredPoint(car,stage,u);
     const p=roofPoint(rows[[0,2,3,4][stage]],u);
@@ -125,7 +127,7 @@ function roofFrame(r,car,raised,alias){
       }
     });
     positioned(r,'drive',alias,()=>{
-      if(panel){
+      if(hydraulic){
         const aft=moved(car,[.890,s*.620,.705]),rodEnd=mix(a,elbow,.78),guide=mix(aft,rodEnd,.60);
         r.rod(aft,guide,.016,iron,10);r.rod(guide,rodEnd,.007,alloy,8);
         for(const p of [aft,rodEnd])sleeve(r,p,y,-.009,.009,.014,.006,alloy,8);
@@ -133,12 +135,10 @@ function roofFrame(r,car,raised,alias){
         // One center drive motor and two flexible shafts from model year 1996.
         // The left and right planetary transmissions are fixed at the main hinge.
         cyl(r,a,y,-.016,.016,.034,iron,12);
-        // The 996 motor sits under its compartment lid, 0.18 m behind the 993's.
-        const [ox,oz]=car.variant==='996'?[.177,.008]:[0,0];
-        const pickup=[a[0]+.019,s*.557,a[2]-.012],guide=[.794+ox,s*.445,.711+oz],socket=[.797+ox,s*.097,.714+oz];
+        const pickup=[a[0]+.019,s*.557,a[2]-.012],guide=[.794,s*.445,.711],socket=[.797,s*.097,.714];
         r.rod(socket,guide,.006,trim,7);r.rod(guide,pickup,.006,trim,7);
         if(s===-1){
-          const c=[.797+ox,0,.714+oz];
+          const c=[.797,0,.714];
           cyl(r,c,y,-.090,.090,.030,iron,12);
           for(const k of [-1,1])cyl(r,c,y,k*.088,k*.104,.017,alloy,10);
         }

@@ -10,7 +10,7 @@ import {pipe,barrel} from './road-primitives.js';
 const TAU=Math.PI*2, phaseTravel=phase=>(1-Math.cos(TAU*phase))*.5;
 const sources={
   classic:{label:'Porsche PET · 993 rear spoiler drive, plate 803-15',url:'https://www.design911.co.uk/diagrams/d/40739/0/'},
-  type996:{label:'Porsche PET · 996 rear spoiler, plate 803-007 (drive unit and electric motor)',url:'https://eurospares.co.uk/Porsche/996/996_(2001)/PartDiagrams/803-007/REAR_SPOILER'},
+  type996:{label:'Rose Passion · 1999 996 Carrera 2 Cabriolet 6-speed rear spoiler (driving mechanism and electric motor, European parts catalogue)',url:'https://www.rosepassion.com/en/diagrams-porsche-996-1999-eu-996-carrera-2-cabrio-manual-gearbox-6-speed/bodywork-271/rear-spoiler-1536'},
   new:{label:'Porsche · Carrera S Cabriolet active aerodynamics',url:'https://newsroom.porsche.com/dam/jcr%3A027b3198-602a-498d-b4fc-52e6e3b5261a/2020_911_Carrera_S_and_4S_Cabriolet_US_Press_Kit.pdf.PDF#page=10'},
   carrier:{label:'TECHART · original 992 motor, carrier and Hall sensor, figures 35–38',url:'https://www.techart.de/fileadmin/mediapoint/6b6d8f2a844669b49e8197fb041bf6f.pdf'}
 };

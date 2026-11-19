@@ -1,5 +1,7 @@
 import {g500FieldOptions} from './g500-field-options.js';
 import {carrier993Id,skiCarrier993Id} from './porsche-roof-state.js';
+import {e90FieldOptions} from './e90-accessory-options.js';
+import {sl550Accessories} from './sl550-accessories.js';
 // The IDs g-rack and f-bed also occur in older saved builds and presets.
 const roof = 'Roof racks';
 const aero = 'Body kits & aero';
@@ -91,7 +93,7 @@ const tequipment993Items=[
   })
 ];
 
-export const FIELD_ACCESSORIES=[...g500FieldOptions,carrier993,litronic993,...tequipment993Items];
+export const FIELD_ACCESSORIES=[...g500FieldOptions,carrier993,litronic993,...tequipment993Items,...e90FieldOptions,...sl550Accessories];
 export const ACCESSORY_PARTS = [
   ...FIELD_ACCESSORIES,
   listing('g-rack-short','g500',roof,{

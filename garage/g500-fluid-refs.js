@@ -11,7 +11,7 @@ export const fluidRefs={
  ballGear:ref('Rane steering systems · recirculating-ball steering section','https://ranegroup.com/wp-content/uploads/2022/04/issue27_oct2021.pdf'),
  oil:ref('Mercedes-Benz Classic USA · 2002 G500 engine, oil pump and pan',classic+'engine--engine'),
  filter:ref('2002 G500 · oil-filter housing, cartridge, seals and oil heat exchanger, plate 2',catalog+'maintenance-lubrication/filters'),
- jets:ref('Mercedes-Benz WIS · 113.962 in 463, pressure galleries, bearing feeds and oil jets','https://lemon-manuals.la/Mercedes%20Benz/2004/G%20500%20%28463.249%29%20V8-5.0L%20%28113.962%29/Repair%20and%20Diagnosis/Engine%2C%20Cooling%20and%20Exhaust/Engine/Service%20and%20Repair/Procedures/GF01.00-P-9611-01G%20General%20Information%20on%20Repair%20Notes/'),
+ jets:ref('Mercedes-Benz WIS · 113.962 in 463, pressure galleries, bearing feeds and oil jets','https://lemon-manuals.la/Mercedes%20Benz/2002/G%20500%20%28463.249%29%20V8-5.0L%20%28113.962%29/Repair%20and%20Diagnosis/Engine%2C%20Cooling%20and%20Exhaust/Engine/Service%20and%20Repair/Procedures/GF01.00-P-9611-01G%20General%20Information%20on%20Repair%20Notes/'),
  atfFilter:ref('MANN-FILTER · H 182 KIT dimensional drawing, OE numbers and 722.6 application','https://www.mann-filter.com/en/catalog/search-results/product.html/h182kit_mann-filter.html'),
  atfPan:ref('Mercedes-Benz Classic USA · G500 transmission pan, gasket, plug and filter',classic+'maintenance-and-lubrication--transmission-components'),
  atfCooler:ref('2002 G500 · transmission cooler, pipe unions, mounting brackets and bushings',catalog+'belts-cooling/trans-oil-cooler'),

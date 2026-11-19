@@ -13,6 +13,8 @@
 // latches, hinges and hinge pins, door checks, regulators, strikers, lock actuators and knobs,
 // mirror assemblies, glass and base gaskets, the hood skin, insulation, stiffeners, vent grille
 // and emblem, the windshield glass and the wiper arms, blades, linkage and motor.
+// Round 2 adds grille and bumper fittings, nameplates, fixed glass, roof moldings, flares, rub strips,
+// body vents, mud guards, running boards and the spare carrier. Standard screws, nuts and washers are left out.
 // Geometry is schematic, in study-local coordinates.
 import {metal,steel,dark,turn,cyl,sleeve,part,study,x,y,z} from './mechanism-shapes.js';
 
@@ -31,7 +33,22 @@ const plates={
   mirrorList:{label:'MB Parts Giant · G500 car mirror listing (fitment by year)',url:'https://www.mbpartsgiant.com/oem-mercedes_benz-g500-car_mirror'},
   mirror2004:{label:'MB Parts Giant · 2004 G500 front door outside mirrors diagram',url:giant+'2004-mercedes_benz-g500/body-hardware/outside-mirrors'},
   windshield:{label:'MB Parts Giant · 2002 G500 windshield glass diagram',url:giant+'2002-mercedes_benz-g500/body-hardware/windshield-glass'},
-  reveal:{label:'MB Parts Giant · 2002 G500 windshield reveal moldings diagram',url:giant+'2002-mercedes_benz-g500/body-hardware/reveal-moldings'}
+  reveal:{label:'MB Parts Giant · 2002 G500 windshield reveal moldings diagram',url:giant+'2002-mercedes_benz-g500/body-hardware/reveal-moldings'},
+  // Round 2: exterior trim, fixed glass and the spare-wheel carrier.
+  grille:{label:'MB Parts Giant · 2002 G500 grille and components diagram',url:giant+'2002-mercedes_benz-g500/body-hardware/grille-components'},
+  frontBumper:{label:'MB Parts Giant · 2002 G500 front bumper and components diagram',url:giant+'2002-mercedes_benz-g500/body-hardware/bumper-components-front'},
+  rearBodyTrim:{label:'MB Parts Giant · 2002 G500 rear body exterior trim diagram',url:giant+'2002-mercedes_benz-g500/interior-exterior-trim/exterior-trim-rear-body'},
+  emblemList:{label:'MB Parts Giant · G500 emblem listing (fitment by year)',url:'https://www.mbpartsgiant.com/oem-mercedes_benz-g500-emblem'},
+  backGlass:{label:'MB Parts Giant · 2002 G500 back door glass and hardware diagram',url:giant+'2002-mercedes_benz-g500/body-hardware/glass-hardware-back-door'},
+  quarterGlass:{label:'MB Parts Giant · 2002 G500 quarter panel glass diagram',url:giant+'2002-mercedes_benz-g500/body-hardware/glass-hardware-quarter-panel'},
+  roofTrim:{label:'MB Parts Giant · 2002 G500 roof exterior trim diagram',url:giant+'2002-mercedes_benz-g500/interior-exterior-trim/exterior-trim-roof'},
+  fenderTrim:{label:'MB Parts Giant · 2002 G500 fender exterior trim diagram',url:giant+'2002-mercedes_benz-g500/interior-exterior-trim/exterior-trim-fender'},
+  quarterTrim:{label:'MB Parts Giant · 2002 G500 quarter panel exterior trim diagram',url:giant+'2002-mercedes_benz-g500/interior-exterior-trim/exterior-trim-quarter-panel'},
+  fender:{label:'MB Parts Giant · 2002 G500 fender and components diagram',url:giant+'2002-mercedes_benz-g500/body-hardware/fender-components'},
+  frontDoorTrim:{label:'MB Parts Giant · 2002 G500 front door exterior trim diagram',url:giant+'2002-mercedes_benz-g500/interior-exterior-trim/exterior-trim-front-door'},
+  rearDoorTrim:{label:'MB Parts Giant · 2002 G500 rear door exterior trim diagram',url:giant+'2002-mercedes_benz-g500/interior-exterior-trim/exterior-trim-rear-door'},
+  pillarTrim:{label:'MB Parts Giant · 2002 G500 pillars, rocker and floor exterior trim diagram',url:giant+'2002-mercedes_benz-g500/interior-exterior-trim/exterior-trim-pillars'},
+  spare:{label:'MB Parts Giant · 2002 G500 spare tire carrier and components diagram',url:giant+'2002-mercedes_benz-g500/body-hardware/carrier-components-spare-tire'}
 };
 export const bodyPackPlates=plates;
 
@@ -190,7 +207,164 @@ const screen=study('g500-windshield-frame','Windshield frame and seals',
 ]);
 screen.viewAngle=[-.45,.2];
 
-export const studies=[linkage,fittings,runs,cargo,hood,washer,mirror,screen];
+// ---- Round 2 ----
+const chrome='#d6dadb',stainless='#c4c8c6',paintGrey='#6c7378';
+// Arch of boxes in the x-z plane, centred on c, radius rad, from angle a0 to a1 (radians, 0 = forward).
+const arch=(r,c,rad,a0,a1,t,d,color,n=10)=>{const pts=[];for(let i=0;i<=n;i++){const a=a0+(a1-a0)*i/n;pts.push([c[0]+rad*Math.cos(a),c[1],c[2]+rad*Math.sin(a)]);}
+  for(let i=1;i<pts.length;i++)tube(r,pts[i-1],pts[i],Math.max(t,d)/2,color,8);};
+// Simple block lettering: each glyph is a list of [x,z,w,h] strokes on a unit cell.
+const glyphs={G:[[0,0,1,.2],[0,0,.2,1],[0,.8,1,.2],[.8,0,.2,.5],[.5,.4,.5,.15]],'5':[[0,.8,1,.2],[0,.45,.2,.5],[0,.4,1,.18],[.8,0,.2,.5],[0,0,1,.2]],
+  '0':[[0,0,1,.2],[0,.8,1,.2],[0,0,.2,1],[.8,0,.2,1]],V:[[0,.3,.2,.7],[.8,.3,.2,.7],[.25,0,.5,.3]],'8':[[0,0,1,.2],[0,.4,1,.18],[0,.8,1,.2],[0,0,.2,1],[.8,0,.2,1]]};
+const letters=(r,text,c,h,color)=>{const w=h*.7,gap=h*.25;let x0=c[0]-(text.length*(w+gap)-gap)/2;
+  for(const ch of text){for(const [gx,gz,gw,gh] of glyphs[ch])r.box(x0+gx*w,c[1]-.008,c[2]-h/2+gz*h,x0+(gx+gw)*w,c[1]+.008,c[2]-h/2+(gz+gh)*h,color);x0+=w+gap;}};
+const sides=[-1,1];
+
+// Grille: the slatted grille fixes to the radiator support through spacers, insulators and grommets.
+const grille=study('g500-grille-mounting','Grille mounting and backing',
+  'The radiator grille carries a separate insert and a backing plate behind the star. Spacers, insulators and grommets float it on the radiator support, and a cover closes it off.',plates.grille,[
+  part('insert','Grille insert · 463-888-00-97','The insert the catalog lists separately from the grille shell. It carries the horizontal slats.',[0,-.35,0],r=>{
+    for(let i=0;i<5;i++)block(r,[0,-.04,-.32+i*.16],[1.1,.03,.05],dark);for(const s of sides)block(r,[s*.56,-.04,0],[.03,.03,.72],dark);}),
+  part('backing-plate','Grille backing plate · 463-888-00-23','The plate behind the centre of the grille that the star emblem fastens through.',[0,.35,.15],r=>{
+    cyl(r,[0,.06,.05],y,0,.02,.16,steel,18);block(r,[0,.07,.05],[.42,.015,.08],steel);}),
+  part('cover','Grille cover · 463-888-00-48','A cover listed at the end of the grille diagram. It closes off the grille shell.',[0,-.2,.5],r=>block(r,[0,.02,.46],[1.2,.06,.04],plastic)),
+  part('spacer','Grille spacer · 136-991-37-40','A spacer at each grille mounting point that sets the gap to the radiator support.',[.45,.3,-.3],r=>{
+    for(const s of sides)for(const zz of [.3,-.3])sleeve(r,[s*.62,.08,zz],y,0,.05,.025,.01,zinc,12);}),
+  part('insulator','Grille insulator · 673-987-00-41','The rubber insulator between the grille and its mountings.',[-.45,.25,.35],r=>{
+    for(const s of sides)for(const zz of [.3,-.3])block(r,[s*.62,.15,zz],[.06,.02,.06],rubber);}),
+  part('grommet','Grille grommet · 461-888-04-97','The grommet in the radiator support that takes a grille fastener.',[-.4,.5,-.25],r=>{
+    for(const s of sides)for(const zz of [.3,-.3])sleeve(r,[s*.62,.2,zz],y,0,.03,.035,.012,rubber,14);})
+]);
+grille.viewAngle=[-.35,.2];
+
+// Front bumper fittings and the factory brush guard frame on the same diagram.
+const bumper=study('g500-front-bumper-fittings','Front bumper fittings and brush guard frame',
+  'The front bumper hangs on two brackets and is held by clips, grommets and lock nuts at the end caps. The same diagram lists the frame parts of the factory brush guard: its brackets, the grille surround, a centre bar and two bumper guards.',plates.frontBumper,[
+  part('clip','Front bumper clip · 107-988-27-78','The clip that holds the bumper to its bracket on each side.',[0,-.3,-.35],r=>{for(const s of sides)block(r,[s*.55,-.02,-.62],[.05,.03,.05],'#d9d4c4');}),
+  part('grommet','Front bumper grommet · 002-997-10-81','The rubber grommet at each bumper mounting point.',[.2,-.35,-.5],r=>{for(const s of sides)sleeve(r,[s*.35,0,-.62],y,-.02,.02,.03,.012,rubber,14);}),
+  part('cap-nut','Bumper end-cap lock nut · 000-994-76-45','The lock nut that holds each bumper end cap. The catalog lists it with the caps.',[.5,-.3,-.45],r=>{for(const s of sides)turn(r,[s*.9,.04,-.62],y,[[0,0],[0,.025],[.02,.025],[.02,0]],metal,{n:6});}),
+  part('guard-bracket','Brush guard bracket, left / right · 463-880-01-75-64 / 463-880-02-75-64','The upright bracket that carries the brush guard on each side of the bumper.',[0,.3,-.15],r=>{
+    for(const s of sides){block(r,[s*.45,-.12,-.35],[.06,.06,.5],black);block(r,[s*.45,-.05,-.58],[.08,.12,.04],black);}}),
+  part('surround','Brush guard grille surround · 463-880-01-51','The tube that frames the grille and both headlamps on the brush guard.',[0,-.45,.35],r=>{
+    path(r,[[-.95,-.2,-.1],[-.95,-.2,.45],[-.8,-.2,.6],[.8,-.2,.6],[.95,-.2,.45],[.95,-.2,-.1]],.025,chrome);}),
+  part('center-bar','Brush guard centre bar · 463-880-05-41-64','The bar across the middle of the brush guard below the grille.',[0,-.55,0],r=>tube(r,[-.45,-.2,-.12],[.45,-.2,-.12],.022,chrome,12)),
+  part('bumper-guard','Bumper guard, left / right · 463-880-01-41-65 / 463-880-02-41-64','The guard on the bumper face at the foot of each brush guard bracket.',[0,-.5,-.55],r=>{
+    for(const s of sides)block(r,[s*.45,-.14,-.66],[.14,.05,.1],rubber);}),
+]);
+bumper.viewAngle=[-.4,.25];
+
+// Model nameplates.
+const nameplates=study('g500-nameplates','G500 and V8 nameplates',
+  'Two chrome nameplates carry the model and engine. The catalog lists the G500 and V8 plates together on the rear body trim diagram and fits both to the 2002–2008 G500.',plates.rearBodyTrim,[
+  part('g500','G500 nameplate · 463-817-12-15','The chrome G500 model plate. It replaces WA-463-817-00-15.',[-.35,-.2,.2],r=>letters(r,'G500',[-.35,0,.15],.16,chrome)),
+  part('v8','V8 nameplate · 463-817-14-15','The chrome V8 engine plate.',[.35,-.2,-.2],r=>letters(r,'V8',[.45,0,-.15],.16,chrome))
+]);
+nameplates.viewAngle=[-.2,.1];
+
+// Fixed glass: back door and rear quarters.
+const fixedGlass=study('g500-fixed-glass','Back-door and quarter glass',
+  'The back door and the two rear quarters carry fixed glass set in rubber seals. The quarter panes are handed, and both sides share one seal number.',plates.backGlass,[
+  part('back-glass','Back door glass · 463-740-06-57','The fixed window in the side-hinged back door.',[0,.3,0],r=>block(r,[0,0,.2],[.7,.012,.5],glassTint)),
+  part('back-seal','Back door glass seal · 463-745-00-24','The rubber seal around the back door glass. It is superseded by 463-745-00-24-64.',[0,-.3,0],r=>frame(r,[0,-.01,.2],.72,.52,.04,.03,rubber)),
+  withSource(part('quarter-glass','Quarter glass, left / right · 463-673-35-10 / 463-673-06-10','The fixed side window behind each rear door.',[0,.35,.3],r=>{
+    for(const s of sides)block(r,[s*.75,.2,.2],[.012,.5,.4],glassTint);}),plates.quarterGlass),
+  withSource(part('quarter-seal','Quarter glass seal · 460-673-07-20','The rubber seal around each quarter glass. It is superseded by 464-745-03-00.',[0,-.35,.3],r=>{
+    for(const s of sides){block(r,[s*.75,.2,.42],[.03,.52,.03],rubber);block(r,[s*.75,.2,-.02],[.03,.52,.03],rubber);block(r,[s*.75,-.06,.2],[.03,.03,.44],rubber);block(r,[s*.75,.46,.2],[.03,.03,.44],rubber);}}),plates.quarterGlass)
+]);
+fixedGlass.viewAngle=[-.6,.25];
+
+// Roof moldings over the gutters.
+const roofTrim=study('g500-roof-moldings','Roof moldings',
+  'Moldings cover the roof seams along each side and around the rear corners. A joint piece links the side and rear moldings, and tape seals them to the roof.',plates.roofTrim,[
+  part('side','Roof side molding · 461-698-22-00','The long molding along each side of the roof. Both sides share one number.',[0,0,.25],r=>{for(const s of sides)block(r,[-.1,s*.7,0],[1.6,.04,.03],black);}),
+  part('rear','Rear roof molding, left / right · 464-698-07-00-64 / 464-698-08-00-64','The molding across each rear corner of the roof.',[.35,0,.2],r=>{for(const s of sides)block(r,[.85,s*.45,0],[.04,.5,.03],black);}),
+  part('joint','Roof molding joint · 464-695-05-00-64','The piece that joins the side molding to the rear molding at each corner.',[.5,0,.4],r=>{for(const s of sides)block(r,[.8,s*.68,.005],[.1,.08,.04],dark);}),
+  part('tape','Roof molding tape · 003-989-58-85','The adhesive tape under the moldings. The roof and quarter-panel diagrams list the same number as a seal.',[0,0,-.2],r=>{for(const s of sides)block(r,[-.1,s*.7,-.025],[1.6,.03,.006],'#5a5f4c');})
+]);
+roofTrim.viewAngle=[-.5,.6];
+
+// Wheel-arch flares and their fittings.
+const flares=study('g500-wheel-flare-fittings','Wheel-arch flares and fittings',
+  'Bolt-on flares run around all four wheel openings. The front flares seal to the wing and carry a protector. The rear flares carry their own protector and fit on front and rear brackets.',plates.fenderTrim,[
+  part('front-flare','Front wheel flare, left / right · 463-880-48-06 / 463-880-49-06','The flare around each front wheel opening. The catalog notes them for the G500.',[-.2,-.2,.25],r=>arch(r,[-.55,0,-.3],.42,0,Math.PI,.06,.08,paintGrey,12)),
+  part('flare-seal','Front flare seal · 463-889-08-98','The seal between the front flare and the wing.',[-.2,.25,.25],r=>arch(r,[-.55,.06,-.3],.38,.1,Math.PI-.1,.025,.02,rubber,10)),
+  part('front-protector','Front flare protector · 463-881-00-95','A protector listed with the front flare on both sides.',[-.45,-.3,-.25],r=>block(r,[-.9,-.02,-.3],[.1,.04,.12],black)),
+  part('flare-bracket','Flare bracket · 461-881-13-14','A bracket under the flare. The fender diagram lists it for the front flare and the quarter diagram lists the same number as the rear flare’s rear bracket.',[0,.35,-.35],r=>{
+    for(const c of [[-.18,0,-.3],[.92,0,-.3]])block(r,[c[0],.1,c[2]],[.04,.1,.08],steel);}),
+  withSource(part('rear-flare','Rear wheel flare, left / right · 463-880-14-21 / 463-880-15-21','The flare around each rear wheel opening. The catalog notes them for the G500.',[.2,-.2,.25],r=>arch(r,[.55,0,-.3],.4,0,Math.PI,.06,.08,paintGrey,12)),plates.quarterTrim),
+  withSource(part('rear-protector','Rear flare protector · 463-882-00-48','The protector listed with the rear flare. Both sides share it.',[.45,-.3,-.25],r=>block(r,[.18,-.02,-.3],[.1,.04,.12],black)),plates.quarterTrim),
+  withSource(part('rear-front-bracket','Rear flare front bracket · 460-637-00-14-64','The bracket at the front end of each rear flare.',[.2,.4,-.4],r=>block(r,[.2,.1,-.36],[.05,.1,.08],steel)),plates.quarterTrim),
+  withSource(part('welt','Front fender welt · 460-881-03-90','A welt strip listed with the front fender on both sides. The catalog does not show where along the wing it seats.',[-.2,.45,.45],r=>arch(r,[-.55,.1,-.3],.46,.05,Math.PI-.05,.015,.012,rubber,10)),plates.fender)
+]);
+flares.viewAngle=[-.3,.2];
+
+// Side rub strips: protective strips on their base moldings along the wing, doors and quarter.
+const strips=study('g500-rub-strips','Side rub strips and base moldings',
+  'A rubber protective strip runs along each wing, door and rear quarter. Each strip sits on its own base molding. The wing strips are handed; the door and quarter strips share numbers side to side.',plates.fenderTrim,[
+  part('wing-strip','Wing protective strip, left / right · 463-698-10-62 / 463-698-11-62','The rubber strip along each front wing. The catalog notes it for the G500.',[-.2,-.3,.15],r=>block(r,[-.78,-.04,0],[.44,.03,.05],rubber)),
+  part('wing-base','Wing strip base molding, left / right · 463-690-06-62 / 463-690-07-62','The base molding under the wing strip.',[-.2,.3,.15],r=>block(r,[-.78,0,0],[.44,.02,.07],dark)),
+  withSource(part('front-door-strip','Front door protective strip · 463-698-14-62','The rubber strip along each front door. The catalog notes it for the G500.',[-.05,-.3,-.15],r=>block(r,[-.28,-.04,0],[.5,.03,.05],rubber)),plates.frontDoorTrim),
+  withSource(part('front-door-base','Front door strip base molding · 463-690-04-62','The base molding under the front door strip.',[-.05,.3,-.15],r=>block(r,[-.28,0,0],[.5,.02,.07],dark)),plates.frontDoorTrim),
+  withSource(part('rear-door-strip','Rear door protective strip · 463-698-15-62','The rubber strip along each rear door.',[.05,-.3,.15],r=>block(r,[.22,-.04,0],[.44,.03,.05],rubber)),plates.rearDoorTrim),
+  withSource(part('rear-door-base','Rear door strip base · 463-690-01-62','The base under the rear door strip.',[.05,.3,.15],r=>block(r,[.22,0,0],[.44,.02,.07],dark)),plates.rearDoorTrim),
+  withSource(part('quarter-strip','Quarter protective strip · 463-698-18-62','The rubber strip along each rear quarter. The catalog notes it for the G500.',[.2,-.3,-.15],r=>block(r,[.72,-.04,0],[.5,.03,.05],rubber)),plates.quarterTrim),
+  withSource(part('quarter-base','Quarter strip base molding · 463-690-03-62','The base molding under the quarter strip. The diagram lists it for the passenger side.',[.2,.3,-.15],r=>block(r,[.72,0,0],[.5,.02,.07],dark)),plates.quarterTrim)
+]);
+strips.viewAngle=[-.3,.15];
+
+// Body vents: the front-wing grille and the rear-quarter vent unit.
+const vents=study('g500-body-vents','Wing grille and quarter vent',
+  'A vent grille sits in each front wing. In each rear quarter a vent unit with a spring-loaded flap lets air out of the body. A hose and plug serve it, and a cover, seal and outer grille close it.',plates.fenderTrim,[
+  part('wing-grille','Front wing vent grille · 463-881-01-85','The vent grille in each front wing.',[-.3,-.3,.1],r=>{frame(r,[-.55,-.02,0],.36,.26,.03,.03,black);for(let i=0;i<4;i++)block(r,[-.55,-.02,-.09+i*.06],[.34,.02,.02],black);}),
+  withSource(part('vent-unit','Quarter vent assembly · 463-830-00-03','The vent unit behind each rear quarter.',[.25,.3,0],r=>{block(r,[.5,.12,0],[.3,.12,.26],plastic);block(r,[.5,.05,0],[.24,.02,.2],'#4c5155');}),plates.quarterTrim),
+  withSource(part('vent-plug','Vent assembly plug · 001-997-96-86','The plug the catalog lists with the vent assembly.',[.5,.45,.35],r=>cyl(r,[.62,.2,.1],y,0,.03,.025,rubber,12)),plates.quarterTrim),
+  withSource(part('vent-spring','Vent flap spring · 201-835-01-34','The spring in the vent assembly.',[.55,.15,-.35],r=>{for(let i=0;i<5;i++)sleeve(r,[.42,.12,-.08+i*.02],z,0,.012,.018,.012,metal,10);}),plates.quarterTrim),
+  withSource(part('vent-hose','Vent hose · 460-628-01-94','The hose connected to the vent assembly.',[.2,.5,-.3],r=>path(r,[[.5,.18,-.12],[.5,.3,-.25],[.35,.45,-.35]],.025,black)),plates.quarterTrim),
+  withSource(part('vent-cover','Vent cover · 463-830-00-13','The cover over the vent assembly.',[.25,.55,.25],r=>block(r,[.5,.2,0],[.32,.015,.28],plastic)),plates.quarterTrim),
+  withSource(part('vent-seal','Vent seal · 463-837-00-98','The seal between the vent and the quarter panel.',[.35,-.2,.3],r=>frame(r,[.5,-.01,0],.26,.2,.02,.02,rubber)),plates.quarterTrim),
+  withSource(part('quarter-grille','Quarter vent grille · 463-690-01-79','The outer grille over the quarter vent. It is superseded by 463-690-01-79-64.',[.4,-.45,0],r=>{frame(r,[.5,-.04,0],.26,.2,.025,.02,black);for(let i=0;i<3;i++)block(r,[.5,-.04,-.05+i*.05],[.24,.015,.015],black);}),plates.quarterTrim)
+]);
+vents.viewAngle=[-.45,.2];
+
+// Mud guards behind the front and rear wheels.
+const mud=study('g500-mud-guards','Mud guards and brackets',
+  'A mud guard hangs behind each wheel. The front guards fit on a bracket with a clip. The rear guards fit on handed brackets with a reinforcement and a stay.',plates.fenderTrim,[
+  part('front-guard','Front mud guard, left / right · 463-880-03-22 / 463-880-04-22','The rubber guard behind each front wheel.',[-.3,-.3,-.2],r=>block(r,[-.5,0,-.35],[.03,.4,.4],rubber)),
+  part('front-bracket','Front mud guard bracket · 463-889-01-14','The bracket that carries each front mud guard.',[-.3,.3,.2],r=>block(r,[-.5,0,-.13],[.06,.36,.04],steel)),
+  part('front-clip','Front mud guard clip · 463-880-00-93','The clip that holds the front mud guard to its bracket.',[-.45,.15,.35],r=>{for(const yy of [-.12,.12])block(r,[-.52,yy,-.17],[.04,.04,.04],'#d9d4c4');}),
+  withSource(part('rear-guard','Rear mud guard, left / right · 460-889-11-05 / 460-889-10-05','The rubber guard behind each rear wheel.',[.3,-.3,-.2],r=>block(r,[.55,0,-.35],[.03,.4,.4],rubber)),plates.quarterTrim),
+  withSource(part('rear-bracket','Rear mud guard bracket, left / right · 463-880-01-39 / 463-880-02-39','The bracket that carries each rear mud guard.',[.3,.3,.2],r=>block(r,[.55,0,-.13],[.06,.36,.04],steel)),plates.quarterTrim),
+  withSource(part('reinforcement','Rear mud guard reinforcement · 460-882-00-27-64','The reinforcing strip along the top of each rear mud guard.',[.45,-.1,.4],r=>block(r,[.58,0,-.2],[.015,.38,.06],zinc)),plates.quarterTrim),
+  withSource(part('stay','Rear mud guard stay, left / right · 463-882-00-07 / 460-882-02-07-64','The stay that braces each rear mud guard.',[.5,.35,-.4],r=>path(r,[[.57,.15,-.45],[.7,.15,-.3],[.75,.15,-.1]],.012,steel)),plates.quarterTrim)
+]);
+mud.viewAngle=[-.6,.25];
+
+// Running boards and rocker moldings.
+const boards=study('g500-running-boards','Running boards, brackets and rocker moldings',
+  'Each running board sits on a support with front and rear brackets under the rocker. End covers close the board ends, and a rocker molding covers the sill above it.',plates.pillarTrim,[
+  part('board','Running board, left / right · 463-855-05-07 / 463-855-06-07-64','The stainless step along each side. The left board is superseded by 463-855-05-07-64.',[0,-.25,.1],r=>{
+    block(r,[0,0,0],[1.6,.3,.03],stainless);for(let i=0;i<5;i++)block(r,[0,-.1+i*.05,.02],[1.5,.02,.012],rubber);}),
+  part('support','Running board support · 463-850-03-30-64','The support under the board. Both sides share it.',[0,.1,-.3],r=>block(r,[0,.03,-.05],[1.4,.06,.04],steel)),
+  part('front-bracket','Running board front bracket · 463-850-01-14','The bracket that holds the front of the board to the body.',[-.3,.3,-.4],r=>{block(r,[-.55,.1,-.05],[.06,.2,.04],steel);block(r,[-.55,.2,.05],[.06,.03,.2],steel);}),
+  part('rear-bracket','Running board rear bracket · 463-855-00-14','The bracket that holds the rear of the board.',[.3,.3,-.4],r=>{block(r,[.55,.1,-.05],[.06,.2,.04],steel);block(r,[.55,.2,.05],[.06,.03,.2],steel);}),
+  part('front-cover','Running board front cover, left / right · 463-855-01-35-7C41 / 463-855-02-35','The black cover over the front end of the board. The left cover is superseded by 463-855-01-35.',[-.45,-.15,.2],r=>block(r,[-.83,0,0],[.06,.32,.06],black)),
+  part('rear-cover','Running board rear cover, left / right · 463-855-03-35-7C41 / 463-855-04-35','The black cover over the rear end of the board. The left cover is superseded by 463-855-03-35.',[.45,-.15,.2],r=>block(r,[.83,0,0],[.06,.32,.06],black)),
+  part('rocker','Rocker molding, left / right · 463-690-29-62 / 463-690-28-62','The molding along the sill above the board.',[0,.35,.45],r=>block(r,[0,.2,.25],[1.6,.03,.1],dark))
+]);
+boards.viewAngle=[-.5,.35];
+
+// Spare-wheel carrier and cover lock.
+const spare=study('g500-spare-carrier','Spare-wheel carrier and cover lock',
+  'The spare wheel hangs on a carrier bolted to the back door through a grommet and bushings. The hard spare cover latches on and locks with its own key set.',plates.spare,[
+  part('carrier','Spare carrier assembly · 463-890-13-44-64','The carrier on the back door that the spare wheel bolts to.',[0,.35,0],r=>{
+    block(r,[0,.2,0],[.5,.04,.5],steel);for(const s of sides)tube(r,[s*.2,.2,0],[s*.2,.4,0],.03,steel,10);cyl(r,[0,.18,0],y,-.15,0,.05,steel,14);}),
+  part('grommet','Carrier grommet · 460-997-14-81','The grommet where the carrier mounts to the door.',[.35,.45,.3],r=>{for(const s of sides)sleeve(r,[s*.2,.42,0],y,0,.02,.05,.03,rubber,14);}),
+  part('bushing','Carrier bushing · 460-992-22-01','A bushing at each carrier mounting bolt.',[-.35,.5,-.3],r=>{for(const s of sides)sleeve(r,[s*.2,.45,0],y,0,.04,.028,.014,zinc,12);}),
+  part('latch-kit','Spare cover latch kit · 463-890-03-89','The latch parts that hold the spare cover on the carrier.',[.4,-.1,-.4],r=>{for(const s of sides)block(r,[s*.3,.0,-.3],[.06,.08,.05],metal);}),
+  part('lock-set','Spare cover lock set · 463-890-05-89-64','The lock cylinder and key set for the spare cover.',[0,-.45,-.3],r=>{cyl(r,[0,-.1,-.3],y,-.06,0,.03,metal,14);block(r,[0,-.17,-.3],[.008,.01,.03],dark);})
+]);
+spare.viewAngle=[-.5,.3];
+
+export const studies=[linkage,fittings,runs,cargo,hood,washer,mirror,screen,grille,bumper,nameplates,fixedGlass,roofTrim,flares,strips,vents,mud,boards,spare];
 const doors=['front-left','front-right','rear-left','rear-right'];
 export const views=new Map([
   ...doors.map(d=>['door-g500-'+d+'.inner-handle',linkage]),
@@ -200,7 +374,18 @@ export const views=new Map([
   ['g500-bonnet.catch',hood],
   ['body.wipers',washer],
   ['body.mirror-left',mirror],['body.mirror-right',mirror],
-  ['body.pillar-molding-left',screen],['body.pillar-molding-right',screen]
+  ['body.pillar-molding-left',screen],['body.pillar-molding-right',screen],
+  ['body.grille',grille],
+  ['body.front-bumper',bumper],['accessories.guard',bumper],
+  ['body.v8-badges',nameplates],
+  ['closure-g500.glass',fixedGlass],['body.quarter-glass',fixedGlass],
+  ['body.roof-rail-left',roofTrim],['body.roof-rail-right',roofTrim],
+  ['body.wheel-flares',flares],
+  ['body.rub-strips',strips],
+  ['body.wing-intakes',vents],
+  ['body.wheelhouses',mud],['body.fender-liner-left',mud],['body.fender-liner-right',mud],
+  ['body.running-boards',boards],
+  ['body.spare-cover',spare]
 ]);
 
 // One claim per cited page within each study.
@@ -212,7 +397,18 @@ const notes={
   'g500-hood-hardware':{fact:'The 2004 G500 hood and components diagram lists these hinges, shims, support cylinders, release, striker and bumpers. The 2002–2008 G500 shares the lower striker.',need:'Hinge, strut and cable geometry is schematic. Confirm the 2002 numbers by VIN.'},
   'g500-washer-supply':{fact:'The 2005 G500 windshield and back-door wiper and washer diagrams list this reservoir, pump, valve, hose and nozzles.',need:'Taken from the 2005 page. Confirm the 2002 numbers by VIN. Reservoir shape, hose routing and nozzle positions are not measured.'},
   'g500-mirror-internals':{fact:'The 2002 G500 mirror diagram and the G500 mirror listing give the two adjusting motors by year. The 2004 G500 outside-mirror diagram lists the signal lenses and puddle lamps.',need:'The signal lens and puddle lamp come from the 2004 diagram. A 2002 US mirror may not have them. Confirm by VIN. Internal layout is schematic.'},
-  'g500-windshield-frame':{fact:'The 2002 G500 windshield glass diagram lists the frame members, seals and retainer. The reveal moldings diagram lists the pillar molding clip.',need:'Frame sections and seal profiles are not measured.'}
+  'g500-windshield-frame':{fact:'The 2002 G500 windshield glass diagram lists the frame members, seals and retainer. The reveal moldings diagram lists the pillar molding clip.',need:'Frame sections and seal profiles are not measured.'},
+  'g500-grille-mounting':{fact:'The 2002 G500 grille and components diagram lists the insert, backing plate, cover, spacer, insulator and grommet with the grille 463-888-00-15 and star 601-817-01-16.',need:'Fastener positions and the cover location are schematic. The diagram\u2019s washers, screw and nut are standard hardware and are left out.'},
+  'g500-front-bumper-fittings':{fact:'The 2002 G500 front bumper diagram lists the bumper clip, grommet and end-cap lock nut, and the brush guard brackets, grille surround, centre bar and bumper guards.',need:'The brush guard frame parts belong to the optional guard 6-6-88-0111. Confirm whether a given truck has it. Mounting points are not measured.'},
+  'g500-nameplates':{fact:'The 2002 G500 rear body exterior trim diagram lists the G500 and V8 nameplates. The G500 emblem listing fits both to the 2002\u20132008 G500.',need:'The diagram does not say where each plate sits. Confirm whether the V8 scripts on the front wings use 463-817-14-15.'},
+  'g500-fixed-glass':{fact:'The 2002 G500 back door glass diagram lists the back glass and its seal. The quarter panel glass diagram lists the handed quarter glass and their shared seal.',need:'Glass outlines, curvature and seal sections are not measured. The back glass in the model is heated; confirm the heated glass number by VIN.'},
+  'g500-roof-moldings':{fact:'The 2002 G500 roof exterior trim diagram lists the side and rear roof moldings, the joint and the molding tape.',need:'Molding lengths and the joint position are schematic.'},
+  'g500-wheel-flare-fittings':{fact:'The 2002 G500 fender and quarter panel exterior trim diagrams list the front and rear flares (noted G500), the seal, protectors and brackets. The fender and components diagram lists the welt.',need:'Flare outlines are drawn as plain arcs. Bracket, protector and welt positions are not measured.'},
+  'g500-rub-strips':{fact:'The 2002 G500 fender, front door, rear door and quarter panel exterior trim diagrams list each protective strip and its base molding.',need:'Strip lengths and heights are schematic. The quarter base molding is listed for the passenger side only; confirm the driver-side number.'},
+  'g500-body-vents':{fact:'The 2002 G500 fender exterior trim diagram lists the wing vent grille. The quarter panel exterior trim diagram lists the vent assembly with its plug, spring, hose, cover, seal and grille.',need:'The vent unit layout, flap and hose routing are schematic. The hose clamp on the diagram is standard hardware and is left out.'},
+  'g500-mud-guards':{fact:'The 2002 G500 fender and quarter panel exterior trim diagrams list the front and rear mud guards with their brackets, clip, reinforcement and stays.',need:'Guard outlines and bracket shapes are not measured.'},
+  'g500-running-boards':{fact:'The 2002 G500 pillars, rocker and floor exterior trim diagram lists the running boards, support, front and rear brackets, end covers and rocker moldings.',need:'Board ribs, bracket shapes and positions are schematic. The rocker molding screw and nut are standard hardware and are left out.'},
+  'g500-spare-carrier':{fact:'The 2002 G500 spare tire carrier diagram lists the carrier, grommet, bushing, latch kit and lock set with the spare cover, cap, ring and emblem.',need:'The carrier shape and latch positions are schematic. Measure them on the back door.'}
 };
 export const claims=studies.flatMap(s=>{
   const bySource=new Map();

@@ -27,6 +27,8 @@ export const ENGINE_LAYOUTS={
  bmw325ci:{layout:'inline6',count:6,banks:1,cams:2,valves:4,plugs:1,length:.98,orientation:'longitudinal',wheelbase:2.725,base:.53},
  bmw328xi:{layout:'inline6',count:6,banks:1,cams:2,valves:4,plugs:1,length:.98,orientation:'longitudinal',wheelbase:2.760,base:.48},
  bmw328i:{layout:'inline6',count:6,banks:1,cams:2,valves:4,plugs:1,length:.98,orientation:'longitudinal',wheelbase:2.725,base:.53},
+ // The bay only uses wheelbase/2 as the front axle station. The C63's front axle
+ // stays at x -1.38 (its 2.766 m wheelbase is carried by the rear axle; see c63-wheel-specs.js).
  c63:{layout:'v8',count:8,banks:2,cams:4,valves:4,plugs:1,length:.86,orientation:'longitudinal',wheelbase:2.76,base:.51},
  hrv:{layout:'inline4',count:4,banks:1,cams:2,valves:4,plugs:1,length:.66,orientation:'transverse',wheelbase:2.654,base:.52,center:-1.46},
  // 4.36 in bore. The block length gives the 460's 4.90 in bore spacing; the

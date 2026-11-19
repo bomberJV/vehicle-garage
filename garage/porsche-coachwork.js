@@ -724,6 +724,8 @@ function exteriorLights(r,car,paint){
   r.tag('shell.bumpers',()=>{
     const plate=tail.point(0,modern?car.kit.plateZ:.361,-.002);
     if(car.kit?.id==='996'){
+      // The plate sits in the 16 mm recess of the cover, not proud of it.
+      plate[0]-=.016;
       // Black rubber guards flank the US plate recess.
       for(const side of [-1,1]){
         const y=side*.235,base=tail.point(y,plate[2],-.002)[0];

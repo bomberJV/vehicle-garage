@@ -1,18 +1,20 @@
 // Geometry is traced schematically from the front elevation in the linked
 // wheel plate or product photograph. Coordinates are in metres.
 import {tint} from './road-primitives.js';
+import {alloy993} from './porsche993-alloy.js';
 const TAU=Math.PI*2;
 const rings={
-  cupii:[[.25,-.14,.32,-.010],[.46,-.075,.225,.002],[.71,.035,.142,.014],[.935,.12,.115,.020]],
   edition507:[[.23,0,.087,-.007],[.49,.16,.065,.004],[.71,.19,.049,.015],[.94,.23,.038,.022]],
+  // Style 44: seven flat, straight spokes that widen slightly toward the rim.
+  style44:[[.29,0,.27,-.006],[.52,0,.155,.003],[.75,0,.123,.010],[.94,0,.108,.016]],
   style68:[[.24,0,.120,-.008],[.46,.096,.091,.002],[.72,.15,.075,.014],[.94,.182,.062,.022]],
   hpd:[[.27,0,.13,-.008],[.62,.03,.092,.003],[.76,.113,.063,.013],[.94,.205,.065,.019]],
   sportclassic:[[.29,0,.105,-.008],[.51,.013,.060,.000],[.71,.113,.036,.010],[.87,.20,.032,.015]],
   rsspyd:[[.28,0,.098,-.005],[.48,.026,.073,.003],[.75,.10,.038,.015],[.94,.133,.031,.022]]
 };
 const faceProfiles={
-  cupii:{arms:5},edition507:{arms:5,paired:true},
-  style68:{arms:5,paired:true},hpd:{arms:5,paired:true},
+  edition507:{arms:5,paired:true},
+  style44:{arms:7},style68:{arms:5,paired:true},hpd:{arms:5,paired:true},
   sportclassic:{arms:10,paired:true},rsspyd:{arms:10,paired:true}
 };
 function flatDisc(r,x,y,z,rad,count,color,phase=0){
@@ -111,6 +113,8 @@ export function drawWheelFace(r,design,{x,y,z,side,rim,finish}){
 
 }
 export function drawAlternativeAlloy(r,design,c){
+  // The 17-inch Cup II is the Cup Design '93 of the 16-inch stock wheel.
+  if(design.id==='cupii')return alloy993(r,c);
   const {x,y,z,side,rim,width,finish}=c,lip=y+side*width*.507;
   const inner=design.id==='sportclassic'?.862:.917;
   r.ringY(x,lip,z,rim,rim*inner,tint(finish,1.14),32);

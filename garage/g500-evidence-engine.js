@@ -20,9 +20,13 @@ const internalClaims=[
  {ids:['g500-m113-timing.cover'],kind:'diagram',fact:'The 112-010-06-33 timing cover is listed for the 2002–2008 G500.',need:'Trace the cover outline and bolt pattern from the casting.',source:m113InternalSources.timingCover},
  {ids:internalIds(timing).filter(id=>!/crank-sprocket|intermediate|chain$|cover$/.test(id)),kind:'diagram',fact:'The M113 5.0 parts diagram lists the tensioner, rail, guides and front seal by number.',need:'Confirm numbers against the G500 VIN and measure the guide profiles.',source:m113InternalSources.m113Plate}
 ];
-const [hvacModule,frontPinion,frontHousing]=g500CatalogStudies;
+const [hvacModule,frontPinion,frontHousing,transmission,brakeService,absMount]=g500CatalogStudies;
 const catalogClaims=[
  {ids:internalIds(hvacModule),kind:'diagram',fact:'The 2004 G500 evaporator and heater diagram lists each of these components by callout and Mercedes number.',need:'Measure each part on the fitted module and confirm 2002 applicability by VIN.',source:catalogStudySources.hvacPlate},
+ {ids:internalIds(transmission).filter(id=>!id.includes('bracket')),kind:'diagram',fact:'The 2004 G500 automatic transmission diagram lists the transmission, torque converter, drive plate, extension housing seal and shift control cable for the G500.',need:'Measure the converter envelope, drive-plate bolt circle and cable routing on the fitted car.',source:catalogStudySources.transmissionPlate},
+ {ids:internalIds(transmission).filter(id=>id.includes('bracket')),kind:'diagram',fact:'The 2004 G500 electrical diagram lists both control-module brackets under the transmission controller.',need:'Measure the brackets and their position on the fitted car.',source:catalogStudySources.controlPlate},
+ {ids:internalIds(brakeService),kind:'diagram',fact:'The G500 brake hydraulic diagram lists the reservoir cap, strainer and booster gasket with the master cylinder and booster.',need:'Measure the cap, strainer depth and gasket on the fitted car.',source:catalogStudySources.brakePlate},
+ {ids:internalIds(absMount),kind:'diagram',fact:'The G500 ABS diagram lists the hydraulic-unit bracket, its rubber buffers and the control-module bracket.',need:'Measure the brackets and buffer positions on the fitted car.',source:catalogStudySources.absPlate},
  {ids:[...internalIds(frontPinion),...internalIds(frontHousing)],kind:'diagram',fact:'The G500 front axle diagram lists each of these components by callout and Mercedes number for the G500 and G55 AMG.',need:'Measure bearing cups, cones, seal bores and housing sections on the fitted axle.',source:catalogStudySources.frontAxlePlate}
 ];
 export default [

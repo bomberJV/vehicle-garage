@@ -13,7 +13,8 @@
 // tailpipe, oxygen sensors, charcoal canister, purge valve, vent shutoff valve and tank
 // pressure sensor as single parts. Their catalog numbers are left out here so that no
 // part is modeled twice. This pack adds the separately numbered shields, mounts and
-// emission-control parts that sit around them.
+// emission-control parts that sit around them. Round 2 adds the oxygen sensor lead holder, the
+// emission pressure sensor and the named fuel and EVAP hose clamps.
 import {metal,steel,dark,turn,cyl,sleeve,part,study,x,y,z} from './mechanism-shapes.js';
 
 const exhaustPlate={label:'MB Parts Giant · 2002 G500 exhaust system diagram',url:'https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/emission-control-exhaust/exhaust-system'};
@@ -114,12 +115,78 @@ const emissionRows=[
 const emission=study('g500-emission-components','Secondary air and EGR components','The G500 emission diagram groups the secondary air pump and valves, the EGR valve and pipe and the canister bracket. Positions are schematic and seen from above the engine.',emissionPlate,emissionRows);
 emission.viewAngle=[-.5,.55];
 
-export const studies=[shields,mounts,emission];
+// ---------------------------------------------------------------- round 2: sources
+// The 2003 G55 AMG plates are W463 dealer diagrams. They print each row's catalog text but not its
+// number. The numbers below come from dealer part pages whose catalog text matches a plate row word for word.
+const g55ExhaustPlate={label:'Mercedes-Benz dealer catalog · 2003 G55 AMG (W463) exhaust system diagram',url:'https://www.mbpartscenter.com/v-2003-mercedes-benz-g55-amg--base--5-5l-v8-gas/exhaust-system--exhaust-system-used-on-six-cylinder-gasoline-vehicles'};
+const g55VentPlate={label:'Mercedes-Benz dealer catalog · 2003 G55 AMG (W463) fuel tank ventilation diagram',url:'https://www.mbpartsdepot.com/v-2003-mercedes-benz-g55-amg--base--5-5l-v8-gas/fuel-system--fuel-tank-ventilation'};
+const emissionPlate2006={label:'MB Parts Giant · 2006 G500 emission components diagram (5.0L)',url:'https://www.mbpartsgiant.com/parts-list/2006-mercedes_benz-g500/emission-control-exhaust/emission-components'};
+const leadHolderPage={label:'Mercedes-Benz dealer catalog · holder 000-546-80-43',url:'https://www.mbpartsdepot.com/oem-parts/mercedes-benz-holder-5468043'};
+const feedClampPage={label:'Mercedes-Benz dealer catalog · hose clamp 000-995-77-35',url:'https://parts.berglundluxuryroanoke.com/oem-parts/mercedes-benz-hose-clamp-9957735'};
+const springClampPage={label:'Mercedes-Benz dealer catalog · spring hose clamp 124-997-19-90',url:'https://www.mbpartsdepot.com/oem-parts/mercedes-benz-spring-hose-clamp-1249971990'};
+const purgeClampPage={label:'Mercedes-Benz dealer catalog · clamp 004-997-25-90',url:'https://www.mbpartsdepot.com/oem-parts/mercedes-benz-clamp-49972590'};
+Object.assign(exhaustPackSources,{g55ExhaustPlate,g55VentPlate,emissionPlate2006,leadHolderPage,feedClampPage,springClampPage,purgeClampPage});
+
+// ---------------------------------------------------------------- emission sensor fittings
+// Study-local view: x runs aft, y to the passenger side, z up. The left sensor lead runs up from the
+// converter pipe at y = -.4 to a bracket where its plug is held. The pressure sensor sits above the engine.
+const plugAt=[.1,-.42,.25];
+const sensorRows=[
+  src(part('lead-holder','Oxygen sensor lead holder · 000-546-80-43','A 24 × 23 mm plastic holder that clips the left oxygen sensor lead and its plug connector to a bracket, listed only for cars with a catalytic converter.',[0,-.35,.25],r=>{
+    block(r,plugAt,[.12,.012,.16],zinc);
+    block(r,[plugAt[0],plugAt[1]+.03,plugAt[2]],[.07,.05,.065],plastic);
+    block(r,[plugAt[0],plugAt[1]+.03,plugAt[2]+.045],[.05,.03,.025],dark);
+    for(const s of [-1,1])block(r,[plugAt[0]+s*.03,plugAt[1]+.015,plugAt[2]-.05],[.012,.02,.04],plastic);
+  }),leadHolderPage),
+  src(part('pressure-sensor','Emission pressure sensor · 005-153-50-28','A small pressure sensor that the G500 emission diagram lists with the secondary-air and EGR parts. The diagram does not say what it measures.',[-.2,.3,.35],r=>{
+    const c=[.55,.45,-.15];
+    cyl(r,c,z,0,.07,.035,dark,14);
+    block(r,[c[0]+.05,c[1],c[2]+.045],[.05,.04,.035],plastic);
+    cyl(r,c,z,-.05,0,.012,steel,8);
+    sleeve(r,c,z,-.02,-.004,.022,.012,plastic,10);
+  }),emissionPlate)
+];
+const sensorFittings=study('g500-emission-sensor-fittings','Emission sensor fittings','The holder that clips the left oxygen sensor lead and plug, and the pressure sensor on the G500 emission diagram. Shapes and positions are schematic.',emissionPlate,sensorRows);
+sensorFittings.viewAngle=[-.6,.35];
+
+// ---------------------------------------------------------------- EVAP and fuel hose clamps
+// Study-local view along the frame: x runs aft, y to the passenger side, z up. Three short runs are shown,
+// with the fuel feed and return hoses at z = -.25, the tank breather at z = 0 and the purge line at z = .25.
+// The hoses themselves are not drawn because the catalog lists them by the meter.
+function bandClamp(r,c,rad,color){
+  sleeve(r,c,x,-.012,.012,rad+.008,rad,color,16);
+  block(r,[c[0],c[1],c[2]+rad+.018],[.03,.03,.022],color);
+}
+function springClamp(r,c,rad,color){
+  sleeve(r,c,x,-.008,.008,rad+.007,rad,color,16);
+  for(const s of [-1,1])block(r,[c[0]+s*.012,c[1],c[2]+rad+.02],[.006,.016,.03],color);
+}
+function earClamp(r,c,rad,color){
+  sleeve(r,c,x,-.006,.006,rad+.005,rad,color,14);
+  block(r,[c[0],c[1],c[2]+rad+.012],[.012,.02,.014],color);
+}
+const clampRows=[
+  src(part('feed-return-clamps','Fuel hose clamps · 000-995-77-35','Band clamps listed for the hose to the feed line and engine, the fuel return hose and return line, and the return hose on the mounting plate. Four ends are shown.',[0,0,-.35],r=>{
+    for(const [dx,dy] of [[-.45,-.12],[-.15,-.12],[-.45,.12],[-.15,.12]])bandClamp(r,[dx,dy,-.25],.045,zinc);
+  }),feedClampPage),
+  src(part('breather-clamps','Spring hose clamps · 124-997-19-90','Spring clamps listed between the combination valve and the breather pipe, at the regeneration valve, and on the line from the fuel tank to the breather valve. Three are shown.',[.1,0,0],r=>{
+    for(const dx of [-.3,0,.3])springClamp(r,[dx,0,0],.04,steel);
+  }),springClampPage),
+  src(part('purge-clamps','Purge line clamps · 004-997-25-90','Small 11.5 mm ear clamps listed between the purge line and the T-piece, on the molded hose to the purge line and charcoal canister, and on the line to the pressure sensor. Three are shown.',[.2,0,.35],r=>{
+    for(const dx of [.05,.3,.55])earClamp(r,[dx,0,.25],.03,metal);
+  }),purgeClampPage)
+];
+const hoseClamps=study('g500-evap-hose-clamps','EVAP and fuel hose clamps','The W463 tank ventilation diagram lists separate clamps for the fuel feed and return hoses, the tank breather and the purge line. The clamps are drawn alone and their positions are schematic.',g55VentPlate,clampRows);
+hoseClamps.viewAngle=[-.55,.3];
+
+export const studies=[shields,mounts,emission,sensorFittings,hoseClamps];
 export const views=new Map([
   ['exhaust.heat-shields',shields],
   ['exhaust.hangers',mounts],
   ['g500-exhaust-manifold-left.casting',emission],
-  ['g500-exhaust-manifold-right.casting',emission]
+  ['g500-exhaust-manifold-right.casting',emission],
+  ['g500-exhaust-sensors.left-upstream',sensorFittings],
+  ['evap.purge-line',hoseClamps]
 ]);
 const ids=s=>s.groups[0].parts.map(p=>p.id);
 const pick=(s,keys)=>keys.map(k=>s.id+'.'+k);
@@ -131,5 +198,13 @@ export const claims=[
   {ids:ids(emission),kind:'diagram',fact:'The 2002 G500 emission components diagram lists the secondary air pump, its insulator and brackets, both shut-off valves, their gasket, the hose, connector and T-joint, the switchover valve and insulator, the check valve, the EGR valve, gasket and pipe, and the canister bracket.',need:'The 2002 rows carry no G500 note. Mounting positions, hose lengths and the EGR pipe route are not measured.',source:emissionPlate},
   {ids:ids(emission),kind:'diagram',fact:'The 2008 G500 diagram lists the same emission parts with 5.0L notes and gives the shut-off valve gasket for both sides.',need:'Confirm that each part was fitted to a 2002 US car by VIN, in particular the EGR valve.',source:emissionPlate2008},
   {ids:pick(emission,['air-pump-front-bracket','air-pump-rear-bracket']),kind:'diagram',fact:'The same-engine 2004 E500 A.I.R. diagram names 112-237-02-40 the front bracket and 112-237-01-40 the rear bracket. The G500 diagrams call them inner and outer and disagree on which is which.',need:'Confirm the G500 bracket positions on the car.',source:e500AirPlate},
-  {ids:pick(emission,['air-pump','shutoff-right','shutoff-left','switchover-valve','check-valve','egr-pipe']),kind:'diagram',fact:'The G500 part listings give 2002–2008 G500 fitment for the air pump, both shut-off valves, the switchover valve, the check valve and the EGR pipe.',need:'Electrical connectors, vacuum line routing and valve mounting angles are not measured.',source:airPumpList}
+  {ids:pick(emission,['air-pump','shutoff-right','shutoff-left','switchover-valve','check-valve','egr-pipe']),kind:'diagram',fact:'The G500 part listings give 2002–2008 G500 fitment for the air pump, both shut-off valves, the switchover valve, the check valve and the EGR pipe.',need:'Electrical connectors, vacuum line routing and valve mounting angles are not measured.',source:airPumpList},
+  {ids:pick(sensorFittings,['pressure-sensor']),kind:'diagram',fact:'The 2002 G500 emission components diagram lists pressure sensor 005-153-50-28 as ref 14. The 2006 and 2008 G500 diagrams list it with a 5.0L note, and the same-engine 2004 E500 A.I.R. diagram lists the same number.',need:'The diagrams do not say what the sensor measures or where it mounts. Its position, connector and hose connection are not measured.',source:emissionPlate},
+  {ids:pick(sensorFittings,['pressure-sensor']),kind:'diagram',fact:'The 2006 G500 emission components diagram lists pressure sensor 005-153-50-28 with a 5.0L note.',need:'Confirm the sensor on a 2002 US car by VIN.',source:emissionPlate2006},
+  {ids:pick(sensorFittings,['lead-holder']),kind:'diagram',fact:'Ref 180 on the 2003 G55 AMG (W463) exhaust diagram is a holder described as "At bracket. 24x23 mm. Oxygen sensor lead mounting. Lambda probe left plug connector", at $13.50 list. The plate does not print its number.',need:'The plate is for the W463 G55, not the G500. Confirm by VIN that a 2002 G500 carries this holder, and locate its bracket on the car.',source:g55ExhaustPlate},
+  {ids:pick(sensorFittings,['lead-holder']),kind:'diagram',fact:'The dealer part page for 000-546-80-43 carries the same catalog text word for word, the same 24 × 23 mm size, the note that it applies only to cars with a catalytic converter, and a rear position.',need:'The number is matched to the G55 plate row by its catalog text. The part page gives no model fitment.',source:leadHolderPage},
+  {ids:ids(hoseClamps),kind:'diagram',fact:'The 2003 G55 AMG (W463) fuel tank ventilation diagram lists a hose clamp at ref 40 for the feed and return hoses, a spring hose clamp at ref 210 for the combination valve, breather pipe and regeneration valve, and an 11.5 mm clamp at ref 230 for the purge line and T-piece. The plate prints each row\'s catalog text but not its number.',need:'The plate is for the W463 G55, not the G500. Confirm by VIN that a 2002 G500 uses the same tank ventilation parts. How many of each clamp the car carries, and where, is not recorded.',source:g55VentPlate},
+  {ids:pick(hoseClamps,['feed-return-clamps']),kind:'diagram',fact:'The dealer part page for 000-995-77-35 carries the same catalog text as the plate\'s ref 40 word for word: between sender unit and deaeration pipe, return line to tank, hose to feed line and engine, fuel return hose to return line, return hose on mounting plate.',need:'The number is matched to the plate row by its catalog text. The part page gives no model fitment.',source:feedClampPage},
+  {ids:pick(hoseClamps,['breather-clamps']),kind:'diagram',fact:'The dealer part page for 124-997-19-90 carries the same catalog text as the plate\'s ref 210: between combination valve and breather pipe, regeneration valve, return hose to return line, fuel tank to breather valve.',need:'The number is matched to the plate row by its catalog text. The part page gives no model fitment.',source:springClampPage},
+  {ids:pick(hoseClamps,['purge-clamps']),kind:'diagram',fact:'The dealer part page for 004-997-25-90 gives the same 11.5 mm, 0.6 mm hose attachment clamp as the plate\'s ref 230: between purge line and T-piece, and on the molded hose to the purge line and charcoal canister. It also lists a use on the line to a pressure sensor.',need:'The number is matched to the plate row by its catalog text. The part page gives no model fitment.',source:purgeClampPage}
 ];

@@ -11,7 +11,9 @@ const transmissionPlate={label:'MB Parts Giant · 2004 G500 automatic transmissi
 const controlPlate={label:'MB Parts Giant · 2004 G500 electrical components diagram',url:'https://www.mbpartsgiant.com/parts-list/2004-mercedes_benz-g500/electrical/electrical-components'};
 const brakePlate={label:'MB Parts Giant · 2005 G500 brake hydraulic system diagram',url:'https://mbpartsgiant.com/parts-list/2005-mercedes_benz-g500/brakes/hydraulic-system'};
 const absPlate={label:'MB Parts Giant · 2003 G500 ABS components diagram',url:'https://www.mbpartsgiant.com/parts-list/2003-mercedes_benz-g500/electrical/abs-components-electrical'};
-export const catalogStudySources={hvacPlate,frontAxlePlate,transmissionPlate,controlPlate,brakePlate,absPlate};
+const enginePlate={label:'MB Parts Giant · G500 5.0 engine parts diagram (2008 G500, M113)',url:'https://www.mbpartsgiant.com/parts-list/2008-mercedes_benz-g500/air-fuel-delivery/intake-manifold'};
+const fuelPlate={label:'MB Parts Giant · 2004 G500 fuel system components diagram',url:'https://mbpartsgiant.com/parts-list/2004-mercedes_benz-g500/air-fuel-delivery/fuel-supply'};
+export const catalogStudySources={hvacPlate,frontAxlePlate,transmissionPlate,controlPlate,brakePlate,absPlate,enginePlate,fuelPlate};
 
 const plastic='#3a3f42',foam='#55524a',rubber='#26292b',grey='#8f9a9c';
 const block=(r,c,s,color)=>r.box(c[0]-s[0]/2,c[1]-s[1]/2,c[2]-s[2]/2,c[0]+s[0]/2,c[1]+s[1]/2,c[2]+s[2]/2,color);
@@ -124,8 +126,52 @@ const absRows=[
 const absMount=study('g500-abs-mounting','ABS unit mounting','The bracket, rubber buffers and control-module bracket that the G500 ABS diagram lists with the hydraulic unit.',absPlate,absRows);
 absMount.viewAngle=[-.6,.3];
 
-const views=new Map([['g500-brake-hydraulics.cylinder',brakeService],['g500-abs-electrical.block',absMount],['powertrain.transmission',transmission],['drivetrain.gearbox',transmission],['hvac.case',hvacModule],['g500-front-diff.pinion',frontPinion],['g500-front-diff.carrier',frontHousing]]);
-export const g500CatalogStudies=[hvacModule,frontPinion,frontHousing,transmission,brakeService,absMount];
+
+// Engine covers and oil hardware from the G500 5.0 engine diagram.
+const pan=(r,z0,z1,w,color)=>{r.box(-.6,-w,z0,.6,w,z1,color);};
+const oilPan=study('g500-oil-pan','M113 oil pan','The two-piece sump: a cast upper pan that stiffens the block and a pressed lower pan with the drain plug.',enginePlate,[
+  part('upper','Upper oil pan · 113-014-14-02','The cast aluminium upper pan, bolted to the block and the transmission bell housing.',[0,0,.25],r=>{pan(r,-.05,.12,.3,'#9aa4a6');r.box(-.62,-.32,.1,.62,.32,.14,'#9aa4a6');}),
+  part('lower','Lower oil pan · 112-010-06-28','The pressed-steel lower pan that holds the oil reserve.',[0,0,-.25],r=>{pan(r,-.32,-.08,.24,'#5f6a6d');cyl(r,[.3,0,-.32],z,-.03,0,.03,metal,10);})
+]);
+oilPan.viewAngle=[-.6,.3];
+const coverShape=(r,side,color)=>{const y0=side*.35;r.box(-.8,y0-.13,0,.8,y0+.13,.14,color);for(let i=0;i<4;i++)cyl(r,[-.48+i*.32,y0,.14],z,0,.03,.06,dark,12);};
+const gasketShape=(r,side)=>{const y0=side*.35;r.box(-.8,y0-.13,-.04,.8,y0-.11,-.02,rubber);r.box(-.8,y0+.11,-.04,.8,y0+.13,-.02,rubber);r.box(-.8,y0-.13,-.04,-.78,y0+.13,-.02,rubber);r.box(.78,y0-.13,-.04,.8,y0+.13,-.02,rubber);};
+const valveCovers=study('g500-valve-covers','M113 valve covers and gaskets','Each bank has its own magnesium valve cover with a molded rubber gasket.',enginePlate,[
+  part('left','Left valve cover · 113-010-00-30','The driver-side cylinder-head cover.',[0,-.25,.25],r=>coverShape(r,-1,'#7c8486')),
+  part('right','Right valve cover · 113-010-04-30','The passenger-side cylinder-head cover.',[0,.25,.25],r=>coverShape(r,1,'#7c8486')),
+  part('left-gasket','Left valve cover gasket · 112-016-02-21','Seals the driver-side cover to its head.',[0,-.25,-.2],r=>gasketShape(r,-1)),
+  part('right-gasket','Right valve cover gasket · 112-016-03-21','Seals the passenger-side cover to its head.',[0,.25,-.2],r=>gasketShape(r,1))
+]);
+valveCovers.viewAngle=[-.6,.4];
+const dipstick=study('g500-dipstick','Oil dipstick and guide tube','The dipstick reaches the sump through a guide tube pressed into the block.',enginePlate,[
+  part('stick','Oil dipstick · 113-010-09-72-64','The dipstick with its handle and level marks.',[.2,0,.2],r=>{cyl(r,[0,0,-.6],z,0,1.2,.008,metal,6);r.box(-.05,-.015,.6,.05,.015,.68,'#c9a227');}),
+  part('tube','Dipstick guide tube · 112-010-02-66','The tube that guides the dipstick down into the oil pan.',[-.2,0,0],r=>sleeve(r,[0,0,-.55],z,0,1.1,.022,.015,steel,10))
+]);
+dipstick.viewAngle=[-.6,.2];
+const oilFiller=study('g500-oil-filler','Oil filler cap and gasket','The bayonet cap on the right valve cover and its seal.',enginePlate,[
+  part('cap','Oil filler cap · 000-010-14-85-64','The twist-lock cap over the oil filler opening.',[0,0,.25],r=>turn(r,[0,0,.05],z,[[0,0],[0,.09],[.05,.09],[.07,.06],[.07,0]],dark,{n:20})),
+  part('gasket','Oil filler cap gasket · 111-018-00-80','The rubber ring that seals the cap.',[0,0,-.15],r=>sleeve(r,[0,0,0],z,0,.012,.085,.06,rubber,18))
+]);
+oilFiller.viewAngle=[-.6,.4];
+
+// Fittings from the G500 fuel-system diagram.
+const tankFittings=study('g500-tank-fittings','Fuel tank fittings','The parts the G500 fuel diagram lists around the tank: the skid-plate brackets, the filler hose, an edge guard and the in-tank strainer.',fuelPlate,[
+  part('shield-bracket','Tank shield brackets · 463-470-04-81','Brackets that hang the lower shield from the tank straps, left and right.',[0,0,-.35],r=>{for(const s of [-1,1])r.box(s*.5-.04,-.25,-.25,s*.5+.04,.25,-.2,steel);}),
+  part('edge-guard','Edge guard · 001-987-22-72-64','A rubber edge protector on the shield.',[0,-.45,-.2],r=>r.box(-.5,-.27,-.24,.5,-.25,-.2,rubber)),
+  part('filler-hose','Filler hose · 463-476-52-26','The hose that joins the filler pipe to the tank.',[.45,0,.3],r=>{const a=[.4,0,.1],b=[.6,0,.45],d=b.map((v,i)=>v-a[i]);cyl(r,a,d,0,Math.hypot(...d),.05,rubber,14);}),
+  part('strainer','In-tank strainer · 463-470-03-06','The strainer at the bottom of the sender that screens fuel before it leaves the tank.',[-.35,0,-.1],r=>{sleeve(r,[-.2,0,-.18],z,0,.08,.07,.06,'#8f9a9c',14);cyl(r,[-.2,0,-.19],z,0,.012,.07,'#8f9a9c',14);})
+]);
+tankFittings.viewAngle=[-.6,.3];
+const pumpFittings=study('g500-pump-fittings','Fuel pump and filter fittings','The spacer, seal, bracket and relay the G500 fuel diagram lists with the frame-mounted pump and filter.',fuelPlate,[
+  part('pump-spacer','Fuel pump spacer · 124-478-05-53','Spaces the pump clamp off its bracket.',[0,-.3,0],r=>sleeve(r,[-.2,0,0],x,0,.04,.07,.05,rubber,14)),
+  part('filter-seal','Fuel filter seal · 603-098-03-65','The sealing ring at the filter connection.',[.3,-.3,0],r=>sleeve(r,[.3,0,0],x,0,.012,.05,.035,rubber,14)),
+  part('filter-bracket','Fuel filter bracket · 463-476-07-36','The bracket that holds the filter on the frame.',[0,.35,0],r=>{r.box(.1,.1,-.1,.5,.12,.1,steel);r.box(.1,.1,-.1,.5,.2,-.08,steel);}),
+  part('pump-relay','Fuel pump relay · 002-542-92-19','The relay that switches the pump supply.',[-.3,.3,.2],r=>r.box(-.45,.15,.1,-.33,.27,.24,dark))
+]);
+pumpFittings.viewAngle=[-.6,.3];
+
+const views=new Map([['powertrain.sump',oilPan],['powertrain.valve-cover',valveCovers],['powertrain.oil-dipstick',dipstick],['powertrain.oil-fill',oilFiller],['g500-fuel-tank.vessel',tankFittings],['g500-fuel-delivery.pump',pumpFittings],['g500-brake-hydraulics.cylinder',brakeService],['g500-abs-electrical.block',absMount],['powertrain.transmission',transmission],['drivetrain.gearbox',transmission],['hvac.case',hvacModule],['g500-front-diff.pinion',frontPinion],['g500-front-diff.carrier',frontHousing]]);
+export const g500CatalogStudies=[hvacModule,frontPinion,frontHousing,transmission,brakeService,absMount,oilPan,valveCovers,dipstick,oilFiller,tankFittings,pumpFittings];
 export function getG500CatalogStudy(vehicle,id){
   if(vehicle!=='g500')return null;
   if(id==='g500-transmission.gearsets')return getRoadDetail('f350','drivetrain.gearbox');

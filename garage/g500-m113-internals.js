@@ -86,6 +86,7 @@ function chainRun(r,a,b,n,color){
   }
 }
 const coverOutline=[[-.75,.55],[-.75,.8],[.75,.8],[.75,.55],[.3,-.75],[-.3,-.75]];
+const rubber='#26292b';
 const timingRows=[
   src(part('crank-sprocket','Crankshaft sprocket · 155-050-00-03-64','The double sprocket on the crank nose drives the timing chain.',[0,0,-.4],r=>gear(r,crankC,y,-.03,.03,.1,.1,21,dark,0,.35)),g500Timing),
   src(part('intermediate','Intermediate sprocket · 275-050-00-05','An idler between the banks carries the chain around the crankcase.',[0,-.25,.05],r=>gear(r,idlerC,y,-.03,.03,.13,.13,26,steel,0,.35)),camGears),
@@ -105,6 +106,7 @@ const timingRows=[
     }
     sleeve(r,[0,-.16,-.6],y,0,.04,.13,.08,'#8f9a9c',18);
   }),timingCover),
+  src(part('rear-seal','Timing cover rear seal · 112-997-08-45','The seal between the back of the timing cover and the cylinder heads.',[0,.5,.35],r=>{for(const s of [-1,1])r.box(s*.4-.15,.1,.74,s*.4+.15,.13,.77,rubber);}),m113Plate),
   src(part('front-seal','Front crankshaft seal · 023-997-84-47-64','The radial seal in the cover seals the crank nose.',[0,-.5,-.35],r=>sleeve(r,[0,-.2,-.6],y,0,.03,.075,.045,dark,18)),m113Plate)
 ];
 const timing=study('g500-m113-timing','M113 timing drive','One double-row chain runs from the crankshaft over an intermediate sprocket to both camshaft sprockets. A hydraulic tensioner and three guides control it.',m113Plate,timingRows);
@@ -119,7 +121,7 @@ const bearingRows=[
   src(part('pin-bushings','Wrist-pin bushings · 112-038-01-50','Bronze bushings pressed into the small end of each connecting rod.',[0,.5,.55],r=>{for(const c of [-.48,-.16,.16,.48])for(const dx of [-.04,.04])sleeve(r,[c+dx-.03,0,.6],x,0,.06,.04,.03,gold,12);}),m113Plate),
   src(part('rear-seal','Rear main seal · 112-997-02-46-65','The radial seal at the flywheel end of the crankshaft.',[.45,0,0],r=>sleeve(r,[.86,0,0],x,0,.03,.15,.09,dark,20)),m113Plate),
   src(part('seal-retainer','Rear main seal retainer · 112-011-02-08','The cover that holds the rear seal against the block.',[.65,0,.2],r=>sleeve(r,[.9,0,0],x,0,.03,.24,.15,'#8f9a9c',22)),m113Plate),
-  src(part('pulley','Crankshaft pulley · 112-030-00-00','The pulley on the crank nose drives the poly-V belt.',[-.5,0,0],r=>turn(r,[-1.02,0,0],x,[[0,.06],[0,.2],[.1,.2],[.1,.16],[.12,.16],[.12,.06],[0,.06]],steel,{n:24})),m113Plate)
+  src(part('pulley','Vibration damper · 112-030-00-00','The damper and belt pulley on the crank nose drives the poly-V belt and calms crankshaft torsional vibration.',[-.5,0,0],r=>turn(r,[-1.02,0,0],x,[[0,.06],[0,.2],[.1,.2],[.1,.16],[.12,.16],[.12,.06],[0,.06]],steel,{n:24})),m113Plate)
 ];
 const bearings=study('g500-m113-bearings','M113 crankshaft bearings and seals','Plain bearing shells support the crankshaft and the connecting rods. Seals at each end keep the oil in.',m113Plate,bearingRows);
 bearings.viewAngle=[-.55,.3];

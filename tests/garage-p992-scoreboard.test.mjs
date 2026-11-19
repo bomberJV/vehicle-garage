@@ -11,17 +11,13 @@ import {measure} from './garage-detail-scoreboard.mjs';
 const target='porsche992scab';
 const measures=['clickable','studies','assemblies','installed'];
 const openGaps={
-  'g500 assemblies':24,'g500 installed':258,
-  'porsche993cab installed':146,'bmw325ci installed':169,
-  // Ties count as gaps: the 911 must lead outright.
-  'sl550 assemblies':21,
+  // Round 4 (fit packs) closed the last gaps: the 911 now leads on all four.
 };
-// The G500 is being built up in parallel by another line of work. Its
-// clickable parts and studies are contested: the 911 led both when this was
-// written (1,773 and 160 against 1,228 and 156), but the test does not fail
-// the G500's own pull requests when it moves ahead; it fails only if the 911
-// stops being listed by name below.
-const contested=new Set(['g500 clickable','g500 studies']);
+// The G500 is being built up in parallel by another line of work, so every
+// G500 measure is contested: the test does not fail the G500's own pull requests
+// when it moves ahead. At round 4 the 911 led it on all four (2,772 clickable,
+// 216 studies, 53 assemblies and 425 installed, against 1,645, 212, 24 and 369).
+const contested=new Set(measures.map(m=>'g500 '+m));
 const scores=Object.fromEntries(Object.keys(VEHICLES).map(v=>[v,measure(v)]));
 
 test('the 911 leads every vehicle on every measure, apart from the recorded open gaps',()=>{
@@ -34,5 +30,5 @@ test('the 911 leads every vehicle on every measure, apart from the recorded open
 
 test('the 911 never loses detail it already has',()=>{
   const s=scores[target];
-  assert(s.clickable>=1773&&s.studies>=160&&s.assemblies>=21&&s.installed>=134,JSON.stringify(s));
+  assert(s.clickable>=2772&&s.studies>=216&&s.assemblies>=53&&s.installed>=425,JSON.stringify(s));
 });

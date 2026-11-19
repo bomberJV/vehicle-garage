@@ -141,7 +141,6 @@ const rear=group('p992-fit-wipers-lamps-rear','Rear small lamps and reversing sw
 
 const courtesy=group('p992-fit-wipers-lamps-courtesy','Courtesy and interior lamps',
   'The peripheral lights under the exterior mirrors, the red warning lights on the door trims, the footwell lights under the dash and the luggage compartment lamp.',interiorLights,[
-  ...sides.map(([s,hand,title])=>part('mirror-light-'+hand,'Exterior mirror peripheral light, '+hand+' · '+(s<0?'992949133A':'992949134A'),title+' LED in the underside of the mirror housing that lights the ground beside the door when the car is unlocked.',[0,s*.12,-.12],frontLights,r=>mirrorLight(r,s))),
   part('door-warning','Door warning light · 992947411','A red lens low at the rear of each door trim panel warns following traffic when a door is open; both doors carry this number.',[0,0,-.18],interiorLights,doorWarning),
   part('footwell','Footwell light · 4E0947415','One lamp under each end of the dash lower edge lights the driver and passenger footwells; both carry this number.',[0,0,-.18],interiorLights,footwell),
   part('luggage-lamp','Luggage compartment lamp · PAB947409','Lights the front luggage compartment when the lid is open; it sits in the compartment rear trim, ahead of the battery.',[-.18,0,.06],interiorLights,luggageLamp),
@@ -154,6 +153,5 @@ export const mounts=[
   ['p992-fit-wipers-lamps-rear.plate-lights','shell.bumpers','each lamp is clipped into its opening in the rear apron above the plate'],
   ...sides.map(([,hand])=>['p992-fit-wipers-lamps-rear.reflector-'+hand,'shell.bumpers','the reflector is clipped into the recessed grille of the rear apron, its lens in the grille opening']),
   ['p992-fit-wipers-lamps-rear.reverse-switch','drivetrain.gearbox','the switch is screwed into a threaded boss of the gearbox housing'],
-  ...sides.map(([,hand])=>['p992-fit-wipers-lamps-courtesy.mirror-light-'+hand,'shell.'+hand+'-door','the light is clipped into the underside of the exterior mirror housing']),
   ...['left','right'].map(hand=>['p992-fit-wipers-lamps-courtesy.door-warning','shell.'+hand+'-door','each warning light is clipped into the lower edge of its door trim panel']),
 ];

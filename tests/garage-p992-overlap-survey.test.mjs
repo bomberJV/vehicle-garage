@@ -19,8 +19,8 @@ test('every crossing pair of installed 992 parts is in the reviewed baseline, wi
 });
 
 test('the survey totals: 205 errors at the first survey, none left',()=>{
-  assert.equal(pairs.length,142);
-  assert.deepEqual(['assembly','mount','terminal','through','overlap'].map(count),[72,41,29,0,0]);
+  assert.equal(pairs.length,399);
+  assert.deepEqual(['assembly','mount','terminal','through','overlap'].map(count),[159,160,80,0,0]);
   assert.deepEqual(wrong.map(p=>p.a+' + '+p.b),[]);
 });
 

@@ -50,7 +50,10 @@ function sidePart(r,s){
  barrel(r,m(s,[.932,.44,.272]),m(s,[1.25,.43,.185]),.018,cast,8);
  barrel(r,m(s,[1.25,.43,.185]),m(s,[1.477,.455,.322]),.018,cast,8);
  cyl(r,m(s,[1.477,.455,.336]),z,-.022,.022,.020,cast,10);
- barrel(r,m(s,[1.477,.47,.345]),m(s,[1.476,.505,.525]),.015,cast,8);
+ // The upper post climbs to the upper rear link pivot. On the left the first
+ // ignition coil sits beside the pivot, so the post rises behind it and returns over it.
+ if(s>0)barrel(r,m(s,[1.477,.47,.345]),m(s,[1.476,.505,.525]),.015,cast,8);
+ else for(const [a,b] of [[[1.477,.47,.345],[1.535,.51,.44]],[[1.535,.51,.44],[1.535,.51,.535]],[[1.535,.51,.535],[1.476,.505,.535]]])barrel(r,m(s,a),m(s,b),.015,cast,8);
  barrel(r,m(s,[1.035,.41,.24]),m(s,[1.035,.41,.495]),.012,cast,8);
  barrel(r,m(s,[1.035,.41,.487]),m(s,[1.01,.44,.487]),.011,cast,8);
 }
@@ -103,10 +106,6 @@ const wheelEnd=group('p992-fit-rear-axle-wheel','Rear wheel carriers, hub and br
   sleeve(r,hub,y,-.745,-.735,.062,.027,steel,14);
   sleeve(r,hub,y,-.751,-.745,.075,.027,steel,16);
  }),
- part('speed-sensor','Rear wheel-speed sensor · 992927807','The left sensor is screwed into the front of the carrier and reads the encoder ring that turns with the hub. The right sensor is the same part.',[-.14,-.2,.12],hubPage,r=>{
-  const d=[Math.cos(Math.PI*5/6),0,Math.sin(Math.PI*5/6)],c=[1.25,-.69,.358];
-  cyl(r,c,d,.066,.11,.009,black,8);cyl(r,c,d,.11,.124,.012,plastic,8);
- }),
  ...sides.map(([s,hand,label])=>part('cable-holder-'+hand,`${label} wheel-speed sensor cable holder · ${s<0?'992971005':'992971006'}`,`This clip on the front edge of the ${hand} carrier's upper ear guides the sensor cable up to the wheel housing.`,[-.12,s*.2,.1],hubPage,r=>{
   box(r,m(s,[1.196,.725,.432]),[.016,.018,.026],plastic);
  })),
@@ -158,12 +157,14 @@ const gearboxMount=group('p992-fit-rear-axle-gearbox','Manual gearbox mount',
  })
 ]);
 
-export const groups=[carrier,wheelEnd,stabilizer,gearboxMount];
+// The manual gearbox carrier and side member are fitted by the engine pack
+// (p992-fit-engine-drive), from the same catalogue page.
+export const groups=[carrier,wheelEnd,stabilizer];
 export const lines=[];
 const wheel='p992-fit-rear-axle-wheel.',axle='p992-fit-rear-axle.',bar='p992-fit-rear-axle-stabilizer.';
 export const mounts=[
  ...sides.flatMap(([s,hand])=>[
-  ...['upper-front','upper-rear','lower','longitudinal','toe'].map(k=>[wheel+'carrier-'+hand,'p992-suspension.'+k+'-'+hand,'the outer joint of this link is bolted into its ear on the wheel carrier']),
+  ...['lower','longitudinal','toe'].map(k=>[wheel+'carrier-'+hand,'p992-suspension.'+k+'-'+hand,'the outer joint of this link is bolted into its ear on the wheel carrier']),
   [wheel+'carrier-'+hand,'p992-suspension.rear-damper-'+hand,'the damper foot is bolted to the inboard arm of the wheel carrier'],
   [axle+'cross-member','p992-suspension.lower-'+hand,'the lower wishbone inner bush is bolted into its bracket on the cross member'],
   ...['upper-front','upper-rear','longitudinal','toe'].map(k=>[axle+'side-'+hand,'p992-suspension.'+k+'-'+hand,'the inner bush of this link is bolted into its pivot on the side part']),
@@ -175,6 +176,4 @@ export const mounts=[
  [bar+'clamp',axle+'cross-member','the clamp is bolted to the rear face of the cross member'],
  [bar+'link',wheel+'carrier-left','the coupling link ball joint is bolted to the lug on the wheel carrier'],
  [bar+'link','shell.fenders','it reaches the wheel carrier through the open wheel housing; the housing wall is drawn as a closed disc'],
- ['p992-fit-rear-axle-gearbox.carrier','drivetrain.gearbox','the carrier is bolted under the nose of the gearbox case'],
- ['p992-fit-rear-axle-gearbox.side-member','floor.pan','the ends of the side member bolt to the rear wall of the tunnel'],
 ];

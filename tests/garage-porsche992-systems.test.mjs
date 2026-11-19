@@ -17,8 +17,10 @@ function nearest(pts,point){return Math.min(...pts.map(p=>Math.hypot(...p.map((n
 test('992.1 assemblies consist of installed and individually pickable surfaces at the same coordinates as their isolated views',()=>{
  const r=renderer();r.buildMesh();const whole=r.faces;
  assert(whole.length<105000); // hub #261: the G500's overview budget
- assert.equal(groups.length,9);
- const ids=groups.flatMap(g=>g.parts.map(p=>p.id));assert.equal(ids.length,new Set(ids).size);assert.equal(ids.length,63);
+ // The fit packs (garage/p992-fit-*.js) are counted by tests/garage-p992-fits.test.mjs.
+ const core=groups.filter(g=>!g.id.startsWith('p992-fit-'));
+ assert.equal(core.length,9);
+ const ids=groups.flatMap(g=>g.parts.map(p=>p.id));assert.equal(ids.length,new Set(ids).size);assert.equal(core.flatMap(g=>g.parts).length,63);
  for(const g of groups){
   const menu=getAssembly(car,g.id);assert.deepEqual(menu.parts.map(p=>p.id),g.parts.map(p=>p.id));
   r.inspection={assembly:g.id};r.isolate=true;r.buildMesh();

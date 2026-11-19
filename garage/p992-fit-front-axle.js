@@ -43,7 +43,7 @@ const strutBase=s=>[-1.20,s*.706,.359],strutTop=s=>[-1.15,s*.555,.771];
 const strutDir=s=>unit(strutTop(s).map((v,i)=>v-strutBase(s)[i]));
 // A flat strap of rectangular section between two points.
 function strap(r,a,b,width,thick,color){
- const d=unit(b.map((v,i)=>v-a[i])),side=unit([d[1],-d[0],0]),up=[side[1]*d[2]-side[2]*d[1],side[2]*d[0]-side[0]*d[2],side[0]*d[1]-side[1]*d[0]];
+ const d=unit(b.map((v,i)=>v-a[i])),side=Math.hypot(d[0],d[1])<1e-6?[0,1,0]:unit([d[1],-d[0],0]),up=[side[1]*d[2]-side[2]*d[1],side[2]*d[0]-side[0]*d[2],side[0]*d[1]-side[1]*d[0]];
  const c=(p,u,v)=>p.map((q,i)=>q+side[i]*u*width/2+up[i]*v*thick/2);
  const ring=p=>[c(p,-1,-1),c(p,1,-1),c(p,1,1),c(p,-1,1)];
  const A=ring(a),B=ring(b);

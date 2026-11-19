@@ -116,33 +116,6 @@ const intake=study('g500-intake-air','Fresh-air intake and air-mass meter','Two 
   intakeRows.map(([id,name,desc,offset,draw,source])=>source?src(part(id,name,desc,offset,draw),source):part(id,name,desc,offset,draw)));
 intake.viewAngle=[-.55,.35];
 
-// ---------------------------------------------------------------------------
-// Secondary air injection: electric pump, changeover and check valves, and one
-// shut-off valve per head.
-const pumpC=[-.55,0,.1];
-const airParts=[
-  src(part('pump','Secondary air pump · 000-140-37-85','The electric pump at the front of the engine that blows fresh air into the exhaust ports during a cold start.',[-.45,0,.35],r=>{
-    cyl(r,pumpC,y,-.14,.14,.12,'#55636a',18);cyl(r,[pumpC[0],.14,pumpC[2]],y,0,.1,.08,dark,16);cyl(r,[pumpC[0]+.12,0,pumpC[2]],x,0,.1,.03,plastic,10);
-  }),plates.air),
-  src(part('pump-insulator','Air pump insulator · 112-237-00-12','The rubber mount that isolates the pump from its brackets.',[-.45,0,-.15],r=>cyl(r,[pumpC[0],0,-.04],z,-.04,0,.06,rubber,14)),plates.air),
-  src(part('inner-bracket','Air pump inner bracket · 112-237-02-40','The inner bracket the pump hangs from.',[-.5,-.35,-.1],r=>{block(r,[-.55,-.12,-.12],[.22,.03,.12],steel);block(r,[-.55,-.08,-.17],[.22,.1,.03],steel);}),plates.air),
-  src(part('outer-bracket','Air pump outer bracket · 112-237-01-40','The outer bracket that ties the pump mount to the engine.',[-.5,.35,-.1],r=>{block(r,[-.55,.12,-.12],[.22,.03,.12],steel);block(r,[-.55,.08,-.17],[.22,.1,.03],steel);}),plates.air),
-  src(part('hose','Air pump hose · 112-238-00-82','The hose from the pump outlet back to the changeover and check valves.',[0,0,.5],r=>hose(r,[[-.43,0,.1],[-.25,0,.25],[0,0,.3]],.035,hoseBlack,12)),plates.air),
-  src(part('hose-connector','Air hose connector · 116-276-09-29','The connector that joins the pump hose to the valve.',[-.1,-.2,.6],r=>sleeve(r,[-.08,0,.29],x,-.03,.03,.05,.035,dark,14)),plates.air),
-  src(part('hose-joint','Air hose joint · 601-078-02-45','The T-joint that splits the air feed between the two banks.',[.1,0,.65],r=>{cyl(r,[.08,0,.3],x,-.05,.05,.04,plastic,12);cyl(r,[.08,0,.3],y,-.1,.1,.03,plastic,12);}),plates.air),
-  src(part('check-valve','Secondary air check valve · 002-140-84-60','A one-way valve that stops exhaust pressure reaching the pump.',[0,.35,.55],r=>{cyl(r,[.0,0,.3],x,-.05,.05,.055,'#6b7a80',14);}),plates.air),
-  src(part('changeover-valve','Secondary air changeover valve · 000-500-32-01','The electric valve that switches vacuum to open the shut-off valves when the pump runs.',[.3,.2,.6],r=>{block(r,[.25,.18,.45],[.1,.07,.08],plastic);for(const d of [-1,1])cyl(r,[.25+d*.03,.18,.49],z,0,.06,.01,dark,8);}),plates.air),
-  src(part('changeover-insulator','Changeover valve insulator · 117-078-09-81','The rubber mount that holds the changeover valve.',[.3,.45,.45],r=>sleeve(r,[.25,.18,.39],z,0,.02,.06,.035,rubber,14)),plates.air),
-  ...[['shutoff-right','Secondary air shut-off valve, passenger side · 002-140-36-60','The vacuum-opened valve on the right cylinder head that admits pump air to the exhaust ports.',1,[.35,.45,0]],
-     ['shutoff-left','Secondary air shut-off valve, driver side · 002-140-35-60','The matching valve on the left cylinder head.',-1,[.35,-.45,0]]].map(([id,name,desc,s,offset])=>src(part(id,name,desc,offset,r=>{
-    const c=[.45,s*.45,.05];cyl(r,c,z,-.08,.06,.07,'#7d8a8e',16);cyl(r,[c[0],c[1],c[2]+.06],z,0,.04,.05,dark,14);
-    hose(r,[[.08,s*.1,.3],[.3,s*.3,.2],[c[0],c[1],c[2]+.1]],.025,hoseBlack,10);
-  }),plates.air)),
-  src(part('shutoff-gaskets','Shut-off valve gaskets · 112-238-00-80','The gasket under each shut-off valve where it bolts to the cylinder head.',[.45,0,-.45],r=>{for(const s of [-1,1])ring(r,[.45,s*.45,-.05],z,.08,.045,.012,copper,16);}),plates.air),
-  src(part('pressure-sensor','Pressure sensor · 005-153-50-28','The pressure sensor the G500 A.I.R. diagram lists with the pump, hoses and valves.',[.6,0,.4],r=>{cyl(r,[.62,0,.25],z,0,.08,.03,dark,12);block(r,[.62,0,.36],[.06,.05,.05],plastic);}),plates.air)
-];
-const secondaryAir=study('g500-secondary-air','Secondary air injection','During a cold start an electric pump blows fresh air into the exhaust ports to heat the catalysts. A changeover valve uses vacuum to open one shut-off valve on each head.',plates.air,airParts);
-secondaryAir.viewAngle=[-.6,.4];
 
 // ---------------------------------------------------------------------------
 // Engine sensors, drawn at their positions around a block outline that is not itself a part.
@@ -195,12 +168,11 @@ const beltDrive=study('g500-belt-drive','Poly-V belt drive','One poly-V belt run
 ]);
 beltDrive.viewAngle=[-.2,.15];
 
-export const studies=[ignition,manifold,intake,secondaryAir,sensors,breather,beltDrive];
+export const studies=[ignition,manifold,intake,sensors,breather,beltDrive];
 export const views=new Map([
   ['powertrain.coils',ignition],
   ['powertrain.fuel-rail',manifold],['powertrain.injectors',manifold],
   ['powertrain.intake-duct',intake],['intake.intake-duct',intake],['powertrain.maf',intake],['intake.maf',intake],
-  ['powertrain.head',secondaryAir],
   ['powertrain.block',sensors],
   ['g500-valve-covers.left',breather],
   ['powertrain.belt',beltDrive],['powertrain.tensioner',beltDrive]
@@ -226,7 +198,5 @@ const facts=new Map([
 ]);
 export const claims=studies.flatMap(s=>[...bySource(s)].map(([source,ids])=>{const [fact,need]=facts.get(source);return {ids,kind:'diagram',fact,need,source};}));
 // Same-engine corroboration for the secondary air parts and the breather vent hose.
-claims.push({ids:idsOf(secondaryAir,['pump','pump-insulator','inner-bracket','outer-bracket','shutoff-right','shutoff-left','shutoff-gaskets','hose','hose-connector','hose-joint','changeover-valve','changeover-insulator','check-valve','pressure-sensor']),kind:'diagram',
-  fact:'The 2004 E500 A.I.R. diagram lists the same pump, brackets, valves, hoses and pressure sensor numbers for the M113 5.0.',need:'The E500 page supports the numbers only; G500 routing must be confirmed on the vehicle.',source:plates.e500Air});
 claims.push({ids:idsOf(breather,['vent-hose']),kind:'diagram',fact:'The 2004 E500 air-intake diagram lists vent hose 112-018-04-82 for the M113 5.0.',need:'Confirm the G500 number by VIN; the E500 air cleaner differs from the G500 twin cleaner.',source:plates.e500Intake});
 claims.push({ids:idsOf(beltDrive,['belt','tensioner','idler','idler-cap']),kind:'diagram',fact:'The 2004 G500 belts and pulleys diagram lists belt 014-997-71-92, tensioner 112-200-09-70, idler 000-202-09-19 and cap 001-988-57-35.',need:'Confirm the belt length and pulley positions.',source:plates.belts04});

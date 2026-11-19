@@ -88,9 +88,23 @@ const wheelAccessories={id:'wheel-accessories',code:'403-240',title:'Accessories
     ['8','992919680E','Switch, steering wheel'],
   ]};
 
+// The manual-gearbox (PG1M) copy of the wheel accessories. Of the cover and
+// rear-cover options, the newest carbon cover and the heated rear cover are kept.
+const manualWheelAccessories={id:'manual-wheel-accessories',code:'403-290',title:'Accessories steering wheel, manual gearbox',year:'2022 (992-1)',
+  url:es('2022_(992-1)','403-290','Accessories_steering_wheel'),
+  rows:[
+    ['1','992998537B 6N3','Multifunction button set, matt black'],
+    ['2','992419732E IL6','Steering wheel cover, carbon'],
+    ['3','992951527A 1E0','Pushbutton for steering wheel heating'],
+    ['4','992971388A','Steering wheel wire set'],
+    ['5','992419798A 5Q0','Rear steering wheel cover, for steering wheel heating'],
+    ['6','992959256D','Control unit for the multifunction steering wheel'],
+    ['7','992919680D 6N3','Switch, steering wheel, matt black'],
+  ]};
+
 const P='p992-steering-';
-export const studies=[steeringGear,steeringColumn,columnSwitch,wheelAccessories].map(d=>catalogueStudy(d,P));
-const [gearStudy,columnStudy,switchStudy,wheelStudy]=studies;
+export const studies=[steeringGear,steeringColumn,columnSwitch,wheelAccessories,manualWheelAccessories].map(d=>catalogueStudy(d,P));
+const [gearStudy,columnStudy,switchStudy,wheelStudy,manualWheelStudy]=studies;
 
 export const views=new Map([
   ['p992-steering.rack',gearStudy],
@@ -103,4 +117,6 @@ export const views=new Map([
   // The adjustment switch sits on the column switch; the wheel mounts on the column.
   [P+'steering-column.r4-9a790770500',switchStudy],
   [P+'steering-column.r1-992419506g',wheelStudy],
+  // The manual-gearbox accessories open from the wheel's button set.
+  [P+'wheel-accessories.r1-992998537b',manualWheelStudy],
 ]);

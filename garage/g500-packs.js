@@ -8,8 +8,10 @@ import * as cabin from './g500-pack-cabin.js';
 import * as chassis from './g500-pack-chassis.js';
 import * as drivetrain from './g500-pack-drivetrain.js';
 import * as exhaust from './g500-pack-exhaust.js';
+import * as shell from './g500-pack-shell.js';
+import * as trim from './g500-pack-trim.js';
 
-export const g500Packs={engine,cooling,electrical,body,cabin,chassis,drivetrain,exhaust};
+export const g500Packs={engine,cooling,electrical,body,cabin,chassis,drivetrain,exhaust,shell,trim};
 export const packStudies=Object.values(g500Packs).flatMap(p=>p.studies);
 export const packClaims=Object.values(g500Packs).flatMap(p=>p.claims);
 export function getG500PackStudy(vehicle,id){

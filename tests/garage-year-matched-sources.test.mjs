@@ -12,8 +12,9 @@ import {roadSystems} from '../garage/road-service-data.js';
 import {refs996} from '../garage/porsche996-sources.js';
 
 const dir=new URL('../garage/',import.meta.url);
-// The G500 study packs (g500-pack-*.js) are built by a separate line of work
-// with its own source review, so they are outside this check.
+// The G500 study packs (g500-pack-*.js) keep their sources in tables this
+// pattern does not read; their plate years are checked in
+// garage-g500-pack-years-a/-b.test.mjs and the exhaust-pack test below.
 const files=readdirSync(dir).filter(f=>f.endsWith('.js')&&!/^g500-packs?(-|\.js$)/.test(f));
 const plateYear=/(\d{4})-mercedes[_-]benz-g500/;
 

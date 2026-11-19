@@ -2,7 +2,6 @@ import {faceTriangles} from './mesh-triangles.js';
 import {hasStudioFinish,studioPaintReflection,studioSurfaceFinish,planeNormal} from './studio-finish.js';
 import {glassOrder} from './glass-order.js';
 import {blueprintInk,studioTheme} from './studio-theme.js';
-import {clipFaces} from './section-plane.js';
 import {shellTarget,bindShellTextures} from './shell-depth.js';
 
 // Mark a pane independently of its parent assembly. Trim and rubber remain opaque.
@@ -412,26 +411,25 @@ export function gpuWorldRender(renderer,w,h,dpr,project,transform) {
     if(d-r<min)min=d-r;if(d+r>max)max=d+r;
   }
   const mid=Number.isFinite(min)?(min+max)*.5:0,range=Math.max((max-min)*.501,1e-7);
-  // Glass, cut and sorted for this view, and the shell's screen-covering triangle, in screen space.
+  // Glass, sorted for this view, in world space so the camera transform places it and the shader
+  // cuts it at the section plane like the body. Then the shell's screen-covering triangle.
   const {eye,rgbFor}=surfaceShading(renderer,project);
   let glassCount=0,pos=0;
   const glass=[];
   if(geo.panes.length){
-    let panes=geo.panes,paneIndices=geo.paneIndices;
-    if(cut){panes=clipFaces(panes,cut);paneIndices=panes.map(face=>face.triangles||faceTriangles(face.points));}
-    const paneColors=panes.map(rgbFor);
-    for(const item of glassOrder(panes,paneIndices,eye,renderer)){
+    const panes=geo.panes,paneColors=panes.map(rgbFor);
+    for(const item of glassOrder(panes,geo.paneIndices,eye,renderer)){
       const face=panes[item.face];
-      glass.push({ps:item.points.map(project),rgb:paneColors[item.face],opacity:face.opacity,indices:faceTriangles(item.points)});
+      glass.push({points:item.points,rgb:paneColors[item.face],opacity:face.opacity,indices:faceTriangles(item.points)});
     }
     for(const surface of glass)glassCount+=surface.indices.length;
   }
   const capacity=glassCount+(target?3:0);
   if(!renderer.vertices||renderer.vertices.length<capacity*7)renderer.vertices=new Float32Array(Math.ceil(capacity*7*1.08));
   const vertices=renderer.vertices;
-  for(const {ps,rgb,opacity,indices} of glass)for(const index of indices){
-    const p=ps[index];
-    vertices[pos++]=p.x/w*2-1;vertices[pos++]=1-p.y/h*2;vertices[pos++]=(mid-p.depth)/range;
+  for(const {points,rgb,opacity,indices} of glass)for(const index of indices){
+    const p=points[index];
+    vertices[pos++]=p[0];vertices[pos++]=p[1];vertices[pos++]=p[2];
     vertices[pos++]=rgb[0]/255;vertices[pos++]=rgb[1]/255;vertices[pos++]=rgb[2]/255;vertices[pos++]=opacity;
   }
   if(target){vertices.set([-1,-1,0,0,0,0,1, 3,-1,0,0,0,0,1, -1,3,0,0,0,0,1],pos);pos+=21;}
@@ -456,6 +454,13 @@ export function gpuWorldRender(renderer,w,h,dpr,project,transform) {
     gl.enableVertexAttribArray(shade);
     gl.bindBuffer(gl.ARRAY_BUFFER,geo.shadeBuffer);gl.vertexAttribPointer(shade,4,gl.FLOAT,false,16,0);
   };
+  // Glass: the frame's buffer, still in world space, lit as given.
+  const panesInWorld=()=>{
+    gl.disableVertexAttribArray(shade);gl.vertexAttrib4f(shade,0,0,0,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER,renderer.buffer);
+    gl.vertexAttribPointer(position,3,gl.FLOAT,false,28,0);gl.vertexAttribPointer(tint,4,gl.FLOAT,false,28,12);
+  };
+  // The shell's overlay triangle is already in clip space.
   const screen=()=>{
     screenState(gl,renderer);
     gl.bindBuffer(gl.ARRAY_BUFFER,renderer.buffer);
@@ -475,8 +480,8 @@ export function gpuWorldRender(renderer,w,h,dpr,project,transform) {
     bindShellTextures(gl,target,true);
   }
   gl.drawArrays(gl.TRIANGLES,0,opaqueCount);
-  screen();
   if(glassCount||target){
+    panesInWorld();
     gl.depthMask(false);gl.enable(gl.BLEND);
     gl.blendFuncSeparate(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA,gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
     if(target){
@@ -484,13 +489,16 @@ export function gpuWorldRender(renderer,w,h,dpr,project,transform) {
         gl.uniform1i(target.mode,1);
         gl.drawArrays(gl.TRIANGLES,0,glassCount);
       }
+      screen();
       gl.disable(gl.DEPTH_TEST);gl.uniform1i(target.mode,3);
       gl.drawArrays(gl.TRIANGLES,glassCount,3);
       gl.enable(gl.DEPTH_TEST);gl.uniform1i(target.mode,2);
+      resident();panesInWorld();
     }
     if(glassCount)gl.drawArrays(gl.TRIANGLES,0,glassCount);
     if(target)gl.uniform1i(target.mode,0);
     gl.depthMask(true);gl.disable(gl.BLEND);
   }
+  screen();
   renderer.ctx.drawImage(renderer.surface,0,0,w,h);return true;
 }

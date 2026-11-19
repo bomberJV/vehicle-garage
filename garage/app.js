@@ -2,7 +2,7 @@ import {basisLabels,g500Geometry,geometryBoardLink} from './g500-geometry-regist
 import {enableFactoryElevations} from './factory-elevations.js';
 import {dimensionStudies} from './factory-dimensions.js';
 import {bindSLControls} from './sl550-controls.js';
-import {hasConvertibleRoof,hasRoofCarrier,isPorscheCabriolet,roofReferences} from './porsche-roof-state.js';
+import {hasConvertibleRoof,hasHardtop,hasRoofCarrier,isPorscheCabriolet,roofReferences} from './porsche-roof-state.js';
 import {COMPACT_SPREAD,spreadPercent,bindSpreadControls} from './compact-explosion.js';
 import {createWorkbenchTools} from './workbench-tools.js';
 import {createCustomizer} from './customizer.js';
@@ -152,6 +152,8 @@ function renderRoofControls(){
     const down=$('roof-down');
     down.disabled=Boolean(hasRoofCarrier(build));
     down.title=down.disabled?'The preview keeps the top up while the load carrier is fitted.':'';
+    const up=$('roof-up');up.disabled=hasHardtop(build);
+    up.title=up.disabled?'The fabric top stays folded under the hardtop.':'';
     for(const pos of ['down','up'])$('roof-'+pos).setAttribute('aria-pressed',String(build.roofPosition===pos));
   }
 }

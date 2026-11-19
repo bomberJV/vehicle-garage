@@ -18,17 +18,17 @@ import {metal,steel,dark,gold,turn,cyl,sleeve,bead,part,study,x,y,z} from './mec
 
 const mbpg='https://www.mbpartsgiant.com/parts-list/';
 const plate=(label,path)=>({label:'MB Parts Giant · '+label,url:mbpg+path});
-const framePlate=plate('2004 G500 frame and components diagram','2004-mercedes_benz-g500/body-hardware/frame-components');
-const stabilizerPlate=plate('2005 G500 stabilizer bar and front suspension diagram','2005-mercedes_benz-g500/suspension/stabilizer-bar-components');
-const rearSuspensionPlate=plate('2005 G500 rear suspension components diagram','2005-mercedes_benz-g500/suspension/rear-suspension-components');
-const linkagePlate=plate('2004 G500 steering gear and linkage diagram','2004-mercedes_benz-g500/steering/steering-gear-linkage');
-const pumpPlate=plate('2004 G500 power-steering pump and hoses diagram','2004-mercedes_benz-g500/steering/p-s-pump-hoses');
-const columnPlate=plate('2005 G500 steering column assembly diagram','2005-mercedes_benz-g500/steering/steering-column-assembly');
-const frontBrakePlate=plate('2004 G500 front brakes diagram','2004-mercedes_benz-g500/brakes/front-brakes');
-const lateFrontBrakePlate=plate('2008 G500 front brakes diagram','2008-mercedes_benz-g500/brakes/front-brakes');
-const rearBrakePlate=plate('2004 G500 rear brakes diagram','2004-mercedes_benz-g500/brakes/rear-brakes');
-const lateRearBrakePlate=plate('2008 G500 rear brakes diagram','2008-mercedes_benz-g500/brakes/rear-brakes');
-const parkingPlate=plate('2004 G500 parking brake diagram','2004-mercedes_benz-g500/brakes/parking-brake');
+const framePlate=plate('2002 G500 frame and components diagram','2002-mercedes_benz-g500/body-hardware/frame-components');
+const stabilizerPlate=plate('2005 G500 stabilizer bar and front suspension diagram, a later-year plate; the 2002 G500 plate could not be retrieved, so 2002 fitment of the bar, brackets, U-bolts and links is unconfirmed. Bushing 463-323-04-85 is listed for the 2006–2008 G500 only, and spring insulator 460-322-01-67 for the 2002–2008 G500','2005-mercedes_benz-g500/suspension/stabilizer-bar-components');
+const rearSuspensionPlate=plate('2005 G500 rear suspension components diagram, a later-year plate; the coil spring insulator listing gives spring seat 460-325-09-15 2002–2008 G500 fitment','2005-mercedes_benz-g500/suspension/rear-suspension-components');
+const linkagePlate=plate('2004 G500 steering gear and linkage diagram, a later-year plate; the tie rod end listing gives drag link ends 002-460-16-48 and 002-460-19-48 and tie rod end 602-330-02-35 2002–2008 G500 fitment. The 2002 plate could not be retrieved, so 2002 fitment of the steering arms, clamps, damper bracket and steering box parts is unconfirmed','2004-mercedes_benz-g500/steering/steering-gear-linkage');
+const pumpPlate=plate('2004 G500 power-steering pump and hoses diagram, a later-year plate; the power steering hose listing gives return hose 463-466-02-81 and reservoir hose 463-466-01-81 2002–2008 G500 fitment','2004-mercedes_benz-g500/steering/p-s-pump-hoses');
+const columnPlate=plate('2005 G500 steering column assembly diagram, a later-year plate; the 2002 G500 plate could not be retrieved, so 2002 fitment of the column stay, clamp, lower bracket, boot and lock ring is unconfirmed','2005-mercedes_benz-g500/steering/steering-column-assembly');
+const frontBrakePlate=plate('2002 G500 front brakes diagram','2002-mercedes_benz-g500/brakes/front-brakes');
+const lateFrontBrakePlate=plate('2008 G500 front brakes diagram, a later-year plate cited for the 2006–2008 caliper guide pin and pad spring; the 2002 G500 front-brake plate does not list them or rotor screw 001-990-09-14, so the screw is unconfirmed for 2002','2008-mercedes_benz-g500/brakes/front-brakes');
+const rearBrakePlate=plate('2004 G500 rear brakes diagram, a later-year plate; the 2002 G500 rear-brake plate lists frame hose 463-428-06-35-64, wheel hose 000-428-93-35-65 and wear indicator 901-540-01-17 but not caliper hoses 123-420-50-28-64 and 123-420-65-28-64, which are unconfirmed for 2002','2004-mercedes_benz-g500/brakes/rear-brakes');
+const lateRearBrakePlate=plate('2008 G500 rear brakes diagram, a later-year plate cited for the 2006–2008 caliper support; the 2002 G500 rear-brake plate does not list 000-421-17-06','2008-mercedes_benz-g500/brakes/rear-brakes');
+const parkingPlate=plate('2004 G500 parking brake diagram, a later-year plate; the 2002 G500 plate lists the same cables 463-420-50-85-64 and 463-420-51-85-64 but parking brake control 463-420-05-84, so lever 463-420-06-84-9045 is unconfirmed for 2002','2004-mercedes_benz-g500/brakes/parking-brake');
 // Round 2 sources. MB Parts Giant diagram pages for 2002 and 2006, two of its part listings
 // that give year ranges, and two ECS Tuning pages for the 2002–2003 G500 (463.249) that list
 // genuine Mercedes numbers the diagram pages leave out.
@@ -36,12 +36,12 @@ const mbList=(label,slug)=>({label:'MB Parts Giant · '+label,url:'https://www.m
 const earlyFrontBrakePlate=plate('2002 G500 front brakes diagram','2002-mercedes_benz-g500/brakes/front-brakes');
 const earlyBrakePartsPlate=plate('2002 G500 brake components diagram','2002-mercedes_benz-g500/brakes/brake-components');
 const earlyParkingPlate=plate('2002 G500 parking brake diagram','2002-mercedes_benz-g500/brakes/parking-brake');
-const midRearBrakePlate=plate('2006 G500 rear brakes diagram','2006-mercedes_benz-g500/brakes/rear-brakes');
-const lateBrakePartsPlate=plate('2008 G500 brake components diagram','2008-mercedes_benz-g500/brakes/brake-components');
+const midRearBrakePlate=plate('2006 G500 rear brakes diagram, a later-year plate; the 2002 G500 rear-brake plate lists calipers 001-420-01-01 and 001-420-02-01 and backing plates 461-423-01-20 and 461-423-02-20, but not backing plates 463-420-01-44 and 463-420-02-44','2006-mercedes_benz-g500/brakes/rear-brakes');
+const lateBrakePartsPlate=plate('2008 G500 brake components diagram, a later-year plate cited for the 2006–2008 caliper hose 123-420-55-28-64; the 2002 G500 rear-brake plate lists rear pads 003-420-24-20','2008-mercedes_benz-g500/brakes/brake-components');
 const caliperListing=mbList('G500 brake caliper listing','oem-mercedes_benz-g500-brake_caliper');
 const ecsLinesPage={label:'ECS Tuning · 2003 G500 (463.249) brake lines',url:'https://www.ecstuning.com/Mercedes_Benz-2003-G500-463.249-Base-Sport_Utility-V8_5.0L/Braking/Lines/'};
 const earlyColumnPlate=plate('2002 G500 steering column diagram','2002-mercedes_benz-g500/steering/steering-column');
-const midColumnPlate=plate('2006 G500 steering column diagram','2006-mercedes_benz-g500/steering/steering-column');
+const midColumnPlate=plate('2006 G500 steering column diagram, a later-year plate cited only for the column number it lists; 2002 fitment of 463-460-33-16 is unconfirmed','2006-mercedes_benz-g500/steering/steering-column');
 const earlyColumnAssemblyPlate=plate('2002 G500 steering column assembly diagram','2002-mercedes_benz-g500/steering/steering-column-assembly');
 const earlyLinkagePlate=plate('2002 G500 steering gear and linkage diagram','2002-mercedes_benz-g500/steering/steering-gear-linkage');
 const earlyPumpPlate=plate('2002 G500 power-steering pump and hoses diagram','2002-mercedes_benz-g500/steering/p-s-pump-hoses');
@@ -49,9 +49,9 @@ const pumpListing=mbList('G500 power steering pump listing','oem-mercedes_benz-g
 const steeringHoseListing=mbList('G500 power steering hose listing','oem-mercedes_benz-g500-power_steering_hose');
 const earlyWheelPlate=plate('2002 G500 wheels diagram','2002-mercedes_benz-g500/suspension/wheels');
 const earlyFrontSuspensionPlate=plate('2002 G500 stabilizer bar and front suspension diagram','2002-mercedes_benz-g500/suspension/stabilizer-bar-components');
-const midFrontSuspensionPlate=plate('2006 G500 front suspension components diagram','2006-mercedes_benz-g500/suspension/front-suspension-components');
+const midFrontSuspensionPlate=plate('2006 G500 front suspension components diagram, a later-year plate cited for its 2006 damper and hub numbers; the 2002 G500 plate could not be retrieved, so 2002 fitment of radius arm washers 460-352-02-76 and 460-352-04-76 is unconfirmed','2006-mercedes_benz-g500/suspension/front-suspension-components');
 const earlyRearSuspensionPlate=plate('2002 G500 rear suspension components diagram','2002-mercedes_benz-g500/suspension/rear-suspension-components');
-const spareCarrierPlate=plate('2006 G500 spare tire carrier diagram','2006-mercedes_benz-g500/body-hardware/carrier-components-spare-tire');
+const spareCarrierPlate=plate('2006 G500 spare tire carrier diagram, a later-year plate that no part in this pack cites; the 2002 G500 spare tire carrier plate does not list spacer 463-991-28-40','2006-mercedes_benz-g500/body-hardware/carrier-components-spare-tire');
 const spacerPage=mbList('spare carrier spacer 463-991-28-40 fitment','genuine/mercedes-benz~carrier-assembly-bushing~4639912840');
 export const chassisPackSources={framePlate,stabilizerPlate,rearSuspensionPlate,linkagePlate,pumpPlate,columnPlate,frontBrakePlate,lateFrontBrakePlate,rearBrakePlate,lateRearBrakePlate,parkingPlate,
   earlyFrontBrakePlate,earlyBrakePartsPlate,earlyParkingPlate,midRearBrakePlate,lateBrakePartsPlate,caliperListing,ecsLinesPage,earlyColumnPlate,midColumnPlate,earlyColumnAssemblyPlate,

@@ -164,13 +164,12 @@ const cargoRows=[
 const cargo=study('g500-cargo-trim','Cargo net and cargo-area trim','The load space behind the rear seat: the cargo net with its brackets, bushings, spacer, support and strap, a tie plate, the mat bracket, the rear vent grille and the linings over the rear wheelhouses.',cargoNetPlate,cargoRows);
 cargo.viewAngle=[-.4,.3];
 
-export const studies=[rearBase,rearBack,consoleParts,pillarTrim,switches,cargo];
+export const studies=[rearBase,rearBack,consoleParts,pillarTrim,cargo];
 export const views=new Map([
   ['body.rear-bench',rearBase],
   ['body.rear-bench-back-left',rearBack],
   ['body.center-console',consoleParts],
   ['body.belt-lower-covers',pillarTrim],
-  ['door-g500-front-left.inner-handle',switches],
   ['body.rear-bench-back-right',cargo]
 ]);
 
@@ -184,7 +183,6 @@ export const claims=[
   {ids:ids(consoleParts,from(ashtrayList)),kind:'diagram',fact:'The G500 ashtray listing gives 463-810-02-30 (replacing 463-810-00-30) for the 2002–2003 and 2006–2008 G500.',need:'The listing does not show where the ashtray mounts; its position at the front of the console is assumed.',source:ashtrayList},
   {ids:ids(pillarTrim,from(pillarList)),kind:'diagram',fact:'The G500 pillar trim listing gives these windshield, center and rear pillar trims by side, with 2002–2003 fitment for the windshield pillars and 2002–2005 for the center and rear pillars.',need:'The listing has no drawing. Pillar trim sections and lengths are schematic; the trim colour suffix needs the car’s interior code.',source:pillarList},
   {ids:ids(pillarTrim,from(pillarPlate)),kind:'diagram',fact:'The related-parts list for center pillar trim 463-690-06-40 (2002–2005 G500, ref 3) gives the windshield pillar lower cover, the footwell (cowl) trim and the two sill retainer plates from the same pillar diagram.',need:'The page does not give sides or positions for these pieces; they are drawn on the driver side as an assumption.',source:pillarPlate},
-  {ids:ids(switches),kind:'diagram',fact:'The G500 seat switch listing gives passenger switch 210-820-90-10-64 (replaces 210-820-90-10) and driver switch 210-820-91-10 (replaced by 210-820-91-10-64) for 2002–2008.',need:'The listing does not show the switch mounting. The door location comes from this register’s steering-column notes and still needs a photo or diagram of the 2002 door.',source:seatSwitchList},
   {ids:ids(cargo,from(cargoNetPlate)),kind:'diagram',fact:'Cargo net 463-860-00-74 is ref 20 on the 2002–2003 G500 cargo-area diagram. Its related-parts list gives the net bracket, bushing, spacer, support, strap, tie plate, mat bracket and vent grille from the same diagram.',need:'The related list has no reference numbers or positions, so the layout is schematic. Check each related number’s fitment against the VIN.',source:cargoNetPlate},
   {ids:ids(cargo,from(wheelhouseList)),kind:'diagram',fact:'The G500 wheelhouse listing gives wheelhouse trim 463-680-13-42 (driver) and 463-680-28-46 (passenger) for 2002–2005.',need:'The trim shape over each wheelhouse is schematic and needs measuring.',source:wheelhouseList}
 ];

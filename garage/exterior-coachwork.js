@@ -119,7 +119,7 @@ function skin(r,cfg,paint){
     const lanes=isHood&&cfg.hoodLanes?cfg.hoodLanes:[0,.55,1];
     for(let k=1;k<lanes.length;k++){
      const lo=lanes[k-1],hi=lanes[k];
-     const p=(x,sw,h,t)=>[x,s*(sw*frac-.008)*t,h+.016+(isHood&&cfg.hoodCrown!=null?cfg.hoodCrown:.036)*(1-t*t)+(isHood&&cfg.hoodPress?cfg.hoodPress(t):0)];
+     const p=(x,sw,h,t)=>[x,s*(sw*frac-.008)*t,h+.016+(isHood&&cfg.hoodCrownAt?cfg.hoodCrownAt(x):isHood&&cfg.hoodCrown!=null?cfg.hoodCrown:.036)*(1-t*t)+(isHood&&cfg.hoodPress?cfg.hoodPress(t):0)];
      face(r,[p(x0,...section(cfg.stations,x0),lo),p(x1,...section(cfg.stations,x1),lo),p(x1,...section(cfg.stations,x1),hi),p(x0,...section(cfg.stations,x0),hi)],tint(paint,(s<0?1.11:1.17)-.035*lo+(isHood&&cfg.hoodPress&&lo===.68?.045:0)+(isHood?cfg.hoodLaneTint?.(lo)??0:0)));
     }
    }};

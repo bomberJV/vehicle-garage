@@ -233,8 +233,8 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
    // the bracket from the rail. The arm bolts to the block wall above the pan
    // rail and stays outside the pan rim.
    cyl([.03,side*.385,.03],[.03,side*.385,.09],.046,BLACK,10);
-   box(-.02,Math.min(side*.33,side*.454),.01,.08,Math.max(side*.33,side*.454),.03,METAL);
-   route([[.02,side*.185,crankRise+.015],[.03,side*.385,.10]],.025,CAST,8);
+   tag('mount-lower-brackets',()=>box(-.02,Math.min(side*.33,side*.454),.01,.08,Math.max(side*.33,side*.454),.03,METAL));
+   tag(side<0?'engine-support-left':'engine-support-right',()=>route([[.02,side*.185,crankRise+.015],[.03,side*.385,.10]],.025,CAST,8));
    continue;
   }
   const mx=honda?-.15:0;

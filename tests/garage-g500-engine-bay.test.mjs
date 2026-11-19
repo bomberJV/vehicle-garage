@@ -17,7 +17,10 @@ function posed(mode){
 const poses=liftOptions('g500').map(o=>o.id);
 const meshes=new Map(poses.map(mode=>[mode,posed(mode)]));
 const lift=mode=>mode==='stock'?0:.040;
-const part=(faces,id)=>worldTriangles(faces,f=>f.part===id);
+// The mount set: rubber mounts, the rail brackets and both support arms.
+const mountSet=new Set(['powertrain.engine-mounts','powertrain.mount-lower-brackets','powertrain.engine-support-left','powertrain.engine-support-right']);
+const matches=(f,id)=>id==='powertrain.engine-mounts'?mountSet.has(f.part):f.part===id;
+const part=(faces,id)=>worldTriangles(faces,f=>matches(f,id));
 const backlog=additionalRequestSections.flatMap(s=>s.items).find(item=>item.id==='g500-engine-bay-overlaps');
 // The crossmember behind the oil pan, without the rails it joins.
 const crossmember=faces=>worldTriangles(faces,f=>f.part==='suspension.frame'&&f.points.every(p=>p[0]>-.98&&p[0]<-.90));
@@ -63,14 +66,15 @@ test('the floor tunnel covers the bellhousing and keeps its ordinary width behin
 
 test('the G500 engine mounts stand on the frame rails, clear of the front axle and its propeller shaft',()=>{
   for(const mode of poses){
-    const faces=meshes.get(mode),mounts=faces.filter(f=>f.part==='powertrain.engine-mounts').flatMap(f=>f.points),rise=lift(mode);
+    const faces=meshes.get(mode),mounts=faces.filter(f=>mountSet.has(f.part)).flatMap(f=>f.points),rise=lift(mode);
     // The brackets sit within the depth of the rails and stop 1 mm short of their inner faces.
     assert(Math.abs(Math.max(...mounts.map(p=>Math.abs(p[1])))-.454)<1e-9);
     assert(Math.min(...mounts.map(p=>p[2]))>.555+rise,`${mode}: the mounts hang ${mm(.555+rise-Math.min(...mounts.map(p=>p[2])))} mm below the rail`);
     clearances(mode,f=>part(f,'powertrain.engine-mounts'),[['differentials.front',[95.0,120.3]],['differentials.front-shaft',[156.7,187.6]],
       ['suspension.frame',1.0],['electrical.primary-power',27.7],['electrical.starter',101.1]]);
     // Only the arms enter another part: they bolt to the block.
-    assert.deepEqual(crossedParts(faces,part(faces,'powertrain.engine-mounts'),'powertrain.engine-mounts'),['powertrain.block']);
+    const crossed=crossedParts(faces.filter(f=>!mountSet.has(f.part)||f.part==='powertrain.engine-mounts'),part(faces,'powertrain.engine-mounts'),'powertrain.engine-mounts');
+    assert.deepEqual(crossed,['powertrain.block']);
   }
   assert(backlog.description.includes('95.0 mm'));
 });

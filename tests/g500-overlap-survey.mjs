@@ -54,6 +54,7 @@ export const mounts=[
   ['chassis.front-hub-ends','wheels.hub','the tab washer, slotted nut and grease cap sit on the hub'],
   ['chassis.rear-bearings','differentials.rear','the bearing cartridge is carried on the flanged axle shaft'],
   ['chassis.steering-damper','differentials.front','the damper bracket is bolted to the axle tube'],
+  ['chassis.transmission-mount-bracket','differentials.center','the rear mount bracket bolts under the transfer case'],
   ['chassis.steering-damper','steering.linkage','the damper rod is clamped to the tie rod'],
   ['chassis.parking-cables','floor.pan','the lever cable passes through a grommet in the floor'],
   ['chassis.parking-cables','suspension.trailing-arms','clips hold each rear cable on its trailing arm'],

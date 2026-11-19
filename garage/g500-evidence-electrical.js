@@ -37,7 +37,7 @@ export default [
 ];
 export const gaps=[
   'Match the US VIN to the front and rear harness variants and document each splice, earth strap, pass-through, boot, clip and branch takeoff.',
-  'Measure the left rear-glass AM/FM antenna and amplifier, windshield locking antenna and amplifier, and GPS antenna under the left headlamp bezel against the option list.',
+  'Measure the left rear-glass AM/FM antenna and amplifier and the windshield locking antenna and amplifier against the option list. The GPS antenna under the left headlamp bezel is modeled.',
   'Document the overhead console, dome and map lights, door courtesy lights, cargo lights, licence-plate lamps and high-mounted stop lamp with sockets and lens sections.',
   'Match the optional CD changer, amplifier, telephone and TELE AID hardware to the VIN before tracing the D2B fibre ring, antennas and mounting brackets.',
   'Obtain the actual 2002 fuse chart, prefuse and busbar geometry, SAM terminal cavities and the fitted relay and fuse part numbers.',

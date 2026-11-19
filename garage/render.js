@@ -42,7 +42,7 @@ import {wheelDesign} from './wheel-designs.js';
 import {drawWheelFace} from './wheel-faces.js';
 import {buildC63Exterior,buildHrvExterior} from './exterior-modern.js';
 import {buildEngineBay,enginePartOffset} from './engine-geometry.js';
-import {drawF350Frame,drawTwinIBeams,drawTwinIBeamLinkage,drawTwinIBeamSpringSeats,drawF350RearLeafSprings} from './f350-powertrain.js';
+import {drawF350Frame,drawTwinIBeams,drawTwinIBeamLinkage,drawTwinIBeamCoilSprings,drawTwinIBeamRadiusArms,drawF350RearLeafSprings} from './f350-powertrain.js';
 import {getEngineDefinition} from './engine-data.js';
 import {baseVehicle} from './vehicle-variants.js';
 import {PROBES,paintModel} from './paint-preview.js';
@@ -715,6 +715,9 @@ export class GarageRenderer{
        }else if(assembly==='suspension'&&this.build.vehicle==='bmw325ci'&&e46SuspensionParts.some(p=>p.id===id)){
          instance=face.instance;
          offset=[id.endsWith('trailing-arms')?.35:0,side*.49,id.endsWith('upper-arms')?.28:-.25];movable=true;
+       }else if(assembly==='suspension'&&this.build.vehicle==='f350'&&['suspension.front-springs','suspension.radius-arms'].includes(id)){
+         instance=side<0?'left':'right';
+         offset=id.endsWith('springs')?[0,side*.32,.45]:[0,side*.40,-.22];movable=true;
        }else if(assembly==='suspension'&&this.build.vehicle==='g500'&&g500SuspensionParts.some(p=>p.id===id)){
          instance=face.instance;
          offset=id==='suspension.rear-axle'?[.32,0,-.40]:id.endsWith('track-bar')?[0,-.43,-.19]:[0,side*.45,-.22];movable=true;
@@ -1074,7 +1077,9 @@ function drawF350Chassis(r,tag){
  tag('suspension.frame',()=>drawF350Frame(r,'#353e43'));
  tag('steering.axle',()=>drawTwinIBeams(r));
  tag('steering.linkage',()=>drawTwinIBeamLinkage(r));
- tag('suspension.spring',()=>{drawTwinIBeamSpringSeats(r);drawF350RearLeafSprings(r);});
- // Front shocks mount behind the beams; rear shocks outboard of the spring seats.
- tag('suspension.damper',()=>{for(const side of [-1,1])for(const [a,b] of [[[front+.10,side*.68,.44],[front+.04,side*.66,.88]],[[rear-.14,side*.64,.43],[rear+.01,side*.66,.80]]]){const m=a.map((v,i)=>v+(b[i]-v)*.5);r.rod(a,b,.026,'#98a4ac');r.rod(a,m,.039,'#414c53');}});
+ tag('suspension.spring',()=>drawF350RearLeafSprings(r));
+ tag('suspension.front-springs',()=>drawTwinIBeamCoilSprings(r));
+ tag('suspension.radius-arms',()=>drawTwinIBeamRadiusArms(r));
+ // Front shocks mount behind the beams, clear of the coil springs; rear shocks outboard of the spring seats.
+ tag('suspension.damper',()=>{for(const side of [-1,1])for(const [a,b] of [[[front+.14,side*.68,.44],[front+.08,side*.66,.88]],[[rear-.14,side*.64,.43],[rear+.01,side*.66,.80]]]){const m=a.map((v,i)=>v+(b[i]-v)*.5);r.rod(a,b,.026,'#98a4ac');r.rod(a,m,.039,'#414c53');}});
 }

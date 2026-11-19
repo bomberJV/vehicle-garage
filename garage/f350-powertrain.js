@@ -3,7 +3,7 @@
 // Positions follow the truck's shared vehicle coordinates (metres, x rearward,
 // y to the right, z up). Diameters, lengths and offsets are estimated layout
 // values chosen to sit inside the existing frame and cab; they are not measured.
-import {cyl,sleeve,turn,steel,metal,dark,gold,x,y} from './mechanism-shapes.js';
+import {cyl,sleeve,turn,steel,metal,dark,gold,x,y,z} from './mechanism-shapes.js';
 
 const unitVector=v=>{const l=Math.hypot(...v);return v.map(q=>q/l);};
 // Crankshaft datum of the installed 7.5-litre V8. Its rear flange is the
@@ -89,8 +89,9 @@ export function drawFullFloatingHubs(r){
  }
 }
 // Front Twin I-Beam: each beam carries one wheel and pivots from a bracket under
-// the opposite frame rail. The beams overlap and are offset fore and aft. Spring
-// and radius-arm details are not drawn; beam section and pivot positions are estimated.
+// the opposite frame rail. The beams overlap and are offset fore and aft. Each
+// beam carries a coil spring and is located by a radius arm (drawn below); beam
+// section and pivot positions are estimated.
 const beamPath=s=>[[-s*.46,.27],[s*.60,.27],[s*.74,.38],[s*.78,.405]];
 function iSection(r,xc,a,b,color){
  const d=[b[0]-a[0],b[1]-a[1]],len=Math.hypot(...d),n=[-d[1]/len,d[0]/len];
@@ -121,14 +122,48 @@ export function drawTwinIBeamLinkage(r){
  r.rod([X,-.70,.32],[X,.70,.32],.020,'#6c787d');
  for(const s of sides)r.rod([X,s*.70,.32],[F350_FRONT_AXLE-.035,s*.775,.43],.018,'#6c787d');
 }
-// The beam seats are shown; the spring element itself is not, because the
-// repository has no source for the front spring arrangement of this truck.
+// The 2WD F-350 carries a coil spring on each I-beam (Ford lists front coil
+// springs, 4x2 lower spring seats and radius arms for this truck). The coil sits
+// on its beam just outboard of the frame rail, under a seat bracket on the
+// rail's outer face. Coil size, turns, installed height and seat positions are
+// estimated, not measured.
+export const F350_FRONT_COIL=Object.freeze({y:.602,helix:.045,wire:.0095,seat:.056,low:.373,high:.580,turns:5.5});
+const coilCenter=s=>[F350_FRONT_AXLE+s*.045,s*F350_FRONT_COIL.y];
 export function drawTwinIBeamSpringSeats(r){
- const X=F350_FRONT_AXLE;
+ const {seat,low,high}=F350_FRONT_COIL,c='#76818a';
  for(const s of sides){
-  const xc=X+s*.045;
-  r.box(xc-.04,s*.48-.045,.306,xc+.04,s*.48+.045,.318,'#76818a');
-  r.box(xc-.04,s*.48-.045,.333,xc+.04,s*.48+.045,.345,'#76818a');
+  const [cx,cy]=coilCenter(s),rail=s*(F350_FRAME.halfWidth+F350_FRAME.railHalf);
+  // Lower seat on a pedestal that stands on the flat top of the beam.
+  cyl(r,[cx,cy,low-.011],z,0,.011,seat,c,20);
+  r.box(cx-.025,Math.min(s*.552,s*.576),.306,cx+.025,Math.max(s*.552,s*.576),low-.011,c);
+  // Upper seat cup, carried by a plate bolted to the outside of the rail.
+  cyl(r,[cx,cy,high],z,0,.012,seat,c,20);
+  r.box(cx-.05,Math.min(rail+s*.0005,rail+s*.0075),.40,cx+.05,Math.max(rail+s*.0005,rail+s*.0075),high+.012,c);
+  r.box(cx-.03,Math.min(rail+s*.0075,s*.56),high,cx+.03,Math.max(rail+s*.0075,s*.56),high+.012,c);
+ }
+}
+export function drawTwinIBeamCoilSprings(r){
+ const {helix,wire,low,high,turns}=F350_FRONT_COIL,steps=Math.round(turns*14);
+ for(const s of sides){
+  const [cx,cy]=coilCenter(s);let prior=null;
+  for(let i=0;i<=steps;i++){const t=i/steps,a=t*turns*2*Math.PI,p=[cx+Math.cos(a)*helix,cy+Math.sin(a)*helix,low+wire+t*(high-low-2*wire)];if(prior)r.rod(prior,p,wire,'#76818a',6);prior=p;}
+ }
+ drawTwinIBeamSpringSeats(r);
+}
+// Each radius arm runs back from a clamp under its beam to a bracket hanging
+// from the frame rail, with rubber insulators either side of the bracket.
+// Arm section, length and the bracket station are estimated.
+export const F350_RADIUS_ARM=Object.freeze({front:.68,z:.25,radius:.022,rearX:-.89,rearY:.48});
+export function drawTwinIBeamRadiusArms(r){
+ const {front,z:Z,radius,rearX,rearY}=F350_RADIUS_ARM,c='#59656a';
+ for(const s of sides){
+  const cx=F350_FRONT_AXLE+s*.045,a=[cx,s*front,Z],b=[rearX+.05,s*rearY,Z];
+  r.rod(a,b,radius,c,10);
+  // Clamp block below the beam's lower flange.
+  r.box(cx-.028,Math.min(s*.655,s*.705),Z-.018,cx+.028,Math.max(s*.655,s*.705),.266,c);
+  // Rear bracket under the rail and the insulators either side of it.
+  r.box(rearX-.02,s*rearY-.035,Z-.02,rearX+.02,s*rearY+.035,F350_FRAME.low[0]-.001,'#4b565b');
+  for(const [x0,x1] of [[-.036,-.021],[.021,.036]])cyl(r,[rearX,s*rearY,Z],x,x0,x1,.032,dark,14);
  }
 }
 // Rear leaf packs sit under the frame rails, beneath the axle tubes. The

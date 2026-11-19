@@ -117,8 +117,8 @@ test('the installed F-350 engine, E4OD and rear axle do not intersect the body, 
     assert.deepEqual(clashes(faces,powertrain,surroundings),[]);
     // The engine and its gearbox meet at the bellhousing without overlapping.
     assert.deepEqual(clashes(faces,p=>p.startsWith('powertrain.'),p=>p.startsWith('drivetrain.')),[]);
-    // The Twin I-Beam axles, linkage and springs clear the frame, body and wheels.
-    const chassis=p=>['steering.axle','steering.linkage','suspension.spring'].includes(p);
+    // The Twin I-Beam axles, linkage, coil springs, radius arms and leaf springs clear the frame, body and wheels.
+    const chassis=p=>['steering.axle','steering.linkage','suspension.spring','suspension.front-springs','suspension.radius-arms'].includes(p);
     assert.deepEqual(clashes(faces,chassis,p=>!chassis(p)&&!powertrain(p),(a,b)=>[a,b].includes('steering.axle')&&[a,b].includes('steering.linkage')),[]);
   }
 });

@@ -5,7 +5,10 @@ const cabinParts=new Set(['body.front-seats','body.rear-seats','body.rear-bench'
   'body.center-console','body.selector-lever','body.console-lid','body.console-trim-plate','body.shift-panel','body.shift-knob',
   'body.glove-box','body.glove-box-lock-cap','body.glove-box-lamp','body.lower-cover-left','body.lower-cover-right','body.column-cover','body.dash-speakers','body.dash-speaker-covers',
   'body.rear-bench-back-left','body.rear-bench-back-right','body.rear-bench-cushion-left','body.rear-bench-cushion-right',
-  'body.rear-bench-pad-left','body.rear-bench-pad-right','body.rear-bench-headrests']);
+  'body.rear-bench-pad-left','body.rear-bench-pad-right','body.rear-bench-headrests',
+  ...['front-belt-retractor-left','front-belt-retractor-right','belt-adjusters-front','belt-adjust-covers','belt-lower-covers','front-belt-buckles',
+   'rear-belt-left','rear-belt-right','belt-adjusters-rear','rear-belt-bracket-left','rear-belt-bracket-right','rear-belt-buckles','rear-center-belt',
+   'driver-airbag','clockspring','passenger-airbag'].map(k=>'body.'+k)]);
 const slRoofSkin=new Set(['roof.windshield','roof.sky-glass','roof.rear-glass','roof.pillars','roof.door-glass','roof.quarter-glass']);
 export function bodyVisibility(faces,selection){
   return faces.map(face=>{

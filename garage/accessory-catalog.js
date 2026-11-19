@@ -1,5 +1,8 @@
 import {g500FieldOptions} from './g500-field-options.js';
 import {carrier993Id,skiCarrier993Id} from './porsche-roof-state.js';
+import {e90FieldOptions} from './e90-accessory-options.js';
+import {sl550Accessories} from './sl550-accessories.js';
+import {carrier996Id,hardtop996Id} from './porsche-roof-state.js';
 // The IDs g-rack and f-bed also occur in older saved builds and presets.
 const roof = 'Roof racks';
 const aero = 'Body kits & aero';
@@ -91,7 +94,55 @@ const tequipment993Items=[
   })
 ];
 
-export const FIELD_ACCESSORIES=[...g500FieldOptions,carrier993,litronic993,...tequipment993Items];
+// Porsche items for the 1999 Carrera Cabriolet (996.1). Each one is recorded in
+// p996-accessory-audit.js; Tequipment brochure page numbers are as printed.
+const tequipment996='https://www.porsche-iberica.com/pt/porscheservice/pdf/TEQ_996_II_gb.pdf';
+const tequipment996Items=[
+  listing(hardtop996Id,'porsche996cab','Hardtop',{
+    name:'Porsche aluminum hardtop', sku:'996 563 911 00', seller:'Porsche Classic Partner',
+    type:'supplier search', fieldKind:'hardtop', unit:'hardtop', url:classicPartner,
+    fit:'Edmunds lists a removable aluminum hardtop as standard on the 1999 911 Cabriolet, so many US cars came with one. Hardtop 996 563 911 00 fits the 996 Cabriolet from 1998 to 2005; a used top may need paint to match the car.',
+    description:'A painted aluminum shell with an electrically heated glass rear window. The fabric top stays folded under its lid, so the preview lowers the top while the hardtop is fitted. Its shape follows the raised fabric top and is an approximation.',
+    source:reference('Porsche PET · 996 hardtop, plate 811-016, pos. 1','https://eurospares.co.uk/Porsche/996/996_(2001)/PartDiagrams/811-016/HARDTOP_-_ACCESSORIES_-_GASKETS')
+  }),
+  listing(carrier996Id,'porsche996cab',roof,{
+    name:'Porsche Tequipment Cabriolet roof transport system', sku:'996 801 055 00', seller:'Porsche Classic Partner',
+    type:'supplier search', fieldKind:'roofTransport', unit:'base carrier set', url:classicPartner,
+    fit:'The Tequipment brochure lists 996 801 055 00 for the 911 Cabriolet, except the Carrera 4S and Turbo Cabriolets, with loads up to 75 kg. It is discontinued; look for a used set with all four pillar brackets.',
+    description:'Two lockable crossbars carry Porsche roof attachments. The front feet clamp at the windshield pillars and the rear feet beside the quarter windows. With the hardtop fitted the bars sit on the hardtop; otherwise the preview keeps the fabric top up. The foot positions are an approximation.',
+    source:reference('Porsche Tequipment 911 brochure, p. 30: roof transport system',tequipment996)
+  }),
+  listing('996-aerokit-carrera','porsche996cab',aero,{
+    name:'Porsche Tequipment Aerokit Carrera', sku:'000 044 801 90', seller:'Porsche Classic Partner',
+    type:'supplier search', fieldKind:'aerokit', unit:'kit', url:classicPartner,
+    fit:'For 911 Carrera Coupés and Cabriolets up to July 2001, which includes the 1999 Carrera Cabriolet. This kit has the front and rear spoilers without the side skirts (000 044 801 89 includes them). Porsche lists the panels in primer (G2X) for painting.',
+    description:'The front section has an integral spoiler, and the fixed rear wing carries a high-level third brake light. The preview draws a deeper lip on the standard bumper and the wing on two supports; both shapes are an approximation.',
+    source:reference('Porsche Tequipment 911 brochure, pp. 8–9: Aerokit Carrera',tequipment996)
+  }),
+  listing('996-wind-deflector','porsche996cab','Interior',{
+    name:'Porsche Tequipment wind deflector', sku:'000 044 801 45', seller:'Porsche Classic Partner', category:'interior',
+    type:'supplier search', fieldKind:'windDeflector', unit:'deflector', url:classicPartner,
+    fit:'Made for the 911 Carrera Cabriolet (996). The Carrera 4 Cabriolet uses 000 044 801 64.',
+    description:'The folding deflector reduces turbulence in the cabin and protects luggage on the rear seats. It stows in the luggage compartment in a protective sleeve. The preview’s proportions are an approximation.',
+    source:reference('Porsche Tequipment 911 brochure, p. 33: wind deflector',tequipment996)
+  }),
+  listing('996-sports-tailpipes','porsche996cab','Exhaust',{
+    name:'Porsche Tequipment sports tailpipes', sku:'996 111 981 00 + 996 111 982 00', seller:'Porsche Classic Partner',
+    type:'supplier search', fieldKind:'tailpipes', unit:'pair', url:classicPartner,
+    fit:'The brochure lists this left and right pair for all 911 Carrera models up to July 2001, including the 1999 Carrera Cabriolet.',
+    description:'Chrome-plated tailpipes with an elliptical cross-section replace the standard outlets under each rear corner. The preview’s proportions are an approximation.',
+    source:reference('Porsche Tequipment 911 brochure, p. 17: sports tailpipes',tequipment996)
+  }),
+  listing('996-door-entry-guards','porsche996cab','Interior',{
+    name:'Porsche stainless door entry guards, Carrera', sku:'996 551 984 01', seller:'Porsche Classic Partner', category:'interior',
+    type:'supplier search', fieldKind:'sillGuards', unit:'pair', url:classicPartner,
+    fit:'Genuine Porsche set 996 551 984 01 fits the 911 (996) from 1998 to 2005. The Tequipment brochure offers the Carrera logo in carbon or stainless steel.',
+    description:'Brushed stainless plates with the Carrera script protect the door sills on both sides. The preview’s proportions are an approximation.',
+    source:reference('teile.com · genuine Porsche scuff plate set 99655198401, 911 (996) 1998–2005','https://teile.com/pdf/teilecom_en_Scuff-plate-set-Carrera-stainless-steel-L-R_99655198401.pdf')
+  })
+];
+
+export const FIELD_ACCESSORIES=[...g500FieldOptions,carrier993,litronic993,...tequipment993Items,...tequipment996Items,...e90FieldOptions,...sl550Accessories];
 export const ACCESSORY_PARTS = [
   ...FIELD_ACCESSORIES,
   listing('g-rack-short','g500',roof,{

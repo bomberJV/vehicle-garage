@@ -1,6 +1,14 @@
 export const carrier993Id='993-cabrio-load-carrier';
 export const skiCarrier993Id='993-cabrio-ski-carrier';
+// The 996's aluminum hardtop closes the car over the folded fabric top. Its
+// roof transport system rides on the raised top, or on the hardtop when fitted.
+export const hardtop996Id='996-aluminum-hardtop';
+export const carrier996Id='996-cabrio-roof-transport';
+export function hasHardtop(build){
+  return build.vehicle==='porsche996cab'&&build.parts?.includes(hardtop996Id)===true;
+}
 export function hasRoofCarrier(build){
+  if(build.vehicle==='porsche996cab')return build.parts?.includes(carrier996Id)===true&&!hasHardtop(build);
   return build.vehicle==='porsche993cab'&&(build.parts?.includes(carrier993Id)||build.parts?.includes(skiCarrier993Id))===true;
 }
 export const roofReferences={

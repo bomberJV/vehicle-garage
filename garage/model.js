@@ -3,7 +3,7 @@ import {paintChoice} from './paint-colors.js';
 import {liftOptions,liftSupply,normalizedLift,liftCaption} from './lift-options.js';
 import {wheelSupplyRows} from './wheel-supplies.js';
 import {slOptions,slComfortSummary} from './sl550-controls.js';
-import {hasConvertibleRoof,hasRoofCarrier} from './porsche-roof-state.js';
+import {hasConvertibleRoof,hasHardtop,hasRoofCarrier} from './porsche-roof-state.js';
 import {wheelDesign} from './wheel-designs.js';
 
 export const DEFAULT_BUILD={version:1,vehicle:'g500',paint:'olive',finish:'silver',wheelDesign:'stock',parts:[],quotes:{},budget:5000,labor:0,paintAllowance:0,notes:''};
@@ -32,7 +32,7 @@ export function sanitizeBuild(raw={}){
  if(wheel)parts.push(wheel.id);
  const amount=v=>Number.isFinite(Number(v))?Math.min(1000000,Math.max(0,Math.round(Number(v)*100)/100)):0;
  const quotes={};if(raw.quotes&&typeof raw.quotes==='object'&&!Array.isArray(raw.quotes))for(const id of parts){if(allowed.get(id)?.mockup)continue;const val=raw.quotes[id];if(val!==null&&val!==''&&val!==undefined&&Number.isFinite(Number(val))&&Number(val)>=0)quotes[id]=amount(val);}
- return {version:1,vehicle,...(vehicle==='sl550'?slOptions(raw):{}),...(vehicle==='bmw325ci'?{bmwVentPosition:raw.bmwVentPosition==='open'?'open':'closed'}:{}),...(liftOptions(vehicle).length?{lift}:{}),paint:paintChoice(raw.paint).id,wheelDesign:design,finish:FINISHES.some(p=>p.id===raw.finish)?raw.finish:'silver',parts,quotes,budget:raw.budget==null?5000:amount(raw.budget),labor:legacyBmw?0:amount(raw.labor),paintAllowance:legacyBmw?0:amount(raw.paintAllowance),notes:typeof raw.notes==='string'?raw.notes.slice(0,3000):'',...(hasConvertibleRoof(vehicle)?{roofPosition:raw.roofPosition==='up'||hasRoofCarrier({vehicle,parts})?'up':'down'}:{})};
+ return {version:1,vehicle,...(vehicle==='sl550'?slOptions(raw):{}),...(vehicle==='bmw325ci'?{bmwVentPosition:raw.bmwVentPosition==='open'?'open':'closed'}:{}),...(liftOptions(vehicle).length?{lift}:{}),paint:paintChoice(raw.paint).id,wheelDesign:design,finish:FINISHES.some(p=>p.id===raw.finish)?raw.finish:'silver',parts,quotes,budget:raw.budget==null?5000:amount(raw.budget),labor:legacyBmw?0:amount(raw.labor),paintAllowance:legacyBmw?0:amount(raw.paintAllowance),notes:typeof raw.notes==='string'?raw.notes.slice(0,3000):'',...(hasConvertibleRoof(vehicle)?{roofPosition:hasHardtop({vehicle,parts})?'down':raw.roofPosition==='up'||hasRoofCarrier({vehicle,parts})?'up':'down'}:{})};
 }
 export function selectWheelDesign(raw,designId){
   return sanitizeBuild({...raw,wheelDesign:designId});

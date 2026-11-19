@@ -4,12 +4,16 @@ import {classicTailpipe,classicTailpipeEnd} from './porsche993-body-profile.js';
 import {roofPoint,roofSections} from './porsche-raised-top.js';
 import {barrel,tint} from './road-primitives.js';
 import {G500_FRONT} from './g500-lamps.js';
+import {e90AccessoryDraw,e90AccessoryOffsets} from './e90-accessory-geometry.js';
+import {sl550AccessoryDraw,sl550AccessoryOffsets} from './sl550-accessory-geometry.js';
+import {cabrio996Draw,p996AccessoryOffsets} from './p996-accessory-geometry.js';
 
 const black='#303638',rubber='#24292a',steel='#596265',bright='#aeb8b9',dark='#444c4f';
 const TAU=Math.PI*2;
 const offsets={headlamps:[-.32,0,.24],carrier:[0,0,.48],skiCarrier:[0,0,.48],strutBrace:[-.30,0,.30],tailpipes:[.28,0,-.04],windDeflector:[.10,0,.42],sillGuards:[0,0,.22],guard:[-.65,0,0],ladder:[.48,-.37,.06],snorkel:[0,.56,.08],aux:[-.23,0,.47],display:[-.40,0,-.10]};
+Object.assign(offsets,sl550AccessoryOffsets);
 
-export function defaultAccessoryOffset(kind){return offsets[kind];}
+export function defaultAccessoryOffset(kind){return offsets[kind]??e90AccessoryOffsets[kind]??p996AccessoryOffsets[kind];}
 
 function linkRings(r,rings,top,side){
   const n=rings[0].length;
@@ -272,7 +276,9 @@ const cabrio993Draw={
     for(const side of [-1,1])headlamp993(r,coupeShape[0],side,paint,porscheDeckPoint,true);
   }
 };
-const fieldDraw={g500:g500Draw,porsche993cab:cabrio993Draw};
+const fieldDraw={g500:g500Draw,porsche993cab:cabrio993Draw,porsche996cab:cabrio996Draw};
+fieldDraw.bmw328xi=e90AccessoryDraw;
+fieldDraw.sl550=sl550AccessoryDraw;
 export function drawFieldAccessory(r,vehicle,kind,paint){
   const draw=fieldDraw[vehicle]?.[kind];
   if(draw)r.tag('accessories.'+kind,()=>draw(r,paint));

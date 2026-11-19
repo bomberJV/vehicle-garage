@@ -6,7 +6,7 @@ import {baseVehicle,withVariants} from './vehicle-variants.js';
    establish the architecture; original geometry and hose paths remain schematic. */
 export const ENGINE_SCOPE = 'An interactive assembly study: components, their jobs and their connections. Shapes, routing, fasteners and separation distances are explanatory, not measured service CAD.';
 export const ENGINE_SOURCES = {
- m113:{label:'Mercedes-Benz · M113.962 complete-engine description (service-document mirror)',url:'https://lemon-manuals.la/Mercedes%20Benz/2004/G%20500%20%28463.249%29%20V8-5.0L%20%28113.962%29/Repair%20and%20Diagnosis/Engine%2C%20Cooling%20and%20Exhaust/Engine/Service%20and%20Repair/Procedures/GF01.00-P-9611F%20General%20Information%20on%20Complete%20Engine/'},
+ m113:{label:'Mercedes-Benz · M113.962 complete-engine description (service-document mirror)',url:'https://lemon-manuals.la/Mercedes%20Benz/2002/G%20500%20%28463.249%29%20V8-5.0L%20%28113.962%29/Repair%20and%20Diagnosis/Engine%2C%20Cooling%20and%20Exhaust/Engine/Service%20and%20Repair/Procedures/GF01.00-P-9611F%20General%20Information%20on%20Complete%20Engine/'},
  gManual:{label:'Mercedes-Benz · 2002 G-Class manual, battery p.319 (reprint)',url:'https://cdn.dealereprocess.org/cdn/servicemanuals/mercedesbenz/2002-gclass.pdf#page=322'},
  gWIS:{label:'Mercedes-Benz WIS · 463.249 intake and ignition, plates P01.30-2025-06 / -2026-09',url:'https://emdi.app/en/documents/ar0130p5800gv'},
  gAir:{label:'2002 G500 · air cleaner, filter elements and inlet ducts',url:'https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/air-fuel-delivery/air-intake'},
@@ -21,7 +21,7 @@ export const ENGINE_SOURCES = {
  cParts:{label:'Mercedes-Benz · 2014 C63 AMG parts catalog',url:'https://mbparts.mbusa.com/v-2014-mercedes-benz-c63-amg--base--6-3l-v8-gas'},
  honda:{label:'Honda · 2026 US HR-V specifications',url:'https://hondanews.com/en-US/releases/release-6f8b202ddb1c7f26ecd92774bb014b0c-2026-honda-hr-v-specifications-and-features'},
  hondaVtc:{label:'Honda · 2026 HR-V engine technology',url:'https://www.hondainfocenter.com/2026/HR-V/Feature-Guide/Engine-Chassis-Features/Powerful-Fuel-Efficient-2-0-liter-Engine/'},
- hondaParts:{label:'Honda · 2026 HR-V air-cleaner diagram (OEM catalog mirror)',url:'https://www.hondapartsnow.com/parts-list/2026-honda-hr_v--5_door_sport_2wd-cvt/electrical_exhaust_heater_fuel/air_cleaner.html'},
+ hondaParts:{label:'Honda · 2026 HR-V Sport 2WD air-cleaner diagram (OEM catalog mirror); case set 17201-6CT-A01 and element 17220-5BA-A00 fit every 2026 trim (LX, Sport and EX-L, 2WD and AWD)',url:'https://www.hondapartsnow.com/parts-list/2026-honda-hr_v--5_door_sport_2wd-cvt/electrical_exhaust_heater_fuel/air_cleaner.html'},
  ford:{label:'LMC Truck · 1993 Ford configuration-dependent parts catalog',url:'https://media.lmctruck.com/pdf/FD/fdComplete.pdf'},
  fordTrucks:{label:'Ford · 1993 commercial pickups and chassis',url:'https://xr793.com/wp-content/uploads/2022/11/1993-Ford-Commercial-Trucks-Pickups-Chassis.pdf'},
 };

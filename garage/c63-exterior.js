@@ -11,6 +11,7 @@
 import {glazingFace} from './surface-materials.js';
 import {starBadge} from './exterior-trim.js';
 import {coachwork,panel,deckPanel,tint as tone} from './exterior-coachwork.js';
+import {C63_AXLES,C63_WHEELBASE} from './c63-wheel-specs.js';
 
 const BLACK='#16191b',GLOSS='#121517',TRIM='#2a3034',CHROME='#c9cfd0',MESH='#0c0f11',LINER='#0f1213',SMOKE='#2a1215',SILVER='#aab2b5';
 const mix=(a,b,t)=>a+(b-a)*t,clamp=t=>Math.max(0,Math.min(1,t));
@@ -31,7 +32,8 @@ const SILL=.27;
 const sideAtZ=(z,top)=>{const l=(z-SILL)/(top-SILL);return l>=0?c63Side(l):-.026+.028*Math.min(1,-l/.10);};
 // Daylight openings, (x,z) from the side photograph.
 // C63 overhangs: about 0.89 m ahead of the front axle (the AMG nose is longer than
-// the standard W204's 0.775 m) and 1.055 m behind the rear axle (shared with the W204).
+// the standard W204's 0.775 m) and 1.055 m behind x 1.38. The rear axle now sits
+// 6 mm behind that station (C63_AXLES), which leaves about 1.049 m.
 // FX and RX map the original nose and tail layout onto those overhangs.
 const FX=x=>x<-1.8?-1.8+(x+1.8)*.81:x,RX=x=>x>1.64?1.64+(x-1.64)*1.167:x;
 // The nose in plan. At the lamps the corners are swept far back: from the
@@ -62,7 +64,7 @@ export const c63Body={
  // The sill and the front apron reach down to 0.18 m, about 145 mm off the
  // ground; behind the rear wheels the bumper ends higher. The arches sit close
  // round the tyres.
- wb:2.76,arch:.368,axleZ:.367,base:.18,rearBase:.225,lowerHem:x=>x>1.74?.225:.18,hoodEnd:-.83,deckStart:1.64,
+ wb:C63_WHEELBASE,axles:C63_AXLES,arch:.368,axleZ:.367,base:.18,rearBase:.225,lowerHem:x=>x>1.74?.225:.18,hoodEnd:-.83,deckStart:1.64,
  door:[-.76,.345,1.17],doorSill:.29,belt:.945,roofZ:1.405,roofWidth:.60,cabinWidth:.795,roofCrown:.036,screenSweep:.015,sideRound:.026,sailTints:[1.05,1.01,.97,.93,.90,.87],roofPinch:.02,
  // The bonnet is split by the grille: a centre section rises to the grille's
  // top edge, and outside it the bonnet falls to the shut line over each
@@ -86,7 +88,7 @@ export const c63Body={
  // shut line, which the side photograph shows at 0.775 m behind the lamp
  // rising to 0.875 m at the cowl; then the A-pillar base rises to the belt.
  stations:[...noseArc(),[-1.60,.900,.784],[-1.38,.906,.811],[-1.08,.896,.840],[-.90,.891,.857],[-.83,.888,.868],[-.76,.887,.925],
-  [-.50,.885,.945],[.30,.887,.968],[1.00,.893,.990],[1.38,.902,1.000],[1.64,.892,.995],[RX(1.90),.878,.955],[RX(2.10),.852,.925],[RX(2.22),.80,.905]],
+  [-.50,.885,.945],[.30,.887,.968],[1.00,.893,.990],[C63_AXLES[1],.902,1.000],[1.64,.892,.995],[RX(1.90),.878,.955],[RX(2.10),.852,.925],[RX(2.22),.80,.905]],
  wind:[[-.78,.978],[.0,1.336]],
  roof:[[.0,1.336],[.15,1.352],[.35,1.369],[.55,1.369],[.75,1.358],[.90,1.340],[1.0,1.322]],rear:[[1.0,1.322],[1.63,1.056]],
  frontWindow,rearWindow,quarter,
@@ -507,7 +509,7 @@ function powerDomes(r,paint){
 
 function archLiners(r){
  r.tag('body.structure',()=>{
-  for(const ax of [-B.wb/2,B.wb/2])for(const side of [-1,1]){
+  for(const ax of B.axles)for(const side of [-1,1]){
    const n=24,wall=ax<0?.685:.66,R=B.arch-.004,r0=.345;
    for(let i=0;i<n;i++){
     const a=i/n*Math.PI,b=(i+1)/n*Math.PI;
@@ -527,7 +529,7 @@ function archLiners(r){
 // rear arches carry a slighter version.
 function archFlares(r,paint){
  r.tag('body.structure',()=>{
-  for(const [ax,out,wide] of [[-B.wb/2,.024,.058],[B.wb/2,.012,.050]])for(const side of [-1,1]){
+  for(const [ax,out,wide] of [[B.axles[0],.024,.058],[B.axles[1],.012,.050]])for(const side of [-1,1]){
    const n=30,R0=B.arch+.001,R1=R0+.020,R2=R0+wide,k=side<0?.95:1;
    const P=(t,rad,lift)=>{const x=ax+Math.cos(t)*rad,z=B.axleZ+Math.sin(t)*rad;return [x,side*(sideY(x,z)+lift),z];};
    for(let i=0;i<n;i++){

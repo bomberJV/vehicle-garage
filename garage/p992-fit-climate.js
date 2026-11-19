@@ -41,10 +41,10 @@ const hose=(r,pts,rad,col)=>pipe(r,pts,rad,col,6);
 // ---------------------------------------------------------------- coolant
 // Expansion tank on the right of the engine compartment, under the engine lid,
 // above the right turbocharger and the A/C lines and ahead of the right airbox.
-const tank=[1.555,.45,.845],neck=[1.50,.45,.90];
+const tank=[1.605,.45,.835],neck=[1.55,.45,.89];
 // Bleed valve on its bracket at the front face of the tank, where the radiator
 // breather line arrives from the front.
-const bleed=[1.437,.49,.83];
+const bleed=[1.487,.49,.82];
 // Coolant distributor top (p992-coolant.distributor box, top face z 0.69).
 const distributorTop=[1.40,.41,.69];
 // Front corner radiators (engine.cooling): x -1.870..-1.800, |y| 0.494..0.726, z 0.32..0.512.
@@ -89,7 +89,7 @@ const coolant=group('coolant','Coolant expansion, radiator fans and bleed lines'
     cyl(r,neck,z,.025,.050,.036,black,16);for(let i=0;i<4;i++){const a=i*Math.PI/2;box(r,[neck[0]+.03*Math.cos(a),neck[1]+.03*Math.sin(a),neck[2]+.040],[.010,.010,.012],black);}
   }),
   part('tank-hose','Expansion tank coolant hose · 992121637','This hose feeds coolant from the bottom of the tank down to the engine coolant distributor.',aft,tankSrc,r=>{
-    hose(r,[[1.49,.40,.792],[1.45,.405,.75],[1.41,.41,.715],distributorTop],.009,rubber);
+    hose(r,[[1.54,.40,.782],[1.47,.405,.75],[1.41,.41,.715],distributorTop],.009,rubber);
   }),
   part('bleed-valve','Bleed valve · 7P5121671A','The bleed valve on the front of the tank lets air out where the long radiator breather line arrives.',fore,tankSrc,r=>{
     cyl(r,bleed,x,-.016,.017,.010,'#4a5254',10);cyl(r,bleed,z,.008,.022,.006,black,8);
@@ -149,7 +149,10 @@ const filterC=[-.93,.28,.81];
 const unitTop=[-.69,0,.79];
 // The dash top lies at z 0.845 and its rear face at x -0.43, so the ducts run
 // below the top and below the instrument binnacle to vents in that face.
-const sideDuct=s=>[[-.70,s*.06,.790],[-.66,s*.20,.792],[-.56,s*.42,.785],[-.475,s*.56,.78]];
+// The ducts leave the unit below the cross-car carrier and run behind it to the
+// outer vents; the right one passes beneath the passenger airbag.
+const sideDuct=s=>s<0?[[-.69,-.06,.752],[-.62,-.14,.775],[-.615,-.25,.79],[-.56,-.42,.792],[-.475,-.56,.78]]
+ :[[-.69,.06,.752],[-.62,.14,.74],[-.60,.25,.708],[-.55,.42,.708],[-.50,.52,.745],[-.475,.56,.78]];
 const cabin=group('cabin','Cabin air filter, climate-unit sensors and dashboard ducts',
   'Fresh air passes the filter in front of the bulkhead before the blower. Behind the dash, a flap motor and sensors regulate the climate unit, which feeds the centre and side vents and the two footwell outlets.',unitSrc,[
   part('cabin-filter','Odour and allergen filter · 9P1819631','The pleated cabin filter lies in its housing at the rear wall of the luggage compartment, upstream of the blower.',fore,unitSrc,r=>{
@@ -171,7 +174,7 @@ const cabin=group('cabin','Cabin air filter, climate-unit sensors and dashboard 
     hose(r,[[-.79,.225,.630],[-.80,.225,.618],[-.82,.225,.58],[-.83,.225,.45],[-.83,.20,.38]],.007,rubber);
   }),
   part('duct-centre','Centre air duct · 992820715A','The centre duct rises from the top of the climate unit to the vents in the middle of the dashboard.',up,ductSrc,r=>{
-    hose(r,[unitTop,[-.60,0,.795],[-.50,0,.79],[-.462,0,.785]],.022,ductGrey);
+    hose(r,[[-.69,0,.752],[-.62,0,.77],[-.55,0,.79],[-.462,0,.785]],.022,ductGrey);
   }),
   ...sides.map(([s,hand,Hand])=>part('duct-'+hand,`Air duct, ${hand} side · ${s<0?'992820157':'992820158'}`,`${Hand} duct under the dashboard top that carries air from the climate unit to the ${hand} outer vent.`,side(s),ductSrc,r=>hose(r,sideDuct(s),.020,ductGrey))),
   ...sides.map(([s,hand,Hand])=>part('footwell-'+hand,`Footwell vent, ${hand} · ${s<0?'992819151':'992819152'}`,`${Hand} outlet below the climate unit that blows air into the ${hand} footwell.`,plus(side(s),down),ductSrc,r=>{

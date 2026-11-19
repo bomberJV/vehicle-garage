@@ -57,7 +57,7 @@ const dme=[1.46,-.517,.665];
 // The front body control module and gateway sit under the dashboard on the
 // driver's side; the chassis unit stands at the right footwell above the right
 // fuse holder. The rear units stand on the bulkhead behind the rear seats.
-const bcmF=[-.62,-.585,.735],gateway=[-.61,-.18,.785],chassis=[-.62,.582,.725];
+const bcmF=[-.55,-.585,.75],gateway=[-.58,-.18,.735],chassis=[-.62,.582,.725];
 const behind=.866,bcmR=[behind,-.36,.575],topUnit=[behind,.34,.575];
 const fpcu=[-1.20,.30,.60],spoilerUnit=[1.66,-.517,.735];
 
@@ -96,7 +96,7 @@ const power=group('power','Fuse and relay carriers and earth strap',
 // ---- Wiring harness runs ---------------------------------------------------
 const harness=group('harness','Wiring harness runs',
  'The main and sectional wiring harnesses: dashboard and passenger compartment, the front-end, lighting, bumper and fuel sections, the engine harness and the rear-axle, rear-lighting and lid sections.',looms,[
- part('dashboard','Dashboard wiring harness · PAA992003','The dashboard harness runs across under the facia from the driver\'s footwell to the passenger footwell and serves the instruments, switches and control units there.',up,looms,r=>wire(r,[[-.62,-.565,.70],[-.62,-.53,.765],[-.62,.53,.765],[-.62,.567,.71]],.011)),
+ part('dashboard','Dashboard wiring harness · PAA992003','The dashboard harness runs across under the facia from the driver\'s footwell to the passenger footwell and serves the instruments, switches and control units there.',up,looms,r=>wire(r,[[-.62,-.565,.70],[-.62,-.50,.71],[-.705,-.47,.80],[-.705,.47,.80],[-.62,.50,.71],[-.62,.567,.71]],.011)),
  part('passenger','Wiring harness, passenger compartment · PAA992001','The main cabin harness leaves the driver\'s footwell and runs back along the inside of the left sill to the bulkhead behind the rear seats.',left,looms,r=>wire(r,[[-.535,-.59,.70],[-.50,-.598,.62],[-.45,-.598,.548],[.80,-.598,.548],[.858,-.55,.56],[.858,-.44,.56]],.011)),
  part('front-end-left','Sectional wiring harness, front end, left · 992970042 Y','This section runs forward from the bulkhead along the left of the front compartment to the front end.',left,looms,r=>wire(r,[[-.705,-.585,.70],[-.80,-.50,.62],[-1.30,-.50,.62],[-1.62,-.45,.56],[-1.80,-.40,.53]])),
  part('front-end-right','Sectional wiring harness, front end, right · 992970270 Y','The right front-end section runs forward along the right of the front compartment to the front end.',right,looms,r=>wire(r,[[-.705,.582,.70],[-.80,.525,.62],[-.95,.525,.44],[-1.40,.525,.44],[-1.50,.44,.50],[-1.62,.42,.56],[-1.80,.40,.53]])),

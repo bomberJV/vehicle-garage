@@ -216,7 +216,7 @@ const ribs=(r,x0,x1,zz,color)=>{for(const yy of [-.20,0,.20])box(r,[(x0+x1)/2,yy
 const underbody=group('p992-fit-body-underbody','Underbody panels',
  'Three plastic panels close the underside of the Cabriolet from the nose to the rear axle. They smooth the airflow and cover the coolant, brake and fuel lines.',S.underbody,[
  part('front','Front underbody panel, Cabriolet · 992825523H',
-  'The front panel covers the underside of the front axle and the coolant pipes to the front radiators.',[0,0,-.25],S.underbody,r=>{flat(r,-1.85,-.86,.30,.40,.214,'#2c3134');ribs(r,-1.85,-.86,.214,'#2c3134');}),
+  'The front panel is screwed beneath the front axle cross member and covers it and the coolant pipes to the front radiators.',[0,0,-.25],S.underbody,r=>{flat(r,-1.65,-.86,.30,.40,.158,'#2c3134');ribs(r,-1.65,-.86,.158,'#2c3134');}),
  part('centre','Centre underbody panel · 992825505',
   'The centre panel runs under the floor and the tunnel, beneath the long coolant pipes and the brake and fuel lines.',[0,0,-.25],S.underbody,r=>{flat(r,-.80,.84,.40,.40,.220,'#303538');ribs(r,-.80,.84,.220,'#303538');}),
  part('rear','Rear underbody panel, Cabriolet · 992825521A',
@@ -226,5 +226,6 @@ const underbody=group('p992-fit-body-underbody','Underbody panels',
 export const groups=[front,lids,rear,underbody];
 export const lines=[];
 export const mounts=[
-  ...['left','right'].map(hand=>['p992-fit-body-rear.air-guide-'+hand,'shell.bumpers','the air guide is clipped to the frame of the air outlet in the corner of the rear bumper cover'])
+  ...['left','right'].map(hand=>['p992-fit-body-rear.air-guide-'+hand,'shell.bumpers','the air guide is clipped to the frame of the air outlet in the corner of the rear bumper cover']),
+  ['p992-fit-body-underbody.front','shell.fenders','the panel\'s front edge is screwed to the lower edge of the front apron; the body shell draws the underside of the nose closed where the panel lies'],
 ];

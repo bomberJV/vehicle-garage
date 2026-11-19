@@ -34,7 +34,6 @@ const tailPlate=plate('202-450','Exhaust tail pipes for sports exhaust system','
 const flapPlate=plate('202-550','Exhaust system throttle control element, electric','2019_(992-1)/PartDiagrams/202-550/EXHAUST_SYSTEM');
 const turboPlate=plate('202-000','Exhaust gas turbochargers and exhaust manifolds','2020_(992-1)/PartDiagrams/202-000/EXHAUST_GAS_TURBOCHARGER');
 const headPlate=plate('103-000','Cylinder head, head gasket and valve cover','2020_(992-1)/PartDiagrams/103-000/CYLINDER_HEAD');
-const sumpPlate=plate('104-050','Oil sump','2020_(992-1)/PartDiagrams/104-050/OIL_PAN');
 
 const part=(id,name,description,offset,source,draw)=>({id,name,description,offset,source,draw});
 const group=(sub,name,description,source,parts)=>({id:'p992-fit-exhaust-'+sub,name,description,source,view:'hero',internal:true,category:'service',
@@ -117,7 +116,7 @@ const silencerParts=[
   part('heat-shield','Silencer heat shield · 992251414A',
     'A pressed sheet over the top of the transverse silencer shields the rear apron and the engine above it from the hot silencer.',
     [0,0,.16],silencerPlate,r=>{
-      arc(r,S,y,-.30,.30,.104,1.25*Math.PI,.60*Math.PI,shieldTone,12);
+      arc(r,S,y,-.30,.30,.104,1.40*Math.PI,.45*Math.PI,shieldTone,12);
     }),
   part('strap','Silencer tensioning strap · 992251571',
     'A steel band around the silencer can pulls it against its bracket; a second strap with the same number sits at the right end.',
@@ -176,11 +175,6 @@ const shieldParts=[
     [0,s*.16,-.06],headPlate,r=>{
       const [a,b]=bankX(s);
       box(r,[(a+b)/2,s*.430,.403],[b-a,.035,.004],shieldTone);
-    })),
-  ...sides.map(([s,hand,Hand])=>part('sump-'+hand,Hand+' oil sump heat insulation · '+(s<0?'0PB115821A':'0PB115822A'),
-    'An insulating plate on the '+hand+' side of the oil sump faces the manifold pipes and keeps their heat out of the engine oil.',
-    [0,s*.14,-.08],sumpPlate,r=>{
-      box(r,[1.575,s*.186,.412],[.28,.006,.036],shieldTone);
     }))
 ];
 
@@ -190,7 +184,7 @@ export const groups=[
   group('silencer','Sports exhaust silencer mounting, flap and tailpipes',
     'The transverse sports silencer hangs from a console under the crankcase, wears a heat shield on top, and ends in two oval stainless tailpipes. An electric actuator works the exhaust flaps.',silencerPlate,silencerParts),
   group('shields','Engine exhaust heat shields',
-    'Pressed shields under the manifolds, around the turbines, below the cylinder heads and on the oil sump keep exhaust heat away from the engine, axle and body.',turboPlate,shieldParts)
+    'Pressed shields under the manifolds, around the turbines, and below the cylinder heads keep exhaust heat away from the engine, axle and body.',turboPlate,shieldParts)
 ];
 export const lines=[];
 const id=(sub,p)=>'p992-fit-exhaust-'+sub+'.'+p;
@@ -198,7 +192,6 @@ export const mounts=[
   ...['left','right'].flatMap(hand=>[
     [id('catalysts','converter-'+hand),'engine.exhaust','the converter is welded into the down pipe, which is drawn as one continuous pipe through it'],
     [id('catalysts','bracket-'+hand),'engine.case','the converter retaining bracket is bolted to the underside of the crankcase'],
-    [id('shields','sump-'+hand),'engine.case','the heat insulation plate is screwed to the side wall of the oil sump'],
     [id('silencer','tailpipe-'+hand),'engine.exhaust','the tailpipe trim is clamped over the silencer outlet pipe'],
     [id('silencer','tailpipe-'+hand),'shell.bumpers','each tailpipe trim sits in its opening in the rear apron; the apron is drawn without the cut-out']
   ]),

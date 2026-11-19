@@ -37,7 +37,7 @@ const requestAssignments={
   'references':['P1','done',all,'Each vehicle links its reference ledger to the workbench.'],
   'model-validation':['P1','todo',all,'Each vehicle has an outstanding comparison with its source material.'],
   'brush-guards':['P2','done',['g500'],'The surround follows the early US guard, including its padded uprights and folding mounts.'],
-  'rear-ladders':['P3','done',['g500','porsche993cab'],'The G500 has the documented ladder. The 993 Cabriolet has its own factory roof carrier.'],
+  'rear-ladders':['P3','done',['g500'],'The G500 has the documented ladder.'],
   'raised-intakes':['P2','done',['g500'],'The ORC twin intake kit is listed for the W463 G500 V8.'],
   'driving-lights':['P2','done',['g500','porsche993cab'],'The catalog identifies the G500 hood brackets and lamps and the US 993 Litronic retrofit.'],
   'police-lights':['P3','done',['g500'],'The display bar is available as a G500 design mock-up.'],

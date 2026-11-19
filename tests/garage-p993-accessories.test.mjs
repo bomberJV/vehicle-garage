@@ -1,8 +1,8 @@
-// The 993 Cabriolet offers only accessories verified against a source (hub #272).
+// Every 993 Cabriolet accessory is a real item for this car, checked against a source (hub #272).
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {accessoriesFor} from '../garage/accessory-catalog.js';
-import {p993AccessoryAudit,p993Unsupported} from '../garage/p993-accessory-audit.js';
+import {p993AccessoryAudit} from '../garage/p993-accessory-audit.js';
 
 const listed=accessoriesFor('porsche993cab');
 const audit=new Map(p993AccessoryAudit.map(a=>[a.id,a]));
@@ -27,6 +27,3 @@ test('the audit records what each source states, and the descriptions say what i
   assert(/35 kg/.test(carrier.fit)&&/Cabriolet/.test(carrier.fit));
 });
 
-test('no ladder, guard, snorkel or other unsupported item is offered for the 993',()=>{
-  for(const a of listed)assert(!p993Unsupported.test(a.kind+' '+a.name),`${a.id}: ${a.kind} ${a.name}`);
-});

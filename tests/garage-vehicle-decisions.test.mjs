@@ -35,7 +35,7 @@ test('a vehicle has one priority across its register entry and review tasks',()=
 });
 
 test('the five November 15 note entries are To do with their priority and the note’s task',()=>{
-  const expected={'porsche-equipment-fit':['P1',/Keep the ladder only if a real one fits/],'g500-2002-guard':['P1',/hoop profile, crossbars/],
+  const expected={'porsche-equipment-fit':['P1',/Widen the range with items made for each car/],'g500-2002-guard':['P1',/hoop profile, crossbars/],
     'g500-sump-diff-clearance':['P0',/meshes intersect or the renderer shows a hidden surface/],'sl550-engine-detail':['P1',/valve covers, intake and charge plumbing/],
     's1000rr-engine-detail':['P1',/fairings hidden so the shapes and connection points/]};
   for(const [id,[level,text]] of Object.entries(expected)){

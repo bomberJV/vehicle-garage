@@ -35,9 +35,9 @@ export const proposedVariants=[
 
 export const additionalRequestSections=[
   {id:'fit-and-detail',name:'Vehicle fit and detail corrections',items:[
-    work('porsche-equipment-fit','P1',['porsche993cab','porsche992scab'],'Verify accessories for each 911 Cabriolet',
-      'The 1998 Cabriolet has its own Porsche Tequipment roof carrier (993 801 055 01) and US Litronic headlamp retrofit. The 2023 Carrera S retains its factory front-axle lift. Unsupported ladder, guard, snorkel, lamp and four-corner lift previews have been removed from both cars.',
-      'For each car, check the exact model and year against a parts catalog, accessory catalog, or documented installation. Keep the ladder only if a real one fits that Porsche. Use a documented Porsche equivalent if it serves the same purpose. Omit the accessory if neither can be verified.',
+    work('porsche-equipment-fit','P1',['porsche993cab','porsche992scab'],'Build out the accessory range for each 911 Cabriolet',
+      'Each car offers accessories that suit it, each with a part number and a source. The 1998 Cabriolet has the Porsche Tequipment roof carrier (993 801 055 01), the US Litronic headlamp kit and RS-style front lips. The 2023 Carrera S has the TECHART rear spoiler and Aero Kit, and its factory front-axle lift.',
+      'Widen the range with items made for each car. For the 1998 Cabriolet, add Porsche Tequipment and Porsche Classic items such as the roof-carrier ski and bicycle holders, the wind deflector, locking wheel nuts and Carrera door sill plates. For the 2023 Carrera S, add Porsche Tequipment items for the 992. Give each item its part number, the exact model and year it fits, and a catalog source.',
       [link('993 Cabriolet touring carrier',garageLink('porsche993cab',{tool:'customize',section:'equipment',equipment:'roof-racks'})),model('2023 Carrera S equipment','porsche992scab','customize')],'todo','partial'),
     work('g500-2002-guard','P1',['g500'],'Replace the later-model brush guard on the 2002 G500',
       'The 2002 US folding guard has a polished surround, rounded headlamp returns, a low tie bar and two padded uprights. The installed view shows the bumper hinges and quick locks in the latched position.',

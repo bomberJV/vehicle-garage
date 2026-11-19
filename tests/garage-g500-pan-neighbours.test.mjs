@@ -16,8 +16,11 @@ function posed(mode,inspection={}){
 }
 const poses=liftOptions('g500').map(o=>o.id);
 const lift=mode=>mode==='stock'?0:.040;
-const part=(faces,id)=>worldTriangles(faces,f=>f.part===id);
-const points=(faces,id)=>faces.filter(f=>f.part===id).flatMap(f=>f.points);
+// The mount set: rubber mounts, the rail brackets and both support arms.
+const mountSet=new Set(['powertrain.engine-mounts','powertrain.mount-lower-brackets','powertrain.engine-support-left','powertrain.engine-support-right']);
+const matches=(f,id)=>id==='powertrain.engine-mounts'?mountSet.has(f.part):f.part===id;
+const part=(faces,id)=>worldTriangles(faces,f=>matches(f,id));
+const points=(faces,id)=>faces.filter(f=>matches(f,id)).flatMap(f=>f.points);
 const backlog=additionalRequestSections.flatMap(s=>s.items).find(item=>item.id==='g500-pan-neighbour-overlaps');
 
 // The pump, the cables, the bellhousing and the mount arms all crossed the pan

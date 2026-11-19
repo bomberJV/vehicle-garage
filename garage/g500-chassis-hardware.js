@@ -16,6 +16,7 @@ export const chassisRefs={
  bearings:plate('wheel bearings, seals and related components','driveline-and-axles--wheel-bearings-seals-and-related-components'),
  rearAxle:plate('rear axle','universals-and-rear-axle--rear-axle'),
  parking:plate('parking brake','brakes--parking-brake'),
+mounts:ref('MB Parts Giant · 2002 G500 engine and transmission mount parts','https://www.mbpartsgiant.com/oem-mercedes_benz-g500-engine_mount'),
  sticker:ref('2002 US G500 factory window sticker · hydraulic steering damper','https://assets.ctfassets.net/x8mrk904j4k6/6YZIXVgSoBZ1iYZgejgX7a/3eb06156c95e3590d88f7e816470770e/2002_Mercedes-Benz_G500_Window_Sticker.pdf')
 };
 
@@ -157,6 +158,13 @@ function parking(r){
  }
 }
 
+// The transmission and transfer case rest on the transfer-case crossmember
+// through a rubber insulator under the case.
+function transmissionMount(r,key){
+ if(key==='support')box(r,[.220,-.020,.333],[.070,.110,.006],iron);
+ if(key==='insulator')box(r,[.220,-.020,.354],[.050,.060,.036],rubber);
+ if(key==='bracket')box(r,[.220,-.020,.391],[.060,.070,.038],metal);
+}
 export const chassisRows=[
  ['body-mounts','Body mount stacks','Rubber stacks join the separate body to the ladder frame. Each stack has upper and lower rubber, a steel cup and a through bolt. Thin pads carry the rear floor. Stations are placed where the floor sill clears the rail.',[0,0,.10],chassisRefs.frame,r=>{
   for(const s of sides){
@@ -191,6 +199,9 @@ export const chassisRows=[
  ['rear-bearings','Rear wheel-bearing cartridges and shaft seals','Each rear hub turns on a sealed bearing cartridge carried on the flanged axle shaft. A lip seal at the tube end keeps axle oil out of the brake.',[.04,.14,0],chassisRefs.rearAxle,r=>{
   for(const s of sides)r.instance(side(s),()=>rearHubEnd(r,s));
  }],
+ ['transmission-support','Transmission rear support · 463-260-16-60','A plate on top of the transfer-case crossmember carries the rear rubber mount.',[0,0,-.06],chassisRefs.mounts,r=>transmissionMount(r,'support')],
+ ['transmission-insulator','Transmission rear insulator · 212-240-04-18','The rubber insulator under the transfer case takes the rear of the transmission and transfer-case assembly onto the crossmember.',[0,0,-.03],chassisRefs.mounts,r=>transmissionMount(r,'insulator')],
+ ['transmission-mount-bracket','Transmission mount rear bracket · 140-242-13-40','The bracket bolts under the transfer case and sits on the insulator.',[0,0,.03],chassisRefs.mounts,r=>transmissionMount(r,'bracket')],
  ['parking-cables','Parking-brake cables and equalizer','The lever cable runs down through the floor to an equalizer that splits the pull evenly between the rear cables. Clips hold each rear cable on its trailing arm. The cable ends at the backing plate behind the rear drum.',[0,0,-.10],chassisRefs.parking,parking]
 ];
 

@@ -9,7 +9,8 @@
 //   Only hook ids that open no study today.
 // - claims: evidence entries {ids,kind,fact,need,source} for every part in the pack's studies.
 // Each part name carries its Mercedes number (xxx-xxx-xx-xx) and each part or study cites the
-// 2003 G500 catalog diagram that lists it.
+// G500 catalog diagram that lists it: the 2002 plate where it lists the part,
+// otherwise the 2003 plate, labelled as a later-year plate.
 //
 // Parts the register already models are left out: the outer quarter panels, fenders, fuel door
 // and pocket, door strikers, the ladder frame, body mounts, the frame brackets already numbered
@@ -17,19 +18,20 @@
 // are left out. Geometry is schematic, in study-local coordinates.
 import {metal,steel,dark,cyl,sleeve,part,study,x,y,z} from './mechanism-shapes.js';
 
-const giant='https://www.mbpartsgiant.com/parts-list/2003-mercedes_benz-g500/';
-const page=(label,path)=>({label:'MB Parts Giant · 2003 G500 '+label+' diagram',url:giant+path});
+const giant=year=>'https://www.mbpartsgiant.com/parts-list/'+year+'-mercedes_benz-g500/';
+const page=(label,path,year=2002,note='')=>({label:'MB Parts Giant · '+year+' G500 '+label+' diagram'+(note&&', '+note),url:giant(year)+path});
+const unread='a later-year plate; the 2002 G500 plate could not be retrieved, so 2002 fitment of ';
 const plates={
-  side:page('center pillar and rocker','body-hardware/center-pillar-rocker'),
-  cowl:page('cowl','body-hardware/cowl'),
-  cowlTrim:page('cowl exterior trim','interior-exterior-trim/exterior-trim-cowl'),
-  fenderInner:page('fender inner components','body-hardware/inner-components-fender'),
+  side:page('center pillar and rocker','body-hardware/center-pillar-rocker',2003,unread+'the pillars, connectors, rockers and floor-side reinforcements is unconfirmed'),
+  cowl:page('cowl','body-hardware/cowl',2003,unread+'the cowl rail, reinforcements and insulation is unconfirmed'),
+  cowlTrim:page('cowl exterior trim','interior-exterior-trim/exterior-trim-cowl',2003,unread+'side moldings 463-690-08-62 and 463-690-09-62 and their bases is unconfirmed'),
+  fenderInner:page('fender inner components','body-hardware/inner-components-fender',2003,unread+'the wheelhouses, side panels, seal, heat shield and covers is unconfirmed'),
   rearBody:page('rear body','body-hardware/rear-body'),
   quarterInner:page('quarter panel inner structure','body-hardware/inner-structure-quarter-panel'),
   fuelDoor:page('fuel door','body-hardware/fuel-door'),
-  roof:page('roof and components','body-hardware/roof-components'),
-  frame:page('frame and components','body-hardware/frame-components'),
-  splash:page('splash shields','body-hardware/splash-shields')
+  roof:page('roof and components','body-hardware/roof-components',2003,unread+'the roof panels, sunroof frame and brackets, bow, reinforcement and stiffeners is unconfirmed'),
+  frame:page('frame and components','body-hardware/frame-components',2002,'which does not list engine under cover 463-520-05-42, so its 2002 fitment is unconfirmed'),
+  splash:page('splash shields','body-hardware/splash-shields',2003,unread+'under cover brackets 463-524-00-10 and 463-524-01-10-64 is unconfirmed')
 };
 export const shellPackPlates=plates;
 
@@ -182,11 +184,11 @@ const notes={
   'g500-rocker-structure':{fact:'The 2003 G500 center pillar and rocker diagram lists the rocker panels, their reinforcements, the floor front reinforcement, the sill extensions and the seat reinforcements.',need:'The rocker is drawn as a hat section. Measure its closed section and the reinforcement lengths on a shell.'},
   'g500-cowl-structure':{fact:'The 2003 G500 cowl diagram lists the cowl rail, the two reinforcements and the dash and inner insulation. The cowl exterior trim diagram lists the side moldings and their bases.',need:'Rail section, plate outlines and insulation thickness are not measured.'},
   'g500-front-wheelhouses':{fact:'The 2003 G500 fender inner components diagram lists the handed wheelhouses and side panels, the shared seal, the heat shield and the covers.',need:'Wheelhouse shape is drawn as an open box. Cover and heat shield positions are estimated.'},
-  'g500-rear-body-panels':{fact:'The 2003 G500 rear body diagram lists the back panel, rear body panel, rear pillars, upper and end panels, the reinforcements and the lock bracket.',need:'Panel outlines are schematic. Some left and right parts carry different number families (460 and 463); '+vin.toLowerCase()},
-  'g500-rear-quarter-structure':{fact:'The 2003 G500 quarter panel inner structure diagram lists the lock pillars, inner rear pillars, wheelhouses, splash shields and seal. The fuel-door diagram lists the stiffeners, outer and inner quarter pillars, the reinforcements and the air baffles.',need:'Pillar and wheelhouse geometry is schematic. Confirm which baffle and stiffener sit around the filler pocket on the right side.'},
+  'g500-rear-body-panels':{fact:'The 2002 G500 rear body diagram lists the back panel, rear body panel, rear pillars, upper and end panels, the reinforcements and the lock bracket.',need:'Panel outlines are schematic. Some left and right parts carry different number families (460 and 463); '+vin.toLowerCase()},
+  'g500-rear-quarter-structure':{fact:'The 2002 G500 quarter panel inner structure diagram lists the lock pillars, inner rear pillars, wheelhouses, splash shields and seal. The fuel-door diagram lists the stiffeners, outer and inner quarter pillars, the reinforcements and the air baffles.',need:'Pillar and wheelhouse geometry is schematic. Confirm which baffle and stiffener sit around the filler pocket on the right side.'},
   'g500-roof-structure':{fact:'The 2003 G500 roof and components diagram lists the roof panel for trucks with and without the sunroof, the sunroof frame and brackets, the roof bow, the corner reinforcement and the edge stiffeners.',need:'The roof is drawn flat. Bow and frame positions are estimated. Check which roof panel a given truck has.'},
-  'g500-fuel-door-hardware':{fact:'The 2003 G500 fuel door diagram lists the reinforcement, spring, bumper and actuator with the fuel door.',need:'Spring and actuator positions are schematic. The bumper number is superseded by 123-987-24-40-64.'},
-  'g500-frame-mounted-brackets':{fact:'The 2003 G500 frame and components diagram lists these brackets and supports. The splash shields diagram lists the engine under cover and its rear brackets.',need:'Bracket shapes and their stations along the frame are estimated. Measure them against the frame datums.'}
+  'g500-fuel-door-hardware':{fact:'The 2002 G500 fuel door diagram lists the reinforcement, spring, bumper and actuator with the fuel door.',need:'Spring and actuator positions are schematic. The bumper number is superseded by 123-987-24-40-64.'},
+  'g500-frame-mounted-brackets':{fact:'The 2002 G500 frame and components diagram lists these brackets and supports. The 2003 G500 splash shields diagram lists the engine under cover and its rear brackets.',need:'Bracket shapes and their stations along the frame are estimated. Measure them against the frame datums.'}
 };
 export const claims=studies.flatMap(s=>{
   const bySource=new Map();

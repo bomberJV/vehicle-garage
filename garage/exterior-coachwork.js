@@ -53,6 +53,8 @@ function trimmedX(cfg,x,towards){
 function skin(r,cfg,paint){
  const ends=cfg.stations.map(s=>s[0]),cuts=new Set([...ends,...cfg.door,cfg.hoodEnd,cfg.deckStart]);
  for(let x=ends[0];x<ends.at(-1);x+=.11)cuts.add(+x.toFixed(6));
+ // cfg.cuts: extra slice positions where a body changes shape quickly.
+ for(const x of cfg.cuts||[])cuts.add(+x.toFixed(6));
  for(const ax of [-cfg.wb/2,cfg.wb/2])for(let i=0;i<=30;i++)cuts.add(+(ax+Math.cos(i*Math.PI/30)*cfg.arch).toFixed(6));
  const xs=[...cuts].sort((a,b)=>a-b);
  for(let i=1;i<xs.length;i++){
@@ -109,7 +111,7 @@ function skin(r,cfg,paint){
    // the engine bay and passenger compartment genuinely open.
    if(mid<cfg.hoodEnd||mid>=cfg.deckStart){
     const cap=(x,sw,h)=>[x,cfg.capFollowsSide?creasePoint(cfg,side,x,h)[1]:side*(sw-.034),h];
-    const inset=(x,sw,h)=>[x,side*(sw*(mid<cfg.hoodEnd?cfg.hoodFrac:.78)),h+.016];
+    const inset=(x,sw,h)=>[x,side*(mid<cfg.hoodEnd&&cfg.hoodHalf?cfg.hoodHalf(x,sw)+.008:sw*(mid<cfg.hoodEnd?cfg.hoodFrac:.78)),h+.016];
     draw(r,'body.structure',()=>face(r,[cap(a,w,z),cap(b,ww,zz),inset(b,ww,zz),inset(a,w,z)],tint(paint,1.05)));
    }
   }
@@ -119,8 +121,13 @@ function skin(r,cfg,paint){
     const lanes=isHood&&cfg.hoodLanes?cfg.hoodLanes:[0,.55,1];
     for(let k=1;k<lanes.length;k++){
      const lo=lanes[k-1],hi=lanes[k];
-     const p=(x,sw,h,t)=>[x,s*(sw*frac-.008)*t,h+.016+(isHood&&cfg.hoodCrownAt?cfg.hoodCrownAt(x):isHood&&cfg.hoodCrown!=null?cfg.hoodCrown:.036)*(1-t*t)+(isHood&&cfg.hoodPress?cfg.hoodPress(t):0)];
-     face(r,[p(x0,...section(cfg.stations,x0),lo),p(x1,...section(cfg.stations,x1),lo),p(x1,...section(cfg.stations,x1),hi),p(x0,...section(cfg.stations,x0),hi)],tint(paint,(s<0?1.11:1.17)-.035*lo+(isHood&&cfg.hoodPress&&lo===.68?.045:0)+(isHood?cfg.hoodLaneTint?.(lo)??0:0)));
+     // cfg.hoodSurface(x,t) and cfg.hoodHalf(x,w): a bonnet shaped across its
+     // width, such as one split by the grille into a centre section and two
+     // sides. cfg.hoodFaceTint(points,s) then shades each face by its slope.
+     const shaped=isHood&&cfg.hoodSurface;
+     const p=(x,sw,h,t)=>shaped?[x,s*cfg.hoodHalf(x,sw)*t,cfg.hoodSurface(x,t)]:[x,s*(sw*frac-.008)*t,h+.016+(isHood&&cfg.hoodCrownAt?cfg.hoodCrownAt(x):isHood&&cfg.hoodCrown!=null?cfg.hoodCrown:.036)*(1-t*t)+(isHood&&cfg.hoodPress?cfg.hoodPress(t):0)];
+     const pts=[p(x0,...section(cfg.stations,x0),lo),p(x1,...section(cfg.stations,x1),lo),p(x1,...section(cfg.stations,x1),hi),p(x0,...section(cfg.stations,x0),hi)];
+     face(r,pts,tint(paint,shaped&&cfg.hoodFaceTint?cfg.hoodFaceTint(pts,s):(s<0?1.11:1.17)-.035*lo+(isHood&&cfg.hoodPress&&lo===.68?.045:0)+(isHood?cfg.hoodLaneTint?.(lo)??0:0)));
     }
    }};
    if(isHood)panel(r,'bonnet',[0,0,.71],'body.hood',top);else deckPanel(r,cfg.hatch,top);

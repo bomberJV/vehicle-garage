@@ -204,17 +204,19 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  const bayTag=(name,fn)=>tag(name,()=>fn(bay));
  // The HR-V's radiator and fan sit lower, under its lower bonnet line.
  const radX=front-.62,radY=0,radZ=base+(baseVehicle(id)==='hrv'?.16:.20),radTop=baseVehicle(id)==='hrv'?.40:id==='bmw328xi'?.44:id==='c63'?.38:.55,fanR=baseVehicle(id)==='hrv'?.20:.245;
+ // The C63's radiator sits between its swept-back headlamps, so it is narrower.
+ const radW=id==='c63'?.46:.59,tankY=id==='c63'?[-.47,.41]:[-.60,.54];
  if(id==='g500'){
   if(!g500ServiceOwnsFlow)drawG500CoolingCircuit(r,'powertrain');
  }else{
- bayTag('radiator',({box})=>{box(radX-.045,-.59,base-.03,radX+.025,.59,base+radTop,DARK);for(let z=base+.005;z<base+radTop-.02;z+=.035)box(radX-.050,-.53,z,radX-.046,.53,z+.009,'#9ca9ad');for(const y of [-.60,.54])box(radX-.045,y,base-.04,radX+.03,y+.06,base+radTop+.01,BLACK);});
+ bayTag('radiator',({box})=>{box(radX-.045,-radW,base-.03,radX+.025,radW,base+radTop,DARK);for(let z=base+.005;z<base+radTop-.02;z+=.035)box(radX-.050,-radW+.06,z,radX-.046,radW-.06,z+.009,'#9ca9ad');for(const y of tankY)box(radX-.045,y,base-.04,radX+.03,y+.06,base+radTop+.01,BLACK);});
  bayTag('fan',({tube,poly,cyl})=>{const x=radX+.09,z=radZ+.07;tube([x-.012,0,z],[x+.012,0,z],fanR,fanR-.02,DARK,20);cyl([x-.018,0,z],[x+.025,0,z],.051,BLACK,12);for(let i=0;i<7;i++){const a=i*Math.PI*2/7,pt=(rad,t,xx)=>[xx,Math.cos(t)*rad,z+Math.sin(t)*rad];poly([pt(.05,a,x+.016),pt(fanR-.025,a+.19,x+.004),pt(fanR-.028,a+.38,x-.004),pt(.066,a+.48,x+.020)],'#4b565c');}});
  tag('water-pump',()=>{cyl([-L/2-.13,0,.21],[-L/2-.045,0,.21],.067,CAST,12);tube([-L/2-.14,0,.21],[-L/2-.13,0,.21],.081,.026,DARK,16);});
  tag('thermostat',()=>{box(-L/2-.11,-.14,.12,-L/2+.01,-.045,.23,CAST);cyl([-L/2-.05,-.16,.18],[-L/2-.05,-.12,.18],.030,DARK,10);});
  const hoseAnchor=honda?world:([x,y,z])=>[cx+(trans?-y:x),trans?x:y,base+z];
  const upperEngine=hoseAnchor([-L/2-.04,-.12,.24]),lowerEngine=hoseAnchor([honda?-L/2-.11:-L/2-.09,.03,.10]);
- bayTag('upper-hose',({route,tube})=>{const hy=honda?.42:-.48;route([[radX+.02,hy,base+radTop-.07],[radX+.20,hy,base+radTop-.01],[upperEngine[0]-.09,upperEngine[1]+(honda?.05:-.07),upperEngine[2]+.10],upperEngine],.025,RUBBER,8);});
- bayTag('lower-hose',({route})=>{const ly=honda?.44:.47;route([[radX+.025,ly,base+.015],[radX+.17,ly,base-.015],[lowerEngine[0]-.10,lowerEngine[1]+(honda?0:.08),lowerEngine[2]-.10],lowerEngine],.026,RUBBER,8);});
+ bayTag('upper-hose',({route,tube})=>{const hy=honda?.42:id==='c63'?-.44:-.48;route([[radX+.02,hy,base+radTop-.07],[radX+.20,hy,base+radTop-.01],[upperEngine[0]-.09,upperEngine[1]+(honda?.05:-.07),upperEngine[2]+.10],upperEngine],.025,RUBBER,8);});
+ bayTag('lower-hose',({route})=>{const ly=honda?.44:id==='c63'?.44:.47;route([[radX+.025,ly,base+.015],[radX+.17,ly,base-.015],[lowerEngine[0]-.10,lowerEngine[1]+(honda?0:.08),lowerEngine[2]-.10],lowerEngine],.026,RUBBER,8);});
  }
  if(id!=='g500'&&!m54)bayTag('coolant-reservoir',({box,cyl,route})=>{const x=honda?-1.79:front+.32,y=honda?.53:.61,z=base+(honda?.20:.28);box(x-.09,y-.065,z,x+.09,y+.065,z+.22,'#aebdb5');box(x-.09,y-.066,z+.045,x+.09,y-.063,z+.11,COOL);cyl([x,y,z+.22],[x,y,z+.25],.036,BLACK,12);route([[x-.05,y,z+.02],[radX+.16,.48,base+.32]],.008,RUBBER,6);});
  if(id==='g500'&&!g500ServiceOwnsFlow)tag('alternator',()=>drawG500ElectronicShared(r,'alternator'));

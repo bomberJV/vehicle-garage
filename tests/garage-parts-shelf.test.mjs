@@ -51,3 +51,11 @@ test('choosing the 996 tire set and filter leaves the tires to quote',()=>{
   assert.deepEqual(totals.unknown,['p96-tires']);
   assert.equal(totals.sourced,17.06);
 });
+
+test('the 328xi service presets load its own parts',async()=>{
+  const {presetBuild}=await import('../garage/model.js');
+  const {VEHICLES:V}=await import('../garage/catalog.js');
+  assert.deepEqual(V.bmw328xi.presets.slice(0,2),['Service first','Wheels & upkeep']);
+  assert.deepEqual(presetBuild('bmw328xi',0).parts.sort(),['b90-air-filter','b90-filter','charger']);
+  assert.deepEqual(presetBuild('bmw328xi',1).parts.sort(),['b90-filter','b90-tires','wax']);
+});

@@ -11,7 +11,7 @@ import {drawFrontBumperBrackets,drawRearBumperBrackets,g500BumperParts,bumperRef
 import {g500DashFittingParts,dashFittingsRef} from './g500-dash-fittings.js';
 import {g500RestraintParts,restraintRefs} from './g500-restraints.js';
 import {drawG500WiperDrive,g500WiperDriveParts,wiperDriveRef} from './g500-wiper-drive.js';
-import {g500SwitchParts,switchRef} from './g500-switches.js';
+import {g500SwitchParts,switchRef,navRef} from './g500-switches.js';
 import {drawG500DoorLocking,drawG500Strikers,g500DoorHardwareParts,doorHardwareRefs} from './g500-door-hardware.js';
 import {roofFrontLip} from './g500-roof-datums.js';
 import {drawG500Bonnet,drawG500FrontDeck,drawG500Scuttle} from './g500-bonnet.js';
@@ -308,7 +308,7 @@ const exteriorPlates={
   ...Object.fromEntries(g500DashFittingParts.map(([key])=>[key,dashFittingsRef])),
   ...Object.fromEntries(g500RestraintParts.map(([key,,,ref])=>[key,restraintRefs[ref]])),
   ...Object.fromEntries(g500WiperDriveParts.map(([key])=>[key,wiperDriveRef])),
-  ...Object.fromEntries(g500SwitchParts.map(([key])=>[key,switchRef])),
+  ...Object.fromEntries(g500SwitchParts.map(([key])=>[key,key==='gps-antenna'?navRef:switchRef])),
   ...Object.fromEntries(g500DoorHardwareParts.map(([key,,,ref])=>[key,doorHardwareRefs[ref]])),
   ...Object.fromEntries(['instrument-panel','cluster-trim','grab-handle'].map(k=>[k,giantRef('instrument panel','instrument-panel')])),
   ...Object.fromEntries(['center-console','console-trim-plate','shift-panel','shift-knob','console-lid'].map(k=>[k,giantRef('center console','center-console')])),

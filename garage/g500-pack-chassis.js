@@ -275,15 +275,6 @@ const wheelEnd=study('g500-wheel-end','Front hub, wheel bolts and valve','The fr
 ]);
 wheelEnd.viewAngle=[-.4,.35];
 
-// The carrier on the cargo door that holds the spare wheel, with its mounting pieces.
-const spare=study('g500-spare-carrier','Spare-wheel carrier','The carrier plate on the side-hinged cargo door that the spare wheel bolts to, with the grommets, spacers and nuts that mount it and the stop on the trim ring.',spareCarrierPlate,[
-  part('carrier','Spare carrier · 463-890-13-44-64','The pressed carrier plate on the outside of the cargo door, with the studs for the spare wheel.',[-.3,0,0],r=>{block(r,[0,0,0],[.04,.55,.45],paint);block(r,[-.05,0,0],[.08,.25,.25],paint);for(let i=0;i<5;i++){const a=i/5*Math.PI*2;cyl(r,[-.09,Math.cos(a)*.08,Math.sin(a)*.08],x,-.12,0,.009,metal,8);}}),
-  part('grommets','Spare carrier grommets · 460-997-14-81','The rubber grommets where the carrier mounting bolts pass through the door skin.',[.45,0,0],r=>{for(const [yy,zz] of [[-.2,-.16],[.2,-.16],[-.2,.16],[.2,.16]])sleeve(r,[.04,yy,zz],x,0,.025,.035,.014,rubber,14);}),
-  sourced(spacerPage,part('spacers','Spare carrier spacers · 463-991-28-40','The spacer tubes between carrier and door that keep the clamp load off the door skin. The listing gives 2004–2008 G500 fitment.',[.25,0,-.4],r=>{for(const [yy,zz] of [[-.2,-.16],[.2,-.16],[-.2,.16],[.2,.16]])sleeve(r,[.06,yy,zz],x,0,.1,.018,.011,metal,12);})),
-  part('nuts','Spare carrier nuts · 460-990-50-50','The nuts the carrier diagram lists for the carrier mounting, inside the door.',[.65,0,.3],r=>{for(const [yy,zz] of [[-.2,-.16],[.2,-.16],[-.2,.16],[.2,.16]])hex(r,[.17,yy,zz],x,.025,.026);}),
-  part('trim-stop','Trim ring stop · 463-898-00-33','The stop the carrier diagram lists on the spare-wheel trim ring.',[-.3,0,.5],r=>{block(r,[-.12,0,.3],[.06,.1,.04],dark);block(r,[-.12,0,.34],[.03,.05,.03],dark);})
-]);
-spare.viewAngle=[-.9,.25];
 
 // A rear backing plate with the drum-in-hat parking shoes it carries.
 const backing=(r,s,color,rad=.32)=>{turn(r,[0,s*.4,0],y,[[0,.05],[0,rad],[-.015,rad],[-.015,.05]],color,{n:24});};
@@ -336,7 +327,7 @@ const locating=study('g500-axle-locating-arms','Radius arms, trailing arms and t
 locating.viewAngle=[-.6,.5];
 
 export const studies=[frame,mounts,springs,stabilizer,knuckles,joints,boxSeals,column,frontBrake,rearBrake,parking,returnHoses,
-  shaft,gearSet,supply,wheelEnd,spare,parkingShoes,frontHoses,friction,locating];
+  shaft,gearSet,supply,wheelEnd,parkingShoes,frontHoses,friction,locating];
 export const views=new Map([
   ['suspension.frame',frame],
   ['chassis.body-mounts',mounts],
@@ -364,7 +355,6 @@ export const views=new Map([
   ['wheels.hub',wheelEnd],
   ['wheels.rim',wheelEnd],
   ['chassis.front-hub-ends',wheelEnd],
-  ['closure-g500.carrier',spare],
   ['g500-rear-brake.backplate',parkingShoes],
   ['g500-rear-brake.shoe-a',parkingShoes],
   ['g500-rear-brake.shoe-b',parkingShoes],
@@ -420,8 +410,6 @@ export const claims=[
   claim(idsFrom(wheelEnd,earlyFrontSuspensionPlate),'The 2002 G500 stabilizer bar and front suspension plate lists the front hub 463-330-01-25, installation kit 463-331-00-44 and hub seals 015-997-79-47.','List the installation kit’s contents and measure the seal. '+vin,earlyFrontSuspensionPlate),
   claim(idsFrom(wheelEnd,midFrontSuspensionPlate),'The 2006 G500 front suspension components plate lists front hub 463-330-04-25 for the G500 and G55 AMG.','Find the year the hub number changed. '+vin,midFrontSuspensionPlate),
   claim(idsFrom(wheelEnd,earlyWheelPlate),'The 2002 G500 wheels plate lists wheel bolt 000-990-53-07 and valve stem 000-400-02-13.','Confirm the bolt count, thread and seat for each wheel option. '+vin,earlyWheelPlate),
-  claim(idsFrom(spare,spareCarrierPlate),'The 2006 G500 spare tire carrier plate lists the spare carrier 463-890-13-44-64, grommet 460-997-14-81, nut 460-990-50-50 and trim ring stop 463-898-00-33.','Confirm the carrier number for 2002–2005 cars and measure the stud pattern. '+vin,spareCarrierPlate),
-  claim(idsFrom(spare,spacerPage),'The part page for spare carrier spacer 463-991-28-40 gives 2004–2008 G500 fitment and calls it a spacer tube; it is replaced by 463-991-28-40-64.','Find the 2002–2003 spacer and measure its length. '+vin,spacerPage),
   claim(idsFrom(parkingShoes,midRearBrakePlate),'The 2006 G500 rear-brake page lists backing plates 463-420-01-44 and 463-420-02-44 at reference 5, and 461-423-01-20 and 461-423-02-20 without a reference number, for left and right.','The page mixes diagrams. Confirm both pairs are rear plates and which years use each. '+vin,midRearBrakePlate),
   claim(idsFrom(parkingShoes,earlyParkingPlate),'The 2002 G500 parking brake plate lists shoes 003-420-34-20 for the G500 and G55 AMG.','Measure the shoe diameter and width inside the disc hat. '+vin,earlyParkingPlate),
   claim(idsFrom(frontHoses,earlyFrontBrakePlate),'The 2002 G500 front-brake plate lists brake hose 461-420-09-48-64 for both sides at reference 8, beside the hose brackets.','Measure the hose length and confirm it runs from the knuckle bracket to the caliper. '+vin,earlyFrontBrakePlate),

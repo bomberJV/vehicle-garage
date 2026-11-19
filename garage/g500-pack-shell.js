@@ -9,7 +9,8 @@
 //   Only hook ids that open no study today.
 // - claims: evidence entries {ids,kind,fact,need,source} for every part in the pack's studies.
 // Each part name carries its Mercedes number (xxx-xxx-xx-xx) and each part or study cites the
-// 2003 G500 catalog diagram that lists it.
+// G500 catalog diagram that lists it: the 2002 plate where it lists the part,
+// otherwise the 2003 plate, labelled as a later-year plate.
 //
 // Parts the register already models are left out: the outer quarter panels, fenders, fuel door
 // and pocket, door strikers, the ladder frame, body mounts, the frame brackets already numbered

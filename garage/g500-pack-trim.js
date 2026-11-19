@@ -8,7 +8,8 @@
 //   Only hook ids that open no study today.
 // - claims: evidence entries {ids,kind,fact,need,source} for every part in the pack's studies.
 // Each part name carries its Mercedes number (xxx-xxx-xx-xx) and each part or study cites the
-// 2003 G500 catalog diagram that lists it. Where a part came in gray and black, the name gives
+// G500 catalog diagram that lists it: the 2002 plate where it lists the part,
+// otherwise the 2003 plate, labelled as a later-year plate. Where a part came in gray and black, the name gives
 // the base number and the description names the color suffixes.
 //
 // Parts the register already models are left out: the steering wheel, airbags and clockspring,

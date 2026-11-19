@@ -12,13 +12,13 @@ import {TAU,metal,steel,dark,gold,copper,turn,cyl,sleeve,gear,part,study,x,y,z} 
 
 const ref=(label,url)=>({label,url});
 const vg150e=ref('awd.tech · VG150 E transfer case parts list, G-Class (cases 463-280-17-00 and 463-280-20-00)','https://awd.tech/apps/catalog/transmission/vg150%20e-mercedes-benz');
-const g500Transfer=ref('MB Parts Giant · 2006 G500 transfer case page: motor 463-540-00-88, output shaft seal 015-997-08-47-64, case 463-280-20-00','https://www.mbpartsgiant.com/parts-list/2006-mercedes_benz-g500/transmission/transfer-case');
+const g500Transfer=ref('MB Parts Giant · 2006 G500 transfer case page: motor 463-540-00-88, output shaft seal 015-997-08-47-64, case 463-280-20-00; a later-year plate: the 2002 G500 plate could not be retrieved, so 2002 fitment is unconfirmed','https://www.mbpartsgiant.com/parts-list/2006-mercedes_benz-g500/transmission/transfer-case');
 const g500Actuator=ref('MB Parts Giant · G500 4WD actuator 463-540-00-88, 2002–2008 G500 fitment','https://www.mbpartsgiant.com/oem-mercedes_benz-g500-4wd_actuator');
 const outputSeal=ref('MB Parts Giant · sealing ring 015-997-08-47-64, 2002–2008 G500 fitment','https://www.mbpartsgiant.com/oem-mercedes_benz-transfer_case_pinion_shaft_seals');
 const gWagenTransfer=ref('Expedition Imports · W463 transmission and transfer-case parts','https://expedition-imports.com/g-wagon-parts/w463-g-class/transmission-and-transfer-case');
 const axleShafts=ref('MB Parts Giant · G500 axle shafts, 2002–2008 G500 fitment','https://mbpartsgiant.com/oem-mercedes_benz-g500-axle_shaft');
 const axleNuts=ref('MB Parts Giant · G500 grooved axle nuts, 2002–2008 G500 fitment','https://mbpartsgiant.com/oem-mercedes_benz-g500-spindle_nut');
-const frontAxle=ref('MB Parts Giant · 2006 G500 front axle shafts and differential diagram','https://mbpartsgiant.com/parts-list/2006-mercedes_benz-g500/driveline-axles/front-axle-shafts-differential');
+const frontAxle=ref('MB Parts Giant · 2002 G500 front axle shafts and differential diagram','https://www.mbpartsgiant.com/parts-list/2002-mercedes_benz-g500/driveline-axles/front-axle-shafts-differential');
 const fcpAxle=ref('FCP Euro · G500 axle parts, Genuine Mercedes','https://www.fcpeuro.com/Mercedes~Benz-parts/G500/Axle/');
 const fcpTransmission=ref('FCP Euro · G500 automatic transmission parts','https://www.fcpeuro.com/Mercedes~Benz-parts/G500/Automatic-Transmission/');
 export const drivetrainPackSources={vg150e,g500Transfer,g500Actuator,outputSeal,gWagenTransfer,axleShafts,axleNuts,frontAxle,fcpAxle,fcpTransmission};
@@ -186,19 +186,19 @@ transmissionParts.viewAngle=[-.55,.3];
 // shafts and the VG150 E center differential and lock actuator.
 const mbpg=(label,path)=>ref('MB Parts Giant · '+label,'https://www.mbpartsgiant.com/'+path);
 const rearAxle02=mbpg('2002 G500 rear axle diagram','parts-list/2002-mercedes_benz-g500/driveline-axles/rear-axle');
-const rearAxle08=mbpg('2008 G500 rear axle diagram','parts-list/2008-mercedes_benz-g500/driveline-axles/rear-axle');
+const rearAxle08=mbpg('2008 G500 rear axle diagram, a later-year plate; the 2002 G500 plate could not be retrieved, so 2002 fitment is unconfirmed for pinion spacers 108-353-00-42 and 639-353-00-53','parts-list/2008-mercedes_benz-g500/driveline-axles/rear-axle');
 const rearHousing02=mbpg('2002 G500 rear axle housing diagram','parts-list/2002-mercedes_benz-g500/suspension/axle-housing-rear');
 const frontAxle02=mbpg('2002 G500 front axle diagram','parts-list/2002-mercedes_benz-g500/driveline-axles/front-axle');
 const frontCarrier02=mbpg('2002 G500 front axle carrier diagram','parts-list/2002-mercedes_benz-g500/suspension/front-axle-carrier');
 const frontHub02=mbpg('2002 G500 stabilizer bar and components diagram (front hub, bearings, knuckle)','parts-list/2002-mercedes_benz-g500/suspension/stabilizer-bar-components');
 const rearProp02=mbpg('2002 G500 rear propeller shaft diagram','parts-list/2002-mercedes_benz-g500/driveline-axles/rear-propeller-shaft');
-const frontShaft06=mbpg('2006 G500 drive shaft, front diagram','parts-list/2006-mercedes_benz-g500/suspension/drive-shaft-front');
+const frontShaft06=mbpg('2006 G500 drive shaft, front diagram, a later-year plate; the 2002 G500 plate could not be retrieved, so 2002 fitment is unconfirmed for drive shaft plate 463-413-01-84','parts-list/2006-mercedes_benz-g500/suspension/drive-shaft-front');
 const driveShafts=mbpg('G500 drive shafts, 2002–2008 G500 fitment','oem-mercedes_benz-g500-drive_shaft');
 const sensorRings=mbpg('G500 ABS sensor rings, 2002–2008 G500 fitment','oem-mercedes_benz-g500-abs_reluctor_ring');
 const hubSeal=mbpg('G500 wheel (hub) seal, 2002–2008 G500 fitment','oem-mercedes_benz-g500-wheel_seal');
 const pinionBearings=mbpg('G500 pinion bearings, 2002–2008 G500 fitment','oem-mercedes_benz-g500-pinion_bearing');
 const ringPinion=mbpg('G500 ring and pinion sets, 2002–2008 G500 fitment','oem-mercedes_benz-g500-ring_and_pinion');
-const transfer08=mbpg('2008 G500 transfer case page: motor 463-540-00-88, seal 015-997-08-47-64, case 463-280-20-00','parts-list/2008-mercedes_benz-g500/transmission/transfer-case');
+const transfer08=mbpg('2008 G500 transfer case page: motor 463-540-00-88, seal 015-997-08-47-64, case 463-280-20-00; a later-year plate: the 2002 G500 plate could not be retrieved, so 2002 fitment is unconfirmed','parts-list/2008-mercedes_benz-g500/transmission/transfer-case');
 Object.assign(drivetrainPackSources,{rearAxle02,rearAxle08,rearHousing02,frontAxle02,frontCarrier02,frontHub02,rearProp02,frontShaft06,driveShafts,sensorRings,hubSeal,pinionBearings,ringPinion,transfer08});
 
 const hex=(r,c,a,inner,outer,width,color=steel)=>turn(r,c,a,[[0,inner],[0,outer],[width,outer],[width,inner],[0,inner]],color,{n:6,start:Math.PI/6});
@@ -387,7 +387,7 @@ export const claims=[
   {ids:ids(rearShafts,['left-nut','right-nut']),kind:'diagram',
    fact:'The G500 spindle-nut listing gives grooved nuts 902-357-01-26 driver side and 902-357-02-26 passenger side for 2002–2008 G500.',need:'Measure the nut across-flats and slot count; the thread hand per side is unconfirmed.',source:axleNuts},
   {ids:ids(frontAxleParts,['companion-flange','pinion-nut']),kind:'diagram',
-   fact:'The 2006 G500 front axle diagram lists companion flange 460-350-05-45 at callout 18 and nut 601-351-01-72 at callout 19. The 2002 page gives 464-350-32-00 as the flange replacement.',need:'Measure the flange diameter, bolt circle and nut across-flats on the fitted axle.',source:frontAxle},
+   fact:'The 2002 G500 front axle diagram lists companion flange 460-350-05-45 at callout 18 and nut 601-351-01-72 at callout 19. The 2002 page gives 464-350-32-00 as the flange replacement.',need:'Measure the flange diameter, bolt circle and nut across-flats on the fitted axle.',source:frontAxle},
   {ids:ids(frontAxleParts,['shaft-bearing']),kind:'diagram',
    fact:'The G500 axle parts listing gives Genuine Mercedes axle shaft bearing 463-337-00-49 for the front axle of the G500 and G55 AMG.',need:'Confirm the bearing position in the knuckle against a G500 diagram and measure its bore and width.',source:fcpAxle},
   {ids:ids(transmissionParts,['shift-rod-bushing']),kind:'diagram',

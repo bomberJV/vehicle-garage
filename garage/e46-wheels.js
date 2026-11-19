@@ -1,5 +1,5 @@
 import {sectionedWheel} from './sectioned-road-wheel.js';
-import {e46Style43,e46Style68Front,e46Style68Rear} from './e46-wheel-specs.js';
+import {e46Style43,e46Style44,e46Style68Front,e46Style68Rear} from './e46-wheel-specs.js';
 import {drawWheelFace} from './wheel-faces.js';
 import {tint} from './road-primitives.js';
 
@@ -50,8 +50,8 @@ export function style43Face(r,{x,y,z,side,rim,finish}){
 }
 
 export function drawE46WheelAndTire(r,mount){
-  const alternative=mount.design?.id==='style68';
-  const spec=alternative?(mount.x<0?e46Style68Front:e46Style68Rear):e46Style43;
+  const id=mount.design?.id,alternative=id==='style68'||id==='style44';
+  const spec=id==='style44'?e46Style44:alternative?(mount.x<0?e46Style68Front:e46Style68Rear):e46Style43;
   sectionedWheel(r,mount,spec,e46Style43.offset,(r,face)=>{
     if(alternative)drawWheelFace(r,mount.design,face);
     else style43Face(r,face);

@@ -297,8 +297,6 @@ const hubRows=[
   src(part('abs-ring','Front ABS sensor ring · 463-334-00-15','The toothed sensor ring the front axle carrier diagram lists on each front axle shaft, drawn here inboard of the hub.',[0,-.5,.2],r=>toneRing(r,[0,-.16,0],y,.13,.08,.03,30)),frontCarrier02)
 ];
 const TAU5=2*Math.PI/5;
-const frontHub=study('g500-front-hub-parts','Front hub, hub seal, bearing kit and ABS ring','Each front hub turns on two tapered bearings on the knuckle. A seal closes the inner end, a toothed ring for the wheel-speed sensor sits on the axle shaft, and an installation kit is listed with the bearings.',frontHub02,hubRows);
-frontHub.viewAngle=[-.45,.3];
 
 // Propeller shafts, laid out along x with the transfer case at the origin.
 function propShaft(r,a,b,rad,color){
@@ -350,7 +348,7 @@ const lockActRows=[
 const lockActuator=study('g500-vg150-lock-actuator','VG150 E lock actuator piston, diaphragm, spring and shift collar','The vacuum actuator for the transfer-case lock: a diaphragm and piston, a return spring, and the splined shift collar in the center differential group.',vg150e,lockActRows);
 lockActuator.viewAngle=[-.55,.3];
 
-export const studies=[rangeSet,caseFittings,rearShafts,frontAxleParts,transmissionParts,rearHousing,rearGears,frontGears,lockParts,shaftEnds,frontHub,propShafts,centerDiff,lockActuator];
+export const studies=[rangeSet,caseFittings,rearShafts,frontAxleParts,transmissionParts,rearHousing,rearGears,frontGears,lockParts,shaftEnds,propShafts,centerDiff,lockActuator];
 export const views=new Map([
   ['g500-center-diff.housing',rangeSet],
   ['g500-center-diff.rear-output',caseFittings],
@@ -362,7 +360,6 @@ export const views=new Map([
   ['g500-front-diff.crown',frontGears],
   ['g500-axle-lock.casting',lockParts],
   ['chassis.rear-bearings',shaftEnds],
-  ['chassis.front-hub-ends',frontHub],
   ['g500-rear-propeller.tube',propShafts],
   ['g500-front-propeller.tube',propShafts],
   ['g500-input-shaft.spindle',propShafts],
@@ -424,12 +421,6 @@ export const claims=[
    fact:'The G500 ABS sensor ring listing gives sensor (spacer) ring 463-357-03-51 for 2002–2008 G500, beside front ring 463-334-00-15.',need:'The listing gives no position; that it is the rear ring is inferred from its 463-357 rear-axle-shaft group. Confirm its seat and tooth count.',source:sensorRings},
   {ids:ids(shaftEnds,['repair-kit']),kind:'diagram',
    fact:'The 2002 G500 rear axle housing diagram lists repair kit 902-350-14-10 at callout 9 for both sides.',need:'The kit contents are not listed; confirm what it holds before drawing it as anything more than a placeholder ring.',source:rearHousing02},
-  {ids:ids(frontHub,['hub','installation-kit']),kind:'diagram',
-   fact:'The 2002 G500 front hub diagram lists front hub 463-330-01-25 at callout 1 and installation kit 463-331-00-44 at callout 2, with front wheel bearings 009-981-41-05 inner and 009-981-48-05 outer.',need:'The kit contents are not listed. Measure the hub flange, bolt circle and bearing seats; the wheel bearings themselves are drawn in their own studies.',source:frontHub02},
-  {ids:ids(frontHub,['hub-seal']),kind:'diagram',
-   fact:'The G500 wheel seal listing gives hub seal 015-997-79-47 for 2002–2008 G500, and the 2002 front hub diagram lists it at callout 3.',need:'Measure the seal bore and section on the fitted hub.',source:hubSeal},
-  {ids:ids(frontHub,['abs-ring']),kind:'diagram',
-   fact:'The 2002 G500 front axle carrier diagram lists ABS ring 463-334-00-15 at callout 4, on the driver and passenger sides, after the axle shafts.',need:'Confirm its seat on the axle shaft and its tooth count.',source:frontCarrier02},
   {ids:ids(propShafts,['front-shaft']),kind:'diagram',
    fact:'The G500 drive shaft listing gives 463-410-13-02 (replacing 460-410-22-18) for 2002–2008 G500, and the 2006 front drive shaft diagram lists it as the shaft to the front axle.',need:'Measure the shaft length, tube diameter and joint sizes; the joints are drawn schematically.',source:driveShafts},
   {ids:ids(propShafts,['rear-shaft','center-shaft']),kind:'diagram',

@@ -7,7 +7,7 @@ import {g500CatalogStudies,catalogStudySources} from './g500-catalog-studies.js'
 const rod={label:'Mercedes-Benz Classic USA · A 113 030 00 20 connecting rod for 4.3 and 5.0 SOHC V8s',url:'https://classicparts.mbusa.com/oem-parts/mercedes-benz-connecting-rod-1130300020'};
 const training={label:'DaimlerChrysler technical training · M112/M113 engine repair, technical data, p. 3',url:'https://4vezde.com/wp-content/uploads/2023/10/2001.03_%D0%A0%D0%B5%D0%BC%D0%BE%D0%BD%D1%82-%D0%B4%D0%B2%D0%B8%D0%B3%D0%B0%D1%82%D0%B5%D0%BB%D0%B5%D0%B9_%D0%9C112-%D0%9C113.pdf'};
 const fuelPlate={label:'Mercedes-Benz Classic USA · 2002 G500 fuel-system components',url:'https://classicparts.mbusa.com/v-2002-mercedes-benz-g500--base--5-0l-v8-gas/fuel-system--fuel-system-components'};
-const firing={label:'Mercedes-Benz service data · M113.962 ignition order',url:'https://charm.li/Mercedes%20Benz/2003/G%20500%20%28463.249%29%20V8-5.0L%20%28113.962%29/Repair%20and%20Diagnosis/Powertrain%20Management/Ignition%20System/Firing%20Order/Specifications/Firing%20Order/'};
+const firing={label:'Mercedes-Benz service data · M113.962 ignition order',url:'https://lemon-manuals.la/Mercedes%20Benz/2002/G%20500%20%28463.249%29%20V8-5.0L%20%28113.962%29/Repair%20and%20Diagnosis/Powertrain%20Management/Ignition%20System/Firing%20Order/'};
 
 // M113 internals: each study part names its Mercedes number. Most come from
 // the M113 5.0 diagram; the timing sprockets, chain and cover also carry G500 fitment pages.

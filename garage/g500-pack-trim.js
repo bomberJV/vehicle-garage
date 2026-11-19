@@ -17,17 +17,18 @@
 // Standard screws, nuts and clips are left out. Geometry is schematic, in study-local coordinates.
 import {metal,steel,dark,cyl,sleeve,turn,part,study,x,y,z} from './mechanism-shapes.js';
 
-const giant='https://www.mbpartsgiant.com/parts-list/2003-mercedes_benz-g500/';
-const page=(label,path)=>({label:'MB Parts Giant · 2003 G500 '+label+' diagram',url:giant+path});
+const giant=year=>'https://www.mbpartsgiant.com/parts-list/'+year+'-mercedes_benz-g500/';
+const page=(label,path,year=2002,note='')=>({label:'MB Parts Giant · '+year+' G500 '+label+' diagram'+(note&&', '+note),url:giant(year)+path});
+const unread='a later-year plate; the 2002 G500 plate could not be retrieved, so 2002 fitment of ';
 const plates={
-  ducts:page('ducts','body-hardware/ducts'),
-  dashLower:page('ignition lock and lower dash','steering/ignition-lock-steering'),
-  wheel:page('steering wheel','steering/steering-wheel'),
-  wheelTrim:page('steering wheel and trim','steering/steering-wheel-trim'),
-  column:page('steering column assembly','steering/steering-column-assembly'),
-  pillars:page('pillar interior trim','interior-exterior-trim/interior-trim-pillars'),
-  quarters:page('quarter panel interior trim','interior-exterior-trim/interior-trim-quarter-panels'),
-  backDoor:page('back door interior trim','interior-exterior-trim/interior-trim-back-door'),
+  ducts:page('ducts','body-hardware/ducts',2002,'which does not list footwell ducts 463-831-80-45 and 463-831-79-45, so their 2002 fitment is unconfirmed'),
+  dashLower:page('ignition lock and lower dash','steering/ignition-lock-steering',2003,'a later-year plate; the 2002 G500 lock cylinder listing gives cylinder 210-689-00-01 2002 G500 fitment, and the 2002 G500 plate could not be retrieved, so 2002 fitment of the center covers, trim cover and ashtray cover is unconfirmed'),
+  wheel:page('steering wheel','steering/steering-wheel',2003,'a later-year plate; the G500 steering column cover listing gives shroud 000-462-17-23-9B51 2002–2005 G500 fitment'),
+  wheelTrim:page('steering wheel and trim','steering/steering-wheel-trim',2003,'a later-year plate; the part pages give ring 463-461-00-65, lock sensor 002-542-19-18 and horn button 463-821-01-51 2002–2003 G500 fitment'),
+  column:page('steering column assembly','steering/steering-column-assembly',2003,'a later-year plate; the G500 steering column cover listing gives upper cover 203-462-07-23-9B51 2002–2003 and lower cover 203-460-01-95-9B51 2002–2005 G500 fitment'),
+  pillars:page('pillar interior trim','interior-exterior-trim/interior-trim-pillars',2003,unread+'the sill covers, scuff plates, pillar trim plate and cowl side trim is unconfirmed'),
+  quarters:page('quarter panel interior trim','interior-exterior-trim/interior-trim-quarter-panels',2003,unread+'the upper and lower quarter trims and the seat-belt trim is unconfirmed'),
+  backDoor:page('back door interior trim','interior-exterior-trim/interior-trim-back-door',2003,unread+'the trim panel, bracket, window trims, pull handle and handle covers is unconfirmed'),
   tracks:page('seat tracks and components','body-hardware/tracks-components'),
   fuel:page('fuel supply','air-fuel-delivery/fuel-supply')
 };
@@ -155,13 +156,13 @@ export const views=new Map([
 ]);
 
 const notes={
-  'g500-cabin-ducts':{fact:'The 2003 G500 ducts diagram lists the air distributor, the defroster, side, floor, center and rear ducts, their connectors, the side vent insert and nozzle and the vent grille. The ignition lock and lower dash diagram lists the two footwell ducts.',need:'Duct routing and sections are schematic. Trace them behind the dash and under the front seats.'},
+  'g500-cabin-ducts':{fact:'The 2002 G500 ducts diagram lists the air distributor, the defroster, side, floor, center and rear ducts, their connectors, the side vent insert and nozzle and the vent grille. The 2003 G500 ignition lock and lower dash diagram lists the two footwell ducts.',need:'Duct routing and sections are schematic. Trace them behind the dash and under the front seats.'},
   'g500-steering-trim':{fact:'The 2003 G500 steering wheel and trim diagram lists the trim ring, lock sensor and horn button. The steering column assembly diagram lists the upper and lower column covers, and the steering wheel diagram lists the shroud.',need:'Cover outlines and the sensor position are estimated. The lower cover 203-460-01-95 is superseded by 203-460-01-95-9051.'},
   'g500-lower-dash-trim':{fact:'The 2003 G500 ignition lock and lower dash diagram lists the center covers, the trim cover, the ashtray cover and the lock cylinder.',need:'The diagram does not say which lock the cylinder serves. Confirm on the truck. Cover outlines are schematic.'},
   'g500-sill-quarter-trim':{fact:'The 2003 G500 pillar interior trim diagram lists the sill covers, the G500 scuff plates, the pillar trim plate and the passenger cowl trim. The quarter panel interior trim diagram lists the upper and lower quarter trims and the seat-belt trim.',need:'Trim outlines are schematic. Confirm the color suffix of each part for a given interior.'},
   'g500-cargo-door-trim':{fact:'The 2003 G500 back door interior trim diagram lists the trim panel, its bracket, the three window trims, the pull handle and its covers.',need:'Panel outline and handle position are schematic. Designo interiors use other trim panel numbers.'},
-  'g500-seat-adjuster-trim':{fact:'The 2003 G500 seat tracks and components diagram lists the outer, inner and rear recline covers, the knobs, the spring, stop, support, bracket and strap.',need:'The diagram does not say where the spring, support, bracket and strap sit on the seat. Positions are estimated.'},
-  'g500-tank-pump-fittings':{fact:'The 2003 G500 fuel supply diagram lists the tank strap and insulators, the shield, the support, the filler neck and seal, the two filler caps by chassis range, the pump assembly and insulator and the fuel filter.',need:'Strap, neck and pump positions are schematic. Check which filler cap fits by chassis number.'}
+  'g500-seat-adjuster-trim':{fact:'The 2002 G500 seat tracks and components diagram lists the outer, inner and rear recline covers, the knobs, the spring, stop, support, bracket and strap.',need:'The diagram does not say where the spring, support, bracket and strap sit on the seat. Positions are estimated.'},
+  'g500-tank-pump-fittings':{fact:'The 2002 G500 fuel supply diagram lists the tank strap and insulators, the shield, the support, the filler neck and seal, the two filler caps by chassis range, the pump assembly and insulator and the fuel filter.',need:'Strap, neck and pump positions are schematic. Check which filler cap fits by chassis number.'}
 };
 export const claims=studies.flatMap(s=>{
   const bySource=new Map();

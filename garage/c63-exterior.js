@@ -2,12 +2,18 @@
 // The side elevation is read off a studio photograph registered at both wheel
 // centres (2765 mm wheelbase); heights are taken at the wheel plane. Features on
 // the centre plane (nose, tail, roof crown) sit farther from the camera, so the
-// ends are set from Mercedes' 4707 mm length instead. The rear is measured from
+// ends are set from Mercedes' published length instead (below). The rear is measured from
 // a straight-on photograph scaled by its 12-inch licence plate. The front is
 // measured from a straight-on photograph whose heights are tied to the side
 // photograph: z = 0.765 - (row - 125)/712 on the 1290-wide face crop, which
 // puts the lamp tops, the outer intakes and the bumper's lower edge where the
 // side view has them.
+// Overall length: Mercedes-Benz USA gives the US C63 AMG sedan 186.0 in
+// (4724 mm) in the 2012 C-Class sedan technical data (C63_SPEC_SOURCE) and the
+// 2014 C-Class brochure. 185.3 in (4707 mm), the figure first used here, is
+// MBUSA's C63 coupe length. The painted bumper skins span about 4705 mm; the
+// intake grille in the front apron and the diffuser fins stand proud of them
+// and make up the US sedan figure.
 import {glazingFace} from './surface-materials.js';
 import {starBadge} from './exterior-trim.js';
 import {coachwork,panel,deckPanel,tint as tone} from './exterior-coachwork.js';
@@ -426,7 +432,10 @@ function rearEnd(r,paint){
  // Bumper: a crease across it, the diffuser's chrome-edged top and four fins.
  band([[-.78,.548],[.78,.548]],[[-.78,.556],[.78,.556]],tone(paint,1.12),.005,{mirror:false,step:.04});
  band([[-.70,.446],[0,.452],[.70,.446]],[[-.70,.456],[0,.462],[.70,.456]],SILVER,.008,{mirror:false,step:.04});
- for(const y of [-.30,-.13,.13,.30])band([[y-.008,.30],[y+.008,.30]],[[y-.008,.44],[y+.008,.44]],'#24292c',.020,{mirror:false,step:.016});
+ // The fins stand 10 mm off the diffuser, just past its chrome edge; they set
+ // the car's rearmost point, and with the AMG apron's intake grille at the
+ // nose give the US sedan's 186.0 in overall length.
+ for(const y of [-.30,-.13,.13,.30])band([[y-.008,.30],[y+.008,.30]],[[y-.008,.44],[y+.008,.44]],'#24292c',.010,{mirror:false,step:.016});
  // Quad exhaust: two oval outlets each side.
  r.tag('body.structure',()=>{
   for(const y of [-.605,-.475,.475,.605]){

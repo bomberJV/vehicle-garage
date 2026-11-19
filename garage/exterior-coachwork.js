@@ -221,7 +221,13 @@ function cabin(r,cfg,paint){
     let k=1;while(k<line.length-1&&x>line[k][0])k++;const [a,h]=line[k-1],[b,g]=line[k];return [x,mix(h,g,Math.max(0,Math.min(1,(x-a)/(b-a))))];};
    surround([roof[i-1],roof[i],inset(roof[i]),inset(roof[i-1])],tint(paint,1.02));
   }
-  surround([roof.at(-1),rear[1],last[3],topEnd],tint(paint,.94));
+  // cfg.sailTints: shade the C-pillar sail in rows, top to bottom, so it reads as
+  // a curved panel rather than one flat quad. Columns fade slightly toward the deck.
+  if(cfg.sailTints){
+   const A=roof.at(-1),B=rear[1],C=last[3],D=topEnd,n=cfg.sailTints.length,m=6;
+   const P=(u,w)=>{const t=[mix(A[0],B[0],u),mix(A[1],B[1],u)],b=[mix(D[0],C[0],u),mix(D[1],C[1],u)];return [mix(t[0],b[0],w),mix(t[1],b[1],w)];};
+   for(let j=0;j<n;j++)for(let i=0;i<m;i++)surround([P(i/m,j/n),P((i+1)/m,j/n),P((i+1)/m,(j+1)/n),P(i/m,(j+1)/n)],tint(paint,cfg.sailTints[j]*(1-.05*(i+.5)/m)));
+  }else surround([roof.at(-1),rear[1],last[3],topEnd],tint(paint,.94));
   const next=rearWindow||quarter;
   surround([frontWindow[3],frontWindow[2],next[1],next[0]],SEAL);
   if(rearWindow&&quarter)surround([rearWindow[3],rearWindow[2],quarter[1],quarter[0]],SEAL);

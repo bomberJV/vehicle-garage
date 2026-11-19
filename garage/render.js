@@ -589,7 +589,9 @@ export class GarageRenderer{
  }
  // HR-V: 12.3-inch front and 12.2-inch rear discs on every trim, whatever the wheel.
  const disc=vehicle==='g500'?(x<0?.1575:.136):baseVehicle(vehicle)==='hrv'?.160:stockRadius*.81;
- this.tag('wheels.disc',()=>{const plane=y-side*.025;if(vehicle==='g500'){drawG500InstalledRotor(this,x>0,side);return;}const bore=baseVehicle(vehicle)==='hrv'?.062:.045;this.ringY(x,plane,z,disc,bore,baseVehicle(vehicle)==='hrv'?'#585f63':'#717b80',N);this.ringY(x,plane-side*.018,z,disc,bore,'#525b60',N);this.tubeY(x,plane-side*.018,plane,z,disc,'#899395',N);});
+ this.tag('wheels.disc',()=>{const plane=y-side*.025;if(vehicle==='g500'){drawG500InstalledRotor(this,x>0,side);return;}const bore=baseVehicle(vehicle)==='hrv'?.062:.045;this.ringY(x,plane,z,disc,bore,baseVehicle(vehicle)==='hrv'?'#585f63':'#596166',N);this.ringY(x,plane-side*.018,z,disc,bore,'#454d51',N);this.tubeY(x,plane-side*.018,plane,z,disc,'#6c7579',N);
+  // Behind the spokes the disc sits in the wheel's shadow: a darker hat inside the swept ring.
+  this.ringY(x,plane+side*.002,z,disc*.55,bore,'#3b4245',N);});
  this.tag('wheels.hub',()=>{
   if(vehicle==='g500'&&x<0){
    const profile=[[-.070,.021],[-.070,.025],[-.045,.025],[-.041,.0275],[.020,.0275],[.024,.039],[.040,.039],[.040,.0424],[.050,.0424],[.050,.021],[-.070,.021]];

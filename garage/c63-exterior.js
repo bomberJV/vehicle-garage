@@ -31,7 +31,7 @@ const rearWindow=[[.405,.971],[.405,1.335],[.92,1.297],[.92,.987]];
 const quarter=[[.985,.989],[.985,1.272],[1.20,1.165],[1.34,.997]];
 export const c63Body={
  wb:2.76,arch:.385,axleZ:.367,base:.27,hoodEnd:-.83,deckStart:1.64,
- door:[-.76,.345,1.17],doorSill:.335,belt:.945,roofZ:1.405,roofWidth:.60,cabinWidth:.795,roofCrown:.036,screenSweep:.015,sideRound:.014,roofPinch:.02,
+ door:[-.76,.345,1.17],doorSill:.335,belt:.945,roofZ:1.405,roofWidth:.60,cabinWidth:.795,roofCrown:.036,screenSweep:.015,sideRound:.026,sailTints:[1.05,1.01,.97,.93,.90,.87],roofPinch:.02,
  hoodFrac:.77,hoodCrown:.032,customEnds:true,capFollowsSide:true,
  cabin:{cargo:[1.66,.40,.36],sillEnd:1.02,rearSeat:[1.18,1.49,.385,.515,1.40,1.49]},
  sideSection:(w,l)=>w+c63Side(l),
@@ -176,10 +176,11 @@ function frontEnd(r,paint){
  band(lampLow,lampTop,'#1a1f22',.008,{...lamp,step:.02});
  band(shift(lampLow,.012),shift(lampTop,-.010),'#7e898f',.010,{...lamp,from:.50,to:.80,step:.02});
  band(shift(lampLow,.018),shift(lampTop,-.016),'#3b454b',.011,{...lamp,from:.51,to:.795,step:.02});
- for(const [y0,z,rad] of [[.560,.735,.038],[.680,.758,.052]])for(const y of [-y0,y0]){
-  ringOn(r,s,'lighting.headlamp',y,z,rad,rad,'#a8b3b8',.012);
-  ringOn(r,s,'lighting.headlamp',y,z,rad*.80,rad*.80,'#2a3439',.0125);
-  ringOn(r,s,'lighting.headlamp',y,z,rad*.48,rad*.48,r.lights?'#eef3ee':'#8d9ca2',.013);
+ for(const [y0,z,rad] of [[.560,.722,.036],[.680,.728,.046]])for(const y of [-y0,y0]){
+  // Satin surrounds and dark lenses: with the lamps off the real projectors barely show.
+  ringOn(r,s,'lighting.headlamp',y,z,rad,rad,'#727e83',.012);
+  ringOn(r,s,'lighting.headlamp',y,z,rad*.80,rad*.80,'#20282c',.0125);
+  ringOn(r,s,'lighting.headlamp',y,z,rad*.48,rad*.48,r.lights?'#eef3ee':'#4a575d',.013);
  }
  band(shift(lampLow,.004),shift(lampLow,.013),r.lights?'#f6faf7':'#dfe7e8',.013,{...lamp,from:.51,to:.80,step:.02});
  band(lampLow,lampTop,null,.017,{...lamp,glass:true,step:.02});
@@ -217,15 +218,18 @@ function frontEnd(r,paint){
  r.tag('lighting.headlamp',()=>{for(const side of [-1,1]){
   const tip=-1.80,xs=[s.x0,-2.07,-2.04,-2.00,-1.96,-1.92,-1.88,-1.84,tip];
   const e=s.edge(.74),t=x=>clamp((x-s.x0)/(tip-s.x0));
-  const lo=x=>mix(Z(edgeAt(lampLow,e)),.795,t(x)**1.15),hi=x=>mix(Z(edgeAt(lampTop,e)),.812,Math.sqrt(t(x)));
+  // The top edge stays under the fender's shut line, as the lamp on the front face does.
+  const lo=x=>mix(Z(edgeAt(lampLow,e)),.795,t(x)**1.15),hi=x=>Math.min(mix(Z(edgeAt(lampTop,e)),.812,Math.sqrt(t(x))),section(x)[1]-.006);
   for(let i=1;i<xs.length;i++){
    const p=(x,z,dy)=>sideAt(x,z,dy,side);
    // Same layers as the front of the lamp: housing, grey reflector, LED strip along the bottom.
-   const layer=(l0,l1,dy,color)=>{const a=xs[i-1],b=xs[i];if(l1(a)-l0(a)<.002&&l1(b)-l0(b)<.002)return;
-    const q=[p(a,l0(a),dy),p(b,l0(b),dy),p(b,Math.max(l0(b)+.0005,l1(b)),dy),p(a,Math.max(l0(a)+.0005,l1(a)),dy)];r.polygon(side<0?q:q.reverse(),color,false);};
-   layer(lo,hi,.006,'#1a1f22');
-   layer(x=>lo(x)+.012*(1-t(x)),x=>hi(x)-.010*(1-t(x)),.008,'#55616a');
-   layer(x=>lo(x)+.003*(1-t(x)),x=>lo(x)+.010*(1-t(x)),.009,r.lights?'#f6faf7':'#dfe7e8');
+   // Split in height so each piece follows the fender's curve instead of cutting into it.
+   const layer=(l0,l1,dy,color)=>{const a=xs[i-1],b=xs[i],ha=Math.max(l0(a)+.0005,l1(a)),hb=Math.max(l0(b)+.0005,l1(b));if(ha-l0(a)<.002&&hb-l0(b)<.002)return;
+    const m=Math.max(1,Math.ceil(Math.max(ha-l0(a),hb-l0(b))/.02));
+    for(let k=0;k<m;k++){const q=[p(a,mix(l0(a),ha,k/m),dy),p(b,mix(l0(b),hb,k/m),dy),p(b,mix(l0(b),hb,(k+1)/m),dy),p(a,mix(l0(a),ha,(k+1)/m),dy)];r.polygon(side<0?q:q.reverse(),color,false);}};
+   layer(lo,hi,.007,'#1a1f22');
+   layer(x=>lo(x)+.012*(1-t(x)),x=>hi(x)-.010*(1-t(x)),.009,'#6c777d');
+   layer(x=>lo(x)+.003*(1-t(x)),x=>lo(x)+.010*(1-t(x)),.010,r.lights?'#f6faf7':'#dfe7e8');
   }
  }});
 }

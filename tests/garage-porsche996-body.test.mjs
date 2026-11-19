@@ -27,6 +27,21 @@ test('the 1999 Carrera Cabriolet matches the published spans with the top raised
   assert.equal(mm.frontTrack,1455);assert.equal(mm.rearTrack,1500);
 });
 
+test('the stock 996 mesh is within 3 mm of the published length, body width, height and wheelbase',()=>{
+  // auto-data.net and cararac list 4,430 x 1,765 x 1,305 mm on a 2,350 mm wheelbase.
+  const {meters}=measureStockMesh('porsche996cab',faces);
+  for(const [id,published] of [['length',4430],['bodyWidth',1765],['height',1305],['wheelbase',2350]]){
+    assert(Math.abs(meters[id]*1000-published)<=3,id+' '+(meters[id]*1000).toFixed(1));
+  }
+});
+
+test('the 996 licence plate sits in its recess instead of setting the overall length',()=>{
+  const plate=faces.filter(f=>f.part==='shell.bumpers'&&f.points.every(([x,y,z])=>x>2.1&&Math.abs(y)<=.1471&&z>.41&&z<.52));
+  assert(plate.length>0);
+  const lid=Math.max(...faces.filter(f=>f.part==='shell.deck').flatMap(f=>f.points).map(p=>p[0]));
+  assert(Math.max(...plate.flatMap(f=>f.points).map(p=>p[0]))<lid);
+});
+
 test('the lofted plan follows the rescue sheet outline from nose to tail',()=>{
   // Mirrors and door handles stand outside the sheet's body outline.
   for(const [x,w] of planOutline996){

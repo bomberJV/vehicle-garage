@@ -25,6 +25,8 @@ import {getSLStudy} from './sl550-studies.js';
 import {getG500M113Internals} from './g500-m113-internals.js';
 import {getG500CatalogStudy} from './g500-catalog-studies.js';
 import {getG500PackStudy} from './g500-packs.js';
+import {getP992CatalogStudy} from './porsche992-catalog-studies.js';
+import {getP992PackStudy} from './p992-packs.js';
 const lookups=[getG500M113Internals,getG500CatalogStudy,getG500PackStudy,getSLStudy,getBmwLighting,getBmwCabinDetail,getBmwFuelDetail,
   getM54DisaDetail,
   getCivilAirframeService,getCivilServiceDetail,
@@ -32,7 +34,7 @@ const lookups=[getG500M113Internals,getG500CatalogStudy,getG500PackStudy,getSLSt
   getPorscheCoolingDetail,getPorscheSpoilerDetail,getDoorDetail,getMarinePropulsionDetail,getFloorDetail,
   getBikeDetail,getRoadDetail,getSaturnDetail,getSpaceEnvironment,
   getSpaceDetail,getFleetDetail,getRoadConstruction,getPistonDetail
-];
+,getP992CatalogStudy,getP992PackStudy];
 const cache=new Map();
 export function getDetail(vehicle,part) {
   if(!vehicle||!part)return null;

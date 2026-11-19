@@ -98,7 +98,7 @@ const layouts={
  f350:{box:'E4OD four-speed automatic',desc:'The E4OD four-speed automatic with overdrive sits behind the 7.5-litre V8. A propeller shaft drives the second-generation Sterling 10.25 full-floating rear axle on this two-wheel-drive truck. Lengths, diameters and offsets are estimated.'},
  bmws1000rr:{box:'Six-speed motorcycle gearbox',desc:'A wet multi-plate clutch feeds the six-speed gearbox. A chain connects its small output sprocket to the larger sprocket fixed to the rear wheel.'},
 };
-withVariants(layouts);
+withVariants(layouts,{hrvlx:{desc:layouts.hrv.desc.replace('HR-V EX-L','HR-V LX')}});
 function register(id,rows){
  const spec=layouts[id],parts=rows.map(([key,name,description,offset,draw,source])=>({id:'drivetrain.'+key,name,description,offset,category:'service',draw,...(source?{source}:{})}));
  return {id:'drivetrain',name:'Transmission & final drive',description:spec.desc,source:references[id],parts,view:'hero',internal:true,category:'service'};

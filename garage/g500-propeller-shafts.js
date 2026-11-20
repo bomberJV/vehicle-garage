@@ -146,7 +146,7 @@ export function drawG500Gearbox(r){
  r.polygon(shoulder,steel,false);
  // The starter boss bulges from the right of the bellhousing flange to the
  // starter's mounting face. Its outline is estimated.
- const boss=[[.150,.600],[.215,.585],[.305,.600],[.312,.665],[.255,.690],[.160,.705]];
+ const boss=[[.150,.600],[.215,.585],[.305,.600],[.312,.655],[.255,.680],[.160,.695]];
  const bell=[caseFront[0]-.006,caseFront[0]+.008];
  const bossFace=boss.map(([yy,zz])=>[bell[0],yy,zz]),bossRear=boss.map(([yy,zz])=>[bell[1],yy,zz]);
  r.polygon(bossFace,metal,false);r.polygon([...bossRear].reverse(),steel,false);

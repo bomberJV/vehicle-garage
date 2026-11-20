@@ -18,6 +18,7 @@ import {FLEET,vehicleDomain,vehicleType,hasBuildPlan} from './fleet.js';
 import {VEHICLES,FINISHES,CATEGORIES,CHECKED} from './catalog.js';
 import {DEFAULT_BUILD,sanitizeBuild,availableParts,accounting,togglePart,presetBuild,importBuild,money,exportText} from './model.js';
 import {GarageRenderer} from './render.js';
+import {bindZoomSlider} from './zoom-slider.js';
 import {getAssemblies,getAssembly,getComponent} from './assemblies.js';
 const $=id=>document.getElementById(id),KEY='brandon-garage-v1';let build=sanitizeBuild(DEFAULT_BUILD),byVehicle={},saved=[],palette=[],category='all',search='';
 function status(message){$('status').textContent=message;}
@@ -36,6 +37,7 @@ try{
 }catch{status('A saved build could not be loaded. Starting with a clean workbench.');}
 function persist(){byVehicle[build.vehicle]=build;try{localStorage.setItem(KEY,JSON.stringify({build,byVehicle,saved,palette}));}catch{$('storage-note').textContent='Browser saving is unavailable. Export your build JSON to keep it.';}}
 const renderer=new GarageRenderer($('vehicle-canvas'));
+bindZoomSlider(renderer,$('zoom-range'),$('zoom-readout'));
 let inspection={vehicle:null,assembly:null,part:null,expanded:false};
 const detailTrail=[];
 function el(tag,className,text){const e=document.createElement(tag);if(className)e.className=className;if(text!==undefined)e.textContent=text;return e;}

@@ -124,9 +124,10 @@ export function drawG500ElectronicShared(r,key){
   terminal(r,A.alternator);return;
  }
  if(key==='starter'){
-  // The starter lies along the right side of the block and ends at the
-  // engine/transmission joint, ahead of the bulkhead and above the crossmember.
-  cyl(r,[-1.06,.26,.635],x,0,.18,.045,'#65747c',10);cyl(r,[-1.03,.30,.69],x,0,.11,.022,black,8);
+  // The starter lies along the right side of the block. Its rear flange
+  // seats 1.5 mm from the starter boss on the bellhousing, ahead of the bulkhead
+  // and above the crossmember.
+  cyl(r,[-1.06,.26,.635],x,0,.1835,.045,'#65747c',10);cyl(r,[-1.03,.30,.69],x,0,.11,.022,black,8);
   terminal(r,A.starter);return;
  }
 }

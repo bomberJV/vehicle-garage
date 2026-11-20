@@ -40,7 +40,7 @@ function clearances(mode,a,list){
 test('the G500 gearbox clears the floor, the bulkhead, the frame and the console at either depicted pose',()=>{
   assert.deepEqual(poses,['stock','g500-orc-40']);
   const gaps=[['floor.pan',8.0],['floor.underlay',35.2],['floor.carpet',34.6],['body.structure',32.1],['suspension.frame',35.0],
-    ['body.center-console',131.3],['electrical.starter',36.9],['electrical.primary-power',85.0],['evap.purge-line',125.1]];
+    ['body.center-console',131.3],['electrical.starter',1.5],['electrical.primary-power',85.0],['evap.purge-line',125.1]];
   for(const mode of poses){
     clearances(mode,faces=>part(faces,'drivetrain.gearbox'),gaps);
     // The transmission plug is the only other part that enters the case.
@@ -93,8 +93,8 @@ test('the starter lies along the block ahead of the bellhousing and its cables s
   for(const mode of poses){
     const faces=meshes.get(mode),starter=faces.filter(f=>f.part==='electrical.starter').flatMap(f=>f.points);
     assert(Math.max(...starter.map(p=>p[0]))<m113RearFace,`${mode}: the starter ends ahead of the engine/transmission joint`);
-    clearances(mode,f=>part(f,'electrical.starter'),[['powertrain.sump',24.3],['powertrain.block',26.8],['body.structure',131.0],['floor.pan',55.9],
-      ['differentials.front-shaft',[129.7,155.8]]]);
+    clearances(mode,f=>part(f,'electrical.starter'),[['powertrain.sump',24.3],['powertrain.block',26.8],['body.structure',127.5],['floor.pan',54.1],
+      ['differentials.front-shaft',[129.5,155.4]]]);
     assert.deepEqual(crossedParts(faces,part(faces,'electrical.starter'),'electrical.starter'),['electrical.primary-power']);
     // Ahead of the bulkhead the cables meet only their three terminals.
     const cables=bayCables(faces);

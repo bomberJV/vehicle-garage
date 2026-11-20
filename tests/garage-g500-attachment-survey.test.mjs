@@ -60,12 +60,14 @@ test('every group of installed G500 parts that hangs clear of the rest is in the
 
 test('the board states the number of unattached groups and the widest gaps',()=>{
   assert.equal(reach,.005);
-  assert.equal(found.length,38);
+  assert.equal(found.length,37);
   assert.deepEqual(found.slice(0,3).map(e=>[e.members.join(' + '),seen[e.members.join(' + ')]]),[
     ['cooling.heater-pump','45.1 mm from body.fender-liner-right'],['body.gps-antenna','35.1 mm from lighting.housing'],['hvac.drier','33.7 mm from intake.intake-duct']]);
   // The compressor is within reach of the front differential at stock height and not of the engine.
   assert.equal(seen['hvac.compressor'],'g500-orc-40: 7.6 mm from differentials.front');
+  // The starter seats 1.5 mm from its boss on the bellhousing and is joined to the gearbox.
+  assert(!('electrical.starter' in seen));
   const open=row('g500-unattached-parts');
   assert.equal(open.status,'open');
-  for(const figure of ['5 mm','38 groups','45.1 mm','35.1 mm','33.7 mm'])assert(open.description.includes(figure),`the survey row states ${figure}`);
+  for(const figure of ['5 mm','37 groups','45.1 mm','35.1 mm','33.7 mm'])assert(open.description.includes(figure),`the survey row states ${figure}`);
 });

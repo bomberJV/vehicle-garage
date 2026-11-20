@@ -106,8 +106,9 @@ const caseRings=()=>caseStations.map(([d,rad])=>{
 // and the height are estimates, not a measured installation.
 export const g500AtfPanOutline=[[-.188,-.111],[-.152,-.139],[.132,-.139],[.185,-.094],[.177,.117],[.145,.135],[-.159,.135],[-.188,.093]];
 export const g500AtfPan=[-.625,-.030,.436];
-// The rail face stands 1 mm above the gasket and the housing roof 1 mm above the solenoids.
-const railHeight=.007,housingHeight=.084;
+// The rail face stands 1 mm above the gasket and the housing ceiling 1 mm above
+// the solenoids. The shoulder is high enough to run into the round case.
+const railHeight=.007,ceilingHeight=.084,shoulderHeight=.109;
 // A cooler union stands on a flat facet on either flank of the bell, ahead of
 // the bulkhead. The right one sits low, above the front propeller shaft. The
 // left one sits higher so its pipe clears the shoulder of the hydraulic housing.
@@ -120,23 +121,29 @@ export function g500CoolerUnion(side){
  return {at,axis:normal[1]*side>0?normal:normal.map(n=>-n)};
 }
 
-export function drawG500Gearbox(r){
- // Body and bell contours are estimated. The tail face meets the CV joint.
+// The case alone, as the engine view shows it. Body and bell contours are
+// estimated. The tail face meets the CV joint.
+export function drawG500GearboxCase(r){
  const front=caseFront,rear=gearboxOutput,segments=caseSegments,rings=caseRings();
  for(let j=1;j<rings.length;j++)for(let i=0;i<segments;i++){const k=(i+1)%segments;r.polygon([rings[j-1][i],rings[j-1][k],rings[j][k],rings[j][i]],i<12?steel:dark,false);}
  sleeve(r,front,x,-.006,.008,.184,.156,metal,24);
  piercedRing(r,rear,x,-.025,0,.054,.021,6,.0044,.046,'to');
+}
+
+export function drawG500Gearbox(r){
+ drawG500GearboxCase(r);
  // The hydraulic housing hangs under the main case and ends in the pan rail.
  // It is open underneath: the valve body, conductor plate and solenoids stand
- // inside it, and the pan and gasket close it from below.
+ // inside it under its ceiling, and the pan and gasket close it from below.
  const ring=(scale,height)=>g500AtfPanOutline.map(([u,v])=>[g500AtfPan[0]+u*scale,g500AtfPan[1]+v*scale,g500AtfPan[2]+height]);
- const rail=ring(1,railHeight),face=ring(.96,railHeight),roof=ring(1,housingHeight);
+ const rail=ring(1,railHeight),face=ring(.96,railHeight),shoulder=ring(1,shoulderHeight);
  for(let i=0;i<rail.length;i++){
   const k=(i+1)%rail.length;
-  r.polygon([rail[i],rail[k],roof[k],roof[i]],steel,false);
+  r.polygon([rail[i],rail[k],shoulder[k],shoulder[i]],steel,false);
   r.polygon([rail[i],rail[k],face[k],face[i]],metal,false);
  }
- r.polygon(roof,steel,false);
+ r.polygon(ring(1,ceilingHeight),dark,false);
+ r.polygon(shoulder,steel,false);
 }
 
 // The outer propellers have two cross joints each. Distances between working flanges

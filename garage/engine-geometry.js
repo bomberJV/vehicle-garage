@@ -1,5 +1,5 @@
 import {m113Stations,m113CrankZ,m113PanRail,m113PanOutline,drawM113Group} from './g500-m113-geometry.js';
-import {drawG500Gearbox} from './g500-propeller-shafts.js';
+import {drawG500GearboxCase} from './g500-propeller-shafts.js';
 import {sharedOilKeys,drawG500EngineOilPart} from './g500-oil-circuits.js';
 import {drawG500ElectronicShared} from './g500-electronic-network.js';
 import {drawRoadBrakeMaster} from './road-service-systems.js';
@@ -229,7 +229,7 @@ export function buildEngineBay(r,definition=null,{detail=true,fuelSystemOwnsRail
  tag('belt',()=>{const x=-L/2-.148,points=[[x,0,crankRise-.07],[x,-.29,.04],[x,-.28,.145],[x,0,.28],[x,.22,.12],[x,.31,-.04],[x,0,crankRise-.07]];for(let i=1;i<points.length;i++){const a=points[i-1],b=points[i],v=b.map((q,j)=>q-a[j]),len=Math.hypot(v[1],v[2]),n=[0,-v[2]/len*.006,v[1]/len*.006];poly([a.map((q,j)=>q+n[j]),b.map((q,j)=>q+n[j]),b.map((q,j)=>q-n[j]),a.map((q,j)=>q-n[j])],BLACK);}rotating.tube([x-.004,0,0],[x+.008,0,0],.071,.033,DARK,14);});
  if(id==='g500'&&!g500ServiceOwnsFlow)tag('starter',()=>drawG500ElectronicShared(r,'starter'));
  if(id!=='g500'&&!ford)tag('starter',()=>{const end=honda?.15:.19,sz=honda?.04:0;cyl([L/2+(honda?.03:.01),.21,-.08+sz],[L/2+end,.21,-.08+sz],.045,CAST,12);cyl([L/2+.04,.25,-.025+sz],[L/2+.15,.25,-.025+sz],.022,BLACK,10);});
- tag('transmission',()=>{if(id==='g500'){drawG500Gearbox(r);return;}if(ford){drawE4OD(r);return;}if(m54){drawE46Gearbox(r);return;}if(honda){cyl([L/2+.02,0,0],[L/2+.06,0,0],.145,CAST,18);cyl([L/2+.06,0,0],[L/2+.10,0,0],.12,CAST,18);for(const a of [0,1,2,3,4,5]){const q=a*Math.PI/3;cyl([L/2+.021,.14*Math.cos(q),.14*Math.sin(q)],[L/2+.035,.14*Math.cos(q),.14*Math.sin(q)],.010,METAL,8);}return;}const a=[L/2+.03,0,-.035],b=[L/2+.56,0,-.06];if(trans){box(L/2+.01,-.17,-.20,L/2+.36,.18,.15,CAST);for(let x=L/2+.03;x<L/2+.34;x+=.065)box(x,-.185,-.16,x+.014,.185,-.13,METAL);}else{cyl(a,[L/2+.15,0,-.035],.18,CAST,14);cyl([L/2+.15,0,-.035],b,.105,CAST,12);for(let x=L/2+.22;x<L/2+.53;x+=.08)tube([x,0,-.06],[x+.012,0,-.06],.115,.10,DARK,12);}});
+ tag('transmission',()=>{if(id==='g500'){drawG500GearboxCase(r);return;}if(ford){drawE4OD(r);return;}if(m54){drawE46Gearbox(r);return;}if(honda){cyl([L/2+.02,0,0],[L/2+.06,0,0],.145,CAST,18);cyl([L/2+.06,0,0],[L/2+.10,0,0],.12,CAST,18);for(const a of [0,1,2,3,4,5]){const q=a*Math.PI/3;cyl([L/2+.021,.14*Math.cos(q),.14*Math.sin(q)],[L/2+.035,.14*Math.cos(q),.14*Math.sin(q)],.010,METAL,8);}return;}const a=[L/2+.03,0,-.035],b=[L/2+.56,0,-.06];if(trans){box(L/2+.01,-.17,-.20,L/2+.36,.18,.15,CAST);for(let x=L/2+.03;x<L/2+.34;x+=.065)box(x,-.185,-.16,x+.014,.185,-.13,METAL);}else{cyl(a,[L/2+.15,0,-.035],.18,CAST,14);cyl([L/2+.15,0,-.035],b,.105,CAST,12);for(let x=L/2+.22;x<L/2+.53;x+=.08)tube([x,0,-.06],[x+.012,0,-.06],.115,.10,DARK,12);}});
  tag('engine-mounts',()=>{for(const side of [-1,1]){
   if(id==='g500'){
    // Each rubber mount stands on a bracket on the inner face of the frame rail,

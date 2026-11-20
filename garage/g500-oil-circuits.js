@@ -5,6 +5,7 @@ import {g500FluidAccess} from './g500-engine-bay.js';
 import {box,path,plus,metal,alloy,iron,rubber} from './road-service-geometry.js';
 import {slab} from './section-primitives.js';
 import {fluidRefs as ref} from './g500-fluid-refs.js';
+import {g500AtfPan,g500AtfPanOutline,g500CoolerUnion} from './g500-propeller-shafts.js';
 
 const oilColor='#9c884c';
 const local=([x,y,z])=>[-1.235+x,y,.57+z];
@@ -107,7 +108,8 @@ export const oilRows=[
 export const sharedOilKeys=new Set(oilParts.map(row=>row[0]));
 
 // Cross-section of the shallow stamped transmission pan and its rolled sealing lip.
-const pan=[-.558,0,.356],panOutline=[[-.188,-.111],[-.152,-.139],[.132,-.139],[.185,-.094],[.177,.117],[.145,.135],[-.159,.135],[-.188,.093]];
+// The pan seals against the rail under the 722.6 case, which sets its position.
+const pan=g500AtfPan,panOutline=g500AtfPanOutline;
 export function panShell(r,c,scale=1){
  const ring=(factor,h)=>panOutline.map(([u,v])=>plus(c,[u*factor*scale,v*factor*scale,h*scale]));
  const bottom=ring(.92,-.060),top=ring(1,0),inside=ring(.90,-.048),lip=ring(.95,0);
@@ -143,8 +145,6 @@ export function drawG500PickupFilter(r,c,scale=1){
 const cooler=[-2.066,0,.712];
 // The header unions stand 3 mm proud of the condenser face.
 const coolerPorts=[[-2.063,-.407,.687],[-2.063,.407,.737]];
-// The right union sits lower so the front shaft clears it when the body is lifted.
-const union=s=>[-.644,s*.155,s>0?.405:.426];
 export const atfRows=[
  ['pan','Transmission oil pan','The shallow stamped pan holds the fluid beneath the five-speed automatic. Its rim and the case clamp the perimeter gasket.',[.14,-.10,-.27],ref.atfPan,r=>panShell(r,pan)],
  ['pan-seal','Pan gasket and drain plug','A molded gasket follows the irregular pan rim. A separate sealing washer sits underneath the drain plug.',[.12,.22,-.15],ref.atfPan,r=>{
@@ -153,11 +153,11 @@ export const atfRows=[
  }],
  ['filter','Transmission suction filter','The MANN replacement measures 111 mm across its body. The 28 mm outlet neck seals into the valve body above.',[-.10,-.23,-.15],ref.atfFilter,r=>drawG500PickupFilter(r,plus(pan,[.006,-.005,-.031]))],
  ['valve-body','Hydraulic valve body','The casting carries fluid between the control valves. The plate above it carries the electrical contacts and speed sensors.',[.13,.25,.08],ref.shift,r=>{
-  slab(r,pan[0],0,pan[2]+.009,.324,.209,.035,alloy,.018);
+  slab(r,pan[0],pan[1],pan[2]+.009,.324,.209,.035,alloy,.018);
   for(const yy of [-.054,-.013,.028,.069])box(r,plus(pan,[.013,yy,.007]),[.253,.010,.007],iron);
  }],
  ['conductor-plate','Conductor plate and six solenoids','The 722.6 conductor plate connects three shift solenoids, two pressure-control solenoids and the converter-clutch solenoid to the transmission controller.',[-.11,.18,.18],ref.shift,r=>{
-  slab(r,pan[0]+.006,0,pan[2]+.045,.307,.190,.009,rubber,.018);
+  slab(r,pan[0]+.006,pan[1],pan[2]+.045,.307,.190,.009,rubber,.018);
   for(const s of [-1,1])for(let i=0;i<3;i++)cyl(r,plus(pan,[-.101+i*.097,s*.066,.051]),z,0,.032,.014,iron,10);
   cyl(r,plus(pan,[.112,.094,.055]),y,-.005,.032,.016,rubber,12);
  }],
@@ -175,13 +175,14 @@ export const atfRows=[
   }
  }],
  ...[-1,1].map((s,i)=>[s<0?'left-line':'right-line',s<0?'Driver-side cooler pipe':'Passenger-side cooler pipe','The bent steel pipe runs forward from a transmission-case union. The short front connection joins the pipe to its cooler header.',[-.03,s*.29,-.09],ref.atfCooler,r=>{
-  const c=union(s),front=[-1.888,s*.433,.487];
-  cyl(r,c,y,-.014,.014,.014,alloy,6);
+  // Each union stands 1 mm off the bell.
+  const {at,axis}=g500CoolerUnion(s),c=plus(at,axis.map(n=>n*.015)),front=[-1.888,s*.433,.487];
+  cyl(r,c,axis,-.014,.014,.014,alloy,6);
   // The pipe climbs beside the sump, inboard of the coil spring and over the axle,
   // then passes outboard of the compressor or alternator to the cooler header.
   const run=s>0?[[-1.565,.25,.61],[-1.585,.40,.585],[-1.80,.43,.53]]:[[-1.572,-.25,.60],[-1.605,-.375,.60],[-1.80,-.40,.55]];
-  const back=s>0?[[-.70,.228,.405],[-.788,.262,.425],[-.981,.285,.47],[-1.05,.27,.572]]:[[-.788,-.208,.435],[-.981,-.228,.420],[-1.05,-.252,.572]];
-  path(r,[c,...back,[-1.30,s*.245,.607],...run,front],.008,metal);
+  const back=s>0?[[-.788,.262,.425],[-.981,.285,.47],[-1.05,.27,.572]]:[[-.788,-.208,.435],[-.981,-.228,.420],[-1.05,-.252,.572]];
+  path(r,[c,plus(at,axis.map(n=>n*.045)),...back,[-1.30,s*.245,.607],...run,front],.008,metal);
   path(r,[front,[-1.970,s*.516,.514],[-2.042,s*.523,.558],[-2.060,s*.488,coolerPorts[i][2]],coolerPorts[i]],.009,rubber);
  }])
 ];

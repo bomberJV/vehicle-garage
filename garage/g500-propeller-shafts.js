@@ -84,26 +84,66 @@ export const g500InputShaftStudy=study('g500-input-shaft','Transmission-to-trans
  'Both CV housings and the spindle turn together between the transmission and transfer case.');
 g500InputShaftStudy.sources=[shaftRefs.intermediate,shaftRefs.welte,shaftRefs.interface];
 
-export function drawG500Gearbox(r){
- // Body and bell contours are estimated. The tail face meets the CV joint, and
- // the body sits over the separate pan and hydraulic assembly at their installed height.
- // The bellhousing flange meets the rear face of the block and upper pan,
- // 359 mm behind the middle of the crankshaft. A 1 mm joint line keeps the
- // two mating faces from sharing a plane.
- const front=[m113RearFace+.007,0,m113CrankZ],rear=gearboxOutput;
- // The bell narrows to the main case ahead of the bulkhead. The case then
- // tapers under the floor tunnel, and a short neck carries the output flange
- // below the front of the center console.
- const stations=[[0,.173],[.018,.177],[.10,.148],[.16,.134],[.30,.112],[.345,.095],[.368,.046],[rear[0]-front[0]-.024,.045]];
- const segments=18;
- const rings=stations.map(([d,rad])=>{
-  const f=d/(rear[0]-front[0]);return Array.from({length:segments},(_,i)=>{
-   const a=TAU*i/segments;return [front[0]+d,front[1]+(rear[1]-front[1])*f+Math.cos(a)*rad,front[2]+(rear[2]-front[2])*f+Math.sin(a)*rad];
-  });
+// The 722.6 case as rings along the line from the crankshaft to the output flange.
+// The bellhousing flange meets the rear face of the block and upper pan,
+// 359 mm behind the middle of the crankshaft. A 1 mm joint line keeps the
+// two mating faces from sharing a plane.
+const caseFront=[m113RearFace+.007,0,m113CrankZ],caseSegments=18;
+// The bell narrows to the main case ahead of the bulkhead. The case then
+// tapers under the floor tunnel, and a short neck carries the output flange
+// below the front of the center console.
+const caseStations=[[0,.173],[.018,.177],[.10,.148],[.16,.134],[.30,.112],[.345,.095],[.368,.046],[gearboxOutput[0]-caseFront[0]-.024,.045]];
+const caseRings=()=>caseStations.map(([d,rad])=>{
+ const f=d/(gearboxOutput[0]-caseFront[0]);return Array.from({length:caseSegments},(_,i)=>{
+  const a=TAU*i/caseSegments;return [caseFront[0]+d,caseFront[1]+(gearboxOutput[1]-caseFront[1])*f+Math.cos(a)*rad,caseFront[2]+(gearboxOutput[2]-caseFront[2])*f+Math.sin(a)*rad];
  });
+});
+// The oil pan bolts to a flat rail under the case. `g500AtfPan` is the middle
+// of the pan rim. The front propeller shaft passes along the right of the pan
+// at the same height, so the rail stands 30 mm left of the crank line; the
+// engine and the shaft keep their fitted positions. The rail height keeps the
+// solenoids under the lowest part of the round case. The outline, the offset
+// and the height are estimates, not a measured installation.
+export const g500AtfPanOutline=[[-.188,-.111],[-.152,-.139],[.132,-.139],[.185,-.094],[.177,.117],[.145,.135],[-.159,.135],[-.188,.093]];
+export const g500AtfPan=[-.625,-.030,.436];
+// The rail face stands 1 mm above the gasket and the housing ceiling 1 mm above
+// the solenoids. The shoulder is high enough to run into the round case.
+const railHeight=.007,ceilingHeight=.084,shoulderHeight=.109;
+// A cooler union stands on a flat facet on either flank of the bell, ahead of
+// the bulkhead. The right one sits low, above the front propeller shaft. The
+// left one sits higher so its pipe clears the shoulder of the hydraulic housing.
+// `at` is the middle of the facet and `axis` points out of it.
+export function g500CoolerUnion(side){
+ const rings=caseRings(),j=3,i=side>0?16:9,k=(i+1)%caseSegments;
+ const quad=[rings[j-1][i],rings[j-1][k],rings[j][k],rings[j][i]],at=[0,1,2].map(n=>quad.reduce((sum,p)=>sum+p[n],0)/4);
+ const u=add(quad[2],quad[0],-1),v=add(quad[3],quad[1],-1);
+ const normal=unit([u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]]);
+ return {at,axis:normal[1]*side>0?normal:normal.map(n=>-n)};
+}
+
+// The case alone, as the engine view shows it. Body and bell contours are
+// estimated. The tail face meets the CV joint.
+export function drawG500GearboxCase(r){
+ const front=caseFront,rear=gearboxOutput,segments=caseSegments,rings=caseRings();
  for(let j=1;j<rings.length;j++)for(let i=0;i<segments;i++){const k=(i+1)%segments;r.polygon([rings[j-1][i],rings[j-1][k],rings[j][k],rings[j][i]],i<12?steel:dark,false);}
  sleeve(r,front,x,-.006,.008,.184,.156,metal,24);
  piercedRing(r,rear,x,-.025,0,.054,.021,6,.0044,.046,'to');
+}
+
+export function drawG500Gearbox(r){
+ drawG500GearboxCase(r);
+ // The hydraulic housing hangs under the main case and ends in the pan rail.
+ // It is open underneath: the valve body, conductor plate and solenoids stand
+ // inside it under its ceiling, and the pan and gasket close it from below.
+ const ring=(scale,height)=>g500AtfPanOutline.map(([u,v])=>[g500AtfPan[0]+u*scale,g500AtfPan[1]+v*scale,g500AtfPan[2]+height]);
+ const rail=ring(1,railHeight),face=ring(.96,railHeight),shoulder=ring(1,shoulderHeight);
+ for(let i=0;i<rail.length;i++){
+  const k=(i+1)%rail.length;
+  r.polygon([rail[i],rail[k],shoulder[k],shoulder[i]],steel,false);
+  r.polygon([rail[i],rail[k],face[k],face[i]],metal,false);
+ }
+ r.polygon(ring(1,ceilingHeight),dark,false);
+ r.polygon(shoulder,steel,false);
 }
 
 // The outer propellers have two cross joints each. Distances between working flanges

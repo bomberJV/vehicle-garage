@@ -1,21 +1,21 @@
-# Plan · 2026 BMW X3 30 xDrive (G45)
+# Plan · 2025 BMW X3 30 xDrive (G45)
 
 Built with the [new-vehicle procedure](NEW-VEHICLE.md). Status: **planning**. Nothing below is modelled yet.
 
 ## Name
 
-BMW sells no "X3 330i". From the 2025 model year BMW dropped the "i" from combustion model names, so the US four-cylinder X3 is the **X3 30 xDrive**; the only other US version is the six-cylinder M50 xDrive. ([BMW Canada press release, June 2024](https://www.press.bmwgroup.com/canada/article/attachment/T0443201EN/618394), [cars.com 2026 trims](https://www.cars.com/research/bmw-x3-2026/specs/478363/))
+BMW sells no "X3 330i". From the 2025 model year BMW dropped the "i" from combustion model names, so the US four-cylinder X3 is the **X3 30 xDrive**; the only other US version is the six-cylinder M50 xDrive. ([BMW Canada press release, June 2024](https://www.press.bmwgroup.com/canada/article/attachment/T0443201EN/618394); the [US release](https://www.press.bmwgroup.com/usa/article/detail/T0443207EN_US) lists the 2025 X3 30 xDrive at $49,500 and the M50 xDrive at $64,100)
 
 ## Phase 0 · Proposed decision
 
 | Item | Proposed | Basis |
 |---|---|---|
-| Market and year | US, model year 2026 | Requested |
+| Market and year | US, model year 2025 | Brandon's choice, 2026-11-20 |
 | Model | X3 30 xDrive, chassis G45 | The four-cylinder US model |
-| Engine | B48 2.0 L turbo four, 255 hp, with 48 V mild hybrid | [BMW USA technical data](https://www.bmwusa.com/vehicles/x-series/x3/bmw-x3-technical-highlights.html) lists "Gasoline – 48 Volt Mild-Hybrid"; [BMW Canada](https://www.bmw.ca/en/all-models/x-series/x3/bmw-x3-technical-data.html) lists 255 hp and 295 lb-ft |
+| Engine | B48 2.0 L turbo four, 255 hp, with 48 V mild hybrid | [BMW USA technical data](https://www.bmwusa.com/vehicles/x-series/x3/bmw-x3-technical-highlights.html) lists "Gasoline – 48 Volt Mild-Hybrid"; [BMW Canada](https://www.bmw.ca/en/all-models/x-series/x3/bmw-x3-technical-data.html) lists 255 hp and 295 lb-ft. Both pages now describe the current car, so check each figure against the June 2024 US release, which describes the 2025 car |
 | Hybrid layout | 48 V starter-generator in the belt drive; 48 V battery in the luggage compartment, its positive cable running under the car | BMW's [June 2024 technical data](https://press.bmwgroup.com/italy/article/attachment/T0443205IT/618313) places the four-cylinders' starter-generator in the belt drive (the M50's is crankshaft-mounted). NHTSA recall [25V202](https://static.nhtsa.gov/odi/rcl/2025/RCRIT-25V202-3123.pdf) gives the G45 cable route |
 | Gearbox and drive | 8-speed automatic, xDrive | BMW USA |
-| Type code | **Confirm.** 51GP and 52GP are listed with a B48 variant from August 2025 production, i.e. model-year 2026 cars | [Leebmann parts application](https://www.leebmann24.com/ch/en/product/bmw-automatic-transmission-10417438) (dealer mirror) |
+| Type code | **Confirm from a 2025 car.** A parts catalogue lists 51GP and 52GP with a later B48 variant from August 2025 production (model year 2026), so the 2025 car's type code and engine variant may differ. Use the 2025 code for every parts-plate lookup | [Leebmann parts application](https://www.leebmann24.com/ch/en/product/bmw-automatic-transmission-10417438) (dealer mirror) |
 | Wheel package | **Decide.** Standard 19-inch; 20- and 21-inch packages are optional | BMW US press release |
 | Body package | **Decide: standard or M Sport.** The M Sport Package changes the bumpers and sills, so it must be fixed before the body is traced | Visible on US dealer stock; confirm against the BMW USA configurator text, not its images |
 | Other body options | **Decide:** panoramic moonroof (Convenience Package), Iconic Glow illuminated grille (optional on 30 xDrive), trailer hitch | BMW US press release, dealer listings |
@@ -31,7 +31,7 @@ BMW sells no "X3 330i". From the 2025 model year BMW dropped the "i" from combus
 | Width with mirrors | 2,132 mm (83.9 in) | BMW global technical data; US dealer listing |
 | Height | 1,660 mm (65.4 in) | BMW USA |
 | Wheelbase | 2,865 mm (112.8 in) | BMW USA; BMW global |
-| Front / rear overhang | 880 / 1,010 mm | Secondary ([carsales](https://www.carsales.com.au/research/bmw/x3/2026/30e-xdrive)); confirm against BMW |
+| Front / rear overhang | 880 / 1,010 mm | Secondary ([carsales](https://www.carsales.com.au/research/bmw/x3/2026/30e-xdrive), an Australian X3 30e listing); confirm against BMW for the US car |
 | Track, front / rear | **Depends on wheel.** US 30 xDrive: 63.5 / 65.3 in (≈1,613 / 1,659 mm). BMW global figures elsewhere: 1,614 / 1,659 mm and 1,636 / 1,681 mm | [Bimmerfile reprint of US data](https://www.bimmerfile.com/?p=69291); BMW [June 2024](https://press.bmwgroup.com/italy/article/attachment/T0443205IT/618314) and [September 2026](https://www.press.bmwgroup.com/global/article/attachment/T0461075EN/655780) data |
 | Ground clearance | 8.5 in (216 mm) | Bimmerfile US table |
 | Turning circle | 40.0 ft | Bimmerfile US table |
@@ -48,7 +48,7 @@ BMW sells no "X3 330i". From the 2025 model year BMW dropped the "i" from combus
 | Class | Reference | Use |
 |---|---|---|
 | Orthographic outline | [Euro NCAP rescue sheet, BMW X3 G45 from 07/2024, WBA_G45ICE_LL_01](https://euroncaprescuesheets.blob.core.windows.net/rescuesheets/BMW/BMW_X3__SUV_2024_5d_GD_EN.pdf) | Side and plan silhouettes; body reinforcement zones; 12 V battery; fuel tank; active pedestrian protection; gas struts; roof cut points. It shows maximum equipment for all markets, so check option-dependent outlines against photographs |
-| Test-programme photographs | NHTSA NCAP 2025 X3 xDrive30i: [frontal report M20254100](https://nrd-static.nhtsa.dot.gov/reports/vehdb/v10000/v15300/v15330R001.pdf), [side MDB report](https://nrd-static.nhtsa.dot.gov/reports/vehdb/v10000/v15300/v15327R001.pdf), pole test 15325 | Pre-test side, front and rear photographs of a US production car; test weights and measurements. The 2025 and 2026 bodies are the same generation; confirm no model-year change to lamps or bumpers |
+| Test-programme photographs | NHTSA NCAP 2025 X3 xDrive30i: [frontal report M20254100](https://nrd-static.nhtsa.dot.gov/reports/vehdb/v10000/v15300/v15330R001.pdf), [side MDB report](https://nrd-static.nhtsa.dot.gov/reports/vehdb/v10000/v15300/v15327R001.pdf), pole test 15325 | Pre-test side, front and rear photographs of a US production car of the exact model year; test weights and measurements |
 | Parts plates | BMW parts catalogue (dealer mirrors) for the G45 30 xDrive | Panel splits, hinge and latch positions, component names and numbers |
 | Service bulletins and recalls | Recall 25V202 (48 V cable), bulletins listed for the G45 on NHTSA | Real routes for the 48 V positive cable; component part numbers |
 | Owner photographs | Wikimedia Commons G45 30 xDrive front, side, rear; original-owner listings | Lamp graphics, grille bars, badge positions |

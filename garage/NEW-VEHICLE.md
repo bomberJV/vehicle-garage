@@ -1,6 +1,6 @@
 # Adding a vehicle to the garage
 
-This is the standing procedure for every new vehicle. It turns "build me this car" into a sequence of decisions, references, geometry and checks that each have a definite finish. The per-vehicle plans ([2026 X3 30 xDrive](bmw-x3-g45-plan.md), [2018 X1 xDrive28i](bmw-x1-f48-plan.md)) apply it to a specific car.
+This is the standing procedure for every new vehicle. It turns "build me this car" into a sequence of decisions, references, geometry and checks that each have a definite finish. The per-vehicle plans ([2025 X3 30 xDrive](bmw-x3-g45-plan.md), [2018 X1 xDrive28i](bmw-x1-f48-plan.md)) apply it to a specific car.
 
 The rule behind every step: **a shape or a number enters the model only with a named source, and every source-backed number is checked against the mesh by a test.** Where a source does not exist, the geometry is labelled an estimate and says what it was estimated from.
 
@@ -100,7 +100,18 @@ Create `<chassis>-body-profile.js` in the format of `e90-body-profile.js`:
 - **window outlines:** each side-glass opening (front door, rear door, quarter light) as a polygon, including the Hofmeister kink on BMWs.
 - **door:** leading and trailing shut lines at the belt.
 
-Trace the rescue sheet or press drawing side view. **Register at the two wheel centres**, not the bumpers: wheel centres are unambiguous on every drawing and photograph, and the wheelbase is the most precisely published dimension. Scale = published wheelbase ÷ wheel-centre distance in the image.
+Trace the rescue sheet or press drawing side view. **Register at the two wheel centres**, not the bumpers: wheel centres are unambiguous on every drawing and photograph, and the wheelbase is the most precisely published dimension. Scale = published wheelbase ÷ wheel-centre distance in the image. Where the rescue sheet is a vector PDF, read the wheel centres from its vectors: the 996 was registered at K = 2,350 mm ÷ (414.85 − 180.95) pt on page 36.
+
+**Start from the closest existing body.** SUVs and crossovers start from the HR-V's `exterior-coachwork.js` hooks (`sideSection`, `capFollowsSide`, `hoodLaneTint`); BMW saloons and coupés start from the E46/E90 loft (`e46-coupe-shell.js`, `e90-sedan-shell.js`).
+
+### 3.1a Photographs: two perspective errors
+
+The garage renders orthographically; photographs are perspective. Two errors have already cost a rebuild:
+
+- **Side photographs shrink the centre plane.** Calibrated on the wheel plane, the roof, nose tip and tail tip sit farther from the camera and read short: the C63's length read 4.48 m against 4,707 mm. Take overhangs and roof height from the published figures, and use side photographs for the shape between them.
+- **Head-on photographs scaled by body width overstate the nose** by about 8 %, because the nose is nearer the camera than the widest point. Scale nose features from something on the nose: a US number plate is 12 in (0.305 m) wide.
+
+Prefer the straightest views (NHTSA pre-test photographs are close to square-on). View photographs in the browser; do not store them in the repository.
 
 ### 3.2 Plan view and sections
 
@@ -109,7 +120,7 @@ Trace the rescue sheet or press drawing side view. **Register at the two wheel c
 
 ### 3.3 Overlay
 
-Add the traced curve to `exterior-profiles.js`, registered at the wheel centres, so the workbench can lay the drawing's gold line over the mesh. **Pass condition:** no point of the traced curve more than 10 mm (true scale) from the mesh silhouette, except where a drawing's line weight or a known option difference is recorded in the legend.
+Add the traced curve to `exterior-profiles.js`, registered at the wheel centres, so the workbench can lay the drawing's gold line over the mesh. **Pass condition**, set by what the 996 reached: plan outline within 10 mm everywhere except mirrors and handles; side upper outline median ≤ 10 mm and maximum ≤ 25 mm. Record each exception (line weight, an option the drawing shows) in the legend.
 
 ### 3.4 Panels and shut lines
 
@@ -126,6 +137,10 @@ Wheel-arch shape and its lip; the shoulder (character) line and where it fades; 
 ### Body gate
 
 The body is done when: the dimension test passes; the overlay passes; the section checks pass; every panel boundary has a parts-plate source; and `vehicle-drawing-checks.js` has an entry naming the reference, the locator (page and view) and one observable result.
+
+**Overlap survey.** From the first installed systems onward, keep an overlap survey for the vehicle (`tests/<vehicle>-overlap-survey.mjs` with a baseline, as for the G500 and 993). Every crossing pair is either intended (assembly, mount, terminal) or an error, and the survey must stay at **0 errors**.
+
+**Face budgets.** Stay inside the existing budgets: about 22,000 faces in the overview and 10,000 in the engine bay.
 
 ---
 
@@ -195,7 +210,9 @@ Each system gets its components placed, named, sourced and selectable. The G500 
 2. Run `node --test tests/*.test.mjs` from the repository root.
 3. Open the workbench and check: orbit, expansion, isolation, See through body, Find a component, every closure, every study, every theme.
 4. Record the review in the vehicle's hub issue with links to the PR and the verification.
-5. Release to `brandon-studio`.
+5. Release to `brandon-studio`, following the release procedure in the site project's garage status notes (three-way merge, voice bank merged key by key, downloads rebuilt).
+
+Reserve the hub issue before starting by pushing `priorities/claims/<issue>.json` to the `priority-hub` branch; delete it when done.
 
 ---
 

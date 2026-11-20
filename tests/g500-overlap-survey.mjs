@@ -27,7 +27,7 @@ export const errorClasses=['through','overlap'];
 const system=id=>id.split('.')[0];
 
 // Wires, hoses and pipes.
-const lines=new Set(['electrical.can-b','electrical.can-c','electrical.chassis-control-harness','electrical.comfort-harness','electrical.engine-harness',
+export const lines=new Set(['electrical.can-b','electrical.can-c','electrical.chassis-control-harness','electrical.comfort-harness','electrical.engine-harness',
   'electrical.lighting-harness','electrical.lock-circuit','electrical.main-feed','electrical.primary-power','electrical.rear-heater-circuit',
   'electrical.roof-circuit','electrical.engine-ground','cooling.heater-feed','cooling.heater-return','cooling.lower-hose','cooling.upper-hose',
   'cooling.bypass','hvac.refrigerant-lines','evap.purge-line','evap.tank-vent','evap.manifold-line','fuel.lines','transmission-fluid.left-line',

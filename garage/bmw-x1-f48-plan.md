@@ -2,22 +2,22 @@
 
 Built with the [new-vehicle procedure](NEW-VEHICLE.md). Status: **planning**. Nothing below is modelled yet.
 
-## Phase 0 · Proposed decision
+## Phase 0 · Decision
 
-| Item | Proposed | Basis |
+| Item | Decision | Basis |
 |---|---|---|
 | Market and year | US, model year 2018 | Requested; Brandon confirmed the US X1, 2026-11-20 |
-| Model | X1 xDrive28i, chassis F48, pre-facelift | The 2018 US X1 came as the front-drive sDrive28i or the all-wheel-drive xDrive28i ([BMW US technical data](https://press.bmwgroup.com/usa/article/attachment/T0220582EN_US/391953)). The facelifted F48 arrived for model year 2020, so 2018 is the original body |
+| Model | X1 xDrive28i, chassis F48, pre-facelift | Brandon chose xDrive28i, 2026-11-20. The 2018 US X1 came as the front-drive sDrive28i or the all-wheel-drive xDrive28i ([BMW US technical data](https://press.bmwgroup.com/usa/article/attachment/T0220582EN_US/391953)). The facelifted F48 arrived for model year 2020, so 2018 is the original body |
 | Engine | B46A20O0, 1,998 cc four-cylinder turbo, transverse, 228 hp at 5,000–6,000 rpm, 258 lb-ft at 1,450–4,500 rpm, bore × stroke 82 × 94.6 mm, compression 10.2:1 | BMW US technical data |
 | Gearbox | Aisin 8-speed automatic. Ratios 5.250 / 3.029 / 1.950 / 1.457 / 1.221 / 1.000 / 0.809 / 0.673, reverse 4.015, final drive 3.2 | BMW US technical data |
 | Drive | xDrive: front-wheel-drive based, with a transfer case at the gearbox feeding a propeller shaft to a rear axle drive | BMW's [F48 Powertrain training manual (ST1508)](https://archive.org/download/BMWTechnicalTrainingDocuments/ST1508%20F48%20Complete%20Vehicle/03_F48%20Powertrain.pdf); F48 transfer-case seal [27108681581](https://www.bimmerworld.com/Driveline-Shifter/Differentials-Accessories/Rear-Output-Seal-Kit-for-Transfer-Case-F44-F48-F39-U11-U10.html); F48 xDrive28i rear axle drive [33108692602, superseded by 33109470035](https://www.bmwpartsdeal.com/oem-2019-bmw-x1-differential.html) |
 | Wheels | 7.5J × 18 alloys, 225/50 R18 95V all-season | BMW US technical data |
 | Steering | Electric, overall ratio 16:1 | BMW US technical data |
-| Body package | **Decide: standard or M Sport.** Confirm which lines the 2018 US car offered before tracing bumpers | |
-| Lighting | **Decide.** IIHS rates the 2018 X1 with LED projector low and high beams on cars with the Premium and Driver Assistance Plus packages, so the headlamp type depends on options | [IIHS 2018 X1](https://www.iihs.org/ratings/vehicle/bmw/x1-4-door-suv/2018) |
-| Other options | **Decide:** panoramic roof, roof rails, trailer hitch | |
+| Body package | **Standard body.** (The M Sport Package, ZMP, was a 2018 option; not chosen) | Brandon, 2026-11-20 |
+| Lighting | **LED Headlights with Cornering Lights (option 5A4) fitted**, from the Premium Package (ZPP) | Brandon, 2026-11-20; BMW NA [pricing guide, model year 2018](https://www.press.bmwgroup.com/usa/article/attachment/T0220582EN_US/391954) (effective July 2, 2017) |
+| Other equipment | **Panoramic moonroof (option 402) fitted. No trailer hitch.** Roof rails: as on the US car; confirm from the same guide | Brandon, 2026-11-20; BMW NA pricing guide, model year 2018 |
 
-**Recommendation:** xDrive28i rather than sDrive28i. It is the car NHTSA crash-tested head-on (so the photographs match it), and its transfer case, propeller shaft and rear axle drive give the most systems to explore. Keep the stock 18-inch wheel as default.
+**As decided:** a standard-body 2018 X1 xDrive28i on the stock 18-inch wheel, with LED headlights and the panoramic moonroof, no hitch. Brandon chose xDrive, 2026-11-20; it is also the car NHTSA crash-tested head-on.
 
 ## Phase 2 · Hard numbers
 
@@ -107,8 +107,6 @@ This halves the engine work and gives the garage a direct comparison of the two 
 
 Oil filter, air filter and 225/50 R18 tyres. BMW genuine roof bars, floor liners, cargo liner and period-correct optional wheels. Each line needs a part number, the exact model and year it fits, and a source.
 
-## Open decisions for Brandon
+## Open decisions
 
-1. xDrive28i (recommended) or sDrive28i?
-2. Standard body or M Sport?
-3. LED headlamps, panoramic roof, roof rails, hitch: fitted or not?
+None. Confirm roof-rail fitment from the 2018 pricing guide during phase 1.

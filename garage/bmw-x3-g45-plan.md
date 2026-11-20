@@ -6,21 +6,21 @@ Built with the [new-vehicle procedure](NEW-VEHICLE.md). Status: **planning**. No
 
 BMW sells no "X3 330i". From the 2025 model year BMW dropped the "i" from combustion model names, so the US four-cylinder X3 is the **X3 30 xDrive**; the only other US version is the six-cylinder M50 xDrive. ([BMW Canada press release, June 2024](https://www.press.bmwgroup.com/canada/article/attachment/T0443201EN/618394); the [US release](https://www.press.bmwgroup.com/usa/article/detail/T0443207EN_US) lists the 2025 X3 30 xDrive at $49,500 and the M50 xDrive at $64,100)
 
-## Phase 0 · Proposed decision
+## Phase 0 · Decision
 
-| Item | Proposed | Basis |
+| Item | Decision | Basis |
 |---|---|---|
 | Market and year | US, model year 2025 | Brandon's choice, 2026-11-20 |
 | Model | X3 30 xDrive, chassis G45 | The four-cylinder US model |
 | Engine | B48 2.0 L turbo four, 255 hp, with 48 V mild hybrid | [BMW USA technical data](https://www.bmwusa.com/vehicles/x-series/x3/bmw-x3-technical-highlights.html) lists "Gasoline – 48 Volt Mild-Hybrid"; [BMW Canada](https://www.bmw.ca/en/all-models/x-series/x3/bmw-x3-technical-data.html) lists 255 hp and 295 lb-ft. Both pages now describe the current car, so check each figure against the June 2024 US release, which describes the 2025 car |
 | Hybrid layout | 48 V starter-generator in the belt drive; 48 V battery in the luggage compartment, its positive cable running under the car | BMW's [June 2024 technical data](https://press.bmwgroup.com/italy/article/attachment/T0443205IT/618313) places the four-cylinders' starter-generator in the belt drive (the M50's is crankshaft-mounted). NHTSA recall [25V202](https://static.nhtsa.gov/odi/rcl/2025/RCRIT-25V202-3123.pdf) gives the G45 cable route |
 | Gearbox and drive | 8-speed automatic, xDrive | BMW USA |
-| Type code | **Confirm from a 2025 car.** A parts catalogue lists 51GP and 52GP with a later B48 variant from August 2025 production (model year 2026), so the 2025 car's type code and engine variant may differ. Use the 2025 code for every parts-plate lookup | [Leebmann parts application](https://www.leebmann24.com/ch/en/product/bmw-automatic-transmission-10417438) (dealer mirror) |
-| Wheel package | **Decide.** Standard 19-inch; 20- and 21-inch packages are optional | BMW US press release |
-| Body package | **Decide: standard or M Sport.** The M Sport Package changes the bumpers and sills, so it must be fixed before the body is traced | Visible on US dealer stock; confirm against the BMW USA configurator text, not its images |
-| Other body options | **Decide:** panoramic moonroof (Convenience Package), Iconic Glow illuminated grille (optional on 30 xDrive), trailer hitch | BMW US press release, dealer listings |
+| Type code | **53GP**, engine **B48P**; US model code 25XD; start of production 08/24. The 2026 guide keeps 53GP and B48P. Use 53GP for every parts-plate lookup (the 51GP and 52GP codes a dealer mirror lists are not the US car's) | BMW of North America [ordering guide, model year 2025](https://g45.bimmerpost.com/forums/attachment.php?attachmentid=3488706&d=1719421516) (effective June 14, 2024) and [model year 2026](https://g45.bimmerpost.com/forums/attachment.php?attachmentid=3745472&d=1748630117), posted on Bimmerpost |
+| Wheels | **Stock: 3HQ, 19-inch Aero Midnight Grey Bicolor, style 941, 19 × 8.5, 245/50 R19 all-season** (the US standard wheel). Selectable options, stock as the default: 1F1 19-inch Refined Silver style 903 (no-cost, same size) and the 20- and 21-inch packages | Brandon, 2026-11-20 ("whatever's US baseline standard"); BMW NA [pricing guide, model year 2025](https://g45.bimmerpost.com/forums/attachment.php?attachmentid=3488705&d=1719421516) |
+| Body package | **Standard body by default. The M Sport Package (ZMP, option 337) is a checkbox** that swaps in its bumpers, sills and M Sport exterior elements, and the 19-inch M style 1035M wheel | Brandon, 2026-11-20; BMW NA pricing guide (ZMP contents: 337, 704 M Sport suspension, 9T1 M Sport exterior elements); [cars.com](https://www.cars.com/research/bmw-x3-2025/specs/461938/) for style 1035M |
+| Other equipment | **Panoramic (Sky Lounge) moonroof fitted** (Convenience or Premium Package). **No trailer hitch.** **Iconic Glow grille: see the open decision below** — on the 30 xDrive it is option 3DP inside the M Sport Professional Package (ZMQ), and "ZMQ requires ordering ZMP", so it cannot be fitted to the standard body | Brandon, 2026-11-20; BMW NA pricing and ordering guides, model year 2025 |
 
-**Recommendation:** M Sport Package on the standard 19-inch wheel. Most US cars carry the M Sport body, and the standard wheel keeps the track figures unambiguous. Add the 20- and 21-inch wheels as selectable options, stock as the default.
+**As decided:** a standard-body 2025 X3 30 xDrive on the 19-inch style 941 wheel with the panoramic moonroof, no hitch, and an M Sport checkbox.
 
 ## Phase 2 · Hard numbers
 
@@ -39,7 +39,9 @@ BMW sells no "X3 330i". From the 2025 model year BMW dropped the "i" from combus
 
 **Closure check:** 880 + 2,865 + 1,010 = 4,755 mm. The overhangs close with the published length.
 
-**Track:** the three published track pairs differ by up to 23 mm per axle. Take the pair BMW publishes for the decided wheel and tyre; do not average them. Get the 19-inch tyre size from BMW's US technical data or a door placard, not a reseller page.
+**Track:** the three published track pairs differ by up to 23 mm per axle. Use the US 30 xDrive pair, 63.5 / 65.3 in, which belongs to the standard 19-inch car (confirm against the NCAP test car's measurements); do not average.
+
+**Wheel radius:** 245/50 R19: (19 × 25.4 / 2 + 245 × 0.50) / 1000 = 0.3638 m.
 
 **Frame:** axles at x = ∓1.4325 m; stock tyre contact z = 0.040.
 
@@ -90,8 +92,6 @@ BMW sells no "X3 330i". From the 2025 model year BMW dropped the "i" from combus
 
 Oil filter, air filter and tyres for the decided package. BMW genuine roof rack and bars, floor liners, cargo liner, trailer hitch and the 20- and 21-inch wheel packages. Each line needs a part number, the exact model and year it fits, and a source.
 
-## Open decisions for Brandon
+## Open decision for Brandon
 
-1. Standard body or M Sport Package?
-2. Which wheel as stock: the standard 19-inch?
-3. Panoramic moonroof, Iconic Glow grille and trailer hitch: fitted or not?
+1. **Iconic Glow on a standard body is not a factory combination.** Proposed: the standard body has the plain grille; ticking M Sport shows a second checkbox, **M Sport Pro**, which adds the Iconic Glow grille, M Shadowline lights, Extended Shadowline trim and the red M Sport brake calipers, and is ticked by default once M Sport is on. Alternative: allow the glow on the standard body and label it as not a factory option.

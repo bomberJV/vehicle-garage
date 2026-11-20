@@ -1,6 +1,6 @@
 # Plan · 2025 BMW X3 30 xDrive (G45)
 
-Built with the [new-vehicle procedure](NEW-VEHICLE.md). Status: **planning**. Nothing below is modelled yet.
+Built with the [new-vehicle procedure](NEW-VEHICLE.md). Status: **building**. The body outline is traced (below); the vehicle is not in the fleet yet.
 
 ## Name
 
@@ -18,9 +18,9 @@ BMW sells no "X3 330i". From the 2025 model year BMW dropped the "i" from combus
 | Type code | **53GP**, engine **B48P**; US model code 25XD; start of production 08/24. The 2026 guide keeps 53GP and B48P. Use 53GP for every parts-plate lookup (the 51GP and 52GP codes a dealer mirror lists are not the US car's) | BMW of North America [ordering guide, model year 2025](https://g45.bimmerpost.com/forums/attachment.php?attachmentid=3488706&d=1719421516) (effective June 14, 2024) and [model year 2026](https://g45.bimmerpost.com/forums/attachment.php?attachmentid=3745472&d=1748630117), posted on Bimmerpost |
 | Wheels | **Stock: 3HQ, 19-inch Aero Midnight Grey Bicolor, style 941, 19 × 8.5, 245/50 R19 all-season** (the US standard wheel). Selectable options, stock as the default: 1F1 19-inch Refined Silver style 903 (no-cost, same size) and the 20- and 21-inch packages | Brandon, 2026-11-20 ("whatever's US baseline standard"); BMW NA [pricing guide, model year 2025](https://g45.bimmerpost.com/forums/attachment.php?attachmentid=3488705&d=1719421516) |
 | Body package | **Standard body by default. The M Sport Package (ZMP, option 337) is a checkbox** that swaps in its bumpers, sills and M Sport exterior elements, and the 19-inch M style 1035M wheel | Brandon, 2026-11-20; BMW NA pricing guide (ZMP contents: 337, 704 M Sport suspension, 9T1 M Sport exterior elements); [cars.com](https://www.cars.com/research/bmw-x3-2025/specs/461938/) for style 1035M |
-| Other equipment | **Panoramic (Sky Lounge) moonroof fitted** (Convenience or Premium Package). **No trailer hitch.** **Iconic Glow grille: see the open decision below** — on the 30 xDrive it is option 3DP inside the M Sport Professional Package (ZMQ), and "ZMQ requires ordering ZMP", so it cannot be fitted to the standard body | Brandon, 2026-11-20; BMW NA pricing and ordering guides, model year 2025 |
+| Other equipment | **Panoramic (Sky Lounge) moonroof fitted** (Convenience or Premium Package). **No trailer hitch. No Iconic Glow grille** (on the 30 xDrive it comes only in the M Sport Professional Package, which requires M Sport) | Brandon, 2026-11-20; BMW NA pricing and ordering guides, model year 2025 |
 
-**As decided:** a standard-body 2025 X3 30 xDrive on the 19-inch style 941 wheel with the panoramic moonroof, no hitch, and an M Sport checkbox.
+**As decided:** a standard-body 2025 X3 30 xDrive on the 19-inch style 941 wheel with the panoramic moonroof and the plain grille, no hitch, and an M Sport checkbox.
 
 ## Phase 2 · Hard numbers
 
@@ -59,12 +59,12 @@ BMW sells no "X3 330i". From the 2025 model year BMW dropped the "i" from combus
 ## Phase 3 · Body: what to get right
 
 - **Proportions:** 880 mm front overhang, 1,010 mm rear overhang, 1,660 mm height. Register everything at the two wheel centres.
-- **Grille:** the large kidney with diagonal bars, and, if chosen, the Iconic Glow contour light around each kidney.
+- **Grille:** the large kidney with vertical and diagonal bars; no Iconic Glow.
 - **Lamps:** headlamp and tail-lamp outlines and graphics from photographs of US cars.
 - **Glasshouse:** front door, rear door and fixed quarter glass outlines; the Hofmeister kink; the D-pillar.
 - **Bumpers:** traced for the decided package only.
 - **Sections:** at least ten, checked against the 1,920 mm body width and the rescue-sheet plan view.
-- **Panels:** bumper covers, wings, bonnet, four doors, tailgate, sills, roof, and the moonroof if chosen.
+- **Panels:** bumper covers, wings, bonnet, four doors, tailgate, sills, roof and the panoramic moonroof.
 
 ## Systems to add
 
@@ -92,6 +92,20 @@ BMW sells no "X3 330i". From the 2025 model year BMW dropped the "i" from combus
 
 Oil filter, air filter and tyres for the decided package. BMW genuine roof rack and bars, floor liners, cargo liner and the 20- and 21-inch wheel packages. No trailer hitch (Brandon, 2026-11-20). Each line needs a part number, the exact model and year it fits, and a source.
 
-## Open decision for Brandon
+## Progress
 
-1. **Iconic Glow on a standard body is not a factory combination.** Proposed: the standard body has the plain grille; ticking M Sport shows a second checkbox, **M Sport Pro**, which adds the Iconic Glow grille, M Shadowline lights, Extended Shadowline trim and the red M Sport brake calipers, and is ticked by default once M Sport is on. Alternative: allow the glow on the standard body and label it as not a factory option.
+**Body outline traced** ([PR #121](https://github.com/bomberJV/vehicle-garage/pull/121), `garage/g45-rescue-outline.js`, 2026-11-20). Page 1 of the rescue sheet is a raster image (2126 × 1890 px). The tyre circles fit at level centres 1,235 px apart, so the 2,865 mm wheelbase gives 2.320 mm per pixel. Traced against published:
+
+| Span | Traced | BMW |
+|---|---|---|
+| Length | 4,744 mm | 4,755 |
+| Front / rear overhang | 870 / 1,009 | 880 / 1,010 |
+| Height | 1,667 (roof rails drawn) | 1,660 |
+| Width / with mirrors | 1,932 / 2,132 | 1,920 / 2,132 |
+| Tyre radius | 365 | 363.8 |
+
+Next: the NHTSA pre-test photographs for the glasshouse, lamps and bumpers; then the body profile and shell.
+
+## Open decisions
+
+None.

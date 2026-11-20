@@ -100,7 +100,7 @@ Create `<chassis>-body-profile.js` in the format of `e90-body-profile.js`:
 - **window outlines:** each side-glass opening (front door, rear door, quarter light) as a polygon, including the Hofmeister kink on BMWs.
 - **door:** leading and trailing shut lines at the belt.
 
-Trace the rescue sheet or press drawing side view. **Register at the two wheel centres**, not the bumpers: wheel centres are unambiguous on every drawing and photograph, and the wheelbase is the most precisely published dimension. Scale = published wheelbase ÷ wheel-centre distance in the image. Where the rescue sheet is a vector PDF, read the wheel centres from its vectors: the 996 was registered at K = 2,350 mm ÷ (414.85 − 180.95) pt on page 36.
+Trace the rescue sheet or press drawing side view. **Register at the two wheel centres**, not the bumpers: wheel centres are unambiguous on every drawing and photograph, and the wheelbase is the most precisely published dimension. Scale = published wheelbase ÷ wheel-centre distance in the image. Where the rescue sheet is a vector PDF, read the wheel centres from its vectors: the 996 was registered at K = 2,350 mm ÷ (414.85 − 180.95) pt on page 36. Where it is a raster image, fit circles to the tyres (a Hough fit on the dark pixels) and check the two centres sit on one level: the X3's fitted 1,235 px apart on y 1652. The shell cannot download these PDFs; open them in Chrome and read them there with pdf.js, which Brandon allowed on 2026-11-20.
 
 **Start from the closest existing body.** SUVs and crossovers start from the HR-V's `exterior-coachwork.js` hooks (`sideSection`, `capFollowsSide`, `hoodLaneTint`); BMW saloons and coupés start from the E46/E90 loft (`e46-coupe-shell.js`, `e90-sedan-shell.js`).
 

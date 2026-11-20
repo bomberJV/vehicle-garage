@@ -6,7 +6,7 @@ Built with the [new-vehicle procedure](NEW-VEHICLE.md). Status: **planning**. No
 
 | Item | Proposed | Basis |
 |---|---|---|
-| Market and year | US, model year 2018 | Requested |
+| Market and year | US, model year 2018 | Requested; Brandon confirmed the US X1, 2026-11-20 |
 | Model | X1 xDrive28i, chassis F48, pre-facelift | The 2018 US X1 came as the front-drive sDrive28i or the all-wheel-drive xDrive28i ([BMW US technical data](https://press.bmwgroup.com/usa/article/attachment/T0220582EN_US/391953)). The facelifted F48 arrived for model year 2020, so 2018 is the original body |
 | Engine | B46A20O0, 1,998 cc four-cylinder turbo, transverse, 228 hp at 5,000–6,000 rpm, 258 lb-ft at 1,450–4,500 rpm, bore × stroke 82 × 94.6 mm, compression 10.2:1 | BMW US technical data |
 | Gearbox | Aisin 8-speed automatic. Ratios 5.250 / 3.029 / 1.950 / 1.457 / 1.221 / 1.000 / 0.809 / 0.673, reverse 4.015, final drive 3.2 | BMW US technical data |
@@ -94,7 +94,7 @@ From the [BMW US technical data](https://press.bmwgroup.com/usa/article/attachme
 
 The X1's B46 and the X3's B48 share the 82 × 94.6 mm bore and stroke and the same four-cylinder architecture. Build one four-cylinder engine module with two installations:
 
-| | 2018 X1 xDrive28i | 2026 X3 30 xDrive |
+| | 2018 X1 xDrive28i | 2025 X3 30 xDrive |
 |---|---|---|
 | Orientation | Transverse | Longitudinal |
 | Gearbox | Aisin 8-speed | 8-speed automatic |

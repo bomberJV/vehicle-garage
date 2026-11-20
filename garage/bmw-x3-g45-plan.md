@@ -90,7 +90,7 @@ BMW sells no "X3 330i". From the 2025 model year BMW dropped the "i" from combus
 
 ## Catalog and accessories
 
-Oil filter, air filter and tyres for the decided package. BMW genuine roof rack and bars, floor liners, cargo liner, trailer hitch and the 20- and 21-inch wheel packages. Each line needs a part number, the exact model and year it fits, and a source.
+Oil filter, air filter and tyres for the decided package. BMW genuine roof rack and bars, floor liners, cargo liner and the 20- and 21-inch wheel packages. No trailer hitch (Brandon, 2026-11-20). Each line needs a part number, the exact model and year it fits, and a source.
 
 ## Open decision for Brandon
 

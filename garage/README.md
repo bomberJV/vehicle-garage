@@ -40,7 +40,7 @@ The 1998 and 2023 Porsche Cabriolets have different spoiler assemblies. The 993 
 
 - Orbit, elevation, zoom, and assembly inspection across the collection. The G500, F-350 XLT, C63 AMG, HR-V, 325Ci, two 911 Cabriolets and S 1000 RR also have road-vehicle build sheets.
 - Seven paint presets, a full RGB picker, hex entry and named colors saved in this browser. The Customize tab previews sourced wheel faces and compatible accessories on the cars, pickup and S 1000 RR. Choosing a replacement wheel adds a set to the build sheet for a quote. References identifies the evidence behind each vehicle, from museum photographs to factory exploded plates and public 3D assets.
-- Pointer/touch dragging, keyboard views, clickable part hotspots, explicit viewpoint buttons, and optional rotation.
+- Pointer/touch dragging, keyboard views, clickable part hotspots, explicit viewpoint buttons, and optional rotation. On phones and other touch screens a zoom slider sits at the view's right edge.
 - Curated parts and services link to the relevant supplier. Each entry identifies whether the link is a product page, vehicle search, catalog or request for a quote.
 - Vehicle-specific product filtering; mutually exclusive tire sets; prices multiplied by explicit quantities.
 - Dated source-price snapshots and user-entered **full-line totals**, with unpriced lines explicitly excluded and labeled incomplete. Separate labor/other and paint/wrap allowances.

@@ -264,3 +264,15 @@ main{padding-top:30px}.opening{align-items:flex-start;margin-bottom:20px}.openin
 .component-geometry{border-left:2px solid var(--line,#62715c);padding:3px 0 3px 10px;margin:10px 0}.component-geometry strong{font-size:.84rem}.component-geometry p{margin:5px 0;font-size:.84rem}.component-geometry a{display:inline-block;font-size:.8rem;margin:3px 12px 2px 0}
 .inline-geometry{display:inline-block;padding:6px 0;font-size:12px;margin-left:10px}
 html.garage-expanded{overflow:hidden}.workbench.expanded{position:fixed;inset:0;z-index:1000;margin:0;width:auto;max-width:none;height:100dvh;padding:12px;background:var(--bg);overflow:hidden;grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:minmax(0,1fr);align-items:stretch;gap:14px}.workbench.expanded .visual-column{position:static;top:auto;display:flex;flex-direction:column;gap:8px;min-height:0;overflow:auto;padding-top:0}.workbench.expanded .studio{flex:1 1 auto;display:flex;flex-direction:column;min-height:0}.workbench.expanded #vehicle-canvas{flex:1 1 auto;height:auto!important;min-height:200px}.workbench.expanded .inspection-legend,.workbench.expanded .visual-references,.workbench.expanded .interaction-hint{display:none}.workbench.expanded .inspector{min-height:0;overflow:auto}@media(max-width:850px){.workbench.expanded{grid-template-columns:1fr;grid-template-rows:minmax(0,2fr) minmax(0,1fr);padding:6px;gap:6px}}
+/* Zoom slider: touch screens have no wheel or plus and minus keys, so the view gets a slider at its right edge. */
+.canvas-frame{position:relative}
+.zoom-slider{display:none}
+@media(pointer:coarse),(max-width:850px){
+ .zoom-slider{display:flex;flex-direction:column;align-items:center;gap:3px;position:absolute;right:6px;top:50%;transform:translateY(-50%);z-index:2;padding:6px 3px;border-radius:999px;background:#101712b8;border:1px solid #4a575066;font:12px/1 var(--mono,monospace);color:#dfe8d4;user-select:none;-webkit-user-select:none}
+ .zoom-slider input{width:120px;height:28px;margin:46px -46px;transform:rotate(-90deg);accent-color:var(--garage-accent);cursor:pointer;touch-action:none}
+ .zoom-slider output{font-size:10px;color:#c2cdbf;font-variant-numeric:tabular-nums;min-width:4ch;text-align:center}
+}
+@media(max-width:540px){.zoom-slider input{width:84px;margin:28px -28px}.zoom-slider{right:4px;padding:4px 2px;gap:1px}}
+.workbench.expanded .canvas-frame{flex:1 1 auto;display:flex;flex-direction:column;min-height:200px}
+.workbench.expanded .canvas-frame #vehicle-canvas{min-height:0}
+@media(max-width:540px){.workbench.expanded .zoom-slider input{width:120px;margin:46px -46px}}

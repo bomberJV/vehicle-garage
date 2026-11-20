@@ -14,7 +14,6 @@
  "electrical.abs-unit": "13 mm from evap.purge-valve",
  "electrical.alternator": "13 mm from powertrain.belt",
  "evap.purge-valve": "13 mm from electrical.abs-unit",
- "electrical.starter": "12.2 mm from suspension.frame",
  "powertrain.tensioner": "12 mm from powertrain.belt",
  "powertrain.oil-pickup + powertrain.oil-pump": "11 mm from powertrain.sump",
  "electrical.esm": "10 mm from electrical.tcm",

@@ -144,6 +144,13 @@ export function drawG500Gearbox(r){
  }
  r.polygon(ring(1,ceilingHeight),dark,false);
  r.polygon(shoulder,steel,false);
+ // The starter boss bulges from the right of the bellhousing flange to the
+ // starter's mounting face. Its outline is estimated.
+ const boss=[[.150,.600],[.215,.585],[.305,.600],[.312,.655],[.255,.680],[.160,.695]];
+ const bell=[caseFront[0]-.006,caseFront[0]+.008];
+ const bossFace=boss.map(([yy,zz])=>[bell[0],yy,zz]),bossRear=boss.map(([yy,zz])=>[bell[1],yy,zz]);
+ r.polygon(bossFace,metal,false);r.polygon([...bossRear].reverse(),steel,false);
+ for(let i=0;i<boss.length;i++){const k=(i+1)%boss.length;r.polygon([bossFace[i],bossFace[k],bossRear[k],bossRear[i]],steel,false);}
 }
 
 // The outer propellers have two cross joints each. Distances between working flanges
